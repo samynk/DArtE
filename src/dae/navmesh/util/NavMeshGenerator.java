@@ -3,15 +3,11 @@ package dae.navmesh.util;
 import com.jme3.math.FastMath;
 import com.jme3.scene.Mesh;
 import com.jme3.scene.VertexBuffer.Type;
-import com.jme3.scene.mesh.IndexBuffer;
 import com.jme3.terrain.Terrain;
-import java.nio.FloatBuffer;
-import org.critterai.nmgen.NavmeshGenerator;
-import org.critterai.nmgen.TriangleMesh;
 
 public class NavMeshGenerator {
 
-    private org.critterai.nmgen.NavmeshGenerator nmgen;
+    //private NavmeshGenerator nmgen;
     private float cellSize = 0.5f;
     private float cellHeight = 0.5f;
     private float minTraversableHeight = 1.0f;
@@ -52,6 +48,7 @@ public class NavMeshGenerator {
     }
 
     public Mesh optimize(Mesh mesh) {
+        /*
         nmgen = new NavmeshGenerator(cellSize, cellHeight, minTraversableHeight,
                 maxTraversableStep, maxTraversableSlope,
                 clipLedges, traversableAreaBorderSize,
@@ -90,6 +87,8 @@ public class NavMeshGenerator {
         mesh2.updateCounts();
 
         return mesh2;
+        * */
+        return null;
     }
 
     public Mesh optimize(Terrain terr) {
@@ -239,6 +238,7 @@ public class NavMeshGenerator {
         this.minUnconnectedRegionSize = minUnconnectedRegionSize;
     }
 
+    /*
     public NavmeshGenerator getNmgen() {
         return nmgen;
     }
@@ -246,6 +246,7 @@ public class NavMeshGenerator {
     public void setNmgen(NavmeshGenerator nmgen) {
         this.nmgen = nmgen;
     }
+    * */
 
     public int getSmoothingThreshold() {
         return smoothingThreshold;

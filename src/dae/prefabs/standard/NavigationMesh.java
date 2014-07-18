@@ -25,8 +25,6 @@ import java.nio.FloatBuffer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jme3tools.optimize.GeometryBatchFactory;
-import org.critterai.nmgen.NavmeshGenerator;
-import org.critterai.nmgen.TriangleMesh;
 
 /**
  *
@@ -35,7 +33,6 @@ import org.critterai.nmgen.TriangleMesh;
 public class NavigationMesh extends Prefab {
 
     private AssetManager manager;
-    private org.critterai.nmgen.NavmeshGenerator nmgen;
     private float cellSize = 0.5f;
     private float cellHeight = 0.5f;
     private float minTraversableHeight = 1.0f;
@@ -209,6 +206,7 @@ public class NavigationMesh extends Prefab {
     }
 
     public Mesh optimize(Mesh mesh) {
+        /*
         nmgen = new NavmeshGenerator(cellSize, cellHeight, minTraversableHeight,
                 maxTraversableStep, maxTraversableSlope,
                 clipLedges, traversableAreaBorderSize,
@@ -247,6 +245,8 @@ public class NavigationMesh extends Prefab {
         mesh2.updateCounts();
 
         return mesh2;
+        * */
+        return null;
     }
 
     public Mesh optimize(Terrain terr) {
@@ -394,14 +394,6 @@ public class NavigationMesh extends Prefab {
 
     public void setMinUnconnectedRegionSize(int minUnconnectedRegionSize) {
         this.minUnconnectedRegionSize = minUnconnectedRegionSize;
-    }
-
-    public NavmeshGenerator getNmgen() {
-        return nmgen;
-    }
-
-    public void setNmgen(NavmeshGenerator nmgen) {
-        this.nmgen = nmgen;
     }
 
     public int getSmoothingThreshold() {
