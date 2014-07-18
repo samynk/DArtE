@@ -551,7 +551,7 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
         // TODO add your handling code here:
         createProjectDialog.setLocationRelativeTo(this);
         createProjectDialog.setVisible(true);
-        
+
         createProjectDialog.clear();
         if (createProjectDialog.getReturnStatus() == CreateProjectDialog.RET_OK) {
             try {
@@ -621,8 +621,13 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
                 if (result == JFileChooser.APPROVE_OPTION) {
                     File selected = sceneChooser.getSelectedFile();
                     currentProject.setProjectLocation(selected);
+                    File klatchDirectory = currentProject.getKlatchDirectory();
+                    klatchDirectory.mkdirs();
+                    currentProject.addAssetFolder(currentProject.getKlatchDirectory());
+
                     try {
                         ProjectSaver.write(currentProject, selected);
+                        GlobalObjects.getInstance().addRecentFile(selected);
                     } catch (IOException ex) {
                         Logger.getLogger(SandboxFrame.class.getName()).log(Level.SEVERE, null, ex);
                     }
