@@ -1,0 +1,416 @@
+FUNCTION BLOCK
+
+VAR_INPUT
+angle_target_rightClavicle@1:REAL;
+angle_target_rightClavicle@2:REAL;
+angle_target_rightShoulder@1:REAL;
+angle_target_rightShoulder@2:REAL;
+angle_target_rightShoulderJointZ:REAL;
+angle_target_rightElbowJointX:REAL;
+angle_alignment_rightUnderArmJointX:REAL;
+angle_alignment_rightWristJointZ:REAL;
+angle_target_rightWristJointY:REAL;
+angle_target_spine1@1:REAL;
+angle_target_spine1@2:REAL;
+angle_target_spine2@1:REAL;
+angle_target_spine2@2:REAL;
+angle_target_spine3@1:REAL;
+angle_target_spine3@2:REAL;
+angle_target_spine4@1:REAL;
+angle_target_spine4@2:REAL;
+angle_target_neck@1:REAL;
+angle_target_neck@2:REAL;
+angle_target_head@1:REAL;
+angle_target_head@2:REAL;
+END_VAR
+
+FUZZIFY angle_target_rightShoulder@1
+TERMS := (farleft,left,at,right,farright):(-60 0.5 1 1.5 60)
+END_FUZZIFY
+
+FUZZIFY angle_target_rightShoulder@2
+TERMS := (farleft,left,at,right,farright):(-60 0.5 1 1.5 60)
+END_FUZZIFY
+
+FUZZIFY angle_target_rightClavicle@1
+TERMS := (farleft,left,at,right,farright):(-60 0.5 1 1.5 60)
+END_FUZZIFY
+
+FUZZIFY angle_target_rightClavicle@2
+TERMS := (farleft,left,at,right,farright):(-60 0.5 1 1.5 60)
+END_FUZZIFY
+
+FUZZIFY angle_target_rightElbowJointX
+TERMS := (farleft,left,at,right,farright):(-60 -0.1 0 0.1 60)
+END_FUZZIFY
+
+FUZZIFY angle_target_rightShoulderJointZ
+TERMS := (farleft,left,at,right,farright):(-60 -0.5 0 0.5 60)
+END_FUZZIFY
+
+FUZZIFY angle_alignment_rightUnderArmJointX
+TERMS := (farleft,left,at,right,farright):(-60 -0.5 0 0.5 60)
+END_FUZZIFY
+
+FUZZIFY angle_target_rightWristJointY
+TERMS := (farleft,left,at,right,farright):(-60 -0.5 0 0.5 60)
+END_FUZZIFY
+
+FUZZIFY angle_alignment_rightWristJointZ
+TERMS := (farleft,left,at,right,farright):(-60 -0.5 0 0.5 60)
+END_FUZZIFY
+
+FUZZIFY angle_target_spine1@1
+TERMS := (farleft,left,at,right,farright):(-60 -0.5 0 0.5 60)
+END_FUZZIFY
+
+FUZZIFY angle_target_spine1@2
+TERMS := (farleft,left,at,right,farright):(-60 -0.5 0 0.5 60)
+END_FUZZIFY
+
+FUZZIFY angle_target_spine2@1
+TERMS := (farleft,left,at,right,farright):(-60 -0.5 0 0.5 60)
+END_FUZZIFY
+
+FUZZIFY angle_target_spine2@2
+TERMS := (farleft,left,at,right,farright):(-60 -0.5 0 0.5 60)
+END_FUZZIFY
+
+FUZZIFY angle_target_spine3@1
+TERMS := (farleft,left,at,right,farright):(-60 -0.5 0 0.5 60)
+END_FUZZIFY
+
+FUZZIFY angle_target_spine3@2
+TERMS := (farleft,left,at,right,farright):(-60 -0.5 0 0.5 60)
+END_FUZZIFY
+
+FUZZIFY angle_target_spine4@1
+TERMS := (farleft,left,at,right,farright):(-60 -0.5 0 0.5 60)
+END_FUZZIFY
+
+FUZZIFY angle_target_spine4@2
+TERMS := (farleft,left,at,right,farright):(-60 -0.5 0 0.5 60)
+END_FUZZIFY
+
+FUZZIFY angle_target_neck@1
+TERMS := (farleft,left,at,right,farright):(-60 -0.5 0 0.5 60)
+END_FUZZIFY
+
+FUZZIFY angle_target_neck@2
+TERMS := (farleft,left,at,right,farright):(-60 -0.5 0 0.5 60)
+END_FUZZIFY
+
+FUZZIFY angle_target_head@1
+TERMS := (farleft,left,at,right,farright):(-60 -0.5 0 0.5 60)
+END_FUZZIFY
+
+FUZZIFY angle_target_head@2
+TERMS := (farleft,left,at,right,farright):(-60 -0.5 0 0.5 60)
+END_FUZZIFY
+
+VAR_OUTPUT
+dangle_rightClavicle@1:REAL;
+dangle_rightClavicle@2:REAL;
+dangle_rightShoulder@1:REAL;
+dangle_rightShoulder@2:REAL;
+dangle_rightShoulderJointZ:REAL;
+dangle_rightElbowJointX:REAL;
+dangle_rightUnderArmJointX:REAL;
+dangle_rightWristJointZ:REAL;
+dangle_rightWristJointY:REAL;
+dangle_spine1@1:REAL;
+dangle_spine1@2:REAL;
+dangle_spine2@1:REAL;
+dangle_spine2@2:REAL;
+dangle_spine3@1:REAL;
+dangle_spine3@2:REAL;
+dangle_spine4@1:REAL;
+dangle_spine4@2:REAL;
+dangle_neck@1:REAL;
+dangle_neck@2:REAL;
+dangle_head@1:REAL;
+dangle_head@2:REAL;
+END_VAR
+
+DEFUZZIFY dangle_rightClavicle@1
+TERM turnrightfast := 0.05
+TERM turnright := 0.025
+TERM stay := 0.0
+TERM turnleft := -0.025
+TERM turnleftfast := -0.05
+END_DEFUZZIFY
+
+DEFUZZIFY dangle_rightClavicle@2
+TERM turnrightfast := 0.05
+TERM turnright := 0.025
+TERM stay := 0.0
+TERM turnleft := -0.025
+TERM turnleftfast := -0.05
+END_DEFUZZIFY
+
+DEFUZZIFY dangle_rightShoulder@1
+TERM turnrightfast := 0.4
+TERM turnright := 0.2
+TERM stay := 0.0
+TERM turnleft := -0.2
+TERM turnleftfast := -0.4
+END_DEFUZZIFY
+
+DEFUZZIFY dangle_rightShoulder@2
+TERM turnrightfast := 0.19
+TERM turnright := 0.09
+TERM stay := 0.0
+TERM turnleft := -0.1
+TERM turnleftfast := -0.2
+END_DEFUZZIFY
+
+DEFUZZIFY dangle_rightShoulderJointZ
+TERM turnrightfast := 0.3
+TERM turnright := 0.1
+TERM stay := 0.0
+TERM turnleft := -0.1
+TERM turnleftfast := -0.3
+END_DEFUZZIFY
+
+DEFUZZIFY dangle_rightElbowJointX
+TERM turnrightfast := 1.0
+TERM turnright := 0.1
+TERM stay := 0.0
+TERM turnleft := -0.1
+TERM turnleftfast := -1.0
+END_DEFUZZIFY
+
+DEFUZZIFY dangle_rightUnderArmJointX
+TERM turnrightfast := 0.3
+TERM turnright := 0.1
+TERM stay := 0.0
+TERM turnleft := -0.1
+TERM turnleftfast := -0.3
+END_DEFUZZIFY
+
+DEFUZZIFY dangle_rightWristJointZ
+TERM turnrightfast := 0.2
+TERM turnright := 0.1
+TERM stay := 0.0
+TERM turnleft := -0.1
+TERM turnleftfast := -0.2
+END_DEFUZZIFY
+
+DEFUZZIFY dangle_rightWristJointY
+TERM turnrightfast := 0.1
+TERM turnright := 0.05
+TERM stay := 0.0
+TERM turnleft := -0.05
+TERM turnleftfast := -0.1
+END_DEFUZZIFY
+
+DEFUZZIFY dangle_spine1@1
+TERM turnrightfast := 0.05
+TERM turnright := 0.025
+TERM stay := 0.0
+TERM turnleft := -0.025
+TERM turnleftfast := -0.05
+END_DEFUZZIFY
+
+DEFUZZIFY dangle_spine1@2
+TERM turnrightfast := 0.05
+TERM turnright := 0.025
+TERM stay := 0.0
+TERM turnleft := -0.025
+TERM turnleftfast := -0.05
+END_DEFUZZIFY
+
+DEFUZZIFY dangle_spine2@1
+TERM turnrightfast := 0.05
+TERM turnright := 0.025
+TERM stay := 0.0
+TERM turnleft := -0.025
+TERM turnleftfast := -0.05
+END_DEFUZZIFY
+
+DEFUZZIFY dangle_spine2@2
+TERM turnrightfast := 0.05
+TERM turnright := 0.025
+TERM stay := 0.0
+TERM turnleft := -0.025
+TERM turnleftfast := -0.05
+END_DEFUZZIFY
+
+DEFUZZIFY dangle_spine3@1
+TERM turnrightfast := 0.05
+TERM turnright := 0.025
+TERM stay := 0.0
+TERM turnleft := -0.025
+TERM turnleftfast := -0.05
+END_DEFUZZIFY
+
+DEFUZZIFY dangle_spine3@2
+TERM turnrightfast := 0.05
+TERM turnright := 0.025
+TERM stay := 0.0
+TERM turnleft := -0.025
+TERM turnleftfast := -0.05
+END_DEFUZZIFY
+
+DEFUZZIFY dangle_neck@1
+TERM turnrightfast := 0.05
+TERM turnright := 0.025
+TERM stay := 0.0
+TERM turnleft := -0.025
+TERM turnleftfast := -0.05
+END_DEFUZZIFY
+
+DEFUZZIFY dangle_neck@2
+TERM turnrightfast := 0.05
+TERM turnright := 0.025
+TERM stay := 0.0
+TERM turnleft := -0.025
+TERM turnleftfast := -0.05
+END_DEFUZZIFY
+
+DEFUZZIFY dangle_head@1
+TERM turnrightfast := 0.2
+TERM turnright := 0.1
+TERM stay := 0.0
+TERM turnleft := -0.1
+TERM turnleftfast := -0.2
+END_DEFUZZIFY
+
+DEFUZZIFY dangle_head@2
+TERM turnrightfast := 0.1
+TERM turnright := 0.05
+TERM stay := 0.0
+TERM turnleft := -0.05
+TERM turnleftfast := -0.1
+END_DEFUZZIFY
+
+RULEBLOCK
+
+RULE 1: if angle_target_rightClavicle@1 is farleft then dangle_rightClavicle@1 is turnrightfast
+RULE 2: if angle_target_rightClavicle@1 is left then dangle_rightClavicle@1 is turnright
+RULE 3: if angle_target_rightClavicle@1 is at then dangle_rightClavicle@1 is stay
+RULE 4: if angle_target_rightClavicle@1 is right then dangle_rightClavicle@1 is turnleft
+RULE 5: if angle_target_rightClavicle@1 is farright then dangle_rightClavicle@1 is turnleftfast
+
+RULE 1: if angle_target_rightClavicle@2 is farleft then dangle_rightClavicle@2 is turnrightfast
+RULE 4: if angle_target_rightClavicle@2 is left then dangle_rightClavicle@2 is turnright
+RULE 4: if angle_target_rightClavicle@2 is at then dangle_rightClavicle@2 is stay
+RULE 5: if angle_target_rightClavicle@2 is right then dangle_rightClavicle@2 is turnleft
+RULE 5: if angle_target_rightClavicle@2 is farright then dangle_rightClavicle@2 is turnleftfast
+
+RULE 1: if angle_target_rightShoulder@1 is farleft then dangle_rightShoulder@1 is turnrightfast
+RULE 2: if angle_target_rightShoulder@1 is left then dangle_rightShoulder@1 is turnright
+RULE 3: if angle_target_rightShoulder@1 is at then dangle_rightShoulder@1 is stay
+RULE 4: if angle_target_rightShoulder@1 is right then dangle_rightShoulder@1 is turnleft
+RULE 5: if angle_target_rightShoulder@1 is farright then dangle_rightShoulder@1 is turnleftfast
+
+RULE 1: if angle_target_rightShoulder@2 is farleft then dangle_rightShoulder@2 is turnrightfast
+RULE 4: if angle_target_rightShoulder@2 is left then dangle_rightShoulder@2 is turnright
+RULE 4: if angle_target_rightShoulder@2 is at then dangle_rightShoulder@2 is stay
+RULE 5: if angle_target_rightShoulder@2 is right then dangle_rightShoulder@2 is turnleft
+RULE 5: if angle_target_rightShoulder@2 is farright then dangle_rightShoulder@2 is turnleftfast
+
+RULE 1: if angle_target_rightShoulderJointZ is farleft then dangle_rightShoulderJointZ is turnrightfast
+RULE 2: if angle_target_rightShoulderJointZ is left then dangle_rightShoulderJointZ is turnright
+RULE 3: if angle_target_rightShoulderJointZ is at then dangle_rightShoulderJointZ is stay
+RULE 4: if angle_target_rightShoulderJointZ is right then dangle_rightShoulderJointZ is turnleft
+RULE 5: if angle_target_rightShoulderJointZ is farright then dangle_rightShoulderJointZ is turnleftfast
+
+RULE 1: if angle_target_rightElbowJointX is farleft then dangle_rightElbowJointX is turnrightfast
+RULE 2: if angle_target_rightElbowJointX is left then dangle_rightElbowJointX is turnright
+RULE 3: if angle_target_rightElbowJointX is at then dangle_rightElbowJointX is stay
+RULE 4: if angle_target_rightElbowJointX is right then dangle_rightElbowJointX is turnleft
+RULE 5: if angle_target_rightElbowJointX is farright then dangle_rightElbowJointX is turnleftfast
+
+RULE 1: if angle_alignment_rightUnderArmJointX is farleft   then dangle_rightUnderArmJointX is turnrightfast
+RULE 2: if angle_alignment_rightUnderArmJointX is left      then dangle_rightUnderArmJointX is turnright
+RULE 3: if angle_alignment_rightUnderArmJointX is at        then dangle_rightUnderArmJointX is stay
+RULE 4: if angle_alignment_rightUnderArmJointX is right     then dangle_rightUnderArmJointX is turnleft
+RULE 5: if angle_alignment_rightUnderArmJointX is farright  then dangle_rightUnderArmJointX is turnleftfast
+
+RULE 1: if angle_alignment_rightWristJointZ is farleft then dangle_rightWristJointZ is turnrightfast
+RULE 2: if angle_alignment_rightWristJointZ is left then dangle_rightWristJointZ is turnright
+RULE 3: if angle_alignment_rightWristJointZ is at then dangle_rightWristJointZ is stay
+RULE 4: if angle_alignment_rightWristJointZ is right then dangle_rightWristJointZ is turnleft
+RULE 5: if angle_alignment_rightWristJointZ is farright then dangle_rightWristJointZ is turnleftfast
+
+RULE 1: if angle_target_rightWristJointY is farleft then dangle_rightWristJointY is turnrightfast
+RULE 2: if angle_target_rightWristJointY is left then dangle_rightWristJointY is turnright
+RULE 3: if angle_target_rightWristJointY is at then dangle_rightWristJointY is stay
+RULE 4: if angle_target_rightWristJointY is right then dangle_rightWristJointY is turnleft
+RULE 5: if angle_target_rightWristJointY is farright then dangle_rightWristJointY is turnleftfast
+
+RULE 1: if angle_target_spine1@1 is farleft then dangle_spine1@1 is turnrightfast
+RULE 2: if angle_target_spine1@1 is left then dangle_spine1@1 is turnright
+RULE 3: if angle_target_spine1@1 is at then dangle_spine1@1 is stay
+RULE 4: if angle_target_spine1@1 is right then dangle_spine1@1 is turnleft
+RULE 5: if angle_target_spine1@1 is farright then dangle_spine1@1 is turnleftfast
+
+RULE 1: if angle_target_spine1@2 is farleft then dangle_spine1@2 is turnrightfast
+RULE 2: if angle_target_spine1@2 is left then dangle_spine1@2 is turnright
+RULE 3: if angle_target_spine1@2 is at then dangle_spine1@2 is stay
+RULE 4: if angle_target_spine1@2 is right then dangle_spine1@2 is turnleft
+RULE 5: if angle_target_spine1@2 is farright then dangle_spine1@2 is turnleftfast
+
+RULE 1: if angle_target_spine2@1 is farleft then dangle_spine2@1 is turnrightfast
+RULE 2: if angle_target_spine2@1 is left then dangle_spine2@1 is turnright
+RULE 3: if angle_target_spine2@1 is at then dangle_spine2@1 is stay
+RULE 4: if angle_target_spine2@1 is right then dangle_spine2@1 is turnleft
+RULE 5: if angle_target_spine2@1 is farright then dangle_spine2@1 is turnleftfast
+
+RULE 1: if angle_target_spine2@2 is farleft then dangle_spine2@2 is turnrightfast
+RULE 2: if angle_target_spine2@2 is left then dangle_spine2@2 is turnright
+RULE 3: if angle_target_spine2@2 is at then dangle_spine2@2 is stay
+RULE 4: if angle_target_spine2@2 is right then dangle_spine2@2 is turnleft
+RULE 5: if angle_target_spine2@2 is farright then dangle_spine2@2 is turnleftfast
+
+RULE 1: if angle_target_spine3@1 is farleft then dangle_spine3@1 is turnrightfast
+RULE 2: if angle_target_spine3@1 is left then dangle_spine3@1 is turnright
+RULE 3: if angle_target_spine3@1 is at then dangle_spine3@1 is stay
+RULE 4: if angle_target_spine3@1 is right then dangle_spine3@1 is turnleft
+RULE 5: if angle_target_spine3@1 is farright then dangle_spine3@1 is turnleftfast
+
+RULE 1: if angle_target_spine3@2 is farleft then dangle_spine3@2 is turnrightfast
+RULE 2: if angle_target_spine3@2 is left then dangle_spine3@2 is turnright
+RULE 3: if angle_target_spine3@2 is at then dangle_spine3@2 is stay
+RULE 4: if angle_target_spine3@2 is right then dangle_spine3@2 is turnleft
+RULE 5: if angle_target_spine3@2 is farright then dangle_spine3@2 is turnleftfast
+
+RULE 1: if angle_target_spine4@1 is farleft then dangle_spine4@1 is turnrightfast
+RULE 2: if angle_target_spine4@1 is left then dangle_spine4@1 is turnright
+RULE 3: if angle_target_spine4@1 is at then dangle_spine4@1 is stay
+RULE 4: if angle_target_spine4@1 is right then dangle_spine4@1 is turnleft
+RULE 5: if angle_target_spine4@1 is farright then dangle_spine4@1 is turnleftfast
+
+RULE 1: if angle_target_spine4@2 is farleft then dangle_spine4@2 is turnrightfast
+RULE 2: if angle_target_spine4@2 is left then dangle_spine4@2 is turnright
+RULE 3: if angle_target_spine4@2 is at then dangle_spine4@2 is stay
+RULE 4: if angle_target_spine4@2 is right then dangle_spine4@2 is turnleft
+RULE 5: if angle_target_spine4@2 is farright then dangle_spine4@2 is turnleftfast
+
+RULE 1: if angle_target_neck@1 is farleft then dangle_neck@1 is turnrightfast
+RULE 2: if angle_target_neck@1 is left then dangle_neck@1 is turnright
+RULE 3: if angle_target_neck@1 is at then dangle_neck@1 is stay
+RULE 4: if angle_target_neck@1 is right then dangle_neck@1 is turnleft
+RULE 5: if angle_target_neck@1 is farright then dangle_neck@1 is turnleftfast
+
+RULE 1: if angle_target_neck@2 is farleft then dangle_neck@2 is turnrightfast
+RULE 2: if angle_target_neck@2 is left then dangle_neck@2 is turnright
+RULE 3: if angle_target_neck@2 is at then dangle_neck@2 is stay
+RULE 4: if angle_target_neck@2 is right then dangle_neck@2 is turnleft
+RULE 5: if angle_target_neck@2 is farright then dangle_neck@2 is turnleftfast
+
+RULE 1: if angle_target_head@1 is farleft then dangle_head@1 is turnrightfast
+RULE 2: if angle_target_head@1 is left then dangle_head@1 is turnright
+RULE 3: if angle_target_head@1 is at then dangle_head@1 is stay
+RULE 4: if angle_target_head@1 is right then dangle_head@1 is turnleft
+RULE 5: if angle_target_head@1 is farright then dangle_head@1 is turnleftfast
+
+RULE 1: if angle_target_head@2 is farleft then dangle_head@2 is turnrightfast
+RULE 2: if angle_target_head@2 is left then dangle_head@2 is turnright
+RULE 3: if angle_target_head@2 is at then dangle_head@2 is stay
+RULE 4: if angle_target_head@2 is right then dangle_head@2 is turnleft
+RULE 5: if angle_target_head@2 is farright then dangle_head@2 is turnleftfast
+
+END_RULEBLOCK
+END_FUNCTIONBLOCK

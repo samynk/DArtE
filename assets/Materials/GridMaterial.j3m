@@ -1,0 +1,9 @@
+Material My Material : Common/MatDefs/Misc/Unshaded.j3md {
+     MaterialParameters {
+        ColorMap : Repeat Textures/refPattern.png
+        VertexColor : false
+     }
+    AdditionalRenderState {
+      Blend Off
+    }
+}

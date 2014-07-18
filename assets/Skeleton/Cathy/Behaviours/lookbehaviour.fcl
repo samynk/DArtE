@@ -1,0 +1,73 @@
+FUNCTION BLOCK
+
+VAR_INPUT
+angle_target_Bip01$Head:REAL;
+angle_target_HeadJointY@1:REAL;
+angle_target_HeadJointY@2:REAL;
+END_VAR
+
+
+FUZZIFY angle_target_Bip01$Head
+TERMS := (farleft,left,at,right,farright):(-60 -0.5 0 0.5 60)
+END_FUZZIFY
+
+FUZZIFY angle_target_HeadJointY@1
+TERMS := (farleft,left,at,right,farright):(-60 -0.5 0 0.5 60)
+END_FUZZIFY
+
+FUZZIFY angle_target_HeadJointY@2
+TERMS := (farleft,left,at,right,farright):(-20 -0.5 0 0.5 20)
+END_FUZZIFY
+
+VAR_OUTPUT
+dangle_Bip01$Head:REAL;
+dangle_HeadJointY@1:REAL;
+dangle_HeadJointY@2:REAL;
+END_VAR
+
+DEFUZZIFY dangle_Bip01$Head
+TERM turnrightfast := 120
+TERM turnright := 40
+TERM stay := 0.0
+TERM turnleft := -40
+TERM turnleftfast := -120
+END_DEFUZZIFY
+
+DEFUZZIFY dangle_HeadJointY@1
+TERM turnrightfast := 120
+TERM turnright := 40
+TERM stay := 0.0
+TERM turnleft := -40
+TERM turnleftfast := -120
+END_DEFUZZIFY
+
+DEFUZZIFY dangle_HeadJointY@2
+TERM turnrightfast := 120
+TERM turnright := 5
+TERM stay := 0.0
+TERM turnleft := -5
+TERM turnleftfast := -120
+END_DEFUZZIFY
+
+RULEBLOCK
+
+RULE 1: if angle_target_Bip01$Head is farleft then dangle_Bip01$Head is turnrightfast
+RULE 2: if angle_target_Bip01$Head is left then dangle_Bip01$Head is turnright
+RULE 3: if angle_target_Bip01$Head is at then dangle_Bip01$Head is stay
+RULE 4: if angle_target_Bip01$Head is right then dangle_Bip01$Head is turnleft
+RULE 5: if angle_target_Bip01$Head is farright then dangle_Bip01$Head is turnleftfast
+
+RULE 1: if angle_target_HeadJointY@1 is farleft then dangle_HeadJointY@1 is turnrightfast
+RULE 2: if angle_target_HeadJointY@1 is left then dangle_HeadJointY@1 is turnright
+RULE 3: if angle_target_HeadJointY@1 is at then dangle_HeadJointY@1 is stay
+RULE 4: if angle_target_HeadJointY@1 is right then dangle_HeadJointY@1 is turnleft
+RULE 5: if angle_target_HeadJointY@1 is farright then dangle_HeadJointY@1 is turnleftfast
+
+RULE 1: if angle_target_HeadJointY@2 is farleft then dangle_HeadJointY@2 is turnrightfast
+RULE 2: if angle_target_HeadJointY@2 is left then dangle_HeadJointY@2 is turnright
+RULE 3: if angle_target_HeadJointY@2 is at then dangle_HeadJointY@2 is stay
+RULE 4: if angle_target_HeadJointY@2 is right then dangle_HeadJointY@2 is turnleft
+RULE 5: if angle_target_HeadJointY@2 is farright then dangle_HeadJointY@2 is turnleftfast
+
+END_RULEBLOCK
+END_FUNCTIONBLOCK

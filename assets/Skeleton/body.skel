@@ -1,0 +1,120 @@
+<?xml version="1.0" ?>
+<body bendAngleFlat="0" bendAngleFlatSupport="7" bendAngleUp="5" bendAngleDown="5" upperLegLength="5" lowerLegLength="5" >
+    <joint type="Fixed" location="[0,7.7,0]" name="body">
+        <joint type="Revolute" axis="[1,0,0]" centered="true" radius="0.15" height="1.0" location="[0,0,0]" name="hip" 
+               minAngle="-90" maxAngle="90" angle="0">
+            <joint type="Revolute" axis="[1,0,0]" centered="true" radius="0.15" height="0.8" location="[1,0,0]" name="rightHipJointX" 
+                   minAngle="90" maxAngle="270" angle="180" group="rightLeg" targetAxis="[0,1,0]" log="true" logOffset="-180" logScale="1.0" logName="hip" logSymbol="CIRCLE" logTranslation="true">
+                <joint type="Revolute" axis="[0,0,1]" centered="true" radius="0.15" height="0.8" location="[0,0,0]" name="rightHipJointZ" 
+                       minAngle="-30" maxAngle="0" angle="0" group="rightLeg">
+                    <joint type="Revolute" axis="[0,1,0]" centered="false" radius="0.15" height="0.5" location="[0,0,0]" name="rightHipJointY" 
+                           minAngle="-10" maxAngle="10" angle="0" group="rightLeg">
+                        <limb type="CYLINDRICAL" radius="0.1" name="rightUpperLeg" height="5" color="green">
+                            <joint type="Revolute" axis="[1,0,0]" location="[0,5,0]" radius="0.15" height="0.5" centered="true" 
+                                   name="rightKneeJointX" group="rightLeg" log="true" logScale="-1.0" logTranslation="true" logSymbol="TRIANGLE" logName="knee" minAngle="-150" maxAngle="0" angle="-10">
+                                <limb type="CYLINDRICAL" radius="0.1" name="rightlowerLeg" height="5" color="green">
+                                    <joint type="Revolute" axis="[1,0,0]" location="[0,5,0]" radius="0.15" height="0.5" centered="true" 
+                                           name="rightFootJointX" group="rightLeg" target="parallel" targetAxis="[0,1,0]" minAngle="45" maxAngle="135" angle="90" log="true" logTranslation="true" logName="ankle" logOffset="-90" logSymbol="SQUARE">	
+                                        <joint type="Revolute" axis="[0,1,0]" location="[0,0,0]" radius="0.15" height="0.5" centered="false" 
+                                               name="rightFootJointY" group="rightLeg" target="parallel" minAngle="-10" maxAngle="10" angle="0">	
+                                            <limb type="CYLINDRICAL" radius="0.1" height="0.8" name="rightFoot" >
+                                                <joint type="Revolute" axis="[1,0,0]" location="[0,0.8,0]" radius="0.15" height="0.5" centered="true"
+                                                       name="rightFootRollJointX" group="rightLeg" target="parallel" targetAxis="[0,1,0]" minAngle="0" maxAngle="30" angle="0" logTranslation="true">
+                                                    <limb type="CYLINDRICAL" radius="0.1" height="0.3" name="rightFootRoll" >
+                                                        <joint type="Revolute" axis="[1,0,0]" location="[0,0.2,0]"  radius="0.01" height="0.5" centered="true" name="rightToeStub" logTranslation="true"
+                                                               group="rightLeg"  minAngle="0" maxAngle="0" angle="0"/>
+                                                    </limb>
+                                                </joint>   
+                                                <attachmentpoint name="rightFootAP" location="[0,0.05,0]"/>
+                                            </limb>
+                                        </joint>    
+                                    </joint>
+                                </limb>
+                            </joint>
+                        </limb>
+                    </joint>
+                </joint>
+            </joint>
+            <joint type="Revolute" axis="[1,0,0]" centered="true" radius="0.15" height="0.8" location="[-1,0,0]" 
+                   name="leftHipJointX" group="leftLeg" minAngle="90" maxAngle="270" angle="180" targetAxis="[0,1,0]">
+                <joint type="Revolute" axis="[0,0,1]" centered="true" radius="0.15" height="0.8" location="[0,0,0]" 
+                       name="leftHipJointZ" group="leftLeg" minAngle="0" maxAngle="30" angle="0">
+                    <joint type="Revolute" axis="[0,1,0]" centered="false" radius="0.15" height="0.5" location="[0,0,0]" 
+                           name="leftHipJointY" group="leftLeg"  minAngle="-10" maxAngle="10" angle="0">
+                        <limb type="CYLINDRICAL" radius="0.1" name="leftUpperLeg" height="5" color="green">
+                            <joint type="Revolute" axis="[1,0,0]" location="[0,5,0]" radius="0.15" height="0.5" centered="true" 
+                                   name="leftKneeJointX" group="leftLeg" minAngle="-150" maxAngle="0" angle="0">
+                                <limb type="CYLINDRICAL" radius="0.1" name="leftLowerLeg" height="5" color="green">
+                                    <joint type="Revolute" axis="[1,0,0]" location="[0,5,0]" radius="0.1" height="0.5" centered="true" 
+                                           name="leftFootJointX" group="leftLeg" target="parallel" targetAxis="[0,1,0]" minAngle="45" maxAngle="135" angle="90">	
+                                        <joint type="Revolute" axis="[0,1,0]" location="[0,0,0]" radius="0.15" height="0.5" centered="false" 
+                                               name="leftFootJointY" group="leftLeg" target="parallel" minAngle="-10" maxAngle="10" angle="0">	
+                                            <limb type="CYLINDRICAL" radius="0.1" height="0.8" name="leftFoot" >
+                                                <joint type="Revolute" axis="[1,0,0]" location="[0,0.8,0]" radius="0.15" height="0.5" centered="true"
+                                                       name="leftFootRollJointX" group="leftLeg" target="parallel" targetAxis="[0,1,0]" minAngle="0" maxAngle="30" angle="0">
+                                                    <limb type="CYLINDRICAL" radius="0.1" height="0.3" name="rightFootRoll" />
+                                                </joint>   
+                                                <attachmentpoint name="leftFootAP" location="[0,0.05,0]"/>
+                                            </limb>
+                                        </joint>
+                                    </joint>
+                                </limb>
+                            </joint>
+                        </limb>
+                    </joint>
+                </joint>
+            </joint>
+            <limb type="CYLINDRICAL" radius="0.1" name="spine" height="1.0" color="green"/>
+            <joint type="Revolute2" group="rightarm" axis1="[0,1,0]" axislabel1="Y" axis2="[1,0,0]" axislabel2="X" radius="0.15" location="[0,1.5,0]" name="spine1" 
+                   angle1="0" angle2="0" minangle1="-5" maxangle1="5" minangle2="-5" maxangle2="5">
+                <limb type="CYLINDRICAL" radius="0.1" name="spine" height="1.0" color="red"/>
+                <joint type="Revolute2" group="rightarm" axis1="[0,1,0]" axislabel1="Y" axis2="[1,0,0]" axislabel2="X" radius="0.15" location="[0,1.0,0]" name="spine2" 
+                       angle1="0" angle2="0" minangle1="-5" maxangle1="5" minangle2="-5" maxangle2="5">
+                    <limb type="CYLINDRICAL" radius="0.1" name="spine" height="1.0" color="blue"/>
+                    <joint type="Revolute2" group="rightarm" axis1="[0,1,0]"  axislabel1="Y" axis2="[1,0,0]" axislabel2="X" radius="0.15" location="[0,1.0,0]" name="spine3" 
+                           angle1="0" angle2="0" minangle1="-5" maxangle1="5" minangle2="-5" maxangle2="5">
+                        <limb type="CYLINDRICAL" radius="0.1" name="spine" height="1.0" color="blue"/>
+                        <joint type="Revolute2" group="rightarm" axis1="[0,1,0]"  axislabel1="Y" axis2="[1,0,0]" axislabel2="X" radius="0.15" location="[0,1.0,0]" name="spine4" 
+                               angle1="0" angle2="0" minangle1="-5" maxangle1="5" minangle2="-5" maxangle2="5">
+                            <limb type="CYLINDRICAL" radius="0.1" name="spine" height="1.0" color="blue"/>
+                            <joint type="Revolute2" group="head" axis1="[0,1,0]"  axislabel1="Y" axis2="[1,0,0]" axislabel2="X" radius="0.15" location="[0,1.0,0]" name="neck" 
+                                   angle1="0" angle2="0" minangle1="-1" maxangle1="1" minangle2="-1" maxangle2="1">
+                                <joint type="Revolute2" group="head" axis1="[0,1,0]"  axislabel1="Y" axis2="[1,0,0]" axislabel2="X" radius="0.15" location="[0,0.4,0]" name="head" 
+                                       angle1="0" angle2="0" minangle1="-90" maxangle1="90" minangle2="-45" maxangle2="45">
+                                    <limb type="MESH" mesh="Skeleton/Helpers/head.j3o" radius="0.1" name="rightHand" height="0.25" color="blue"/>
+                                    <attachmentpoint name="head" location="[0.0,0,-0.1]" alignmentAxis="[-1,0,0]"/>
+                                </joint>
+                            </joint>
+                            <joint type="Revolute2" group="rightarm"  axis1="[0,1,0]" axislabel1="Y" axis2="[0,0,1]" axislabel2="Z" radius="0.15" height="1.0" location="[0.2,1.0,0]" name="rightClavicle" 
+                                   angle1="0" angle2="0" minangle1="-10" maxangle1="10" minangle2="-10" maxangle2="10">
+                                <joint type="Revolute2" group="rightarm" axis1="[1,0,0]" axislabel1="Y" axis2="[0,0,1]" axislabel2="Z" radius="0.15" location="[1.0,0,0]" name="rightShoulder" 
+                                      angle1="0" angle2="-90" minangle1="-120" maxangle1="30" minangle2="-180" maxangle2="0">
+                                    <joint type="Revolute" axis="[0,1,0]" centered="true" group="rightarm" radius="0.15" height="1.0" location="[0,0.3,0]" name="rightShoulderJointZ" 
+                                               minAngle="-160" maxAngle="20" angle="-90">
+                                        <limb type="CYLINDRICAL" radius="0.1" name="rightUpperArm" height="2.3" color="blue"/>
+                                        <joint type="Revolute" axis="[0,0,1]" group="rightarm" centered="true" radius="0.15" height="1.0" location="[0,2.3,0]" name="rightElbowJointX" 
+                                                   minAngle="0" maxAngle="160" angle="0">
+                                            <limb type="CYLINDRICAL" radius="0.1" name="rightUnderArm" height="1.1" color="blue"/>
+                                            <joint type="Revolute" axis="[0,1,0]" group="rightarm" centered="true" radius="0.15" height="1.0" location="[0,1.1,0]" name="rightUnderArmJointX" 
+                                                       minAngle="-45" maxAngle="170" angle="0">
+                                                <limb type="CYLINDRICAL" radius="0.1" name="rightUnderArm" height="1.1" color="blue"/>
+                                                <joint type="Revolute" axis="[0,0,1]" group="rightarm" centered="true" radius="0.15" height="1.0" location="[0,1.1,0]" name="rightWristJointZ" 
+                                                           minAngle="-30" maxAngle="30" angle="0">
+                                                    <joint type="Revolute" axis="[1,0,0]" group="rightarm" centered="true" radius="0.15" height="1.0" location="[0,0,0]" name="rightWristJointY" 
+                                                               minAngle="-75" maxAngle="20" angle="0">
+                                                        <limb type="MESH" mesh="Skeleton/Helpers/Hand.j3o" radius="0.1" name="rightHand" height="0.25" color="blue"/>
+                                                        <attachmentpoint name="rightarm" location="[0.1,0.4,-0.1]" alignmentAxis="[-1,0,0]"/>
+                                                    </joint>
+                                                </joint>
+                                            </joint>
+                                        </joint>
+                                    </joint>
+                                </joint>
+                            </joint>
+                        </joint>
+                    </joint>
+                </joint>
+            </joint>
+        </joint>
+    </joint>
+</body>

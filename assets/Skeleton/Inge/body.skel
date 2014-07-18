@@ -1,0 +1,121 @@
+<?xml version="1.0" ?>
+<body mesh="Skeleton/Inge/character2.j3o">
+    <joint name="Bip01"  type="Fixed" location="[0,0.88335,0]" rotation="[0,-90,0]">
+        <joint name="Bip01_Pelvis" type="Fixed" location="[0,0,0]"  rotation="[0,270,90]">
+            <!--<limb type="CYLINDRICAL" radius="0.1" name="spine" height="1.0" color="green"/>-->
+            <joint name="Bip01_Spine"  type="Fixed" location="[0.110474,0,0.0225469]" rotation="[-3.6346935E-6,6.9551996E-4,1.2732468E-6]">
+                <!--<limb type="CYLINDRICAL" radius="0.1" name="spine" height="1.0" color="red"/>-->
+                <joint name="Bip01$Spine1" type="Revolute2" group="rightarm" radius="0.02"
+                       location="[0.197496,-2.35943E-10,1.62802E-4]" 
+                       refaxisx="[0.999981,1.2335823E-7,-0.0061708377]"
+                       refaxisy="[-1.2336176E-7,1.0,-1.883495E-10]"
+                       refaxisz="[0.0061708377,9.495913E-10,0.999981]"
+                       axis1="[0,1,0]" axislabel1="Y" 
+                       axis2="[1,0,0]" axislabel2="X" 
+                       angle1="0" minangle1="-5" maxangle1="5" angle2="0" 
+                       minangle2="-5" maxangle2="5">
+                    <joint name="Bip01$Neck"  type="Revolute2" group="head" radius="0.02"
+                           location="[0.204456,8.6884E-10,7.94768E-5]"
+                           refaxisx="[0.9991973,2.6645156E-7,-0.040059462]"
+                           refaxisy="[-2.6645145E-7,1.0,5.3414047E-9]"
+                           refaxisz="[0.040059462,5.3367843E-9,0.9991973]"
+                           axis1="[0,1,0]" axislabel1="Y" 
+                           angle1="0"  minangle1="-5" maxangle1="5" 
+                           axis2="[1,0,0]" axislabel2="X" 
+                           angle2="0" minangle2="-5" maxangle2="5">
+                        <joint name="Bip01$Head" type="Revolute2" group="head" radius="0.02"
+                               rotation="[3.8787262E-9,0.077585526,8.486834E-8]"
+                               location="[0.0998286,-8.62694E-9,0.0]"
+                               axis1="[1,0,0]"  axislabel1="Y" 
+                               angle1="0" minangle1="-90" maxangle1="90" 
+                               axis2="[0,0,1]" axislabel2="Z" 
+                               angle2="0" minangle2="-5" maxangle2="+5"
+                               chainwithchild="true" chainchildname="headJointY">
+                            <joint  name="headJointY"  type="Revolute" axis="[0,1,0]" group="head" radius="0.02" height="0.4" location="[0,0,0]"
+                                    minAngle="-90" maxAngle="90" angle="0"
+                                    chainwithparent="true">
+                                <attachmentpoint name="head" location="[0.0,0.0,-0.01]" alignmentAxis="[0,0,1]"/>
+                            </joint>
+                        </joint>    
+                        <joint  name="Bip01$R$Clavicle" type="Revolute2" group="rightarm" radius="0.05"
+                                refaxisx="[-0.10426295,-0.9945474,-0.0021719942]"
+                                refaxisy="[-0.99433166,0.10428554,-0.020714141]"
+                                refaxisz="[0.020827703,-3.4458935E-8,-0.99978304]"
+                                location="[-0.00826767,-0.0391653,0.00661198]"
+                                axis1="[0,1,0]" axislabel1="Y" 
+                                angle1="0"  minangle1="-5" maxangle1="5"
+                                axis2="[0,0,1]" axislabel2="Z"
+                                angle2="0" minangle2="-5" maxangle2="5">
+                            <joint name="Bip01$R$UpperArm"  type="Revolute2" group="rightarm" radius="0.02"
+                                   location="[0.106745,1.52588E-7,0.0]"
+                                   refaxisx="[0.8170384,0.5681949,-0.09799388]"
+                                   refaxisy="[-0.5712339,0.82077926,-0.0036471859]"
+                                   refaxisz="[0.07835904,0.058957316,0.9951803]"
+                                   axis1="[0,1,0]" axislabel1="Y" 
+                                   angle1="0" minangle1="-120" maxangle1="75"
+                                   axis2="[0,0,1]" axislabel2="Z"  
+                                   angle2="0"  minangle2="-125" maxangle2="45"
+                                   chainwithchild="true" chainchildname="rightShoulderJointZ">
+                                <joint  name="rightShoulderJointZ"  type="Revolute" axis="[1,0,0]" group="rightarm" radius="0.02" height="0.4" location="[0,0,0]"
+                                        minAngle="-160" maxAngle="70" angle="0"
+                                        chainwithparent="true">
+                                    <joint name="Bip01$R$Forearm"  type="Revolute" 
+                                           location="[0.253375,0.0,9.53674E-9]"
+                                           refaxisx="[0.98080164,-5.5611917E-8,0.19500795]"
+                                           refaxisy="[5.6546117E-8,1.0,7.763403E-10]"
+                                           refaxisz="[-0.19500795,1.0265506E-8,0.98080164]"
+                                           axis="[0,1,0]" group="rightarm" centered="true" radius="0.02" height="0.2"
+                                           minAngle="-160" maxAngle="0" angle="0"
+                                           chainwithchild="true" chainchildname="rightForeArmJointX"
+                                    >
+                                        <joint name="rightForeArmJointX"  type="Revolute" axis="[1,0,0]" group="rightarm" centered="true" radius="0.02" height="0.4" location="[0,0,0]" 
+                                               minAngle="-45" maxAngle="170" angle="0" chainwithparent="true">
+                                            <joint name="Bip01$R$Hand"  type="Revolute" axis="[0,1,0]" group="rightarm" centered="true" radius="0.05" height="0.2"
+                                                   location="[0.249881,7.62939E-8,2.38419E-9]" 
+                                                   refaxisx="[0.9929641,0.10974111,-0.04448864]"
+                                                   refaxisy="[0.045013536,-0.002309084,0.99898374]"
+                                                   refaxisz="[0.10952684,-0.9939575,-0.007232666]"
+                                                   minAngle="-60" maxAngle="60" angle="0"
+                                                   chainwithchild="true" chainchildname="rightWristJointY">
+                                                <joint type="Revolute" axis="[1,0,0]" group="rightarm" centered="true" radius="0.02" height="0.4" location="[0,0,0]" name="rightWristJointY" 
+                                                       minAngle="-75" maxAngle="75" angle="0"
+                                                       chainwithparent="true">
+                                                    <attachmentpoint name="rightarm" location="[0.08,0,-0.03]" alignmentAxis="[0,1,0]"/>
+                                                </joint>
+                                            </joint>
+                                        </joint>
+                                    </joint>
+                                </joint>
+                            </joint>
+                        </joint>
+                        <!--
+                        <joint type="Revolute2" group="rightarm" axis1="[1,0,0]" axislabel1="Y" axis2="[0,0,1]" axislabel2="Z" radius="0.15" location="[1.0,0,0]" name="rightShoulder" 
+                               angle1="0" angle2="-90" minangle1="-120" maxangle1="30" minangle2="-180" maxangle2="0">
+                            <joint type="Revolute" axis="[0,1,0]" centered="true" group="rightarm" radius="0.15" height="1.0" location="[0,0.3,0]" name="rightShoulderJointZ" 
+                                   minAngle="-160" maxAngle="20" angle="-90">
+                                <limb type="CYLINDRICAL" radius="0.1" name="rightUpperArm" height="2.3" color="blue"/>
+                                <joint type="Revolute" axis="[0,0,1]" group="rightarm" centered="true" radius="0.15" height="1.0" location="[0,2.3,0]" name="rightElbowJointX" 
+                                       minAngle="0" maxAngle="160" angle="0">
+                                    <limb type="CYLINDRICAL" radius="0.1" name="rightUnderArm" height="1.1" color="blue"/>
+                                    <joint type="Revolute" axis="[0,1,0]" group="rightarm" centered="true" radius="0.15" height="1.0" location="[0,1.1,0]" name="rightUnderArmJointX" 
+                                           minAngle="-45" maxAngle="170" angle="0">
+                                        <limb type="CYLINDRICAL" radius="0.1" name="rightUnderArm" height="1.1" color="blue"/>
+                                        <joint type="Revolute" axis="[0,0,1]" group="rightarm" centered="true" radius="0.15" height="1.0" location="[0,1.1,0]" name="rightWristJointZ" 
+                                               minAngle="-30" maxAngle="30" angle="0">
+                                            <joint type="Revolute" axis="[1,0,0]" group="rightarm" centered="true" radius="0.15" height="1.0" location="[0,0,0]" name="rightWristJointY" 
+                                                   minAngle="-75" maxAngle="20" angle="0">
+                                                <limb type="MESH" mesh="Skeleton/Helpers/Hand.j3o" radius="0.1" name="rightHand" height="0.25" color="blue"/>
+                                                <attachmentpoint name="rightarm" location="[0.1,0.4,-0.1]" alignmentAxis="[-1,0,0]"/>
+                                            </joint>
+                                        </joint>
+                                    </joint>
+                                </joint>
+                            </joint>
+                        </joint>
+                        -->
+                    </joint>
+                </joint>
+            </joint>
+        </joint>
+    </joint>
+</body>

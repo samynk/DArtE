@@ -1,0 +1,256 @@
+FUNCTION BLOCK
+
+VAR_INPUT
+angle_target_rightHipJointX:REAL;
+angle_rightHipJointX:REAL;
+distance_rightKneeJointX:REAL;
+height_rightKneeJointX:REAL;
+arc_Distance:REAL;
+angle_rightKneeJointX:REAL;
+current_angle_rightKneeJointX:REAL;
+angle_rightFootJointX:REAL;
+current_angle_rightFootRollJointX:REAL;
+current_angle_leftKneeJointX:REAL;
+current_angle_rightHipJointX:REAL;
+body_angle_leftHipJointX:REAL;
+height_ap:REAL;
+END_VAR
+
+
+FUZZIFY arc_Distance
+TERMS := (start,#right,center,#left,end,over):(-1 -0.95 -0.5 0.0 0.5 0.9 1.0 1.02)
+END_FUZZIFY
+
+FUZZIFY angle_target_rightHipJointX
+TERMS := (left,center,right):(-1 0 1)
+END_FUZZIFY
+
+FUZZIFY angle_rightHipJointX
+TERMS := (left,center,right):(-5 0 5)
+END_FUZZIFY
+
+FUZZIFY distance_rightKneeJointX
+TERMS := (under,at,#over,far_over):(-0.05 0 0.05 2.8 5.0)
+END_FUZZIFY
+
+FUZZIFY height_rightKneeJointX
+TERMS := (under,#at,over):(4 4.7 4.75 5)
+END_FUZZIFY
+
+FUZZIFY current_angle_rightKneeJointX
+TERMS := (left,center,right):(-78 80 82)
+END_FUZZIFY
+
+
+FUZZIFY angle_rightKneeJointX
+TERMS := (left,center,right):(-1 0 1)
+END_FUZZIFY
+
+FUZZIFY angle_rightFootJointX
+TERMS := (left,center,right):(-7 0 7 )
+END_FUZZIFY
+
+FUZZIFY current_angle_rightFootRollJointX
+TERMS := (left,center,right):(-1 0 1)
+END_FUZZIFY
+
+FUZZIFY current_angle_leftKneeJointX
+TERMS := (left,center,right):(-50 -40 -30)
+END_FUZZIFY
+
+FUZZIFY current_angle_rightHipJointX
+TERMS := (left,#center,right):(100 150 210 260)
+END_FUZZIFY
+
+FUZZIFY body_angle_leftHipJointX
+TERMS := (farleft,left,center,right,farright):(-60 -5 0 5 60)
+END_FUZZIFY
+
+FUZZIFY height_ap
+TERMS := (under,at,over):(-0.05 0 0.05)
+END_FUZZIFY
+
+
+VAR_OUTPUT
+dangle_rightHipJointX:REAL;
+dangle_rightKneeJointX:REAL;
+dangle_rightFootJointX:REAL;
+dangle_rightFootRollJointX:REAL;
+dangle_leftHipJointX:REAL;
+dangle_leftKneeJointX:REAL;
+dangle_leftFootJointX:REAL;
+dangle_leftFootRollJointX:REAL;
+END_VAR
+
+DEFUZZIFY dangle_rightHipJointX
+TERM turnrightfast := 0.6
+TERM turnright := 0.3
+TERM turnrightslow := 0.1
+TERM turnrightveryslow := 0.02
+TERM stay := 0.0
+TERM turnleft := -0.15
+END_DEFUZZIFY
+
+DEFUZZIFY dangle_rightKneeJointX
+TERM turnrightfast := 1.6
+TERM turnright := 1.1
+TERM turnrightslow := 0.15
+TERM stay := 0.0
+TERM turnleftslow := -0.1
+TERM turnleft := -1.0
+TERM turnleftfast := -1.6
+END_DEFUZZIFY
+
+DEFUZZIFY dangle_rightFootJointX
+TERM turnrightfast := 0.8
+TERM turnright := 0.3
+TERM turnrightslow := 0.02
+TERM stay := 0.0
+TERM turnleftslow := -0.02
+TERM turnleft := -0.3
+TERM turnleftfast := -0.8
+END_DEFUZZIFY
+
+DEFUZZIFY dangle_rightFootRollJointX
+TERM turnright := 1.0
+TERM stay := 0.0
+TERM turnleft := -1.0
+END_DEFUZZIFY
+
+DEFUZZIFY dangle_leftHipJointX
+TERM turnrightfast := 0.9
+TERM turnright := 0.4
+TERM stay := 0.0
+TERM turnleft := -0.4
+TERM turnleftfast := -0.9
+END_DEFUZZIFY
+
+DEFUZZIFY dangle_leftKneeJointX
+TERM turnrightfast := 0.5
+TERM turnright := 0.14
+TERM turnrightslow := 0.07
+TERM stay := 0.0
+TERM turnleftslow := -0.07
+TERM turnleft := -0.14
+END_DEFUZZIFY
+
+DEFUZZIFY dangle_leftFootJointX
+TERM turnrightfast := 0.30
+TERM turnright := 0.22
+TERM turnrightslow := 0.12
+TERM stay := 0.0
+TERM turnleftslow := -0.01
+TERM turnleft := -0.02
+TERM turnleftfast := -0.1
+END_DEFUZZIFY
+
+DEFUZZIFY dangle_leftFootRollJointX
+TERM turnrightfast := 0.20
+TERM turnright := 0.16
+TERM turnrightslow := 0.12
+TERM stay := 0.0
+TERM turnleft := -0.12
+TERM turnleftfast := -0.24
+END_DEFUZZIFY
+
+RULEBLOCK
+#right hip joint rules
+
+RULE 1: if arc_distance is start && height_ap isnot under then dangle_rightHipJointX is turnrightslow
+RULE 1: if arc_distance is start && height_ap is under then dangle_rightHipJointX is turnrightveryslow
+RULE 2: if arc_distance is right && height_ap isnot under then dangle_rightHipJointX is turnright
+RULE 2: if arc_distance is right && height_ap is under then dangle_rightHipJointX is turnrightveryslow
+RULE 3: if arc_distance is center then dangle_rightHipJointX is turnright
+RULE 4: if arc_distance is left then dangle_rightHipJointX is turnright
+RULE 1: if arc_distance is end && angle_rightHipJointX is right then dangle_rightHipJointX is turnrightslow
+RULE 1: if arc_distance is end && angle_rightHipJointX is left then dangle_rightHipJointX is turnleft
+RULE 1: if arc_distance is end && angle_rightHipJointX is center then dangle_rightHipJointX is stay
+RULE 1: if arc_distance is over then dangle_rightHipJointX is turnleftslow
+
+#right knee joint rules
+
+RULE 1: if arc_distance is start && current_angle_rightKneeJointX is left then dangle_rightKneeJointX is turnleftslow
+RULE 2: if arc_distance is right && current_angle_rightKneeJointX is left then dangle_rightKneeJointX is turnleft
+RULE 3: if arc_distance is center then dangle_rightKneeJointX is stay
+RULE 1: if angle_rightKneeJointX is right && arc_distance is left then dangle_rightKneeJointX is turnright
+RULE 1: if angle_rightKneeJointX is center && arc_distance is left then dangle_rightKneeJointX is stay
+RULE 1: if angle_rightKneeJointX is left && arc_distance is left then dangle_rightKneeJointX is turnleft
+RULE 1: if angle_rightKneeJointX is right  && (arc_distance is end || arc_distance is over)then dangle_rightKneeJointX is turnright
+RULE 1: if angle_rightKneeJointX is center && (arc_distance is end || arc_distance is over) then dangle_rightKneeJointX is stay
+RULE 1: if angle_rightKneeJointX is left && (arc_distance is end || arc_distance is over) then  dangle_rightKneeJointX is turnleft
+
+RULE 10:if arc_distance is start then dangle_rightFootJointX is turnrightslow
+RULE 10:if arc_distance is right then dangle_rightFootJointX is turnrightslow
+RULE 10:if arc_distance is center then dangle_rightFootJointX is stay
+
+RULE 10:if arc_distance is left && angle_rightFootJointX is left then dangle_rightFootJointX is turnleftfast
+RULE 10:if arc_distance is left && angle_rightFootJointX is center then dangle_rightFootJointX is stay
+RULE 10:if arc_distance is left && angle_rightFootJointX is right then dangle_rightFootJointX is turnrightfast
+RULE 10:if arc_distance is end && angle_rightFootJointX is left then dangle_rightFootJointX is turnleftfast
+RULE 10:if arc_distance is end && angle_rightFootJointX is center then dangle_rightFootJointX is stay
+RULE 10:if arc_distance is end && angle_rightFootJointX is right then dangle_rightFootJointX is turnrightfast
+RULE 10:if arc_distance is over && angle_rightFootJointX is left then dangle_rightFootJointX is turnleftfast
+RULE 10:if arc_distance is over && angle_rightFootJointX is center then dangle_rightFootJointX is stay
+RULE 10:if arc_distance is over && angle_rightFootJointX is right then dangle_rightFootJointX is turnrightfast
+
+
+RULE 17:if current_angle_rightFootRollJointX is left then dangle_rightFootRollJointX is turnright
+RULE 18:if current_angle_rightFootRollJointX is center then dangle_rightFootRollJointX is stay
+RULE 19:if current_angle_rightFootRollJointX is right then dangle_rightFootRollJointX is turnleft
+
+#RULE 6: if height_ap is under then dangle_leftKneeJointX is turnrightfast
+RULE 10:if arc_distance is start && height_ap is under then dangle_leftKneeJointX is turnright
+RULE 10:if arc_distance is start && height_ap isnot under then dangle_leftKneeJointX is stay
+RULE 10:if arc_distance is right && height_ap is under then dangle_leftKneeJointX is turnrightfast
+RULE 10:if arc_distance is right && height_ap isnot under then dangle_leftKneeJointX is turnleft
+RULE 10:if arc_distance is center then dangle_leftKneeJointX is stay
+RULE 11:if arc_distance is left then dangle_leftKneeJointX is turnright
+RULE 11:if arc_distance is end then dangle_leftKneeJointX is turnrightslow
+
+RULE 11:if arc_distance is over  && height_ap is over then dangle_leftKneeJointX is turnrightslow
+RULE 11:if arc_distance is over  && height_ap is at then dangle_leftKneeJointX is stay
+
+
+RULE 7:  if arc_distance is center && height_ap is over then dangle_leftFootRollJointX is turnright
+RULE 7:  if arc_distance is center && height_ap is under then dangle_leftFootRollJointX is stay
+RULE 7:  if arc_distance is center && height_ap is at then dangle_leftFootRollJointX is stay
+
+
+
+RULE 7:  if arc_distance is start && (height_ap isnot under) then dangle_leftFootRollJointX is turnrightslow
+RULE 7:  if arc_distance is right && (height_ap isnot under) then dangle_leftFootRollJointX is turnright
+RULE 7:  if arc_distance is start && (height_ap is under) then dangle_leftFootRollJointX is turnleftslow
+RULE 7:  if arc_distance is right && (height_ap ist under) then dangle_leftFootRollJointX is turnleftslow
+RULE 7:  if arc_distance is center then dangle_leftFootRollJointX is stay
+RULE 7:  if arc_distance is left then dangle_leftFootRollJointX is turnright
+RULE 7:  if arc_distance is end && height_ap is over then dangle_leftFootRollJointX is turnright
+RULE 7:  if arc_distance is end && height_ap is under then dangle_leftFootRollJointX is stay
+RULE 7:  if arc_distance is end && height_ap is at then dangle_leftFootRollJointX is stay
+RULE 7:  if arc_distance is over && height_ap is over then dangle_leftFootRollJointX is turnrightslow
+RULE 7:  if arc_distance is over && height_ap is under then dangle_leftFootRollJointX is stay
+RULE 7:  if arc_distance is over && height_ap is at then dangle_leftFootRollJointX is stay
+
+#upper body rectification rules
+RULE 7:  if arc_distance is start && (height_ap is under) then dangle_leftFootJointX is turnleftfast
+RULE 7:  if arc_distance is right && (height_ap is under) then dangle_leftFootJointX is turnleftfast
+RULE 7:  if arc_distance is start && (height_ap isnot under) then dangle_leftFootJointX is turnrightslow
+RULE 7:  if arc_distance is right && (height_ap isnot under) then dangle_leftFootJointX is turnright
+RULE 7:  if arc_distance is center then dangle_leftFootJointX is stay
+RULE 7:  if arc_distance is left && height_ap is over then dangle_leftFootJointX is turnright
+RULE 7:  if arc_distance is left && height_ap is under then dangle_leftFootJointX is stay
+RULE 7:  if arc_distance is left && height_ap is at then dangle_leftFootJointX is stay
+RULE 7:  if arc_distance is end && height_ap is over then dangle_leftFootJointX is turnright
+RULE 7:  if arc_distance is end && height_ap is under then dangle_leftFootJointX is stay
+RULE 7:  if arc_distance is end && height_ap is at then dangle_leftFootJointX is stay
+
+RULE 7:  if arc_distance is over && height_ap is over then dangle_leftFootJointX is turnrightslow
+RULE 7:  if arc_distance is over && height_ap is under then dangle_leftFootJointX is stay
+RULE 7:  if arc_distance is over && height_ap is at then dangle_leftFootJointX is stay
+
+RULE 27:if body_angle_leftHipJointX is farleft then dangle_leftHipJointX is turnleftfast
+RULE 27:if body_angle_leftHipJointX is left then dangle_leftHipJointX is turnleft
+RULE 28: if body_angle_leftHipJointX is center then dangle_leftHipJointX is stay
+RULE 27:if body_angle_leftHipJointX is right then dangle_leftHipJointX is turnright
+RULE 29: if body_angle_leftHipJointX is farright then dangle_leftHipJointX is turnrightfast
+END_RULEBLOCK
+END_FUNCTIONBLOCK

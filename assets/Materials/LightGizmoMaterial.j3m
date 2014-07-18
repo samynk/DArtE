@@ -1,0 +1,9 @@
+Material My Material : Common/MatDefs/Misc/Unshaded.j3md {
+     MaterialParameters {
+        Color : 1.0 1.0 0.4 1.0
+        ColorMap : Repeat Textures/pivotpattern.png
+     }
+    AdditionalRenderState {
+        FaceCull Off
+    }
+}

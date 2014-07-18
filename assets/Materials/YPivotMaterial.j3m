@@ -1,0 +1,8 @@
+Material My Material : Common/MatDefs/Misc/Unshaded.j3md {
+     MaterialParameters {
+        Color : 0.28235295 0.9607843 0.28235295 1.0
+        ColorMap : Repeat Textures/pivotpattern.png
+     }
+    AdditionalRenderState {
+    }
+}

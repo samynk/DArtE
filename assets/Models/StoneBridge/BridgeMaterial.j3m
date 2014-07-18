@@ -1,0 +1,11 @@
+Material My Material : Common/MatDefs/Light/Lighting.j3md {
+     MaterialParameters {
+        DiffuseMap : Models/StoneBridge/bridge.jpg
+        NormalMap : Models/StoneBridge/bridge_normal.jpg
+        SpecularMap : Models/StoneBridge/bridge_spec.jpg
+        Shininess : 20.0
+        ParallaxHeight : 0.3
+     }
+    AdditionalRenderState {
+    }
+}

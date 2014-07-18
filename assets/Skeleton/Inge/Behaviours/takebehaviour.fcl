@@ -1,0 +1,332 @@
+FUNCTION BLOCK
+
+VAR_INPUT
+angle_target_Bip01$R$Clavicle@1:REAL;
+angle_target_Bip01$R$Clavicle@2:REAL;
+angle_target_Bip01$R$UpperArm@1:REAL;
+angle_target_Bip01$R$UpperArm@2:REAL;
+angle_target_RightShoulderJointZ:REAL;
+angle_target_Bip01$R$Forearm:REAL;
+angle_alignment_rightForeArmJointX:REAL;
+angle_alignment_Bip01$R$Hand:REAL;
+angle_target_rightWristJointY:REAL;
+angle_target_Bip01$Spine1@1:REAL;
+angle_target_Bip01$Spine1@2:REAL;
+angle_target_Bip01$Neck@1:REAL;
+angle_target_Bip01$Neck@2:REAL;
+angle_target_Bip01$Head@1:REAL;
+angle_target_Bip01$Head@2:REAL;
+angle_target_HeadJointY:REAL;
+END_VAR
+
+FUZZIFY angle_target_Bip01$R$UpperArm@1
+TERMS := (farleft,left,at,right,farright):(-60 -0.5 0 0.5 60)
+END_FUZZIFY
+
+FUZZIFY angle_target_Bip01$R$UpperArm@2
+TERMS := (farleft,left,at,right,farright):(-60 -0.5 0 .5 60)
+END_FUZZIFY
+
+FUZZIFY angle_target_Bip01$R$Clavicle@1
+TERMS := (farleft,left,at,right,farright):(-60 -0.5 0 0.5 60)
+END_FUZZIFY
+
+FUZZIFY angle_target_Bip01$R$Clavicle@2
+TERMS := (farleft,left,at,right,farright):(-60 -0.5 0 .5 60)
+END_FUZZIFY
+
+FUZZIFY angle_target_Bip01$R$Forearm
+TERMS := (farleft,left,at,right,farright):(-60 -1 0 1 60)
+END_FUZZIFY
+
+FUZZIFY angle_target_RightShoulderJointZ
+TERMS := (farleft,left,at,right,farright):(-60 -5 0 5 60)
+END_FUZZIFY
+
+FUZZIFY angle_alignment_rightForeArmJointX
+TERMS := (farleft,left,at,right,farright):(-60 -0.5 0 0.5 60)
+END_FUZZIFY
+
+FUZZIFY angle_target_rightWristJointY
+TERMS := (farleft,left,at,right,farright):(-60 -5 0 5 60)
+END_FUZZIFY
+
+FUZZIFY angle_alignment_Bip01$R$Hand
+TERMS := (farleft,left,at,right,farright):(-60 -0.5 0 0.5 60)
+END_FUZZIFY
+
+FUZZIFY angle_target_Bip01$Spine1@1
+TERMS := (farleft,left,at,right,farright):(-60 -0.5 0 0.5 60)
+END_FUZZIFY
+
+FUZZIFY angle_target_Bip01$Spine1@2
+TERMS := (farleft,left,at,right,farright):(-60 -0.5 0 0.5 60)
+END_FUZZIFY
+
+FUZZIFY angle_target_Bip01$Neck@1
+TERMS := (farleft,left,at,right,farright):(-60 -0.5 0 0.5 60)
+END_FUZZIFY
+
+FUZZIFY angle_target_Bip01$Neck@2
+TERMS := (farleft,left,at,right,farright):(-60 -5 0 5 60)
+END_FUZZIFY
+
+FUZZIFY angle_target_Bip01$Head@1
+TERMS := (farleft,left,at,right,farright):(-60 -5 0 5 60)
+END_FUZZIFY
+
+FUZZIFY angle_target_Bip01$Head@2
+TERMS := (farleft,left,at,right,farright):(-60 -10 0 10 60)
+END_FUZZIFY
+
+FUZZIFY angle_target_HeadJointY
+TERMS := (farleft,left,at,right,farright):(-60 -5 0 5 60)
+END_FUZZIFY
+
+VAR_OUTPUT
+dangle_Bip01$R$Clavicle@1:REAL;
+dangle_Bip01$R$Clavicle@2:REAL;
+dangle_Bip01$R$UpperArm@1:REAL;
+dangle_Bip01$R$UpperArm@2:REAL;
+dangle_RightShoulderJointZ:REAL;
+dangle_Bip01$R$Forearm:REAL;
+dangle_rightForeArmJointX:REAL;
+dangle_Bip01$R$Hand:REAL;
+dangle_rightWristJointY:REAL;
+dangle_Bip01$Spine1@1:REAL;
+dangle_Bip01$Spine1@2:REAL;
+dangle_Bip01$Neck@1:REAL;
+dangle_Bip01$Neck@2:REAL;
+dangle_Bip01$Head@1:REAL;
+dangle_Bip01$Head@2:REAL;
+dangle_HeadJointY:REAL;
+END_VAR
+
+DEFUZZIFY dangle_Bip01$R$Clavicle@1
+TERM turnrightfast := 0.05
+TERM turnright := 0.025
+TERM stay := 0.0
+TERM turnleft := -0.025
+TERM turnleftfast := -0.05
+END_DEFUZZIFY
+
+DEFUZZIFY dangle_Bip01$R$Clavicle@2
+TERM turnrightfast := 0.05
+TERM turnright := 0.025
+TERM stay := 0.0
+TERM turnleft := -0.025
+TERM turnleftfast := -0.05
+END_DEFUZZIFY
+
+DEFUZZIFY dangle_Bip01$R$UpperArm@1
+TERM turnrightfast := 0.8
+TERM turnright := 0.2
+TERM stay := 0.0
+TERM turnleft := -0.2
+TERM turnleftfast := -0.8
+END_DEFUZZIFY
+
+DEFUZZIFY dangle_Bip01$R$UpperArm@2
+TERM turnrightfast := 0.6
+TERM turnright := 0.09
+TERM stay := 0.0
+TERM turnleft := -0.1
+TERM turnleftfast := -0.6
+END_DEFUZZIFY
+
+DEFUZZIFY dangle_RightShoulderJointZ
+TERM turnrightfast := 0.3
+TERM turnright := 0.1
+TERM stay := 0.0
+TERM turnleft := -0.1
+TERM turnleftfast := -0.3
+END_DEFUZZIFY
+
+DEFUZZIFY dangle_Bip01$R$Forearm
+TERM turnrightfast := 1.0
+TERM turnright := 0.1
+TERM stay := 0.0
+TERM turnleft := -0.1
+TERM turnleftfast := -1.0
+END_DEFUZZIFY
+
+DEFUZZIFY dangle_rightForeArmJointX
+TERM turnrightfast := 0.3
+TERM turnright := 0.1
+TERM stay := 0.0
+TERM turnleft := -0.1
+TERM turnleftfast := -0.3
+END_DEFUZZIFY
+
+DEFUZZIFY dangle_Bip01$R$Hand
+TERM turnrightfast := 0.2
+TERM turnright := 0.1
+TERM stay := 0.0
+TERM turnleft := -0.1
+TERM turnleftfast := -0.2
+END_DEFUZZIFY
+
+DEFUZZIFY dangle_rightWristJointY
+TERM turnrightfast := 0.05
+TERM turnright := 0.025
+TERM stay := 0.0
+TERM turnleft := -0.025
+TERM turnleftfast := -0.05
+END_DEFUZZIFY
+
+DEFUZZIFY dangle_Bip01$Spine1@1
+TERM turnrightfast := 0.05
+TERM turnright := 0.025
+TERM stay := 0.0
+TERM turnleft := -0.025
+TERM turnleftfast := -0.05
+END_DEFUZZIFY
+
+DEFUZZIFY dangle_Bip01$Spine1@2
+TERM turnrightfast := 0.05
+TERM turnright := 0.025
+TERM stay := 0.0
+TERM turnleft := -0.025
+TERM turnleftfast := -0.05
+END_DEFUZZIFY
+
+DEFUZZIFY dangle_Bip01$Neck@1
+TERM turnrightfast := 0.05
+TERM turnright := 0.025
+TERM stay := 0.0
+TERM turnleft := -0.025
+TERM turnleftfast := -0.05
+END_DEFUZZIFY
+
+DEFUZZIFY dangle_Bip01$Neck@2
+TERM turnrightfast := 0.05
+TERM turnright := 0.025
+TERM stay := 0.0
+TERM turnleft := -0.025
+TERM turnleftfast := -0.05
+END_DEFUZZIFY
+
+DEFUZZIFY dangle_Bip01$Head@1
+TERM turnrightfast := 0.1
+TERM turnright := 0.05
+TERM stay := 0.0
+TERM turnleft := -0.05
+TERM turnleftfast := -0.1
+END_DEFUZZIFY
+
+DEFUZZIFY dangle_Bip01$Head@2
+TERM turnrightfast := 0.025
+TERM turnright := 0.0125
+TERM stay := 0.0
+TERM turnleft := -0.025
+TERM turnleftfast := -0.0125
+END_DEFUZZIFY
+
+DEFUZZIFY dangle_HeadJointY
+TERM turnrightfast := 0.1
+TERM turnright := 0.05
+TERM stay := 0.0
+TERM turnleft := -0.05
+TERM turnleftfast := -0.1
+END_DEFUZZIFY
+
+RULEBLOCK
+
+RULE 1: if angle_target_Bip01$R$Clavicle@1 is farleft then dangle_Bip01$R$Clavicle@1 is turnrightfast
+RULE 2: if angle_target_Bip01$R$Clavicle@1 is left then dangle_Bip01$R$Clavicle@1 is turnright
+RULE 3: if angle_target_Bip01$R$Clavicle@1 is at then dangle_Bip01$R$Clavicle@1 is stay
+RULE 4: if angle_target_Bip01$R$Clavicle@1 is right then dangle_Bip01$R$Clavicle@1 is turnleft
+RULE 5: if angle_target_Bip01$R$Clavicle@1 is farright then dangle_Bip01$R$Clavicle@1 is turnleftfast
+
+RULE 1: if angle_target_Bip01$R$Clavicle@2 is farleft then dangle_Bip01$R$Clavicle@2 is turnrightfast
+RULE 4: if angle_target_Bip01$R$Clavicle@2 is left then dangle_Bip01$R$Clavicle@2 is turnright
+RULE 4: if angle_target_Bip01$R$Clavicle@2 is at then dangle_Bip01$R$Clavicle@2 is stay
+RULE 5: if angle_target_Bip01$R$Clavicle@2 is right then dangle_Bip01$R$Clavicle@2 is turnleft
+RULE 5: if angle_target_Bip01$R$Clavicle@2 is farright then dangle_Bip01$R$Clavicle@2 is turnleftfast
+
+RULE 1: if angle_target_Bip01$R$UpperArm@1 is farleft then dangle_Bip01$R$UpperArm@1 is turnrightfast
+RULE 2: if angle_target_Bip01$R$UpperArm@1 is left then dangle_Bip01$R$UpperArm@1 is turnright
+RULE 3: if angle_target_Bip01$R$UpperArm@1 is at then dangle_Bip01$R$UpperArm@1 is stay
+RULE 4: if angle_target_Bip01$R$UpperArm@1 is right then dangle_Bip01$R$UpperArm@1 is turnleft
+RULE 5: if angle_target_Bip01$R$UpperArm@1 is farright then dangle_Bip01$R$UpperArm@1 is turnleftfast
+
+RULE 1: if angle_target_Bip01$R$UpperArm@2 is farleft then dangle_Bip01$R$UpperArm@2 is turnrightfast
+RULE 4: if angle_target_Bip01$R$UpperArm@2 is left then dangle_Bip01$R$UpperArm@2 is turnright
+RULE 4: if angle_target_Bip01$R$UpperArm@2 is at then dangle_Bip01$R$UpperArm@2 is stay
+RULE 5: if angle_target_Bip01$R$UpperArm@2 is right then dangle_Bip01$R$UpperArm@2 is turnleft
+RULE 5: if angle_target_Bip01$R$UpperArm@2 is farright then dangle_Bip01$R$UpperArm@2 is turnleftfast
+
+RULE 1: if angle_target_RightShoulderJointZ is farleft then dangle_RightShoulderJointZ is turnrightfast
+RULE 2: if angle_target_RightShoulderJointZ is left then dangle_RightShoulderJointZ is turnright
+RULE 3: if angle_target_RightShoulderJointZ is at then dangle_RightShoulderJointZ is stay
+RULE 4: if angle_target_RightShoulderJointZ is right then dangle_RightShoulderJointZ is turnleft
+RULE 5: if angle_target_RightShoulderJointZ is farright then dangle_RightShoulderJointZ is turnleftfast
+
+RULE 1: if angle_target_Bip01$R$Forearm is farleft then dangle_Bip01$R$Forearm is turnrightfast
+RULE 2: if angle_target_Bip01$R$Forearm is left then dangle_Bip01$R$Forearm is turnright
+RULE 3: if angle_target_Bip01$R$Forearm is at then dangle_Bip01$R$Forearm is stay
+RULE 4: if angle_target_Bip01$R$Forearm is right then dangle_Bip01$R$Forearm is turnleft
+RULE 5: if angle_target_Bip01$R$Forearm is farright then dangle_Bip01$R$Forearm is turnleftfast
+
+RULE 1: if angle_alignment_rightForeArmJointX is farleft   then dangle_rightForeArmJointX is turnrightfast
+RULE 2: if angle_alignment_rightForeArmJointX is left      then dangle_rightForeArmJointX is turnright
+RULE 3: if angle_alignment_rightForeArmJointX is at        then dangle_rightForeArmJointX is stay
+RULE 4: if angle_alignment_rightForeArmJointX is right     then dangle_rightForeArmJointX is turnleft
+RULE 5: if angle_alignment_rightForeArmJointX is farright  then dangle_rightForeArmJointX is turnleftfast
+
+RULE 1: if angle_alignment_Bip01$R$Hand is farleft then dangle_Bip01$R$Hand is turnrightfast
+RULE 2: if angle_alignment_Bip01$R$Hand is left then dangle_Bip01$R$Hand is turnright
+RULE 3: if angle_alignment_Bip01$R$Hand is at then dangle_Bip01$R$Hand is stay
+RULE 4: if angle_alignment_Bip01$R$Hand is right then dangle_Bip01$R$Hand is turnleft
+RULE 5: if angle_alignment_Bip01$R$Hand is farright then dangle_Bip01$R$Hand is turnleftfast
+
+RULE 1: if angle_target_rightWristJointY is farleft then dangle_rightWristJointY is turnrightfast
+RULE 2: if angle_target_rightWristJointY is left then dangle_rightWristJointY is turnright
+RULE 3: if angle_target_rightWristJointY is at then dangle_rightWristJointY is stay
+RULE 4: if angle_target_rightWristJointY is right then dangle_rightWristJointY is turnleft
+RULE 5: if angle_target_rightWristJointY is farright then dangle_rightWristJointY is turnleftfast
+
+RULE 1: if angle_target_Bip01$Spine1@1 is farleft then dangle_Bip01$Spine1@1 is turnrightfast
+RULE 2: if angle_target_Bip01$Spine1@1 is left then dangle_Bip01$Spine1@1 is turnright
+RULE 3: if angle_target_Bip01$Spine1@1 is at then dangle_Bip01$Spine1@1 is stay
+RULE 4: if angle_target_Bip01$Spine1@1 is right then dangle_Bip01$Spine1@1 is turnleft
+RULE 5: if angle_target_Bip01$Spine1@1 is farright then dangle_Bip01$Spine1@1 is turnleftfast
+
+RULE 1: if angle_target_Bip01$Spine1@2 is farleft then dangle_Bip01$Spine1@2 is turnrightfast
+RULE 2: if angle_target_Bip01$Spine1@2 is left then dangle_Bip01$Spine1@2 is turnright
+RULE 3: if angle_target_Bip01$Spine1@2 is at then dangle_Bip01$Spine1@2 is stay
+RULE 4: if angle_target_Bip01$Spine1@2 is right then dangle_Bip01$Spine1@2 is turnleft
+RULE 5: if angle_target_Bip01$Spine1@2 is farright then dangle_Bip01$Spine1@2 is turnleftfast
+
+RULE 1: if angle_target_Bip01$Neck@1 is farleft then dangle_Bip01$Neck@1 is turnrightfast
+RULE 2: if angle_target_Bip01$Neck@1 is left then dangle_Bip01$Neck@1 is turnright
+RULE 3: if angle_target_Bip01$Neck@1 is at then dangle_Bip01$Neck@1 is stay
+RULE 4: if angle_target_Bip01$Neck@1 is right then dangle_Bip01$Neck@1 is turnleft
+RULE 5: if angle_target_Bip01$Neck@1 is farright then dangle_Bip01$Neck@1 is turnleftfast
+
+RULE 1: if angle_target_Bip01$Neck@2 is farleft then dangle_Bip01$Neck@2 is turnrightfast
+RULE 2: if angle_target_Bip01$Neck@2 is left then dangle_Bip01$Neck@2 is turnright
+RULE 3: if angle_target_Bip01$Neck@2 is at then dangle_Bip01$Neck@2 is stay
+RULE 4: if angle_target_Bip01$Neck@2 is right then dangle_Bip01$Neck@2 is turnleft
+RULE 5: if angle_target_Bip01$Neck@2 is farright then dangle_Bip01$Neck@2 is turnleftfast
+
+RULE 1: if angle_target_Bip01$Head@1 is farleft then dangle_Bip01$Head@1 is turnrightfast
+RULE 2: if angle_target_Bip01$Head@1 is left then dangle_Bip01$Head@1 is turnright
+RULE 3: if angle_target_Bip01$Head@1 is at then dangle_Bip01$Head@1 is stay
+RULE 4: if angle_target_Bip01$Head@1 is right then dangle_Bip01$Head@1 is turnleft
+RULE 5: if angle_target_Bip01$Head@1 is farright then dangle_Bip01$Head@1 is turnleftfast
+
+RULE 1: if angle_target_Bip01$Head@2 is farleft then dangle_Bip01$Head@2 is turnrightfast
+RULE 2: if angle_target_Bip01$Head@2 is left then dangle_Bip01$Head@2 is turnright
+RULE 3: if angle_target_Bip01$Head@2 is at then dangle_Bip01$Head@2 is stay
+RULE 4: if angle_target_Bip01$Head@2 is right then dangle_Bip01$Head@2 is turnleft
+RULE 5: if angle_target_Bip01$Head@2 is farright then dangle_Bip01$Head@2 is turnleftfast
+
+RULE 1: if angle_target_HeadJointY is farleft then dangle_HeadJointY is turnrightfast
+RULE 2: if angle_target_HeadJointY is left then dangle_HeadJointY is turnright
+RULE 3: if angle_target_HeadJointY is at then dangle_HeadJointY is stay
+RULE 4: if angle_target_HeadJointY is right then dangle_HeadJointY is turnleft
+RULE 5: if angle_target_HeadJointY is farright then dangle_HeadJointY is turnleftfast
+
+END_RULEBLOCK
+END_FUNCTIONBLOCK

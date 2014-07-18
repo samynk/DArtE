@@ -1,0 +1,157 @@
+FUNCTION BLOCK
+
+VAR_INPUT
+angle_target_Bip01$L$Thigh@1:REAL;
+angle_target_Bip01$L$Thigh@2:REAL;
+distance_Bip01$L$Calf:REAL;
+angle_alignment1_Bip01$L$ThighX:REAL;
+angle_alignment2_Bip01$L$ThighX:REAL;
+angle_target_Bip01$L$Calf:REAL;
+angle_alignment1_Bip01$L$Foot@1:REAL;
+angle_alignment2_Bip01$L$Foot@2:REAL;
+END_VAR
+
+FUZZIFY angle_target_Bip01$L$Thigh@1
+TERMS := (veryfarleft,farleft,left,#at,right,farright,veryfarright):(-10.0 -1.2 -0.1 -0.09 0.09 0.1 1.2 10.0)
+END_FUZZIFY
+
+FUZZIFY angle_target_Bip01$L$Thigh@2
+TERMS := (farleft,left,#at,right,farright):(-30 -0.1 -0.09 0.09 0.1 30)
+END_FUZZIFY
+
+FUZZIFY distance_Bip01$L$Calf
+TERMS := (outside,at,inside):(-0.01 0 0.01  )
+END_FUZZIFY
+
+FUZZIFY angle_alignment1_Bip01$L$ThighX
+TERMS := (farleft,left,#at,right,farright):(-35 -0.5 -0.45 0.45 0.5 35)
+END_FUZZIFY
+
+FUZZIFY angle_alignment2_Bip01$L$ThighX
+TERMS := (farleft,left,#at,right,farright):(-35 -0.5 -0.45 0.45 0.5 35)
+END_FUZZIFY
+
+FUZZIFY angle_target_Bip01$L$Calf
+TERMS := (veryfarleft,farleft,left,#at,right,farright,veryfarright):(-10.0 -2.0 -0.2 -0.19 0.19 0.2 2.0 10.0)
+END_FUZZIFY
+
+FUZZIFY angle_alignment1_Bip01$L$Foot@1
+TERMS := (farleft,left,at,right,farright):(-5.0 -0.5 -0.45 0.45 0.5 5.0)
+END_FUZZIFY
+
+FUZZIFY angle_alignment2_Bip01$L$Foot@2
+TERMS := (farleft,left,at,right,farright):(-5.0 -2 -1.9 1.9 2.0 5.0)
+END_FUZZIFY
+
+
+VAR_OUTPUT
+dangle_Bip01$L$Thigh@1:REAL;
+dangle_Bip01$L$Thigh@2:REAL;
+dangle_Bip01$L$ThighX:REAL;
+dangle_Bip01$L$Calf:REAL;
+dangle_Bip01$L$Foot@1:REAL;
+dangle_Bip01$L$Foot@2:REAL;
+END_VAR
+
+DEFUZZIFY dangle_Bip01$L$Thigh@1
+TERM turnrightveryfast := 150.0
+TERM turnrightfast := 60.0
+TERM turnright := 15.0
+TERM stay := 0.0
+TERM turnleft := -15.0
+TERM turnleftfast := -61
+TERM turnleftveryfast := -150.0
+END_DEFUZZIFY
+
+DEFUZZIFY dangle_Bip01$L$Thigh@2
+TERM turnrightfast := 120.0
+TERM turnright := 15.0
+TERM stay := 0.0
+TERM turnleft := -15.0
+TERM turnleftfast := -120.0
+END_DEFUZZIFY
+
+DEFUZZIFY dangle_Bip01$L$ThighX
+TERM turnrightfast := 120.0
+TERM turnright := 10.0
+TERM stay := 0.0
+TERM turnleft := -10.0
+TERM turnleftfast := -120.0
+END_DEFUZZIFY
+
+DEFUZZIFY dangle_Bip01$L$Calf
+TERM turnrightveryfast := 150.0
+TERM turnrightfast := 40
+TERM turnright := 5
+TERM stay := 0.0
+TERM turnleft := -5
+TERM turnleftfast := -40
+TERM turnleftveryfast := -150.0
+END_DEFUZZIFY
+
+DEFUZZIFY dangle_Bip01$L$Foot@1
+TERM turnrightfast := 60
+TERM turnright := 30
+TERM stay := 0.0
+TERM turnleft := -30
+TERM turnleftfast := -60
+END_DEFUZZIFY
+
+DEFUZZIFY dangle_Bip01$L$Foot@2
+TERM turnrightfast := 50
+TERM turnright := 10
+TERM stay := 0.0
+TERM turnleft := -10
+TERM turnleftfast := -50
+END_DEFUZZIFY
+
+RULEBLOCK
+
+RULE 1: if angle_target_Bip01$L$Thigh@1 is veryfarleft then dangle_Bip01$L$Thigh@1 is turnrightveryfast
+RULE 1: if angle_target_Bip01$L$Thigh@1 is farleft then dangle_Bip01$L$Thigh@1 is turnrightfast
+RULE 2: if angle_target_Bip01$L$Thigh@1 is left then dangle_Bip01$L$Thigh@1 is turnright
+RULE 3: if angle_target_Bip01$L$Thigh@1 is at then dangle_Bip01$L$Thigh@1 is stay
+RULE 4: if angle_target_Bip01$L$Thigh@1 is right then dangle_Bip01$L$Thigh@1 is turnleft
+RULE 5: if angle_target_Bip01$L$Thigh@1 is farright then dangle_Bip01$L$Thigh@1 is turnleftfast
+RULE 1: if angle_target_Bip01$L$Thigh@1 is veryfarright then dangle_Bip01$L$Thigh@1 is turnleftveryfast
+
+RULE 1: if angle_target_Bip01$L$Thigh@2 is farleft then dangle_Bip01$L$Thigh@2 is turnrightfast
+RULE 4: if angle_target_Bip01$L$Thigh@2 is left then dangle_Bip01$L$Thigh@2 is turnright
+RULE 4: if angle_target_Bip01$L$Thigh@2 is at then dangle_Bip01$L$Thigh@2 is stay
+RULE 5: if angle_target_Bip01$L$Thigh@2 is right then dangle_Bip01$L$Thigh@2 is turnleft
+RULE 5: if angle_target_Bip01$L$Thigh@2 is farright then dangle_Bip01$L$Thigh@2 is turnleftfast
+
+RULE 1: if angle_alignment1_Bip01$L$ThighX is farleft then dangle_Bip01$L$ThighX is turnrightfast
+RULE 2: if angle_alignment1_Bip01$L$ThighX is left then dangle_Bip01$L$ThighX is turnright
+RULE 3: if angle_alignment1_Bip01$L$ThighX is at then dangle_Bip01$L$ThighX is stay
+RULE 4: if angle_alignment1_Bip01$L$ThighX is right then dangle_Bip01$L$ThighX is turnleft
+RULE 5: if angle_alignment1_Bip01$L$ThighX is farright then dangle_Bip01$L$ThighX is turnleftfast
+
+RULE 1: if angle_alignment2_Bip01$L$ThighX is farleft then dangle_Bip01$L$ThighX is turnrightfast
+RULE 2: if angle_alignment2_Bip01$L$ThighX is left then dangle_Bip01$L$ThighX is turnright
+RULE 3: if angle_alignment2_Bip01$L$ThighX is at then dangle_Bip01$L$ThighX is stay
+RULE 4: if angle_alignment2_Bip01$L$ThighX is right then dangle_Bip01$L$ThighX is turnleft
+RULE 5: if angle_alignment2_Bip01$L$ThighX is farright then dangle_Bip01$L$ThighX is turnleftfast
+
+RULE 1: if angle_target_Bip01$L$Calf is veryfarleft then dangle_Bip01$L$Calf is turnrightveryfast
+RULE 1: if angle_target_Bip01$L$Calf is farleft then dangle_Bip01$L$Calf is turnrightfast
+RULE 2: if angle_target_Bip01$L$Calf is left then dangle_Bip01$L$Calf is turnright
+RULE 3: if angle_target_Bip01$L$Calf is at then dangle_Bip01$L$Calf is stay
+RULE 5: if angle_target_Bip01$L$Calf is right then dangle_Bip01$L$Calf is turnleft
+RULE 5: if angle_target_Bip01$L$Calf is farright then dangle_Bip01$L$Calf is turnleftfast
+RULE 1: if angle_target_Bip01$L$Calf is veryfarright then dangle_Bip01$L$Calf is turnleftveryfast
+
+RULE 1: if angle_alignment1_Bip01$L$Foot@1 is farleft then dangle_Bip01$L$Foot@1 is turnrightfast
+RULE 2: if angle_alignment1_Bip01$L$Foot@1 is left then dangle_Bip01$L$Foot@1 is turnright
+RULE 3: if angle_alignment1_Bip01$L$Foot@1 is at then dangle_Bip01$L$Foot@1 is stay
+RULE 4: if angle_alignment1_Bip01$L$Foot@1 is right then dangle_Bip01$L$Foot@1 is turnleft
+RULE 5: if angle_alignment1_Bip01$L$Foot@1 is farright then dangle_Bip01$L$Foot@1 is turnleftfast
+
+RULE 1: if angle_alignment2_Bip01$L$Foot@2 is farleft then dangle_Bip01$L$Foot@2 is turnrightfast
+RULE 2: if angle_alignment2_Bip01$L$Foot@2 is left then dangle_Bip01$L$Foot@2 is turnright
+RULE 3: if angle_alignment2_Bip01$L$Foot@2 is at then dangle_Bip01$L$Foot@2 is stay
+RULE 4: if angle_alignment2_Bip01$L$Foot@2 is right then dangle_Bip01$L$Foot@2 is turnleft
+RULE 5: if angle_alignment2_Bip01$L$Foot@2 is farright then dangle_Bip01$L$Foot@2 is turnleftfast
+
+END_RULEBLOCK
+END_FUNCTIONBLOCK

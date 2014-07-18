@@ -1,0 +1,598 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+
+
+<objects>
+    <collection name="Standard" >
+        <object label="Crate" class="dae.prefabs.standard.CrateObject">
+            <parameters section="Transform">
+                <parameter type="string" id="name"/>
+                <parameter type="float3" id="localPrefabTranslation"/>
+                <parameter type="float3" id="localPrefabRotation"/>
+                <parameter type="float3" id="dimension"/>
+                <parameter type="action" id="drop" method="drop"/>
+            </parameters>
+        </object>
+        <object label="Sphere" class="dae.prefabs.standard.SphereObject">
+            <parameters section="Transform">
+                <parameter type="string" id="name"/>
+                <parameter type="float3" id="localPrefabTranslation"/>
+                <parameter type="float3" id="localPrefabRotation"/>
+                <parameter type="float" id="radius"/>
+                <parameter type="action" id="drop" method="drop"/>
+            </parameters>
+        </object>
+        <object label="Cylinder" class="dae.prefabs.standard.CylinderObject">
+            <parameters section="Transform">
+                <parameter type="string" id="name"/>
+                <parameter type="float3" id="localPrefabTranslation"/>
+                <parameter type="float3" id="localPrefabRotation"/>
+            </parameters>
+            <parameters section="Physics">
+                <parameter type="float" id="mass"/>
+                <parameter type="action" id="drop" method="drop"/>
+            </parameters>
+            <parameters section="Shape parameters">
+                <parameter type="float" id="radius" constraint="positive"/>
+                <parameter type="float" id="height" constraint="positive"/>
+                <parameter type="int" id="radialSegments" constraint="positive"/>
+                <parameter type="int" id="axialSegments" constraint="positive"/>
+            </parameters>
+        </object>
+        <object label="HingeJoint" class="dae.prefabs.physics.JointPrefab">
+            <parameters section="Transform">
+                <parameter type="string" id="name"/>
+                <parameter type="float3" id="localPrefabTranslation"/>
+                <parameter type="float3" id="localPrefabRotation"/>
+            </parameters>
+            <parameters section="Physics">
+                <parameter type="float" id="lowerLimit"/>
+                <parameter type="float" id="upperLimit"/>
+                <parameter type="float" id="limitSoftness" constraint="positive"/>
+                <parameter type="float" id="velocity" constraint="positive"/>
+                <parameter type="float" id="maxMotorImpulse" constraint="positive"/>
+                <parameter type="float" id="biasFactor" constraint="positive"/>
+                <parameter type="float" id="relaxationFactor" constraint="positive"/>
+                <parameter type="action" id="turnCW" method="turnCW"/>
+                <parameter type="action" id="turnCCW" method="turnCCW"/>
+                <parameter type="action" id="stop" method="stop"/>
+            </parameters>
+        </object>
+        <object label="Ground" class="motum.Ground">
+            <parameters section="Transform">
+                <parameter type="float3" id="localTranslation"/>
+                <parameter type="float" id="width"/>
+                <parameter type="float" id="length"/>
+            </parameters>
+        </object>
+        <object label="Trigger" class="motum.objects.prefab.TriggerBox">
+            <parameters section="Transform">
+                <parameter type="string" id="id"/>
+                <parameter type="float" id="xTranslation"/>
+                <parameter type="float" id="yTranslation"/>
+                <parameter type="float" id="zTranslation"/>
+                <parameter type="float" id="width"/>
+                <parameter type="float" id="height"/>
+                <parameter type="float" id="length"/>
+            </parameters>
+        </object>
+        <object label="Hinge" class="motum.objects.prefab.HingeObject">
+            <parameters section="Transform">
+                <parameter type="string" id="id"/>
+                <parameter type="float" id="xTranslation"/>
+                <parameter type="float" id="yTranslation"/>
+                <parameter type="float" id="zTranslation"/>
+                <parameter type="float" id="xRotation" min="0" max="360" step="1"/>
+                <parameter type="float" id="yRotation" min="0" max="360" step="1"/>
+                <parameter type="float" id="zRotation" min="0" max="360" step="1"/>
+                <parameter type="object" id="hingeObject"/>
+                <parameter type="float" id="xOffset"/>
+                <parameter type="float" id="yOffset"/>
+                <parameter type="float" id="zOffset"/>
+                <parameter type="float" id="xOffsetRotation"  min="0" max="360" step="1"/>
+                <parameter type="float" id="yOffsetRotation"  min="0" max="360" step="1"/>
+                <parameter type="float" id="zOffsetRotation"  min="0" max="360" step="1"/>
+            </parameters>
+        </object>
+        <object label="WaypointFile" class="motum.objects.waypoints.MapNode">
+            <parameter type="string" id="name"/>
+        </object>
+        <object label="Rack" class="motum.objects.prefab.RackObject">
+            <parameters section="Transform">
+                <parameter type="float3" id="localTranslation"/>
+                <parameter type="float3" id="dimension"/>
+                <parameter type="int" id="nrOfRacks"/>
+                <parameter type="int" id="nrOfSupports"/>
+            </parameters>
+        </object>
+        <object label="MessageBoard" class="motum.objects.prefab.MessageBoardObject">
+            <defaults>
+                <parameter type="float3" id="offset" value="[0,0,1]"/>
+            </defaults>
+            <parameters section="Transform">
+                <parameter type="float3" id="localTranslation"/>
+                <parameter type="float" id="zRotation"/>
+                <parameter type="string" id="text"/>
+            </parameters>
+            <parameters section="Appearance">
+                <parameter type="color" id="fontColor"/>
+            </parameters>
+        </object>
+        <object label="Ton" class="dae.prefabs.standard.MeshObject" mesh="Models/barrel.j3o">
+            <parameters section="Transform">
+                <parameter type="float3" id="localTranslation"/>
+                <parameter type="float" id="zRotation"/>
+            </parameters>
+            <parameters section="Appearance">
+                <parameter type="color" id="diffuseColor"/>
+            </parameters>
+        </object>
+        <object label="Klatch" class="dae.prefabs.Klatch" defaultloader="true">
+            <parameters section="Transform">
+                <parameter type="string" id="name"/>
+                <parameter type="float3" id="localTranslation"/>
+                <parameter type="float3" id="localRotation"/>
+                <parameter type="float3" id="localScale"/>
+                <parameter type="string" id="layer"/>
+                <parameter type="enumlist" id="shadowMode" enumclass="com.jme3.renderer.queue.RenderQueue$ShadowMode"/>
+            </parameters>
+            <parameters section="Appearance">
+                <parameter type="boolean" id="wireframe"/>
+                <parameter type="boolean" id="locked"/>
+            </parameters>
+        </object>
+        <object label="Mesh" class="dae.prefabs.standard.MeshObject">
+            <parameters section="Transform">
+                <parameter type="string" id="name"/>
+                <parameter type="float3" id="localTranslation"/>
+                <parameter type="float3" id="localRotation"/>
+                <parameter type="float3" id="localScale"/>
+                <parameter type="object" id="physicsMesh"/>
+                <parameter type="magnets" id="magnets">
+                    <gridmagnet type="construction"/>
+                    <magnet translation="[0,0,0]" radius="0.02" type="construction,pivot" activePivot="true"/>
+                </parameter>
+                <parameter type="string" id="layer"/>
+                <parameter type="enumlist" id="shadowMode" enumclass="com.jme3.renderer.queue.RenderQueue$ShadowMode"/>
+            </parameters>
+            <parameters section="Appearance">
+                <parameter type="boolean" id="wireframe"/>
+                <parameter type="boolean" id="locked"/>
+            </parameters>
+        </object>
+        <object label="NPC" class="motum.objects.prefab.NPC">
+            <parameters section="Transform">
+                <parameter type="string" id="name"/>
+                <parameter type="string" id="animation"/>
+                <parameter type="string" id="actorName"/>
+                <parameter type="string" id="actorId"/>
+                <parameter type="float" id="xTranslation"/>
+                <parameter type="float" id="yTranslation"/>
+                <parameter type="float" id="zTranslation"/>
+                <parameter type="range" id="xRotation" min="0" max="360" step="1"/>
+                <parameter type="range" id="yRotation" min="0" max="360" step="1"/>
+                <parameter type="range" id="zRotation" min="0" max="360" step="1"/>
+                <parameter type="string" id="waypointTest"/>
+                <parameter type="action" id="doWaypointTest" method="doWaypointTest"/>
+            </parameters>
+        </object>
+        <object label="J3ONPC" class="motum.objects.prefab.J3ONPC">
+            <parameters section="Transform">
+                <parameter type="string" id="name"/>
+                <parameter type="string" id="animation"/>
+                <parameter type="string" id="actorName"/>
+                <parameter type="string" id="actorId"/>
+                <parameter type="float" id="xTranslation"/>
+                <parameter type="float" id="yTranslation"/>
+                <parameter type="float" id="zTranslation"/>
+                <parameter type="range" id="xRotation" min="0" max="360" step="1"/>
+                <parameter type="range" id="yRotation" min="0" max="360" step="1"/>
+                <parameter type="range" id="zRotation" min="0" max="360" step="1"/>
+                <parameter type="string" id="waypointTest"/>
+                <parameter type="action" id="doWaypointTest" method="doWaypointTest"/>
+            </parameters>
+        </object>
+        <object label="Situation" class="motum.objects.prefab.SituationEntity">
+            <parameters section="Transform">
+                <parameter type="string" id="name"/>
+                <parameter type="string" id="eventId"/>
+                <parameter type="float" id="xTranslation"/>
+                <parameter type="float" id="yTranslation"/>
+                <parameter type="float" id="zTranslation"/>
+            </parameters>
+        </object>
+        <object label="Camera" class="motum.objects.prefab.CameraEntity">
+            <parameters section="Transform">
+                <parameter type="string" id="name"/>
+                <parameter type="string" id="cameraId"/>
+                <parameter type="float" id="xTranslation"/>
+                <parameter type="float" id="yTranslation"/>
+                <parameter type="float" id="zTranslation"/>
+                <parameter type="range" id="xRotation" min="0" max="360" step="1"/>
+                <parameter type="range" id="yRotation" min="0" max="360" step="1"/>
+                <parameter type="range" id="zRotation" min="0" max="360" step="1"/>
+                <parameter type="boolean" id="startCam"/>
+            </parameters>
+        </object>
+        <object label="Sound" class="motum.objects.prefab.SoundEntity">
+            <parameters section="Transform">
+                <parameter type="string" id="name"/>
+                <parameter type="sound" id="soundFile"/>
+                <parameter type="range" id="volume" min="0" max="1" step="0.01"/>
+                <parameter type="boolean" id="looping"/>
+                <parameter type="boolean" id="positional"/>
+                <parameter type="float3" id="localTranslation"/>
+            </parameters>
+        </object>
+        <object label="PlayerStart" class="motum.objects.prefab.PlayerStartEntity">
+            <parameters section="Transform">
+                <parameter type="string" id="name"/>
+                <parameter type="float" id="xTranslation"/>
+                <parameter type="float" id="yTranslation"/>
+                <parameter type="float" id="zTranslation"/>
+                <parameter type="range" id="xRotation" min="0" max="360" step="1"/>
+                <parameter type="range" id="yRotation" min="0" max="360" step="1"/>
+                <parameter type="range" id="zRotation" min="0" max="360" step="1"/>
+            </parameters>
+        </object>
+        <object label="NPCLocation" class="motum.objects.prefab.NPCLocationEntity">
+            <parameters section="Transform">
+                <parameter type="string" id="name"/>
+                <parameter type="float" id="xTranslation"/>
+                <parameter type="float" id="yTranslation"/>
+                <parameter type="float" id="zTranslation"/>
+                <parameter type="range" id="yRotation" min="0" max="360" step="1"/>
+                <parameter type="gmf_object" id="npc"/>
+                <parameter type="string" id="animation"/>
+            </parameters>
+        </object>
+        <object label="Waypoint" class="motum.objects.prefab.WayPointEntity">
+            <parameters section="Transform">
+                <parameter type="string" id="name"/>
+                <parameter type="string" id="waypointId"/>
+                <parameter type="float" id="xTranslation"/>
+                <parameter type="float" id="yTranslation"/>
+                <parameter type="float" id="zTranslation"/>
+                <parameter type="range" id="xRotation" min="0" max="360" step="1"/>
+                <parameter type="range" id="yRotation" min="0" max="360" step="1"/>
+                <parameter type="range" id="zRotation" min="0" max="360" step="1"/>
+                
+            </parameters>
+        </object>
+        <object label="NavigationMesh" class="motum.objects.prefab.NavigationMesh">
+            <parameters section="Transform">
+                <parameter type="string" id="name"/>
+                <parameter type="object" id="sourceMesh"/>
+                <parameter type="float" id="cellSize" default="0.5" constraint="positive"/>
+                <parameter type="float" id="cellHeight" default="0.5" constraint="positive"/>
+                <parameter type="float" id="maxTraversableHeight" default="1.0" constraint="positive"/>
+                <parameter type="float" id="maxTraversableStep" default="0.5" constraint="positive"/>
+                <parameter type="range" id="maxTraversableSlope" min="0" max="90" step="1"/>
+                <parameter type="boolean" id="clipLedges" default="false"/>
+                <parameter type="float" id="traversableAreaBorderSize" default="0.5" constraint="positive"/>
+                <parameter type="int" id="smoothingTreshhold" default="2" />
+                <parameter type="boolean" id="useConservativeExpansion" default="false"/>
+                <parameter type="int" id="minUnconnectedRegionSize" default="1" contraint="positive"/>
+                <parameter type="int" id="mergeRegionSize" dfault="4" constraint="positive"/>
+                <parameter type="float" id="maxEdgeLength" default="0" constraint="positive"/>
+                <parameter type="float" id="edgeMaxDeviation" default="0.5" constraint="positive"/>
+                <parameter type="int" id="maxVertsPerPoly" default="6" constraint="positive"/>
+                <parameter type="float" id="contourSampleDistance" default="10"/>
+                <parameter type="float" id="contourMaxDeviation" default="10"/>
+                <parameter type="action" id="generateMesh" method="generateMesh"/>
+            </parameters>
+        </object>
+    </collection>
+    <collection name="Metadata">
+        <object label="Pivot" class="dae.prefabs.gizmos.PivotGizmo">
+            <parameters section="Transform">
+                <parameter type="string" id="name"/>
+                <parameter type="float3" id="localTranslation"/>
+                <parameter type="float3" id="localRotation"/>
+            </parameters>
+        </object>
+    </collection>
+    <collection name="Animation">
+        <object label="Skeleton" class="dae.animation.skeleton.Body" defaultloader="true">
+            <parameters section="Transform">
+                <parameter type="string" id="name"/>
+                <parameter type="float3" id="localTranslation"/>
+                <parameter type="float" id="yRotation"/>
+                <parameter type="boolean" id="showCharacter"/>
+            </parameters>
+            <parameters section="Animation">
+                <parameter type="object" id="leftHandTarget"/>
+                <parameter type="object" id="rightHandTarget"/>
+                <parameter type="object" id="characterPath" classFilter="dae.animation.custom.CharacterPath"/>
+                <parameter type="action" id="walk" method="walk"/>
+            </parameters>
+        </object>
+        <object label="RevoluteJoint" class="dae.animation.skeleton.RevoluteJoint">
+            <parameters section="Transform">
+                <parameter type="string" id="name"/>
+                <parameter type="float" id="currentAngle"/>
+                <parameter type="float" id="minAngle"/>
+                <parameter type="float" id="maxAngle"/>
+            </parameters>
+        </object>
+        <object label="RevoluteJointTwoAxis" class="dae.animation.skeleton.RevoluteJointTwoAxis">
+            <parameters section="Transform">
+                <parameter type="string" id="name"/>
+                <parameter type="float" id="currentAngle1"/>
+                <parameter type="float" id="currentAngle2"/>
+            </parameters>
+        </object>
+        <object label="Handle" class="dae.prefabs.standard.MeshObject" mesh="Skeleton/Helpers/Handle.j3o">
+            <parameters section="Transform">
+                <parameter type="string" id="name"/>
+                <parameter type="float3" id="localTranslation"/>
+                <parameter type="float3" id="localRotation"/>
+            </parameters>
+            <parameters section="Appearance">
+                <parameter type="color" id="diffuseColor"/>
+            </parameters>
+        </object>
+        <object label="TwoAxisHandle" class="dae.animation.skeleton.Handle">
+            <parameters section="Transform">
+                <parameter type="string" id="name"/>
+                <parameter type="float3" id="localTranslation"/>
+                <parameter type="float3" id="localRotation"/>
+            </parameters>
+        </object>
+        <object label="Handshake" class="dae.animation.skeleton.Handshake">
+            <parameters section="Transform">
+                <parameter type="string" id="name"/>
+                <parameter type="float3" id="localTranslation"/>
+                <parameter type="float3" id="localRotation"/>
+            </parameters>
+        </object>
+        <object label="CharacterPath" class="dae.animation.custom.CharacterPath">
+            <parameters section="Transform">
+                <parameter type="string" id="name"/>
+                <parameter type="float3" id="localTranslation"/>
+                <parameter type="float" id="yRotation"/>
+            </parameters>
+        </object>
+        <object label="Waypoint" class="dae.animation.custom.Waypoint">
+            <parameters section="Transform">
+                <parameter type="string" id="name"/>
+                <parameter type="float3" id="localTranslation"/>
+                <parameter type="float" id="yRotation"/>
+            </parameters>
+        </object>
+        <object label="Footcurve" class="dae.animation.trajectory.FootstepTargetCurve">
+            <parameters section="Transform">
+                <parameter type="string" id="name"/>
+                <parameter type="float3" id="localTranslation"/>
+            </parameters>
+            <parameters section="Trajectory">
+                <parameter type="float" id="tolerance"/>
+                <parameter type="float" id="height"/>
+            </parameters>
+        </object>
+        <object label="Handcurve" class="dae.animation.trajectory.HandTargetCurve">
+            <parameters section="Transform">
+                <parameter type="string" id="name"/>
+                <parameter type="float3" id="localTranslation"/>
+            </parameters>
+            <parameters section="Trajectory">
+                <parameter type="float" id="tolerance"/>
+            </parameters>
+        </object>
+    </collection>
+    <collection name="Light">
+        <object label="SpotLight" class="dae.prefabs.lights.SpotLightPrefab">
+            <parameters section="Transform">
+                <parameter type="string" id="name"/>
+                <parameter type="float3" id="localPrefabTranslation"/>
+                <parameter type="float3" id="localPrefabRotation"/>
+            </parameters>
+            <parameters section="Light">
+                <parameter type="float" id="spotInnerAngle"/>
+                <parameter type="float" id="spotOuterAngle"/>
+                <parameter type="float" id="spotRange"/>
+                <parameter type="color" id="spotLightColor"/>
+                <parameter type="float" id="spotLightIntensity" default="1" min="0" max="10" step=".1"/>
+                <parameter type="boolean" id="castShadow"/>
+            </parameters>
+        </object>
+        <object label="PointLight" class="dae.prefabs.lights.PointLightPrefab">
+            <parameters section="Transform">
+                <parameter type="string" id="name"/>
+                <parameter type="float3" id="localPrefabTranslation"/>
+            </parameters>
+            <parameters section="Light">
+                <parameter type="float" id="radius"/>
+                <parameter type="color" id="pointLightColor"/>
+                <parameter type="float" id="pointLightIntensity" default="1" min="0" max="10" step=".1"/>
+               
+            </parameters>
+        </object>
+        <object label="DirectionalLight" class="dae.prefabs.lights.DirectionalLightPrefab">
+            <parameters section="Transform">
+                <parameter type="string" id="name"/>
+                <parameter type="float3" id="localPrefabTranslation"/>
+                <parameter type="float3" id="localPrefabRotation"/>
+            </parameters>
+            <parameters section="Light">
+                <parameter type="color" id="directionalLightColor"/>
+                <parameter type="float" id="directionalLightIntensity" default="1" min="0" max="10" step=".1"/>
+                <parameter type="boolean" id="castShadow"/> 
+            </parameters>
+        </object>
+         <object label="AmbientLight" class="dae.prefabs.lights.AmbientLightPrefab">
+            <parameters section="Transform">
+                <parameter type="string" id="name"/>
+                <parameter type="float3" id="localPrefabTranslation"/>
+                <parameter type="float3" id="localPrefabRotation"/>
+            </parameters>
+            <parameters section="Light">
+                <parameter type="color" id="ambientLightColor"/>
+                <parameter type="float" id="ambientLightIntensity" default="1" min="0" max="10" step=".1"/>
+            </parameters>
+        </object>
+    </collection>
+    <collection name="House">
+        <object label="Brick" class="motum.objects.prefab.MeshObject" mesh="Objects/misc/brick.obj">
+            <parameters section="Transform">
+                <parameter type="float3" id="localTranslation"/>
+                <parameter type="float" id="zRotation"/>
+                <parameter type="magnets" id="magnets">
+                    <magnet translation="[0,0,0.067]" radius="0.02" type="construction"/>
+                    <magnet translation="[-0.1,0,0.067]" radius="0.02" type="construction"/>
+                    <magnet translation="[0.1,0,0.067]" radius="0.02" type="construction"/>
+                    <magnet translation="[0,0,0]" radius="0.02" type="construction,pivot" activePivot="true"/>
+                    <magnet translation="[-0.1,0,0.0335]" radius="0.02" type="construction,pivot"/>
+                    <magnet translation="[0.1,0,0.0335]" radius="0.02" type="construction,pivot"/>
+                </parameter>
+            </parameters>
+            <parameters section="Appearance">
+                <parameter type="color" id="diffuseColor"/>
+            </parameters>
+        </object>
+        <object label="Big Brick" class="motum.objects.prefab.MeshObject" mesh="Objects/misc/big_brick.obj">
+            <parameters section="Transform">
+                <parameter type="float3" id="localTranslation"/>
+                <parameter type="float" id="zRotation"/>
+                <parameter type="magnets" id="magnets">
+                  
+                    <magnet translation="[-0.175,0,0.124]" name="topmiddleleft" radius="0.02" type="construction" selectPivot="center">
+                        <rotation axis="[0,0,1]" values="[-45,-40,-36,-30,-24,-20,-15,-10,-5,0,5,10,15,20,25,30,35,40,45]" currentRotation="0"/>
+                    </magnet>
+                    <magnet translation="[0.175,0,0.124]" name="topmiddleright" radius="0.02" type="construction" selectPivot="center">
+                        <rotation axis="[0,0,1]" values="[-45,-40,-36,-30,-24,-20,-15,-10,-5,0,5,10,15,20,25,30,35,40,45]" currentRotation="0"/>
+                    </magnet>
+              
+                    <magnet translation="[0,-0.085,0.124]" name="topleft" radius="0.02" type="construction" selectPivot="side1leftbottom">
+                        <rotation axis="[0,0,1]" values="[-22.5,-20,-18,-15,-12,-10,-7.5,-5,-2.5,0,2.5,5,7.5,10,12.5,15,17.5,20,22.5]" currentRotation="0"/>
+                    </magnet>
+                    <magnet translation="[0,0.085,0.124]" name="topright" radius="0.02" type="construction" selectPivot="side1rightbottom">
+                        <rotation axis="[0,0,1]" values="[-22.5,-20,-18,-15,-12,-10,-7.5,-5,-2.5,0,2.5,5,7.5,10,12.5,15,17.5,20,22.5]" currentRotation="0"/>
+                    </magnet>
+                    
+                    <magnet translation="[-0.175,-0.085,0]" name="side1leftbottom" radius="0.02" type="construction"/>
+                    <magnet translation="[-0.175, 0.085,0]" name="side1rightbottom" radius="0.02" type="construction"/>
+                    
+                    <magnet translation="[0,0,0]" name="center" radius="0.02" type="construction,pivot" selectPivot="center" activePivot="true"/>
+                    <magnet translation="[0,0,0.124]" name="topcenter" radius="0.02" type="construction,pivot" selectPivot="center" activePivot="true"/>
+                    <magnet translation="[-0.175,0,0.057]" name="side1half_right" radius="0.02" type="construction" selectPivot="rotated1" tangentFrame="[[0,-1,0];[1,0,0];[0,0,1]]">
+                        <area min="[-0.171,0.05,0]" max="[-0.169,0.09,0.124]"/>
+                    </magnet>
+                    <magnet translation="[-0.175,0,0.057]" name="side1half_left" radius="0.02" type="construction" selectPivot="rotated3" tangentFrame="[[0,1,0];[-1,0,0];[0,0,1]]">
+                        <area min="[-0.171,-0.09,0]" max="[-0.169,-0.05,0.124]"/>
+                    </magnet>
+                    <magnet translation="[-0.175,-0.085,0.057]" name="side1half_leftcenter" type="construction" selectPivot="side2half_leftcenter">
+                        <area min="[-0.171,-0.05,-0.02]" max="[-0.169,-0.02,0.124]"/>
+                        <rotation axis="[0,0,1]" values="[-45,-40,-36,-30,-24,-20,-15,-10,-5,0]" currentRotation="0"/>
+                    </magnet>
+                    <magnet translation="[-0.175,0,0.057]" name="side1half_center" radius="0.02" type="construction,pivot" selectPivot="side2half_center"/>
+                    <magnet translation="[-0.175,0.085,0.057]" name="side1half_rightcenter" type="construction" selectPivot="side2half_rightcenter">
+                        <area min="[-0.171,0.02,0]" max="[-0.169,0.05,0.124]"/>
+                        <rotation axis="[0,0,1]" values="[0,5,10,15,20,24,30,36,40,45]" currentRotation="0"/>
+                    </magnet>
+                    
+                    <magnet translation="[0.175,0,0.057]" name="side2half_right" radius="0.02" type="construction,pivot" selectPivot="rotated2" tangentFrame="[[0,1,0];[-1,0,0];[0,0,1]]">
+                        <area min="[0.169,0.05,0]" max="[0.171,0.09,0.124]"/>
+                    </magnet>
+                    <magnet translation="[0.175,0,0.057]" name="side2half_left" radius="0.02" type="construction,pivot" selectPivot="rotated4" tangentFrame="[[0,-1,0];[1,0,0];[0,0,1]]">
+                        <area min="[0.169,-0.09,0]" max="[0.171,-0.05,0.124]"/>
+                    </magnet>
+                    <magnet translation="[0.175,-0.085,0.057]" name="side2half_leftcenter" type="construction" selectPivot="side1half_leftcenter">
+                        <area min="[0.169,-0.05,-0.02]" max="[0.171,-0.02,0.124]"/>
+                        <rotation axis="[0,0,1]" values="[-45,-40,-36,-30,-24,-20,-15,-10,-5,0]" currentRotation="0"/>
+                    </magnet>
+                    <magnet translation="[0.175,0.085,0.057]" name="side2half_rightcenter" type="construction" selectPivot="side1half_rightcenter">
+                        <area min="[0.169,0.02,0]" max="[0.171,0.05,0.124]"/>
+                        <rotation axis="[0,0,1]" values="[0,5,10,15,20,24,30,36,40,45]" currentRotation="0"/>
+                    </magnet>
+                    
+                    <magnet translation="[0.175,0,0.057]" name="side2half_center" radius="0.02" type="construction,pivot" selectPivot="side1half_center"/>
+                    <magnet translation="[0.085,0.09,0.057]" name="rotated1" radius="0.02" type="construction" selectPivot="side1half_center" tangentFrame="[[0,1,0];[-1,0,0];[0,0,1]]"/>
+                    <magnet translation="[-0.085,0.09,0.057]" name="rotated2" radius="0.02" type="construction" selectPivot="side1half_center" tangentFrame="[[0,1,0];[-1,0,0];[0,0,1]]"/>
+                    <magnet translation="[0.085,-0.09,0.057]" name="rotated3" radius="0.02" type="construction" selectPivot="side1half_center"  tangentFrame="[[0,-1,0];[1,0,0];[0,0,1]]"/>
+                    <magnet translation="[-0.085,-0.09,0.057]" name="rotated4" radius="0.02" type="construction" selectPivot="side1half_center"  tangentFrame="[[0,-1,0];[1,0,0];[0,0,1]]"/>
+                </parameter>
+                <parameter type="filler" id="filler">
+                    <quad name="frontQuad" maxlength="0.05" connectorLoc="[0.170,0.01,0.056]" dir="[1,0,0]" triangles="3,2" clockwise="true">
+                        <point location="[0.170,0.085,0]" dir1="[1,0,0]" dir2="[0,0,-1]"/>
+                        <point location="[0.170,0.085,0.114]" dir1="[1,0,0]" dir2="[0,0,1]"/>
+                        <point location="[0.170,-0.085,0.114]" dir1="[1,0,0]" dir2="[0,0,1]"/>
+                        <point location="[0.170,-0.085,0]" dir1="[1,0,0]" dir2="[0,0,-1]"/>  
+                    </quad>
+                    <quad name="sideQuad" maxlength="0.05" connectorLoc="[-0.170,0.01,0.056]" dir="[-1,0,0]" triangles="6,7" clockwise="false">
+                        <point location="[-0.170,0.085,0]" dir1="[-1,0,0]" dir2="[0,0,-1]"/>
+                        <point location="[-0.170,0.085,0.114]" dir1="[-1,0,0]" dir2="[0,0,1]"/>  
+                        <point location="[-0.170,-0.085,0.114]" dir1="[-1,0,0]" dir2="[0,0,1]"/>
+                        <point location="[-0.170,-0.085,0]" dir1="[-1,0,0]" dir2="[0,0,-1]"/>
+                    </quad>
+                    <quad name="bottomQuad1" maxlength="0.05" connectorLoc="[0.0875,0,0]" dir="[0,0,-1]" triangles="8,9" clockwise="false">
+                        <point location="[-0.170,0.085,0]" dir1="[0,0,-1]" dir2="[0,0,-1]"/>
+                        <point location="[-0.170,-0.085,0]" dir1="[0,0,-1]" dir2="[0,0,-1]"/>  
+                        <point location="[0.170,-0.085,0]" dir1="[0,0,-1]" dir2="[0,0,-1]"/>
+                        <point location="[0.170,0.085,0]" dir1="[0,0,-1]" dir2="[0,0,-1]"/>
+                    </quad>
+                    <quad name="bottomQuad2" maxlength="0.05" connectorLoc="[-0.0875,0,0]" dir="[0,0,-1]" triangles="8,9" clockwise="false">
+                        <point location="[-0.170,0.085,0]" dir1="[0,0,-1]" dir2="[0,0,-1]"/>
+                        <point location="[-0.170,-0.085,0]" dir1="[0,0,-1]" dir2="[0,0,-1]"/>  
+                        <point location="[0.170,-0.085,0]" dir1="[0,0,-1]" dir2="[0,0,-1]"/>
+                        <point location="[0.170,0.085,0]" dir1="[0,0,-1]" dir2="[0,0,-1]"/>
+                    </quad>
+                    <quad name="topQuad" maxlength="0.05" connectorLoc="[0.0875,0,0.114]" dir="[0,0,1]" triangles="4,5" clockwise="true">
+                        <point location="[-0.170,0.085,0.114]" dir1="[0,0,-1]" dir2="[0,0,-1]"/>
+                        <point location="[-0.170,-0.085,0.114]" dir1="[0,0,-1]" dir2="[0,0,-1]"/>  
+                        <point location="[0.170,-0.085,0.114]" dir1="[0,0,-1]" dir2="[0,0,-1]"/>
+                        <point location="[0.170,0.085,0.114]" dir1="[0,0,-1]" dir2="[0,0,-1]"/>
+                    </quad>
+                </parameter>
+            </parameters>
+            <parameters section="Appearance">
+                <parameter type="color" id="diffuseColor"/>
+            </parameters>
+        </object>
+        <object label="Half Big Brick" class="motum.objects.prefab.MeshObject" mesh="Objects/misc/big_brick_half.obj">
+            <parameters section="Transform">
+                <parameter type="float3" id="localTranslation"/>
+                <parameter type="float" id="zRotation"/>
+                <parameter type="magnets" id="magnets">
+                    <magnet translation="[-0.005,0,0.0]" name="center" radius="0.02" type="construction,pivot" activePivot="true"/>
+                    <magnet translation="[0.175,0,0.057]" name="side2half" radius="0.02" type="construction,pivot"/>
+                    <magnet translation="[0.085,0.09,0.057]" name="rotated" radius="0.02" type="construction" tangentFrame="[[0,1,0];[-1,0,0];[0,0,1]]"/>
+                    <magnet translation="[0.085,-0.09,0.057]" name="rotated" radius="0.02" type="construction" tangentFrame="[[0,-1,0];[1,0,0];[0,0,1]]"/>
+                </parameter>
+            </parameters>
+            <parameters section="Appearance">
+                <parameter type="color" id="diffuseColor"/>
+            </parameters>
+        </object>
+        <object label="Tile" class="motum.objects.prefab.MeshObject" mesh="Objects/misc/big_tile.obj">
+            <parameters section="Transform">
+                <parameter type="float3" id="localTranslation"/>
+                <parameter type="float" id="zRotation"/>
+                <parameter type="magnets" id="magnets">
+                    <magnet translation="[0.175,0.085,0]" name="side4half_center" radius="0.02" selectPivot="side1half_center" type="construction,pivot"/>
+                    <magnet translation="[-0.1750,0.085,0]" name="side1half_center" radius="0.02"  selectPivot="side4half_center" type="construction,pivot"/>
+                    <magnet translation="[0.085,0.175,0]" name="side2half_center" radius="0.02" selectPivot="side3half_center" type="construction,pivot"/>
+                    <magnet translation="[0.085,-0.175,0]" name="side3half_center" radius="0.02" selectPivot="side2half_center" type="construction,pivot" activePivot="true"/>
+                </parameter>
+            </parameters>
+            <parameters section="Appearance">
+                <parameter type="color" id="diffuseColor"/>
+            </parameters>
+        </object>
+        <object label="Door" class="motum.objects.prefab.MeshObject" mesh="Objects/misc/door.obj">
+            <parameters section="Transform">
+                <parameter type="float3" id="localTranslation"/>
+                <parameter type="float" id="zRotation"/>
+                <parameter type="magnets" id="magnets">
+                    <magnet translation="[-.7,0,.057]" radius="0.02" type="construction,pivot"/>
+                </parameter>
+            </parameters>
+            <parameters section="Appearance">
+                <parameter type="color" id="diffuseColor"/>
+            </parameters>
+        </object>
+    </collection>
+</objects>
