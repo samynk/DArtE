@@ -34,6 +34,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.nio.file.Paths;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -66,7 +67,7 @@ public class ProjectPanel extends javax.swing.JPanel implements TreeSelectionLis
             public void mousePressed(MouseEvent e) {
                 doPopup(e);
             }
-            
+
             @Override
             public void mouseReleased(MouseEvent e) {
                 doPopup(e);
@@ -83,13 +84,13 @@ public class ProjectPanel extends javax.swing.JPanel implements TreeSelectionLis
                             projectMenu.show(projectTree, pathBounds.x, pathBounds.y + pathBounds.height / 2);
                         } else if (o instanceof Level) {
                             layerMenu.show(projectTree, pathBounds.x, pathBounds.y + pathBounds.height / 2);
-                        } else if ( o instanceof Klatch){
+                        } else if (o instanceof Klatch) {
                             klatchMenu.show(projectTree, pathBounds.x, pathBounds.y + pathBounds.height / 2);
-                        } else if (o instanceof Prefab ){
+                        } else if (o instanceof Prefab) {
                             prefabMenu.show(projectTree, pathBounds.x, pathBounds.y + pathBounds.height / 2);
                         }
                     }
-                    
+
                 }
             }
         });
@@ -236,32 +237,35 @@ public class ProjectPanel extends javax.swing.JPanel implements TreeSelectionLis
 
     private void mnuCreateKlatchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuCreateKlatchActionPerformed
         // TODO add your handling code here:
-        createKlatchDialog.setLocationRelativeTo(this);
-        createKlatchDialog.setCurrentProject(this.currentProject);
-        createKlatchDialog.setVisible(true);
-        
-        if ( createKlatchDialog.getReturnStatus() == CreateKlatchDialog.RET_OK)
-        {
-            String path = createKlatchDialog.getAssemblyName();
-            TreePath selected = projectTree.getLeadSelectionPath();
-            Object o = selected.getLastPathComponent();
-            if ( !(o instanceof Klatch) ){
-                Prefab original = (Prefab)o;
-                Node parentNode = original.getParent();
-                Prefab copy = (Prefab)original.clone();
-                copy.setLocalTransform(Transform.IDENTITY);
-                
-                Node sceneNode = new Node();
-                sceneNode.attachChild(copy);
-                SceneSaver.writeScene(new File(currentProject.getKlatchDirectory(),path), sceneNode);
-                // TODO ask to replace the current object with a klatch object.
-                Level currentLevel = (Level)selected.getPathComponent(LEVELDEPTH);
-                LevelEvent removeNode = new LevelEvent(currentLevel , EventType.NODEREMOVEREQUEST, original);
-                GlobalObjects.getInstance().postEvent(removeNode);
-                
-                InsertObjectEvent ioe = new InsertObjectEvent(currentLevel, path,original.getName(),parentNode, original.getLocalTransform());
-                GlobalObjects.getInstance().postEvent(ioe);
+        if (currentProject.hasFileLocation()) {
+            createKlatchDialog.setLocationRelativeTo(this);
+            createKlatchDialog.setCurrentProject(this.currentProject);
+            createKlatchDialog.setVisible(true);
+
+            if (createKlatchDialog.getReturnStatus() == CreateKlatchDialog.RET_OK) {
+                String path = createKlatchDialog.getAssemblyName();
+                TreePath selected = projectTree.getLeadSelectionPath();
+                Object o = selected.getLastPathComponent();
+                if (!(o instanceof Klatch)) {
+                    Prefab original = (Prefab) o;
+                    Node parentNode = original.getParent();
+                    Prefab copy = (Prefab) original.clone();
+                    copy.setLocalTransform(Transform.IDENTITY);
+
+                    Node sceneNode = new Node();
+                    sceneNode.attachChild(copy);
+                    SceneSaver.writeScene(new File(currentProject.getKlatchDirectory(), path), sceneNode);
+                    // TODO ask to replace the current object with a klatch object.
+                    Level currentLevel = (Level) selected.getPathComponent(LEVELDEPTH);
+                    LevelEvent removeNode = new LevelEvent(currentLevel, EventType.NODEREMOVEREQUEST, original);
+                    GlobalObjects.getInstance().postEvent(removeNode);
+
+                    InsertObjectEvent ioe = new InsertObjectEvent(currentLevel, path, original.getName(), parentNode, original.getLocalTransform());
+                    GlobalObjects.getInstance().postEvent(ioe);
+                }
             }
+        } else {
+            JOptionPane.showMessageDialog(this,"Save the project first before creating assemblies!","Error",JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_mnuCreateKlatchActionPerformed
 
@@ -272,7 +276,6 @@ public class ProjectPanel extends javax.swing.JPanel implements TreeSelectionLis
     private void mnuDeleteKlatchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuDeleteKlatchActionPerformed
         deleteNode();
     }//GEN-LAST:event_mnuDeleteKlatchActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPopupMenu klatchMenu;
     private javax.swing.JPopupMenu layerMenu;
@@ -320,7 +323,7 @@ public class ProjectPanel extends javax.swing.JPanel implements TreeSelectionLis
         if (event.getAssetEventType() == AssetEventType.EDIT) {
             FileNode asset = event.getFileNode();
             String assetLocation = asset.getFullName();
-            
+
             AssetLevel aLevel = new AssetLevel(Paths.get(assetLocation));
             currentProject.addLevel(aLevel);
             treeModel.fireInsertLevelEvent(aLevel, currentProject.getIndexOfLevel(aLevel));
@@ -342,8 +345,8 @@ public class ProjectPanel extends javax.swing.JPanel implements TreeSelectionLis
         // TODO add your handling code here:
         TreePath selection = projectTree.getSelectionPath();
         Prefab deleted = (Prefab) selection.getLastPathComponent();
-        Level level = (Level)selection.getPathComponent(1);
-        LevelEvent levelEvent = new LevelEvent(level, LevelEvent.EventType.NODEREMOVEREQUEST,deleted);
+        Level level = (Level) selection.getPathComponent(1);
+        LevelEvent levelEvent = new LevelEvent(level, LevelEvent.EventType.NODEREMOVEREQUEST, deleted);
         GlobalObjects.getInstance().postEvent(levelEvent);
     }
 }
