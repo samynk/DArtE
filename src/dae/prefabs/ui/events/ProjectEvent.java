@@ -21,6 +21,12 @@ public class ProjectEvent {
         this.project = project;
         this.source = source;
     }
+    
+    public ProjectEvent(Project project, ProjectEventType type, Object source){
+        this.project = project;
+        this.source = source;
+        this.eventType = type;
+    }
 
     public Project getProject() {
         return project;

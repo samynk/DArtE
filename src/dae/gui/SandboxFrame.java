@@ -21,6 +21,7 @@ import dae.prefabs.ui.events.CreateObjectEvent;
 import dae.prefabs.ui.events.GizmoEvent;
 import dae.prefabs.ui.events.GizmoType;
 import dae.prefabs.ui.events.ProjectEvent;
+import dae.prefabs.ui.events.ProjectEventType;
 import dae.prefabs.ui.events.ViewportReshapeEvent;
 import dae.prefabs.ui.events.ZoomEvent;
 import dae.prefabs.ui.events.ZoomEventType;
@@ -624,7 +625,8 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
                     File klatchDirectory = currentProject.getKlatchDirectory();
                     klatchDirectory.mkdirs();
                     currentProject.addAssetFolder(currentProject.getKlatchDirectory());
-
+                    ProjectEvent pe = new ProjectEvent(currentProject,ProjectEventType.ASSETFOLDERCHANGED,this);
+                    GlobalObjects.getInstance().postEvent(pe);
                     try {
                         ProjectSaver.write(currentProject, selected);
                         GlobalObjects.getInstance().addRecentFile(selected);
