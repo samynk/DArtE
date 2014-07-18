@@ -291,8 +291,11 @@ public class CreateKlatchDialog extends javax.swing.JDialog implements TreeSelec
     public String getAssemblyName() {
         StringBuilder name = new StringBuilder();
         if (currentSelection != null) {
-            name.append(currentSelection.getFullName());
-            name.append("/");
+            String fullName = currentSelection.getFullName();
+            if (fullName.length() > 0) {
+                name.append(fullName);
+                name.append("/");
+            }
         }
         name.append(txtAssemblyName.getText());
         name.append(".klatch");
