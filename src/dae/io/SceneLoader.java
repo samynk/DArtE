@@ -619,6 +619,9 @@ public class SceneLoader implements AssetLoader {
         for (Spatial s : klatch.getChildren()) {
             s.setUserData("klatchpart", Boolean.TRUE);
         }
+        
+        klatch.setCategory("Standard");
+        klatch.setType("Klatch");
         return klatch;
     }
 }

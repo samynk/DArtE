@@ -265,7 +265,7 @@ public class ProjectPanel extends javax.swing.JPanel implements TreeSelectionLis
                 }
             }
         } else {
-            JOptionPane.showMessageDialog(this,"Save the project first before creating assemblies!","Error",JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Save the project first before creating assemblies!", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_mnuCreateKlatchActionPerformed
 
@@ -311,11 +311,15 @@ public class ProjectPanel extends javax.swing.JPanel implements TreeSelectionLis
 
     @Subscribe
     public void levelChanged(final LevelEvent le) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                treeModel.levelChanged(le);
-            }
-        });
+        if (SwingUtilities.isEventDispatchThread()) {
+            treeModel.levelChanged(le);
+        } else {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    treeModel.levelChanged(le);
+                }
+            });
+        }
     }
 
     @Subscribe

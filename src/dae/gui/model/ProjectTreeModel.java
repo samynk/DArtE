@@ -187,6 +187,7 @@ public class ProjectTreeModel implements TreeModel {
 
         int[] indices = {index};
         Object[] objects = {p};
+        System.out.println("Removing " + p.getName() + ", at index " + index);
         return new TreeModelEvent(this, path, indices, objects);
 
     }
@@ -232,6 +233,7 @@ public class ProjectTreeModel implements TreeModel {
 
         int[] indices = {index};
         Object[] objects = {p};
+        System.out.println("Removing " + p.getName() + "  at index " + index);
         return new TreeModelEvent(this, path, indices, objects);
 
     }
@@ -281,6 +283,8 @@ public class ProjectTreeModel implements TreeModel {
             
             int[] indices = {index};
             Object[] objects = {original};
+            
+            System.out.println("Inserting " + original.getName() + " at index " + index);
             return new TreeModelEvent(this, path, indices, objects);
         }
 

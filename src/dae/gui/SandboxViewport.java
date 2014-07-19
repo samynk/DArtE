@@ -1264,6 +1264,7 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
                     copy.setUserData("BaseTranslation", n.getLocalTranslation().clone());
                     copy.disablePhysics();
                     copy.setUserData("DuplicateParent", n.getParent());
+                    copy.setName(this.createName(this.level,copy.getPrefix()));
                 }
             }
             clearSelection();
@@ -1381,10 +1382,25 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
                 public void run() {
                     for (Node n : le.getNodes()) {
                         GlobalObjects.getInstance().addEdit(new DeletePrefabEdit(n));
-                        n.removeFromParent();
+                        if ( n instanceof Prefab)
+                        {
+                            Prefab p = (Prefab)n;
+                            int childIndex = -1;
+                            if ( p.getParent() instanceof Prefab)
+                            {
+                                Prefab parent = (Prefab)p.getParent();
+                                childIndex = parent.indexOfPrefab(p);
+                            }else{
+                                childIndex = p.getParent().getChildIndex(p);
+                            }
+                            LevelEvent le = new LevelEvent(level,LevelEvent.EventType.NODEREMOVED,n);
+                            GlobalObjects.getInstance().postEvent(le);
+                            n.removeFromParent();
+                        }
+                       
                     }
                     clearSelection();
-                    GlobalObjects.getInstance().postEvent(new LevelEvent(level, LevelEvent.EventType.NODEREMOVED, le.getNodes()));
+                    
                 }
             });
         } 

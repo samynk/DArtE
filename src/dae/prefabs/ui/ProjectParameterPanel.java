@@ -202,7 +202,7 @@ public class ProjectParameterPanel extends javax.swing.JPanel {
             int index = currentProject.getAssetFolderIndex(directory);
             assetFolderListModel.assetFolderAdded(index);
             
-            GlobalObjects.getInstance().postEvent(new ProjectEvent(currentProject,ProjectEventType.ASSETFOLDERCHANGED));
+            GlobalObjects.getInstance().postEvent(new ProjectEvent(currentProject,ProjectEventType.ASSETFOLDERCHANGED,this));
         }
     }//GEN-LAST:event_btnAddAssetFolderActionPerformed
 
@@ -214,7 +214,7 @@ public class ProjectParameterPanel extends javax.swing.JPanel {
         {
             currentProject.removeAssetFolder(file);
             assetFolderListModel.assetFolderRemoved(indexOfFile);
-            GlobalObjects.getInstance().postEvent(new ProjectEvent(currentProject,ProjectEventType.ASSETFOLDERCHANGED));
+            GlobalObjects.getInstance().postEvent(new ProjectEvent(currentProject,ProjectEventType.ASSETFOLDERCHANGED,this));
         }
     }//GEN-LAST:event_btnRemoveAssetFolderActionPerformed
 

@@ -70,9 +70,12 @@ public class DirectorySearcher implements FileVisitor<Path> {
         if (relativeName.length() > 0 && matcher != null) {
             matcher.reset(relativeName);
             if (matcher.matches()) {
+                
                 FileNode node = createSubdirs(rootNode, relative.getParent());
                 if (node != null) {
                     node.addChild(new FileNode(file.getFileName().toString(), true));
+                }else{
+                    rootNode.addChild(new FileNode(file.getFileName().toString(),true));
                 }
             }
         }
@@ -80,6 +83,9 @@ public class DirectorySearcher implements FileVisitor<Path> {
     }
 
     private FileNode createSubdirs(FileNode root, Path relative) {
+        if ( relative == null){
+            return null;
+        }
         for (int i = 0; i < relative.getNameCount(); ++i) {
             Path subdir = relative.getName(i);
             String subdirname = subdir.toString();
