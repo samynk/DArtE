@@ -11,6 +11,7 @@ import dae.prefabs.ui.events.LevelEvent;
 import dae.project.Layer;
 import dae.project.Level;
 import dae.project.Project;
+import dae.project.ProjectTreeNode;
 import java.util.ArrayList;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
@@ -130,23 +131,26 @@ public class ProjectTreeModel implements TreeModel {
         } else if (le.getEventType() == LevelEvent.EventType.NODEREMOVED) {
             for (Node n : le.getNodes()) {
 
-                TreeModelEvent event = createDeleteTreeModelEvent(le.getLevel(), n);
-                if (n instanceof Prefab) {
-                    Prefab p = (Prefab) n;
-                    Layer l = le.getLevel().getLayer(p.getLayerName());
-                    l.removeNode(p);
+                TreeModelEvent event = createDeleteTreeModelEvent(le.getLevel(), le.getPreviousParent(), le.getPreviousIndex(), n);
+                if (event != null) {
+                    if (n instanceof Prefab) {
+                        Prefab p = (Prefab) n;
+                        Layer l = le.getLevel().getLayer(p.getLayerName());
+                        l.removeNode(p);
+                    }
+                    for (TreeModelListener tml : listeners) {
+                        tml.treeNodesRemoved(event);
+                    }
                 }
-                for (TreeModelListener tml : listeners) {
-                    tml.treeNodesRemoved(event);
-                }
-                
             }
         } else if (le.getEventType() == LevelEvent.EventType.NODEMOVED) {
             // first remove the node from the previous parent.
             for (Node n : le.getNodes()) {
                 TreeModelEvent event = createDeleteTreeModelEvent(le.getLevel(), le.getPreviousParent(), le.getPreviousIndex(), n);
-                for (TreeModelListener tml : listeners) {
-                    tml.treeNodesRemoved(event);
+                if (event != null) {
+                    for (TreeModelListener tml : listeners) {
+                        tml.treeNodesRemoved(event);
+                    }
                 }
             }
             // now add it to the correct node.
@@ -170,127 +174,53 @@ public class ProjectTreeModel implements TreeModel {
         }
     }
 
-    public TreeModelEvent createDeleteTreeModelEvent(Level level, Node n) {
-        int pathCount = 2; // project and node itself
+    public TreeModelEvent createDeleteTreeModelEvent(Level level, Object previousParent, int previousIndex, Node n) {
+        int depth = 1;
 
-        Prefab p = (Prefab) n;
-        int parentLayers = p.getNumParentLayers();
-        Object[] path = new Object[pathCount + parentLayers];
-        path[0] = this.project;
-        path[1] = level;
+        ProjectTreeNode start = (ProjectTreeNode) previousParent;
 
-        for (int i = 0; i < parentLayers; ++i) {
-            path[2 + i] = level.getParentLayer(p.getLayerName(), i);
+        while (start.getProjectParent() != null) {
+            ++depth;
+            start = start.getProjectParent();
         }
-        Layer l = level.getLayer(p.getLayerName());
-        int index = l.getIndexOfNode(p);
+        
+        start = (ProjectTreeNode)previousParent;
+        Object[] path = new Object[depth];
+        for (int i = depth - 1; i >= 0; --i) {
+            path[i] = start;
+            start = start.getProjectParent();
+        }
+        
+        int[] indices = {previousIndex};
+        Object[] objects = {n};
 
-        int[] indices = {index};
-        Object[] objects = {p};
-        System.out.println("Removing " + p.getName() + ", at index " + index);
+        System.out.println("Deleting " + n.getName() + " at index " + previousIndex);
         return new TreeModelEvent(this, path, indices, objects);
-
-    }
-
-    public TreeModelEvent createDeleteTreeModelEvent(Level level, Node previousParent, int previousIndex, Node n) {
-        // check the parents of previousParent
-        Node parent = previousParent;
-        int numParents = 0;
-        while (parent != level) {
-            parent = parent.getParent();
-            ++numParents;
-        }
-
-        // project and level itself
-        int pathCount = 2;
-
-        Prefab p = (Prefab) n;
-        int parentLayers = p.getNumParentLayers();
-        Object[] path = new Object[pathCount + numParents + parentLayers];
-        path[0] = this.project;
-        path[1] = level;
-
-
-
-        for (int i = 0; i < parentLayers; ++i) {
-            path[2 + i] = level.getParentLayer(p.getLayerName(), i);
-        }
-
-        parent = previousParent;
-        for (int i = numParents; i > 0; --i) {
-            path[2 + parentLayers + numParents] = parent;
-            parent = parent.getParent();
-        }
-
-        int index;
-        if (numParents == 0) {
-            Layer l = level.getLayer(p.getLayerName());
-            index = l.getIndexOfNode(p);
-            l.removeNode(p);
-        } else {
-            index = previousIndex;
-        }
-
-        int[] indices = {index};
-        Object[] objects = {p};
-        System.out.println("Removing " + p.getName() + "  at index " + index);
-        return new TreeModelEvent(this, path, indices, objects);
-
     }
 
     public TreeModelEvent createInsertTreeModelEvent(Node n) {
-        int pathCount = 2; // project and node itself
-        Node original = n;
-        Node layerChild = n;
+        int depth = 0;
 
-        while (n.getParent() != null && !(n instanceof Level)) {
-            ++pathCount;
-            layerChild = n;
-            n = n.getParent();
+        ProjectTreeNode start = (ProjectTreeNode) n;
+        ProjectTreeNode parent = start.getProjectParent();
+        int index = parent.getIndexOfChild(start);
+
+        while (start.getProjectParent() != null) {
+            ++depth;
+            start = start.getProjectParent();
         }
 
-        if (n instanceof Level && layerChild instanceof Prefab) {
-            Level level = (Level) n;
-            Prefab p = (Prefab) layerChild;
-
-            int parentLayers = p.getNumParentLayers();
-            Object[] path = new Object[pathCount + p.getNumParentLayers() - 1];
-            path[0] = this.project;
-            path[1] = n;
-
-            for (int i = 0; i < parentLayers; ++i) {
-                path[2 + i] = level.getParentLayer(p.getLayerName(), i);
-            }
-            
-            // add the parent(s) of the node
-            int startIndex = path.length-1;
-            n = original;
-            while( n != layerChild){
-                path[startIndex] = n.getParent();
-                n = n.getParent();
-                startIndex--;
-            }
-
-            int index = -1;
-            if ( original == layerChild)
-            {
-                Layer l = level.getLayer(p.getLayerName());
-                index = l.getIndexOfNode(p);
-            }else{
-                Prefab parent = (Prefab)path[path.length-1];
-                index = parent.indexOfPrefab((Prefab)original);
-            }
-            
-            int[] indices = {index};
-            Object[] objects = {original};
-            
-            System.out.println("Inserting " + original.getName() + " at index " + index);
-            return new TreeModelEvent(this, path, indices, objects);
+        Object[] path = new Object[depth];
+        for (int i = depth - 1; i >= 0; --i) {
+            path[i] = parent;
+            parent = parent.getProjectParent();
         }
 
+        int[] indices = {index};
+        Object[] objects = {n};
 
-
-        return null;
+        System.out.println("Inserting " + n.getName() + " at index " + index);
+        return new TreeModelEvent(this, path, indices, objects);
     }
 
     public void layerAdded(LayerEvent le) {
