@@ -32,6 +32,7 @@ import dae.prefabs.standard.ConnectorPrefab;
 import dae.prefabs.standard.UpdateObject;
 import dae.prefabs.ui.events.PrefabChangedEvent;
 import dae.prefabs.ui.events.PrefabChangedEventType;
+import dae.project.ProjectTreeNode;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.lang.reflect.InvocationTargetException;
@@ -45,7 +46,7 @@ import java.util.logging.Logger;
  *
  * @author Koen
  */
-public class Prefab extends Node {
+public class Prefab extends Node implements ProjectTreeNode {
 
     private String prefix = "prefab";
     private HashMap<String, Method> getMethods =
@@ -1092,5 +1093,41 @@ public class Prefab extends Node {
      */
     public void addPropertyListener(String property, PropertyChangeListener pcl) {
         pcs.addPropertyChangeListener(property, pcl);
+    }
+
+    public boolean hasChildren() {
+        return this.getPrefabChildChildCount() > 0;
+    }
+
+    public ProjectTreeNode getProjectChild(int index) {
+        return (ProjectTreeNode)this.getPrefabChildAt(index);
+    }
+
+    public int getIndexOfChild(ProjectTreeNode object) {
+        int pindex = 0;
+        for (Spatial s : this.getChildren()) {
+            if (s instanceof Prefab) {
+                if (s == object) {
+                    return pindex;
+                }
+                ++pindex;
+            }
+        }
+        return -1;
+    }
+
+    public ProjectTreeNode getProjectParent() {
+        Node p = this.getParent();
+
+        if (p instanceof dae.project.Level) {
+            dae.project.Level l = (dae.project.Level) p;
+            return l.getLayer(layerName);
+        } else {
+            return (ProjectTreeNode)p;
+        }
+    }
+
+    public boolean isLeaf() {
+        return getPrefabChildChildCount() > 0;
     }
 }
