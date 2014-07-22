@@ -89,7 +89,9 @@ import dae.prefabs.ui.events.ShadowEvent;
 import dae.prefabs.ui.events.ViewportReshapeEvent;
 import dae.prefabs.ui.events.ZoomEvent;
 import dae.project.Grid;
+import dae.project.Layer;
 import dae.project.Project;
+import dae.project.ProjectTreeNode;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -477,11 +479,8 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
             } else if (editorState == EditorState.IDLE) {
                 //System.out.println("Name : " + name);
                 if ("DELETE_SELECTION".equals(name)) {
-                    ArrayList<Node> dest = new ArrayList<Node>(currentSelection);
-                    GlobalObjects.getInstance().postEvent(new LevelEvent(level, LevelEvent.EventType.NODEREMOVED, dest));
                     for (Node n : currentSelection) {
-                        GlobalObjects.getInstance().addEdit(new DeletePrefabEdit(n));
-                        n.removeFromParent();
+                        removeNode(level, n);
                     }
                     clearSelection();
                 }
@@ -1103,15 +1102,14 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
                         currentChildElement.setLocalScale(local.toScaleVector());
 
                         // child element is moved from one place to another.
-                        Node previousParent = currentChildElement.getParent();
-                        int previousIndex = 0;
-                        if (previousParent instanceof Prefab) {
-                            Prefab prefabParent = (Prefab) previousParent;
-                            previousIndex = prefabParent.indexOfPrefab(currentChildElement);
-                        } else {
-                            previousIndex = previousParent.getChildIndex(currentChildElement);
-                        }
+                        ProjectTreeNode previousParent = currentChildElement.getProjectParent();
+                        int previousIndex = previousParent.getIndexOfChild(currentChildElement);
                         p.attachChild(currentChildElement);
+                        // remove child from its layer
+                        if (previousParent instanceof Layer) {
+                            Layer l = (Layer) previousParent;
+                            l.removeNode(p);
+                        }
 
                         LevelEvent le = new LevelEvent(level, EventType.NODEMOVED, currentChildElement, previousParent, previousIndex, p);
                         GlobalObjects.getInstance().postEvent(le);
@@ -1264,7 +1262,7 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
                     copy.setUserData("BaseTranslation", n.getLocalTranslation().clone());
                     copy.disablePhysics();
                     copy.setUserData("DuplicateParent", n.getParent());
-                    copy.setName(this.createName(this.level,copy.getPrefix()));
+                    copy.setName(this.createName(this.level, copy.getPrefix()));
                 }
             }
             clearSelection();
@@ -1338,13 +1336,13 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
     public void onObjectInsertion(final InsertObjectEvent ioe) {
         submitViewportTask(new Runnable() {
             public void run() {
-               Spatial s = assetManager.loadModel(ioe.getPath());
-               s.setName(ioe.getName());
-               s.setLocalTransform(ioe.getTransform());
-               ioe.getParent().attachChild(s);
-               LevelEvent le = new LevelEvent(ioe.getLevel(), EventType.NODEADDED,(Node)s);
-               GlobalObjects.getInstance().postEvent(le);
-               GlobalObjects.getInstance().addEdit(new AddPrefabEdit((Node)s));
+                Spatial s = assetManager.loadModel(ioe.getPath());
+                s.setName(ioe.getName());
+                s.setLocalTransform(ioe.getTransform());
+                ioe.getParent().attachChild(s);
+                LevelEvent le = new LevelEvent(ioe.getLevel(), EventType.NODEADDED, (Node) s);
+                GlobalObjects.getInstance().postEvent(le);
+                GlobalObjects.getInstance().addEdit(new AddPrefabEdit((Node) s));
             }
         });
     }
@@ -1381,29 +1379,28 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
             submitViewportTask(new Runnable() {
                 public void run() {
                     for (Node n : le.getNodes()) {
-                        GlobalObjects.getInstance().addEdit(new DeletePrefabEdit(n));
-                        if ( n instanceof Prefab)
-                        {
-                            Prefab p = (Prefab)n;
-                            int childIndex = -1;
-                            if ( p.getParent() instanceof Prefab)
-                            {
-                                Prefab parent = (Prefab)p.getParent();
-                                childIndex = parent.indexOfPrefab(p);
-                            }else{
-                                childIndex = p.getParent().getChildIndex(p);
-                            }
-                            LevelEvent le = new LevelEvent(level,LevelEvent.EventType.NODEREMOVED,n);
-                            GlobalObjects.getInstance().postEvent(le);
-                            n.removeFromParent();
-                        }
-                       
+
+                        removeNode(le.getLevel(), n);
                     }
                     clearSelection();
-                    
                 }
             });
-        } 
+        }
+    }
+
+    private void removeNode(dae.project.Level level, Node n) {
+        if (n instanceof Prefab) {
+            Prefab p = (Prefab) n;
+            ProjectTreeNode parent = p.getProjectParent();
+            if (parent != null) {
+                int childIndex = parent.getIndexOfChild(p);
+                n.removeFromParent();
+                LevelEvent le = LevelEvent.createNodeRemovedEvent(level, n, parent, childIndex);
+                GlobalObjects.getInstance().postEvent(le);
+                GlobalObjects.getInstance().addEdit(new DeletePrefabEdit(n));
+            }
+
+        }
     }
 
     @Subscribe
