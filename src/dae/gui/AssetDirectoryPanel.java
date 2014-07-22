@@ -76,7 +76,7 @@ public class AssetDirectoryPanel extends javax.swing.JPanel implements DocumentL
         btnSearch = new javax.swing.JButton();
         btnSearch.putClientProperty("JComponent.sizeVariant", "mini");
         btnNewFolder = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
+        lblNewDirectory = new javax.swing.JLabel();
         txtNewDirectory = new dae.gui.components.AlphaNumericTextField();
 
         jButton1.setText("jButton1");
@@ -84,6 +84,7 @@ public class AssetDirectoryPanel extends javax.swing.JPanel implements DocumentL
         javax.swing.tree.DefaultMutableTreeNode treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("Assets");
         assetTree.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));
         assetTree.setDragEnabled(true);
+        assetTree.setPreferredSize(null);
         assetTree.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseReleased(java.awt.event.MouseEvent evt) {
                 assetTreeMouseReleased(evt);
@@ -117,7 +118,7 @@ public class AssetDirectoryPanel extends javax.swing.JPanel implements DocumentL
             }
         });
 
-        jLabel1.setText("New directory:");
+        lblNewDirectory.setText("New directory:");
 
         txtSearch.putClientProperty("JComponent.sizeVariant", "small");
         txtSearch.putClientProperty("JComponent.sizeVariant", "small");
@@ -134,7 +135,7 @@ public class AssetDirectoryPanel extends javax.swing.JPanel implements DocumentL
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnSearch))
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jLabel1)
+                .addComponent(lblNewDirectory)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtNewDirectory, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -144,12 +145,13 @@ public class AssetDirectoryPanel extends javax.swing.JPanel implements DocumentL
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnNewFolder)
-                    .addComponent(jLabel1)
-                    .addComponent(txtNewDirectory, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 18, Short.MAX_VALUE)
-                .addComponent(scrAssetPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 386, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(lblNewDirectory)
+                        .addComponent(txtNewDirectory, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(18, 18, 18)
+                .addComponent(scrAssetPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 386, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -261,7 +263,7 @@ public class AssetDirectoryPanel extends javax.swing.JPanel implements DocumentL
     private javax.swing.JButton btnNewFolder;
     private javax.swing.JButton btnSearch;
     private javax.swing.JButton jButton1;
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel lblNewDirectory;
     private javax.swing.JLabel lblSearch;
     private javax.swing.JScrollPane scrAssetPanel;
     private dae.gui.components.AlphaNumericTextField txtNewDirectory;
