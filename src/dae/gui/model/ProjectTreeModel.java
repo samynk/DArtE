@@ -64,7 +64,7 @@ public class ProjectTreeModel implements TreeModel {
             return layer.getChildCount();
         } else if (parent instanceof Prefab) {
             Prefab p = (Prefab) parent;
-            return p.getPrefabChildChildCount();
+            return p.getPrefabChildCount();
         } else {
             return 0;
         }
@@ -74,7 +74,7 @@ public class ProjectTreeModel implements TreeModel {
 
         if (node instanceof Prefab) {
             Prefab p = (Prefab) node;
-            return !p.hasSavableChildren();
+            return p.isLeaf();
         } else {
             return false;
         }
@@ -161,6 +161,23 @@ public class ProjectTreeModel implements TreeModel {
                 }
             }
         }
+    }
+    
+    public Object[] createPathForNode(ProjectTreeNode start){
+        int depth = 1;
+        ProjectTreeNode copy = start;
+        while( start.getProjectParent() != null){
+            depth++;
+            start = start.getProjectParent();
+        }
+        Object[] result = new Object[depth];
+        for( int i = depth-1 ; i >= 0; --i)
+        {
+            result[i] = copy;
+            copy = copy.getProjectParent();
+        }
+        
+        return result;
     }
 
     public void fireInsertLevelEvent(Level l, int index) {
