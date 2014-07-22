@@ -9,7 +9,6 @@ import com.jme3.bullet.BulletAppState;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
-import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
@@ -32,7 +31,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
  *
  * @author Koen Samyn
  */
-public class Level extends Node {
+public class Level extends Node implements ProjectTreeNode{
 
     private File location;
     private AxisEnum upAxis = AxisEnum.Z;
@@ -494,4 +493,28 @@ public class Level extends Node {
     public void setProject(Project project) {
         this.project = project;
     }
+    
+    // project tree node implementation
+
+    public boolean hasChildren() {
+        return layers.size() > 0;
+    }
+
+    public int getIndexOfChild(ProjectTreeNode object) {
+        return layers.indexOf(object);
+    }
+
+    public boolean isLeaf() {
+        return layers.size()>0;
+    }
+
+    public ProjectTreeNode getProjectChild(int index) {
+        return layers.get(index);
+    }
+
+    public ProjectTreeNode getProjectParent() {
+        return this.project;
+    }
+    
+    
 }

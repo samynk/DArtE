@@ -12,7 +12,7 @@ import java.util.ArrayList;
  *
  * @author Koen Samyn
  */
-public class Layer {
+public class Layer implements ProjectTreeNode{
 
     /**
      * The Level object that is the parent of this layer.
@@ -161,7 +161,14 @@ public class Layer {
      * parent layer.
      */
     public Layer getParentLayer() {
-        return parent.getParentLayer(this.getName(), 0);
+        String layerName = this.getName();
+        int lastDotIndex = layerName.indexOf('.');
+        if ( lastDotIndex > 0 ){
+            String parentLayerName = layerName.substring(0,lastDotIndex);
+            return parent.getLayer(parentLayerName);
+        }else{
+            return null;
+        }
     }
 
     /**
@@ -169,7 +176,12 @@ public class Layer {
      *
      */
     public int getNumParentLayers() {
-        int count = name.length() - name.replace(".", "").length();
+        int startIndex = 0;
+        int count =0;
+        while( (startIndex = name.indexOf('.',startIndex)) > 0){
+            ++startIndex;
+            ++count;
+        }
         return count;
     }
 
@@ -282,5 +294,36 @@ public class Layer {
     @Override
     public String toString() {
         return name.substring(name.lastIndexOf('.') + 1);
+    }
+
+    // implementation for tree model.
+    
+    public boolean hasChildren() {
+        return (this.getNrOfLayers()+ this.getNrOfNodes()) > 0;
+    }
+
+    public ProjectTreeNode getProjectChild(int index) {
+        return (ProjectTreeNode)this.getChild(index);
+    }
+
+    public int getIndexOfChild(ProjectTreeNode object) {
+        if ( object instanceof Layer){
+            return getIndexOfLayer((Layer)object);
+        }else{
+            return getIndexOfNode((Node)object);
+        }
+    }
+
+    public ProjectTreeNode getProjectParent() {
+        Layer layerParent = getParentLayer();
+        if ( layerParent == null){
+            return getParentLevel();
+        }else{
+            return layerParent;
+        }
+    }
+
+    public boolean isLeaf() {
+        return false;
     }
 }

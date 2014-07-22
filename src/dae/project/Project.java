@@ -4,15 +4,11 @@
  */
 package dae.project;
 
-import dae.prefabs.ui.events.AssetEvent;
-import dae.prefabs.ui.events.AssetEventType;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.nio.file.FileSystems;
-import java.nio.file.WatchService;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
@@ -22,7 +18,7 @@ import java.util.logging.Logger;
  *
  * @author samyn_000
  */
-public class Project {
+public class Project implements ProjectTreeNode{
 
     private String projectName = "empty";
     private File projectLocation;
@@ -329,5 +325,25 @@ public class Project {
 
     public void removeLevel(Level level) {
         this.levels.remove(level);
+    }
+
+    public boolean hasChildren() {
+        return levels.size() > 0;
+    }
+
+    public ProjectTreeNode getProjectChild(int index) {
+        return levels.get(index);
+    }
+
+    public int getIndexOfChild(ProjectTreeNode object) {
+        return levels.indexOf(object);
+    }
+
+    public ProjectTreeNode getProjectParent() {
+        return null;
+    }
+
+    public boolean isLeaf() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
