@@ -16,15 +16,14 @@ public class LevelEvent {
 
     private Level level;
 
-    
-
     public enum EventType {
+
         LEVELSELECTED, NODEREMOVED, NODEADDED, NODEMOVED, NODEREMOVEREQUEST
     };
     private EventType eventType;
     private Iterable<Node> nodes;
-    private Node previousParent;
-    private Node currentParent;
+    private Object previousParent;
+    private Object currentParent;
     private int previousIndex;
 
     public LevelEvent(Level level) {
@@ -40,7 +39,28 @@ public class LevelEvent {
         nodes = alNodes;
     }
 
-    public LevelEvent(Level level, EventType type, Node node, Node previousParent, int previousIndex, Node currentParent) {
+    /**
+     * Constructor for node removed events.
+     *
+     * @param level the level where the node was removed.
+     * @param type the type of the event (should be NodeRemoved for this
+     * constructor.
+     * @param node the node that was remove.
+     * @param index the index of the node.
+     */
+    public LevelEvent(Level level, EventType type, Node node, Object parent, int index) {
+        this.level = level;
+        eventType = type;
+        ArrayList<Node> alNodes = new ArrayList<Node>();
+        alNodes.add(node);
+        nodes = alNodes;
+
+        this.previousParent = parent;
+        this.currentParent = null;
+        this.previousIndex = index;
+    }
+
+    public LevelEvent(Level level, EventType type, Node node, Object previousParent, int previousIndex, Node currentParent) {
         this.level = level;
         eventType = type;
         ArrayList<Node> alNodes = new ArrayList<Node>();
@@ -55,7 +75,7 @@ public class LevelEvent {
     public LevelEvent(Level level, EventType type, Iterable<Node> nodeList) {
         this.level = level;
         eventType = type;
-        
+
         nodes = nodeList;
     }
 
@@ -71,19 +91,23 @@ public class LevelEvent {
         return nodes;
     }
 
-    public Node getPreviousParent() {
+    public Object getPreviousParent() {
         return previousParent;
     }
 
     public int getPreviousIndex() {
         return previousIndex;
     }
-    
+
     public void setCurrentParent(Node parentNode) {
         this.currentParent = parentNode;
     }
 
-    public Node getCurrentParent() {
+    public Object getCurrentParent() {
         return currentParent;
+    }
+
+    public static LevelEvent createNodeRemovedEvent(Level level, Node toRemove, Object parent, int index) {
+        return new LevelEvent(level, EventType.NODEREMOVED, toRemove, parent, index);
     }
 }
