@@ -1025,7 +1025,7 @@ public class Prefab extends Node implements ProjectTreeNode {
         return 0;
     }
 
-    public int getPrefabChildChildCount() {
+    public int getPrefabChildCount() {
         int pindex = 0;
         for (Spatial s : this.getChildren()) {
             if (s instanceof Prefab) {
@@ -1096,7 +1096,7 @@ public class Prefab extends Node implements ProjectTreeNode {
     }
 
     public boolean hasChildren() {
-        return this.getPrefabChildChildCount() > 0;
+        return this.getPrefabChildCount() > 0;
     }
 
     public ProjectTreeNode getProjectChild(int index) {
@@ -1122,12 +1122,14 @@ public class Prefab extends Node implements ProjectTreeNode {
         if (p instanceof dae.project.Level) {
             dae.project.Level l = (dae.project.Level) p;
             return l.getLayer(layerName);
-        } else {
+        } else  if ( p instanceof ProjectTreeNode) {
             return (ProjectTreeNode)p;
+        }else{
+            return null;
         }
     }
 
     public boolean isLeaf() {
-        return getPrefabChildChildCount() > 0;
+        return getPrefabChildCount() == 0;
     }
 }
