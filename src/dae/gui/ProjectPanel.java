@@ -52,6 +52,7 @@ public class ProjectPanel extends javax.swing.JPanel implements TreeSelectionLis
     private CreateLayerDialog createLayerDialog;
     private CreateKlatchDialog createKlatchDialog;
     private final int LEVELDEPTH = 1;
+    private boolean silentSelection = false;
 
     /**
      * Creates new form ProjectPanel
@@ -291,6 +292,8 @@ public class ProjectPanel extends javax.swing.JPanel implements TreeSelectionLis
     // End of variables declaration//GEN-END:variables
 
     public void valueChanged(TreeSelectionEvent e) {
+        if ( silentSelection )
+            return;
         Object selected = e.getPath().getLastPathComponent();
         if (selected instanceof Level) {
             Level l = (Level) selected;
@@ -343,6 +346,30 @@ public class ProjectPanel extends javax.swing.JPanel implements TreeSelectionLis
                 }
             });
         }
+    }
+    
+    @Subscribe
+    public void nodeSelected(final SelectionEvent se)
+    {
+        if (SwingUtilities.isEventDispatchThread())
+        {
+            selectNode(se.getSelectedNode());
+        }else{
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    selectNode(se.getSelectedNode());
+                }
+            });
+        }
+    }
+    
+    private void selectNode(Prefab node){
+        silentSelection = true;
+        Object[] path = treeModel.createPathForNode(node);
+        TreePath tp= new TreePath(path);
+        projectTree.setSelectionPath(new TreePath(path));
+        projectTree.scrollPathToVisible(tp);
+        silentSelection = false;
     }
 
     private void deleteNode() {
