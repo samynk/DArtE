@@ -115,6 +115,7 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
 
         assetPopupMenu = new javax.swing.JPopupMenu();
         mnuEditObject = new javax.swing.JMenuItem();
+        mnuDelete = new javax.swing.JMenuItem();
         scrAssetPanel = new javax.swing.JScrollPane();
         assetTree = new javax.swing.JTree();
         txtSearch = new javax.swing.JTextField();
@@ -125,13 +126,21 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
         cboKlatchFilter = new javax.swing.JToggleButton();
 
         mnuEditObject.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dae/icons/editobject.png"))); // NOI18N
-        mnuEditObject.setText("Edit Object");
+        mnuEditObject.setText("Create Assembly ...");
         mnuEditObject.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 mnuEditObjectActionPerformed(evt);
             }
         });
         assetPopupMenu.add(mnuEditObject);
+
+        mnuDelete.setText("Delete Asset ...");
+        mnuDelete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuDeleteActionPerformed(evt);
+            }
+        });
+        assetPopupMenu.add(mnuDelete);
 
         javax.swing.tree.DefaultMutableTreeNode treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("Assets");
         assetTree.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));
@@ -267,6 +276,11 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
         // TODO add your handling code here:
         adaptFilter();
     }//GEN-LAST:event_cboKlatchFilterItemStateChanged
+
+    private void mnuDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuDeleteActionPerformed
+        // TODO add your handling code here:
+        
+    }//GEN-LAST:event_mnuDeleteActionPerformed
 
     private void adaptFilter() {
         boolean klatchs = cboKlatchFilter.isSelected();
@@ -609,6 +623,7 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
     private javax.swing.JToggleButton cboKlatchFilter;
     private javax.swing.JToggleButton cboMeshFilter;
     private javax.swing.JLabel lblSearch;
+    private javax.swing.JMenuItem mnuDelete;
     private javax.swing.JMenuItem mnuEditObject;
     private javax.swing.JScrollPane scrAssetPanel;
     private javax.swing.JTextField txtSearch;
