@@ -10,15 +10,21 @@ import dae.prefabs.ui.events.LevelEvent;
 import dae.prefabs.ui.events.LevelEvent.EventType;
 import dae.project.Level;
 import java.awt.event.ItemEvent;
+import java.io.File;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  *
- * @author samyn_000
+ * @author Koen Samyn
  */
 public class LevelParameterPanel extends javax.swing.JPanel {
 
     private Level current;
     private boolean disregardEvent;
+    
+    private JFileChooser chooser;
 
     /**
      * Creates new form LevelParameterPanel
@@ -26,6 +32,9 @@ public class LevelParameterPanel extends javax.swing.JPanel {
     public LevelParameterPanel() {
         initComponents();
         GlobalObjects.getInstance().registerListener(this);
+        chooser = new JFileChooser();
+        chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        chooser.addChoosableFileFilter( new FileNameExtensionFilter( "j3o files","j3o"));
     }
 
     /**
@@ -38,23 +47,20 @@ public class LevelParameterPanel extends javax.swing.JPanel {
     private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
-        btnChangeLevelFileLocation = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
         cboTargetObjects = new javax.swing.JCheckBox();
         cboHideWaypoints = new javax.swing.JCheckBox();
+        txtLevelName = new javax.swing.JTextField();
+        jLabel4 = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        txtJ3OFileLocation = new javax.swing.JTextField();
+        btnExportAsJ3O = new javax.swing.JButton();
+        cboExportOnSave = new javax.swing.JCheckBox();
 
         setBorder(javax.swing.BorderFactory.createTitledBorder("Level"));
         setMaximumSize(new java.awt.Dimension(640, 480));
 
-        jLabel1.setText("Level");
-
-        jLabel2.setText("File :");
-
-        jTextField1.setEditable(false);
-
-        btnChangeLevelFileLocation.setText("...");
+        jLabel1.setText("Name : ");
 
         jLabel3.setText("Hide/Show elements");
 
@@ -67,6 +73,26 @@ public class LevelParameterPanel extends javax.swing.JPanel {
 
         cboHideWaypoints.setText("Hide waypoints");
 
+        jLabel4.setText("Export settings :");
+
+        jLabel5.setText("J3O :");
+
+        txtJ3OFileLocation.setEditable(false);
+
+        btnExportAsJ3O.setText("...");
+        btnExportAsJ3O.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExportAsJ3OActionPerformed(evt);
+            }
+        });
+
+        cboExportOnSave.setText("Export on save");
+        cboExportOnSave.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                cboExportOnSaveItemStateChanged(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -75,43 +101,54 @@ public class LevelParameterPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel2)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 290, Short.MAX_VALUE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnChangeLevelFileLocation))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel1)
-                                    .addComponent(jLabel3))
-                                .addGap(0, 0, Short.MAX_VALUE)))
-                        .addContainerGap())
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtLevelName))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(10, 10, 10)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(cboHideWaypoints)
-                            .addComponent(cboTargetObjects))
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                            .addComponent(jLabel3)
+                            .addComponent(jLabel4))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel5)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtJ3OFileLocation)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnExportAsJ3O))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(10, 10, 10)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(cboHideWaypoints)
+                                    .addComponent(cboTargetObjects)))
+                            .addComponent(cboExportOnSave))
+                        .addGap(246, 246, 246)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnChangeLevelFileLocation))
+                    .addComponent(jLabel1)
+                    .addComponent(txtLevelName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(cboTargetObjects)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(cboHideWaypoints)
-                .addContainerGap(119, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel4)
+                .addGap(4, 4, 4)
+                .addComponent(cboExportOnSave)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel5)
+                    .addComponent(txtJ3OFileLocation, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnExportAsJ3O))
+                .addContainerGap(69, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -124,6 +161,29 @@ public class LevelParameterPanel extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_cboTargetObjectsItemStateChanged
 
+    private void btnExportAsJ3OActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportAsJ3OActionPerformed
+        // TODO add your handling code here:
+        File j3o = current.getExportLocation("j3o");
+        if ( j3o != null){
+            chooser.setCurrentDirectory(j3o.getParentFile());
+        }
+        int option = chooser.showOpenDialog(this);
+        if ( option == JFileChooser.APPROVE_OPTION){
+            File selected = chooser.getSelectedFile();
+            if ( !selected.getPath().toLowerCase().endsWith(".j3o"))
+            {
+                selected = new File( selected.getParentFile(), selected.getName()+".j3o");
+            }
+            current.setExportLocation("j3o",selected);
+            txtJ3OFileLocation.setText(selected.getAbsolutePath());
+        }
+    }//GEN-LAST:event_btnExportAsJ3OActionPerformed
+
+    private void cboExportOnSaveItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cboExportOnSaveItemStateChanged
+        // TODO add your handling code here:
+        current.setExportOnSave(cboExportOnSave.isSelected());
+    }//GEN-LAST:event_cboExportOnSaveItemStateChanged
+
     @Subscribe
     public void levelSelected(LevelEvent le) {
         if (le.getEventType() == EventType.LEVELSELECTED) {
@@ -131,15 +191,24 @@ public class LevelParameterPanel extends javax.swing.JPanel {
             disregardEvent = true;
             cboTargetObjects.setSelected(!current.getShowsTargetObjects());
             disregardEvent = false;
+            txtLevelName.setText(current.getName());
+            cboExportOnSave.setSelected(current.isExportOnSave());
+            File j3oExportFile = current.getExportLocation("j3o");
+            if ( j3oExportFile != null){
+                txtJ3OFileLocation.setText(j3oExportFile.getAbsolutePath());
+            }
         }
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnChangeLevelFileLocation;
+    private javax.swing.JButton btnExportAsJ3O;
+    private javax.swing.JCheckBox cboExportOnSave;
     private javax.swing.JCheckBox cboHideWaypoints;
     private javax.swing.JCheckBox cboTargetObjects;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JTextField jTextField1;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JTextField txtJ3OFileLocation;
+    private javax.swing.JTextField txtLevelName;
     // End of variables declaration//GEN-END:variables
 }
