@@ -176,7 +176,7 @@ public class GameSceneLoader {
         float outerangle = XMLUtils.parseFloat("spotouterangle", map);
         float spotrange = XMLUtils.parseFloat("spotrange", map);
         float intensity = XMLUtils.parseFloat("spotintensity", map);
-        
+
         SpotLight spotLight = new SpotLight();
         spotLight.setName(name);
         spotLight.setPosition(translation);
@@ -188,14 +188,14 @@ public class GameSceneLoader {
         spotLight.setSpotRange(spotrange);
         return spotLight;
     }
-    
+
     private static PointLight createPointLight(NamedNodeMap map) {
         Vector3f translation = XMLUtils.parseFloat3(getAttrContent("translation", map));
         ColorRGBA color = XMLUtils.parseColor(getAttrContent("color", map));
         float intensity = XMLUtils.parseFloat("intensity", map);
-        float radius = XMLUtils.parseFloat("radius",map);
+        float radius = XMLUtils.parseFloat("radius", map);
         String name = getAttrContent("name", map);
-        
+
         PointLight pointlight = new PointLight();
         pointlight.setName(name);
         pointlight.setPosition(translation);
@@ -203,35 +203,33 @@ public class GameSceneLoader {
         pointlight.setColor(color.mult(intensity));
         return pointlight;
     }
-    
-     private static Light createDirectionalLight(NamedNodeMap map) {
+
+    private static Light createDirectionalLight(NamedNodeMap map) {
         String name = getAttrContent("name", map);
         Vector3f translation = XMLUtils.parseFloat3(getAttrContent("translation", map));
         Quaternion rotation = XMLUtils.parseQuaternion(getAttrContent("rotation", map));
         ColorRGBA color = XMLUtils.parseColor(getAttrContent("color", map));
         float intensity = XMLUtils.parseFloat("intensity", map);
         boolean castshadow = XMLUtils.parseBoolean("castshadow", map);
-        
+
         DirectionalLight light = new DirectionalLight();
         light.setName(name);
         light.setColor(color.mult(intensity));
         Vector3f dir = rotation.mult(Vector3f.UNIT_X);
         light.setDirection(dir);
-        light.setDirection(translation);
         return light;
     }
-     
-     private static Light createAmbientLight(NamedNodeMap map) {
+
+    private static Light createAmbientLight(NamedNodeMap map) {
         ColorRGBA color = XMLUtils.parseColor(getAttrContent("color", map));
         float intensity = XMLUtils.parseFloat("intensity", map);
         String name = getAttrContent("name", map);
-        
+
         AmbientLight light = new AmbientLight();
         light.setName(name);
         light.setColor(color.mult(intensity));
         return light;
     }
-
 
     private static String getAttrContent(String key, NamedNodeMap map) {
         org.w3c.dom.Node attr = map.getNamedItem(key);
@@ -239,7 +237,7 @@ public class GameSceneLoader {
     }
 
     private static void readNodeChildren(NodeList nl, AssetManager am, Spatial parentNode) throws IllegalAccessException, NumberFormatException, ClassNotFoundException, InstantiationException {
-        
+
         for (int i = 0; i < nl.getLength(); ++i) {
             org.w3c.dom.Node n = nl.item(i);
             NamedNodeMap map = n.getAttributes();
@@ -249,42 +247,31 @@ public class GameSceneLoader {
             } else if ("klatch".equals(n.getNodeName())) {
                 currentSpatial = createKlatch(map, am);
             } else if ("spotlight".equals(n.getNodeName())) {
-                if ( currentSpatial != null )
-                {
-                    parentNode.addLight(createSpotLight(map));
-                }
+                parentNode.addLight(createSpotLight(map));
             } else if ("pointlight".equals(n.getNodeName())) {
-                if  (currentSpatial != null )
-                {
-                    parentNode.addLight(createPointLight(map));
-                }
+                parentNode.addLight(createPointLight(map));
             } else if ("directionallight".equals(n.getNodeName())) {
-                if ( currentSpatial != null)
-                {
-                    parentNode.addLight(createDirectionalLight(map));
-                }
+                parentNode.addLight(createDirectionalLight(map));
             } else if ("ambientlight".equals(n.getNodeName())) {
-                if  (currentSpatial != null)
-                {
-                    parentNode.addLight(createAmbientLight(map));
-                }
+                parentNode.addLight(createAmbientLight(map));
             }
             if (currentSpatial != null) {
-                if ( parentNode instanceof Spatial){
-                    Node structural = new Node();
+                if (parentNode instanceof Node) {
+                    ((Node) parentNode).attachChild(currentSpatial);
+                } else if (parentNode instanceof Spatial) {
+                    Node structural = new Node("structural");
                     Transform backup = parentNode.getLocalTransform();
                     parentNode.setLocalTransform(Transform.IDENTITY);
                     structural.setLocalTransform(backup);
-                    
+
                     Node parent = parentNode.getParent();
                     parent.attachChild(structural);
                     structural.attachChild(parentNode);
                     parentNode = structural;
-                }else if ( parentNode instanceof Node){
-                    ((Node)parentNode).attachChild(currentSpatial);
+                    structural.attachChild(currentSpatial);
                 }
-                
-                if ( n.hasChildNodes()) {
+
+                if (n.hasChildNodes()) {
                     readNodeChildren(n.getChildNodes(), am, currentSpatial);
                 }
             }
