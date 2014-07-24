@@ -19,7 +19,7 @@ import javax.swing.text.StyleContext;
 
 /**
  *
- * @author samyn_000
+ * @author Koen Samyn
  */
 public class OutputPanel extends javax.swing.JPanel {
     
