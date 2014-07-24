@@ -65,7 +65,7 @@ public class ProjectLoader {
                     }
                 } else if ("levels".equals(n.getNodeName())) {
                     readLevels(p, n, manager);
-                }
+                } 
             }
         } catch (ParserConfigurationException ex) {
             Logger.getLogger(ProjectLoader.class.getName()).log(Level.SEVERE, null, ex);
@@ -115,22 +115,31 @@ public class ProjectLoader {
                                 SceneLoader.loadScene(sceneFile, manager, l, GlobalObjects.getInstance().getObjectsTypeCategory(),
                                         manager.loadMaterial("Materials/SelectionMaterial.j3m"));
 
+                            }else if ("exportsettings".equals(fileNode.getNodeName())){
+                                readExportSettings(fileNode, l);
                             }
                         }
                     }
                      p.addLevel(l);
                 }else if (type.equals("klatch")){
                     NodeList levelChildren = level.getChildNodes();
+                    AssetLevel al = null;
                     for (int j = 0; j < levelChildren.getLength(); ++j) {
                         Node fileNode = levelChildren.item(j);
                         if (fileNode != null) {
                             if ("file".equals(fileNode.getNodeName())) {
                                 String path = fileNode.getFirstChild().getTextContent();
-                                AssetLevel al = new AssetLevel(Paths.get(path));
+                                al = new AssetLevel(Paths.get(path));
                                 p.addLevel(al);
+                            }else if ("exportsettings".equals(fileNode.getNodeName())){
+                                if ( al != null)
+                                {
+                                    readExportSettings(fileNode, al);
+                                }
                             }
                         }
                     }
+                    p.addLevel(al);
                 }
             }
         }
@@ -139,5 +148,24 @@ public class ProjectLoader {
     private String getAttrContent(String key, NamedNodeMap map) {
         org.w3c.dom.Node attr = map.getNamedItem(key);
         return attr != null ? attr.getTextContent() : "";
+    }
+
+    private void readExportSettings(Node fileNode, dae.project.Level l) {
+        boolean exportOnSave = XMLUtils.parseBoolean("exportonsave", fileNode.getAttributes());
+        l.setExportOnSave(exportOnSave);
+        NodeList exportNodes = fileNode.getChildNodes();
+        for( int i = 0 ; i < exportNodes.getLength(); ++i)
+        {
+            Node exportNode = exportNodes.item(i);
+            if ( exportNode == null)
+                continue;
+            if ( "exportfile".equals(exportNode.getNodeName()))
+            {
+                String key = getAttrContent("key", exportNode.getAttributes());
+                String path = exportNode.getFirstChild().getTextContent();
+                l.setExportLocation(key, new File(path));
+            }
+        }
+        fileNode.getAttributes();
     }
 }
