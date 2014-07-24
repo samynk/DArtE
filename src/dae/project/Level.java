@@ -44,6 +44,10 @@ public class Level extends Node implements ProjectTreeNode{
     private boolean createDefaultLights = true;
     
     private ArrayList<Prefab> defaultLights = new ArrayList<Prefab>();
+    private HashMap<String, File> exportLocations = new HashMap<String,File>();
+    
+    private boolean exportOnSave = true;
+    
     /**
      * The assetmanager to use.
      */
@@ -195,6 +199,19 @@ public class Level extends Node implements ProjectTreeNode{
     public boolean hasLocation() {
         return location != null;
     }
+    
+    /**
+     * Returns the absolute location of the level file.
+     * @return 
+     */
+    public File getAbsoluteLocation(){
+        if ( hasRelativeLocation()){
+            File projectLocation = project.getProjectLocation().getParentFile();
+            return new File(projectLocation, this.getRelativeLocation().getPath());
+        }else{
+            return this.getLocation();
+        }
+    }
 
     /**
      * Gets the up axis for this level, default is Z Axis.
@@ -244,6 +261,10 @@ public class Level extends Node implements ProjectTreeNode{
                 GlobalObjects.getInstance().postEvent(se);
             }
         }
+    }
+    
+    public AssetManager getAssetManager(){
+        return manager;
     }
     
     public void levelHidden(){
@@ -515,6 +536,28 @@ public class Level extends Node implements ProjectTreeNode{
     public ProjectTreeNode getProjectParent() {
         return this.project;
     }
+
+    public void setExportLocation(String key, File selected) {
+        exportLocations.put(key, selected);
+    }
     
+    public File getExportLocation(String key){
+        return exportLocations.get(key);
+    }
     
+    public boolean isExportOnSave(){
+        return exportOnSave;
+    }
+    
+    public void setExportOnSave(boolean value){
+        this.exportOnSave = value;
+    }
+
+    public boolean hasExportKeys() {
+        return !exportLocations.isEmpty();
+    }
+    
+    public Iterable<String> getExportKeys(){
+        return exportLocations.keySet();
+    }
 }
