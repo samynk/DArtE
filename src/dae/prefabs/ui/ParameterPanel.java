@@ -12,7 +12,6 @@ import java.awt.GridBagConstraints;
 import java.util.HashMap;
 import javax.swing.JComponent;
 import javax.swing.border.TitledBorder;
-import sun.misc.JavaxSecurityAuthKerberosAccess;
 
 /**
  *
