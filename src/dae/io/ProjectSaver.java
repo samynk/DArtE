@@ -11,14 +11,25 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import static dae.io.XMLUtils.*;
+import dae.io.export.Exporter;
 import dae.project.AssetLevel;
 import dae.project.Level;
+import java.io.Writer;
+import java.util.HashMap;
+import java.util.logging.Logger;
 
 /**
  *
  * @author samyn_000
  */
 public class ProjectSaver {
+
+    private final static HashMap<String, Exporter> registeredExporters =
+            new HashMap<String, Exporter>();
+
+    static {
+        registeredExporters.put("j3o", new SceneToJ3OExporter());
+    }
 
     public static void write(Project project, File file) throws IOException {
         // check if file has a correct file extension.
@@ -27,10 +38,10 @@ public class ProjectSaver {
             project.setProjectLocation(file);
         }
         // create a klatch folder
-        if ( project.getKlatchDirectory().exists()){
+        if (project.getKlatchDirectory().exists()) {
             project.getKlatchDirectory().mkdirs();
         }
-        
+
         FileWriter fw = new FileWriter(file);
         BufferedWriter bw = new BufferedWriter(fw);
         bw.write("<?xml version='1.0'?>\n");
@@ -54,8 +65,8 @@ public class ProjectSaver {
                 bw.write("\t\t<level ");
                 writeAttribute(bw, "name", l.getName());
                 bw.write(" ");
-                if ( l instanceof AssetLevel ){
-                    writeAttribute(bw, "type","klatch");
+                if (l instanceof AssetLevel) {
+                    writeAttribute(bw, "type", "klatch");
                 }
                 bw.write(">\n");
                 bw.write("\t\t\t<file><![CDATA[");
@@ -63,6 +74,7 @@ public class ProjectSaver {
                     bw.write(l.getRelativeLocation().getPath());
                 }
                 bw.write("]]></file>\n");
+                writeExportSettings(bw, l);
                 bw.write("\t\t</level>\n");
             }
         }
@@ -70,6 +82,27 @@ public class ProjectSaver {
         bw.write("</project>\n");
 
         bw.close();
+    }
+
+    private static void writeExportSettings(Writer w, Level l) {
+        if (l.hasExportKeys()) {
+            try {
+                w.write("\t\t\t<exportsettings ");
+                writeAttribute(w, "exportonsave", l.isExportOnSave());
+                w.write(">\n");
+                for (String key : l.getExportKeys()) {
+                    File loc = l.getExportLocation(key);
+                    w.write("\t\t\t\t<exportfile ");
+                    writeAttribute(w, "key", key);
+                    w.write("><![CDATA[");
+                    w.write(loc.getPath());
+                    w.write("]]></exportfile>\n");
+                }
+                w.write("\t\t\t</exportsettings>\n");
+            } catch (IOException ex) {
+                Logger.getLogger(ProjectSaver.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            }
+        }
     }
 
     private static void writeLevel(File projectDir, Level l) {
@@ -89,7 +122,18 @@ public class ProjectSaver {
             l.setRelativeLocation(true);
             l.setLocation(levelFile);
 
-            SceneSaver.writeScene(new File(projectDir,levelFile.getPath()), l);
+            SceneSaver.writeScene(new File(projectDir, levelFile.getPath()), l);
+        }
+
+        if (l.isExportOnSave() && l.hasExportKeys()) {
+            for (String key : l.getExportKeys()) {
+                Exporter e = registeredExporters.get(key);
+                File location = l.getExportLocation(key);
+                if (e != null && location != null) {
+
+                    e.writeScene(location, l.getAssetManager(), l);
+                }
+            }
         }
     }
 }
