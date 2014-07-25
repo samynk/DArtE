@@ -75,7 +75,6 @@ public class ConnectorPrefab extends Prefab {
         geo.setMaterial(mat);
 
         this.setOriginalMaterial(mat);
-        this.setSelectionMaterial(mat);
         this.attachChild(geo);
     }
 }
