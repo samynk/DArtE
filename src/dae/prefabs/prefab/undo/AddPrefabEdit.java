@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package motum.objects.prefab.undo;
+package dae.prefabs.prefab.undo;
 
 import com.jme3.scene.Node;
 import javax.swing.undo.AbstractUndoableEdit;
