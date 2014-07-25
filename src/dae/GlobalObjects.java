@@ -53,7 +53,6 @@ public class GlobalObjects {
     private Material wireMaterial;
     // The Preferences object that is used to store preferences.
     private Preferences preferences;
-    
     private static int MAXRECENTFILES = 10;
 
     private GlobalObjects() {
@@ -92,13 +91,17 @@ public class GlobalObjects {
                 ((UndoPrefabPropertyEdit) edit).setSignificant(true);
             }
         }
+        System.out.println("Adding edit : " + edit);
         undoManager.addEdit(edit);
         lastEdit = edit;
     }
 
     public void undo() throws CannotUndoException {
         lastEdit = null;
-        undoManager.undo();
+        try {
+            undoManager.undo();
+        } catch (CannotUndoException ex) {
+        }
     }
 
     public void redo() throws CannotRedoException {
