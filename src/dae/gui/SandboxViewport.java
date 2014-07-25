@@ -64,6 +64,7 @@ import dae.prefabs.gizmos.RotateGizmo;
 import dae.prefabs.magnets.FillerParameter;
 import dae.prefabs.magnets.Magnet;
 import dae.prefabs.magnets.MagnetParameter;
+import dae.prefabs.prefab.undo.AddPrefabEdit;
 import dae.prefabs.prefab.undo.DeletePrefabEdit;
 import dae.prefabs.prefab.undo.UndoPrefabPropertyEdit;
 import dae.prefabs.shapes.LineShape;
@@ -94,14 +95,12 @@ import dae.project.Project;
 import dae.project.ProjectTreeNode;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
-import motum.objects.prefab.undo.AddPrefabEdit;
 
 /**
  *
@@ -590,10 +589,8 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
                 }
                 // System.out.println("Setting local translation to : " + b2);
                 Vector3f newValue = n.getLocalTranslation().clone();
-                UndoPrefabPropertyEdit edit = new UndoPrefabPropertyEdit(n, "localTranslation", oldValue, newValue);
+                UndoPrefabPropertyEdit edit = new UndoPrefabPropertyEdit(n, "localPrefabTranslation", oldValue, newValue);
                 GlobalObjects.getInstance().addEdit(edit);
-
-
             }
         } else if (editorState == EditorState.ROTATEX || editorState == EditorState.ROTATEY || editorState == EditorState.ROTATEZ) {
             Vector2f screenCoords = new Vector2f(evt.getX(), evt.getY());
@@ -673,7 +670,6 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
             sceneElements.attachChild(p);
             if (p instanceof Prefab) {
                 Prefab prefab = (Prefab) p;
-                prefab.setSelectionMaterial(selectionMaterial);
                 //prefab.connect(sceneElements);
                 BulletAppState bas = this.stateManager.getState(BulletAppState.class);
                 prefab.addPhysics(bas.getPhysicsSpace());
@@ -751,7 +747,6 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
 
                 p.setType(objectTypeToCreate.getLabel());
                 p.setCategory(objectTypeToCreate.getCategory());
-                p.setSelectionMaterial(selectionMaterial);
                 p.notifyLoaded();
                 insertionElements.attachChild((Node) p);
                 currentInsertion = (Node) p;
@@ -1394,10 +1389,11 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
             ProjectTreeNode parent = p.getProjectParent();
             if (parent != null) {
                 int childIndex = parent.getIndexOfChild(p);
+                GlobalObjects.getInstance().addEdit(new DeletePrefabEdit(this.level,n));
                 n.removeFromParent();
                 LevelEvent le = LevelEvent.createNodeRemovedEvent(level, n, parent, childIndex);
                 GlobalObjects.getInstance().postEvent(le);
-                GlobalObjects.getInstance().addEdit(new DeletePrefabEdit(n));
+                
             }
 
         }
