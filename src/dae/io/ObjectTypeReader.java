@@ -35,7 +35,6 @@ import dae.prefabs.types.ObjectTypeCategory;
 import dae.prefabs.types.ObjectTypeCollection;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -146,6 +145,7 @@ public class ObjectTypeReader implements AssetLoader {
                 String type = getAttrContent("type", map);
                 String id = getAttrContent("id", map);
                 String label;
+                String converter = getAttrContent("converter",map);
                 try {
                     label = translations.getString(id);
                 } catch (MissingResourceException ex) {
@@ -227,6 +227,7 @@ public class ObjectTypeReader implements AssetLoader {
                 }
                 if (p != null) {
                     p.setLabel(label);
+                    p.setConverter(converter);
                 }
             }
         }
