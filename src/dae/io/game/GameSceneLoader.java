@@ -16,6 +16,7 @@ import com.jme3.light.PointLight;
 import com.jme3.light.SpotLight;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Transform;
 import com.jme3.math.Vector3f;
@@ -183,8 +184,8 @@ public class GameSceneLoader {
         Vector3f spotLightDir = Vector3f.UNIT_Y.mult(-1.0f);
         spotLight.setDirection(rotation.mult(spotLightDir));
         spotLight.setColor(color.mult(intensity));
-        spotLight.setSpotInnerAngle(innerangle);
-        spotLight.setSpotOuterAngle(outerangle);
+        spotLight.setSpotInnerAngle(innerangle* FastMath.DEG_TO_RAD);
+        spotLight.setSpotOuterAngle(outerangle* FastMath.DEG_TO_RAD);
         spotLight.setSpotRange(spotrange);
         return spotLight;
     }
