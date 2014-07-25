@@ -2,13 +2,10 @@ package dae.project;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.bullet.collision.shapes.BoxCollisionShape;
-import com.jme3.bullet.collision.shapes.PlaneCollisionShape;
 import com.jme3.bullet.control.RigidBodyControl;
-import com.jme3.light.Light;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Matrix3f;
-import com.jme3.math.Plane;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
@@ -121,7 +118,6 @@ public class Grid extends Prefab {
         zGeometry.setLocalTranslation(0, 0, -0.01f);
 
         this.setOriginalMaterial(groundMaterial);
-        this.setSelectionMaterial(groundMaterial);
 
         // set the cube's material
         magnet = new GridMagnet();
