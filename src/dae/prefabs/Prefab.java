@@ -37,6 +37,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -56,7 +57,6 @@ public class Prefab extends Node implements ProjectTreeNode {
     private final ArrayList<UpdateObject> workList =
             new ArrayList<UpdateObject>();
     private boolean selected = false;
-    private Material selectionMaterial;
     private Material originalMaterial;
     private float[] angles = new float[3];
     private Vector3f offset;
@@ -145,10 +145,6 @@ public class Prefab extends Node implements ProjectTreeNode {
         this.category = category;
     }
 
-    public void setSelectionMaterial(Material material) {
-        this.selectionMaterial = material;
-    }
-
     public void setOriginalMaterial(Material material) {
         this.originalMaterial = material;
     }
@@ -193,29 +189,25 @@ public class Prefab extends Node implements ProjectTreeNode {
                         }
                     }
                 }
-
             }
             boolean undoableEdit = uo.isUndoableEdit();
 
             if (m != null) {
                 try {
-                    Object oldValue = null;
-                    if (undoableEdit) {
-                        oldValue = getParameter(property);
-                        if (oldValue instanceof Vector3f) {
-                            oldValue = ((Vector3f) oldValue).clone();
-                        }
-                    }
-                    m.invoke(this, value);
-                    if (undoableEdit) {
-                        if (!value.equals(oldValue)) {
+                    Object oldValue = getParameter(property);
+                    oldValue = this.clone(oldValue);
+                    boolean equal = value.equals(oldValue);
+                    if (!equal) {
+                        m.invoke(this, value);
+                        //System.out.println("Setting property " + property + " from  " + oldValue + " to  " + value);
+                        if (undoableEdit) {
                             GlobalObjects go = GlobalObjects.getInstance();
                             //System.out.println("Adding UndoPrefabPropertyEdit :" + this.getName() + " : " + oldValue + "," + value);
                             go.addEdit(new UndoPrefabPropertyEdit(this, property, oldValue, value));
                             pcs.firePropertyChange(property, oldValue, value);
                         }
+                        changed = true;
                     }
-                    changed = true;
                 } catch (IllegalAccessException ex) {
                     Logger.getLogger(Prefab.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (InvocationTargetException ex) {
@@ -269,6 +261,30 @@ public class Prefab extends Node implements ProjectTreeNode {
         } else {
             return clazz;
         }
+    }
+
+    private Object clone(Object toClone) {
+        if (toClone instanceof Cloneable) {
+            try {
+                Method clone = toClone.getClass().getMethod("clone");
+                if (clone != null && Modifier.isPublic(clone.getModifiers())) {
+                    return clone.invoke(toClone);
+                } else {
+                    return toClone;
+                }
+            } catch (NoSuchMethodException ex) {
+                Logger.getLogger(Prefab.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (SecurityException ex) {
+                Logger.getLogger(Prefab.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IllegalAccessException ex) {
+                Logger.getLogger(Prefab.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IllegalArgumentException ex) {
+                Logger.getLogger(Prefab.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InvocationTargetException ex) {
+                Logger.getLogger(Prefab.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return toClone;
     }
 
     public Object getParameter(String property) {
@@ -1100,7 +1116,7 @@ public class Prefab extends Node implements ProjectTreeNode {
     }
 
     public ProjectTreeNode getProjectChild(int index) {
-        return (ProjectTreeNode)this.getPrefabChildAt(index);
+        return (ProjectTreeNode) this.getPrefabChildAt(index);
     }
 
     public int getIndexOfChild(ProjectTreeNode object) {
@@ -1122,9 +1138,9 @@ public class Prefab extends Node implements ProjectTreeNode {
         if (p instanceof dae.project.Level) {
             dae.project.Level l = (dae.project.Level) p;
             return l.getLayer(layerName);
-        } else  if ( p instanceof ProjectTreeNode) {
-            return (ProjectTreeNode)p;
-        }else{
+        } else if (p instanceof ProjectTreeNode) {
+            return (ProjectTreeNode) p;
+        } else {
             return null;
         }
     }
