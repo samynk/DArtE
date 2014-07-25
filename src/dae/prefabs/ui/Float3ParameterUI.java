@@ -10,6 +10,7 @@ import com.jme3.math.Vector3f;
 import dae.GlobalObjects;
 import dae.prefabs.Prefab;
 import dae.prefabs.parameters.Parameter;
+import dae.prefabs.parameters.converter.PropertyConverter;
 
 import dae.prefabs.standard.UpdateObject;
 import dae.prefabs.ui.events.PrefabChangedEvent;
@@ -27,6 +28,7 @@ public class Float3ParameterUI extends javax.swing.JPanel implements ParameterUI
     private Prefab currentNode;
     private boolean disregardEvent = false;
     private PrefabChangedEventType eventType;
+    private PropertyConverter converter;
 
     /**
      * Creates new form Float3ParameterUI
@@ -192,9 +194,10 @@ public class Float3ParameterUI extends javax.swing.JPanel implements ParameterUI
     @Override
     public void setParameter(Parameter p) {
         parameter = p;
+        converter = p.getConverter();
         if (p.getId().equals("localTranslation") || p.getId().equals("localPrefabTranslation")) {
             eventType = PrefabChangedEventType.TRANSLATION;
-        } else if (p.getId().equals("localRotation")) {
+        } else if (p.getId().equals("localRotation") || p.getId().equals("localPrefabTranslation")) {
             eventType = PrefabChangedEventType.ROTATION;
         } else if (p.getId().equals("localScale")) {
             eventType = PrefabChangedEventType.SCALE;
@@ -212,6 +215,9 @@ public class Float3ParameterUI extends javax.swing.JPanel implements ParameterUI
         }
         String property = parameter.getId();
         Object value = currentSelectedNode.getParameter(property);
+        if ( converter != null ){
+            value = converter.convertFromObjectToUI(value);
+        }
         if (value != null && value instanceof Vector3f) {
             this.setFloat3((Vector3f) value);
         }
@@ -224,11 +230,11 @@ public class Float3ParameterUI extends javax.swing.JPanel implements ParameterUI
                 public void run() {
                     switch (event.getType()) {
                         case TRANSLATION:
-                            setFloat3(currentNode.getLocalTranslation());
+                            setFloat3(currentNode.getLocalPrefabTranslation());
                             break;
                         case ROTATION:
                             float angles[] = new float[3];
-                            currentNode.getLocalRotation().toAngles(angles);
+                            currentNode.getLocalPrefabRotation().toAngles(angles);
                             setFloat3(angles[0]*FastMath.RAD_TO_DEG, angles[1]*FastMath.RAD_TO_DEG, angles[2]*FastMath.RAD_TO_DEG);
                             break;
                         case SCALE:
@@ -237,7 +243,6 @@ public class Float3ParameterUI extends javax.swing.JPanel implements ParameterUI
                     }
                 }
             });
-
         }
     }
 
@@ -245,7 +250,10 @@ public class Float3ParameterUI extends javax.swing.JPanel implements ParameterUI
         if (disregardEvent) {
             return;
         }
-        Vector3f value = getFloat3();
+        Object value = getFloat3();
+        if ( converter != null){
+            value = converter.convertFromUIToObject(value);
+        }
         String property = parameter.getId();
         if (currentNode != null) {
             //System.out.println("Setting " + property + " to " + value);
