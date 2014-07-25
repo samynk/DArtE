@@ -11,7 +11,7 @@ and open the template in the editor.
             <parameters section="Transform">
                 <parameter type="string" id="name"/>
                 <parameter type="float3" id="localPrefabTranslation"/>
-                <parameter type="float3" id="localPrefabRotation"/>
+                <parameter type="float3" id="localPrefabRotation" converter="dae.prefabs.parameters.converter.QuaternionConverter"/>
                 <parameter type="float3" id="dimension"/>
                 <parameter type="action" id="drop" method="drop"/>
             </parameters>
@@ -20,7 +20,7 @@ and open the template in the editor.
             <parameters section="Transform">
                 <parameter type="string" id="name"/>
                 <parameter type="float3" id="localPrefabTranslation"/>
-                <parameter type="float3" id="localPrefabRotation"/>
+                <parameter type="float3" id="localPrefabRotation" converter="dae.prefabs.parameters.converter.QuaternionConverter"/>
                 <parameter type="float" id="radius"/>
                 <parameter type="action" id="drop" method="drop"/>
             </parameters>
@@ -29,7 +29,7 @@ and open the template in the editor.
             <parameters section="Transform">
                 <parameter type="string" id="name"/>
                 <parameter type="float3" id="localPrefabTranslation"/>
-                <parameter type="float3" id="localPrefabRotation"/>
+                <parameter type="float3" id="localPrefabRotation" converter="dae.prefabs.parameters.converter.QuaternionConverter"/>
             </parameters>
             <parameters section="Physics">
                 <parameter type="float" id="mass"/>
@@ -46,7 +46,7 @@ and open the template in the editor.
             <parameters section="Transform">
                 <parameter type="string" id="name"/>
                 <parameter type="float3" id="localPrefabTranslation"/>
-                <parameter type="float3" id="localPrefabRotation"/>
+                <parameter type="float3" id="localPrefabRotation" converter="dae.prefabs.parameters.converter.QuaternionConverter"/>
             </parameters>
             <parameters section="Physics">
                 <parameter type="float" id="lowerLimit"/>
@@ -79,35 +79,7 @@ and open the template in the editor.
                 <parameter type="float" id="length"/>
             </parameters>
         </object>
-        <object label="Hinge" class="motum.objects.prefab.HingeObject">
-            <parameters section="Transform">
-                <parameter type="string" id="id"/>
-                <parameter type="float" id="xTranslation"/>
-                <parameter type="float" id="yTranslation"/>
-                <parameter type="float" id="zTranslation"/>
-                <parameter type="float" id="xRotation" min="0" max="360" step="1"/>
-                <parameter type="float" id="yRotation" min="0" max="360" step="1"/>
-                <parameter type="float" id="zRotation" min="0" max="360" step="1"/>
-                <parameter type="object" id="hingeObject"/>
-                <parameter type="float" id="xOffset"/>
-                <parameter type="float" id="yOffset"/>
-                <parameter type="float" id="zOffset"/>
-                <parameter type="float" id="xOffsetRotation"  min="0" max="360" step="1"/>
-                <parameter type="float" id="yOffsetRotation"  min="0" max="360" step="1"/>
-                <parameter type="float" id="zOffsetRotation"  min="0" max="360" step="1"/>
-            </parameters>
-        </object>
-        <object label="WaypointFile" class="motum.objects.waypoints.MapNode">
-            <parameter type="string" id="name"/>
-        </object>
-        <object label="Rack" class="motum.objects.prefab.RackObject">
-            <parameters section="Transform">
-                <parameter type="float3" id="localTranslation"/>
-                <parameter type="float3" id="dimension"/>
-                <parameter type="int" id="nrOfRacks"/>
-                <parameter type="int" id="nrOfSupports"/>
-            </parameters>
-        </object>
+
         <object label="MessageBoard" class="motum.objects.prefab.MessageBoardObject">
             <defaults>
                 <parameter type="float3" id="offset" value="[0,0,1]"/>
@@ -121,20 +93,12 @@ and open the template in the editor.
                 <parameter type="color" id="fontColor"/>
             </parameters>
         </object>
-        <object label="Ton" class="dae.prefabs.standard.MeshObject" mesh="Models/barrel.j3o">
-            <parameters section="Transform">
-                <parameter type="float3" id="localTranslation"/>
-                <parameter type="float" id="zRotation"/>
-            </parameters>
-            <parameters section="Appearance">
-                <parameter type="color" id="diffuseColor"/>
-            </parameters>
-        </object>
+        
         <object label="Klatch" class="dae.prefabs.Klatch" defaultloader="true">
             <parameters section="Transform">
                 <parameter type="string" id="name"/>
-                <parameter type="float3" id="localTranslation"/>
-                <parameter type="float3" id="localRotation"/>
+                <parameter type="float3" id="localPrefabTranslation"/>
+                <parameter type="float3" id="localPrefabRotation" converter="dae.prefabs.parameters.converter.QuaternionConverter"/>
                 <parameter type="float3" id="localScale"/>
                 <parameter type="string" id="layer"/>
                 <parameter type="enumlist" id="shadowMode" enumclass="com.jme3.renderer.queue.RenderQueue$ShadowMode"/>
@@ -147,8 +111,8 @@ and open the template in the editor.
         <object label="Mesh" class="dae.prefabs.standard.MeshObject">
             <parameters section="Transform">
                 <parameter type="string" id="name"/>
-                <parameter type="float3" id="localTranslation"/>
-                <parameter type="float3" id="localRotation"/>
+                <parameter type="float3" id="localPrefabTranslation"/>
+                <parameter type="float3" id="localPrefabRotation" converter="dae.prefabs.parameters.converter.QuaternionConverter"/>
                 <parameter type="float3" id="localScale"/>
                 <parameter type="object" id="physicsMesh"/>
                 <parameter type="magnets" id="magnets">
@@ -290,8 +254,8 @@ and open the template in the editor.
         <object label="Pivot" class="dae.prefabs.gizmos.PivotGizmo">
             <parameters section="Transform">
                 <parameter type="string" id="name"/>
-                <parameter type="float3" id="localTranslation"/>
-                <parameter type="float3" id="localRotation"/>
+                <parameter type="float3" id="localPrefabTranslation"/>
+                <parameter type="float3" id="localPrefabRotation" converter="dae.prefabs.parameters.converter.QuaternionConverter"/>
             </parameters>
         </object>
     </collection>
@@ -388,7 +352,7 @@ and open the template in the editor.
             <parameters section="Transform">
                 <parameter type="string" id="name"/>
                 <parameter type="float3" id="localPrefabTranslation"/>
-                <parameter type="float3" id="localPrefabRotation"/>
+                <parameter type="float3" id="localPrefabRotation" converter="dae.prefabs.parameters.converter.QuaternionConverter"/>
             </parameters>
             <parameters section="Light">
                 <parameter type="float" id="spotInnerAngle"/>
@@ -415,7 +379,7 @@ and open the template in the editor.
             <parameters section="Transform">
                 <parameter type="string" id="name"/>
                 <parameter type="float3" id="localPrefabTranslation"/>
-                <parameter type="float3" id="localPrefabRotation"/>
+                <parameter type="float3" id="localPrefabRotation" converter="dae.prefabs.parameters.converter.QuaternionConverter"/>
             </parameters>
             <parameters section="Light">
                 <parameter type="color" id="directionalLightColor"/>
@@ -427,7 +391,7 @@ and open the template in the editor.
             <parameters section="Transform">
                 <parameter type="string" id="name"/>
                 <parameter type="float3" id="localPrefabTranslation"/>
-                <parameter type="float3" id="localPrefabRotation"/>
+                <parameter type="float3" id="localPrefabRotation" converter="dae.prefabs.parameters.converter.QuaternionConverter"/>
             </parameters>
             <parameters section="Light">
                 <parameter type="color" id="ambientLightColor"/>
