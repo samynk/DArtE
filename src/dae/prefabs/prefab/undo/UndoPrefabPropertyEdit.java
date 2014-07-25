@@ -5,10 +5,8 @@
 package dae.prefabs.prefab.undo;
 
 import com.jme3.scene.Node;
-import dae.GlobalObjects;
 import dae.prefabs.Prefab;
 import dae.prefabs.standard.UpdateObject;
-import dae.prefabs.ui.events.PrefabChangedEvent;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotUndoException;
 
@@ -67,5 +65,10 @@ public class UndoPrefabPropertyEdit extends AbstractUndoableEdit {
 
     public void setSignificant(boolean significant) {
         this.significant = significant;
+    }
+    
+    @Override
+    public String toString(){
+        return this.property + ":" + oldValue + " changed to " + newValue;
     }
 }
