@@ -260,6 +260,13 @@ and open the template in the editor.
         </object>
     </collection>
     <collection name="Animation">
+         <object label="Rig" class="dae.animation.rig.Rig" defaultloader="true">
+            <parameters section="Transform">
+                <parameter type="string" id="name"/>
+                <parameter type="float3" id="localTranslation"/>
+                <parameter type="float3" id="localPrefabRotation" converter="dae.prefabs.parameters.converter.QuaternionConverter"/>
+            </parameters>
+        </object>
         <object label="Skeleton" class="dae.animation.skeleton.Body" defaultloader="true">
             <parameters section="Transform">
                 <parameter type="string" id="name"/>
