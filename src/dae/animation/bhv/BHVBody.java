@@ -8,11 +8,13 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import dae.animation.skeleton.BodyElement;
 import dae.animation.skeleton.RotationJoint;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 
 /**
  *
- * @author Koen
+ * @author Koen Samyn
  */
 public class BHVBody extends Node implements BodyElement {
 
@@ -84,5 +86,9 @@ public class BHVBody extends Node implements BodyElement {
                 ((BodyElement)s).showTargetObjects();
             }
         }
+    }
+
+    public void write(Writer w, int depth) throws IOException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
