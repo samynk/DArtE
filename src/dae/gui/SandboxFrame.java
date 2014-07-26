@@ -8,6 +8,10 @@ import com.google.common.eventbus.Subscribe;
 import com.jme3.system.AppSettings;
 import com.jme3.system.JmeCanvasContext;
 import dae.GlobalObjects;
+import dae.animation.rig.Rig;
+import dae.animation.rig.io.RigWriter;
+import dae.animation.skeleton.Body;
+import dae.animation.skeleton.RevoluteJoint;
 import dae.gui.events.ApplicationStoppedEvent;
 import dae.io.ProjectLoader;
 import dae.io.ProjectSaver;
@@ -17,6 +21,9 @@ import dae.prefabs.gizmos.events.GizmoSpaceChangedEvent;
 import dae.prefabs.gizmos.events.RotateGizmoSpaceChangedEvent;
 import dae.prefabs.types.ObjectType;
 import dae.prefabs.types.ObjectTypeCategory;
+import dae.prefabs.ui.classpath.FileNode;
+import dae.prefabs.ui.events.AssetEvent;
+import dae.prefabs.ui.events.AssetEventType;
 import dae.prefabs.ui.events.CreateObjectEvent;
 import dae.prefabs.ui.events.GizmoEvent;
 import dae.prefabs.ui.events.GizmoType;
@@ -25,6 +32,7 @@ import dae.prefabs.ui.events.ProjectEventType;
 import dae.prefabs.ui.events.ViewportReshapeEvent;
 import dae.prefabs.ui.events.ZoomEvent;
 import dae.prefabs.ui.events.ZoomEventType;
+import dae.project.AssetLevel;
 import dae.project.Project;
 import java.awt.Dimension;
 import java.awt.datatransfer.DataFlavor;
@@ -55,6 +63,7 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
 
     private SandboxViewport viewport;
     private CreateProjectDialog createProjectDialog;
+    private CreateKlatchDialog createObjectDialog;
     /**
      * The current project.
      */
@@ -100,6 +109,8 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
         pnlViewPort.setLeftComponent(ctx.getCanvas());
 
         createProjectDialog = new CreateProjectDialog(this, true);
+        createObjectDialog = new CreateKlatchDialog(this, true);
+        createObjectDialog.setExtension("rig");
     }
 
     /**
@@ -143,6 +154,7 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
         mnuRedo = new javax.swing.JMenuItem();
         mnuPreferences = new javax.swing.JMenuItem();
         mnuAdd = new javax.swing.JMenu();
+        mnuCreateRig = new javax.swing.JMenuItem();
         mnuAddSkeleton = new javax.swing.JMenuItem();
         mnuSkeleton2 = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
@@ -347,6 +359,14 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
         mnuSandboxMenu.add(mnuEdit);
 
         mnuAdd.setText("Animation");
+
+        mnuCreateRig.setText("Create Rig ...");
+        mnuCreateRig.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuCreateRigActionPerformed(evt);
+            }
+        });
+        mnuAdd.add(mnuCreateRig);
 
         mnuAddSkeleton.setText("Add Skeleton 1");
         mnuAddSkeleton.addActionListener(new java.awt.event.ActionListener() {
@@ -850,6 +870,26 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
         // TODO add your handling code here:
         GlobalObjects.getInstance().postEvent(new ApplicationStoppedEvent());
     }//GEN-LAST:event_formWindowClosing
+
+    private void mnuCreateRigActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuCreateRigActionPerformed
+        // TODO add your handling code here:
+        createObjectDialog.setTitle("Create Rig");
+        createObjectDialog.setCurrentProject(this.currentProject);
+        createObjectDialog.setVisible(true);
+        if ( createObjectDialog.getReturnStatus() == CreateKlatchDialog.RET_OK)
+        {
+            String rigLocation = createObjectDialog.getAssemblyName();
+            // Create a default body.
+            Rig rig = new Rig();
+            File klatchDir = currentProject.getKlatchDirectory();
+            File rigFile = new File(klatchDir,rigLocation);
+            RigWriter.writeRig(rigFile, rig);
+            
+            AssetEvent ae = new AssetEvent(AssetEventType.EDIT, FileNode.createFromPath(rigLocation));
+            GlobalObjects.getInstance().postEvent(ae);
+            
+        }
+    }//GEN-LAST:event_mnuCreateRigActionPerformed
     /**
      * @param args the command line arguments
      */
@@ -920,6 +960,7 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
     private javax.swing.JMenuItem mnuAddSphere;
     private javax.swing.JMenuItem mnuAddSpotLight;
     private javax.swing.JMenuItem mnuAddWaypoint;
+    private javax.swing.JMenuItem mnuCreateRig;
     private javax.swing.JMenu mnuEdit;
     private javax.swing.JMenu mnuFile;
     private javax.swing.JMenuItem mnuHandCurve;
@@ -1006,6 +1047,11 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
                     ObjectType ot = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Standard", "Klatch");
                     ot.setExtraInfo(asset);
                     CreateObjectEvent event = new CreateObjectEvent("dae.prefabs.Klatch", asset, ot);
+                    viewport.onObjectCreation(event);
+                }else if ( extension.equals("rig")){
+                    ObjectType ot = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Animation", "Rig");
+                    ot.setExtraInfo(asset);
+                    CreateObjectEvent event = new CreateObjectEvent("dae.animation.rig.Rig", asset, ot);
                     viewport.onObjectCreation(event);
                 }
 

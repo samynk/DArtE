@@ -92,6 +92,14 @@
             <Property name="text" type="java.lang.String" value="Animation"/>
           </Properties>
           <SubComponents>
+            <MenuItem class="javax.swing.JMenuItem" name="mnuCreateRig">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Create Rig ..."/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuCreateRigActionPerformed"/>
+              </Events>
+            </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="mnuAddSkeleton">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Add Skeleton 1"/>
