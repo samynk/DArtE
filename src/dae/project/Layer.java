@@ -5,6 +5,7 @@
 package dae.project;
 
 import com.jme3.scene.Node;
+import com.jme3.scene.Spatial;
 import java.util.ArrayList;
 
 /**
@@ -272,7 +273,7 @@ public class Layer implements ProjectTreeNode{
                 public void run() {
                     if (!Layer.this.visible) {
                         for (Node n : nodes) {
-                            System.out.println("trying to remove : " + n.getName());
+                            //System.out.println("trying to remove : " + n.getName());
                             n.removeFromParent();
                         }
                     } else {
@@ -325,5 +326,9 @@ public class Layer implements ProjectTreeNode{
 
     public boolean isLeaf() {
         return false;
+    }
+
+    public boolean hasNode(Node node) {
+       return this.nodes.contains(node);
     }
 }
