@@ -39,7 +39,7 @@ import javax.swing.tree.TreePath;
 
 /**
  *
- * @author samyn_000
+ * @author Koen Samyn
  */
 public class AssetPanel extends javax.swing.JPanel implements WatchServiceListener {
 
@@ -51,7 +51,6 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
     private AssetTreeModel treeModel;
     private Pattern filePattern;
     private ExecutorService executor;
-    
     private boolean registerListener;
 
     /**
@@ -59,7 +58,7 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
      */
     public AssetPanel() {
         // match j3o files and klatch files
-        setFilePattern(".*\\.(?:j3o|klatch)");
+        setFilePattern(".*\\.(?:j3o|klatch|rig)");
         initComponents();
         assetTree.setCellRenderer(new AssetTreeCellRenderer());
         assetTree.setTransferHandler(new TreeTransferHandler());
@@ -72,9 +71,8 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
         } catch (IOException ex) {
             Logger.getLogger(AssetPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        if ( registerListener )
-        {
+
+        if (registerListener) {
             GlobalObjects.getInstance().registerListener(this);
         }
         executor = Executors.newSingleThreadExecutor();
@@ -87,20 +85,22 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
     public String getFilePattern() {
         return filePattern.pattern();
     }
-    
+
     /**
      * Listen to project events.
+     *
      * @param value true if the listener should register for project events.
      */
-    public void setRegisterListener(boolean value){
+    public void setRegisterListener(boolean value) {
         this.registerListener = value;
     }
-    
+
     /**
      * Checks if this panel listens to project events.
+     *
      * @return true if this panel is registered, false otherwise.
      */
-    public boolean isRegisterListener(){
+    public boolean isRegisterListener() {
         return registerListener;
     }
 
@@ -124,6 +124,7 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
         btnSearch.putClientProperty("JComponent.sizeVariant", "mini");
         cboMeshFilter = new javax.swing.JToggleButton();
         cboKlatchFilter = new javax.swing.JToggleButton();
+        cboRigFilter = new javax.swing.JToggleButton();
 
         mnuEditObject.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dae/icons/editobject.png"))); // NOI18N
         mnuEditObject.setText("Create Assembly ...");
@@ -187,6 +188,14 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
             }
         });
 
+        cboRigFilter.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dae/icons/body.png"))); // NOI18N
+        cboRigFilter.setSelected(true);
+        cboRigFilter.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                cboRigFilterItemStateChanged(evt);
+            }
+        });
+
         txtSearch.putClientProperty("JComponent.sizeVariant", "small");
         txtSearch.putClientProperty("JComponent.sizeVariant", "small");
         cboMeshFilter.putClientProperty("JComponent.sizeVariant", "mini");
@@ -204,7 +213,9 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
                         .addComponent(cboMeshFilter)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(cboKlatchFilter)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 227, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cboRigFilter)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 172, Short.MAX_VALUE)
                         .addComponent(btnSearch))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblSearch)
@@ -224,7 +235,8 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(cboKlatchFilter, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(cboMeshFilter)))
+                            .addComponent(cboMeshFilter)
+                            .addComponent(cboRigFilter)))
                     .addComponent(btnSearch))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(scrAssetPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 387, Short.MAX_VALUE)
@@ -268,32 +280,57 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
     }//GEN-LAST:event_cboMeshFilterItemStateChanged
 
     private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
-        // TODO add your handling code here:
         adaptFilter();
     }//GEN-LAST:event_btnSearchActionPerformed
 
     private void cboKlatchFilterItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cboKlatchFilterItemStateChanged
-        // TODO add your handling code here:
         adaptFilter();
     }//GEN-LAST:event_cboKlatchFilterItemStateChanged
 
     private void mnuDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuDeleteActionPerformed
-        // TODO add your handling code here:
-        
     }//GEN-LAST:event_mnuDeleteActionPerformed
 
+    private void cboRigFilterItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cboRigFilterItemStateChanged
+        adaptFilter();
+    }//GEN-LAST:event_cboRigFilterItemStateChanged
+
     private void adaptFilter() {
-        boolean klatchs = cboKlatchFilter.isSelected();
-        boolean meshs = cboMeshFilter.isSelected();
-        System.out.println("[klatch,mesh]=[" + klatchs + "," + meshs + "]");
-        if (cboKlatchFilter.isSelected() && cboMeshFilter.isSelected()) {
-            filePattern = Pattern.compile(".*" + txtSearch.getText() + ".*\\.(?:j3o|klatch)");
-        } else if (cboKlatchFilter.isSelected()) {
-            filePattern = Pattern.compile(".*" + txtSearch.getText() + ".*\\.klatch");
-        } else if (cboMeshFilter.isSelected()) {
-            filePattern = Pattern.compile(".*" + txtSearch.getText() + ".*\\.j3o");
+        int count = 0;
+        boolean klatches = cboKlatchFilter.isSelected();
+        count += klatches ? 1 : 0;
+        boolean meshes = cboMeshFilter.isSelected();
+        count += meshes ? 1 : 0;
+        boolean rigs = cboRigFilter.isSelected();
+        count += rigs ? 1 : 0;
+
+        if ( count == 1 ){
+            if ( klatches ){
+                filePattern = Pattern.compile(".*" + txtSearch.getText() + ".*\\.klatch");
+            }else if ( meshes){
+                filePattern = Pattern.compile(".*" + txtSearch.getText() + ".*\\.j3o");
+            }else if ( rigs ){
+                filePattern = Pattern.compile(".*" + txtSearch.getText() + ".*\\.rig");
+            }
+        }else if ( count > 1 ){
+            String pattern = "";
+            if ( klatches) {
+                pattern += "klatch";
+            }
+            if ( meshes ){
+                if ( pattern.length() > 0 ){
+                    pattern += "|";
+                }
+                pattern += "j3o";
+            }
+            if ( rigs ){
+                if ( pattern.length() > 0){
+                    pattern += "|";
+                }
+                pattern += "rig";
+            }
+            filePattern = Pattern.compile(".*" + txtSearch.getText() + ".*\\.(?:"+pattern+")");
         } else {
-            System.out.println("no search results");
+            //System.out.println("no search results");
             assetTree.setModel(new AssetTreeModel(new FileNode("no search results", false)));
             assetTree.repaint();
             return;
@@ -622,6 +659,7 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
     private javax.swing.JButton btnSearch;
     private javax.swing.JToggleButton cboKlatchFilter;
     private javax.swing.JToggleButton cboMeshFilter;
+    private javax.swing.JToggleButton cboRigFilter;
     private javax.swing.JLabel lblSearch;
     private javax.swing.JMenuItem mnuDelete;
     private javax.swing.JMenuItem mnuEditObject;
