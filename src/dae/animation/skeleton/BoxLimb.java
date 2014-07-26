@@ -11,6 +11,9 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
+import dae.io.XMLUtils;
+import java.io.IOException;
+import java.io.Writer;
 
 /**
  *
@@ -93,6 +96,40 @@ public class BoxLimb extends Node implements BodyElement {
             if ( s instanceof BodyElement ){
                 ((BodyElement)s).showTargetObjects();
             }
+        }
+    }
+
+    public void write(Writer w, int depth) throws IOException {
+        for (int i = 0; i < depth; ++i) {
+            w.write('\t');
+        }
+        w.write("<limb ");
+        XMLUtils.writeAttribute(w, "name", this.getName());
+        XMLUtils.writeAttribute(w, "type", "BOX");
+        XMLUtils.writeAttribute(w, "length", this.length);
+        XMLUtils.writeAttribute(w, "width", this.width);
+        XMLUtils.writeAttribute(w, "height", this.height);
+
+        boolean hasBodyElements = false;
+        for (Spatial child : this.getChildren()) {
+            if (child instanceof BodyElement) {
+                hasBodyElements = true;
+                break;
+            }
+        }
+
+        if (!hasBodyElements) {
+            w.write("/>\n");
+        } else {
+            for ( Spatial child : this.getChildren()){
+                if ( child instanceof BodyElement ){
+                    ((BodyElement)child).write(w, depth+1);
+                }
+            }
+            for (int i = 0; i < depth; ++i) {
+                w.write('\t');
+            }
+            w.write("</limb>\n");
         }
     }
 }

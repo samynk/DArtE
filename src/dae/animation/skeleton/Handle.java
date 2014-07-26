@@ -15,7 +15,10 @@ import com.jme3.scene.Mesh;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.VertexBuffer;
 import com.jme3.util.BufferUtils;
+import dae.io.XMLUtils;
 import dae.prefabs.Prefab;
+import java.io.IOException;
+import java.io.Writer;
 
 /**
  * A handle object can define a number of targets for an animation. The most
@@ -240,6 +243,44 @@ public class Handle extends Prefab implements BodyElement {
             if (s instanceof BodyElement) {
                 ((BodyElement) s).showTargetObjects();
             }
+        }
+    }
+    
+    public void write(Writer w, int depth) throws IOException {
+        for (int i = 0; i < depth; ++i) {
+            w.write('\t');
+        }
+        w.write("<target ");
+        XMLUtils.writeAttribute(w, "name", this.getName());
+        XMLUtils.writeAttribute(w, "location", this.getLocalTranslation());
+        Quaternion localRotation = this.getLocalRotation();
+        Vector3f rotation = new Vector3f();
+        float[] angles = new float[3];
+        localRotation.toAngles(angles);
+        rotation.set(angles[0],angles[1],angles[2]);
+        rotation.multLocal(FastMath.RAD_TO_DEG);
+        XMLUtils.writeAttribute(w, "rotation", rotation);
+
+        boolean hasBodyElements = false;
+        for (Spatial child : this.getChildren()) {
+            if (child instanceof BodyElement) {
+                hasBodyElements = true;
+                break;
+            }
+        }
+
+        if (!hasBodyElements) {
+            w.write("/>\n");
+        } else {
+            for ( Spatial child : this.getChildren()){
+                if ( child instanceof BodyElement ){
+                    ((BodyElement)child).write(w, depth+1);
+                }
+            }
+            for (int i = 0; i < depth; ++i) {
+                w.write('\t');
+            }
+            w.write("</target>\n");
         }
     }
 }

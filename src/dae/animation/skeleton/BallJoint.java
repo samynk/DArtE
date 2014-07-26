@@ -14,6 +14,8 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Dome;
 import com.jme3.scene.shape.Sphere;
+import java.io.IOException;
+import java.io.Writer;
 
 /**
  *
@@ -141,5 +143,9 @@ public class BallJoint extends Node implements BodyElement {
                 ((BodyElement)s).showTargetObjects();
             }
         }
+    }
+
+    public void write(Writer w, int depth) throws IOException {
+        throw new UnsupportedOperationException("Ball joint is no longer supported"); //To change body of generated methods, choose Tools | Templates.
     }
 }

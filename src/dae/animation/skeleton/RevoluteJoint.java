@@ -17,7 +17,10 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import dae.animation.skeleton.debug.BoneVisualization;
 import dae.animation.skeleton.debug.JointVisualization;
+import dae.io.XMLUtils;
 import dae.prefabs.Prefab;
+import java.io.IOException;
+import java.io.Writer;
 
 /**
  *
@@ -66,7 +69,6 @@ public class RevoluteJoint extends Prefab implements BodyElement {
     // visualization of the joint
     private AssetManager manager;
     private ColorRGBA jointColor = ColorRGBA.Blue;
-    
     // maximum allowed changed for the angle
     private float maxAngleChange;
 
@@ -189,7 +191,7 @@ public class RevoluteJoint extends Prefab implements BodyElement {
 
     public void attachBodyElement(BodyElement element) {
         if (element instanceof Node) {
-            Node n = (Node)element;
+            Node n = (Node) element;
             this.attachChild((Node) element);
             if (manager != null) {
                 // create a visualization for the bone.
@@ -200,7 +202,7 @@ public class RevoluteJoint extends Prefab implements BodyElement {
                     Geometry boneGeo = new Geometry("bone", bv); // using our custom mesh object
                     Material boneMat = new Material(manager,
                             "Common/MatDefs/Misc/Unshaded.j3md");
-                    boneMat.setColor("Color", new ColorRGBA(32/255.0f,222/255.0f,61/255.0f,1.0f));
+                    boneMat.setColor("Color", new ColorRGBA(32 / 255.0f, 222 / 255.0f, 61 / 255.0f, 1.0f));
                     boneGeo.setMaterial(boneMat);
                     attachChild(boneGeo);
                 }
@@ -421,30 +423,87 @@ public class RevoluteJoint extends Prefab implements BodyElement {
         this.jointColor = jointColor;
     }
 
-    public  void setCurrentMaxAngleChange(float angle) {
-       this.maxAngleChange = angle;
+    public void setCurrentMaxAngleChange(float angle) {
+        this.maxAngleChange = angle;
     }
-    
-    public float getCurrentMaxAngleChange(){
+
+    public float getCurrentMaxAngleChange() {
         return maxAngleChange;
     }
-    
-     @Override
-    public void hideTargetObjects(){
+
+    @Override
+    public void hideTargetObjects() {
         for (Spatial s : children) {
             if (s instanceof BodyElement) {
-                ((BodyElement)s).hideTargetObjects();
+                ((BodyElement) s).hideTargetObjects();
             }
         }
     }
-    
-   
+
+    @Override
     public void showTargetObjects() {
-        for( Spatial s: this.getChildren())
-        {
-            if ( s instanceof BodyElement ){
-                ((BodyElement)s).showTargetObjects();
+        for (Spatial s : this.getChildren()) {
+            if (s instanceof BodyElement) {
+                ((BodyElement) s).showTargetObjects();
             }
+        }
+    }
+
+    public void write(Writer w, int depth) throws IOException {
+        for (int i = 0; i < depth; ++i) {
+            w.write('\t');
+        }
+        w.write("<joint ");
+        XMLUtils.writeAttribute(w, "name", this.getName());
+        XMLUtils.writeAttribute(w, "type", "revolute");
+
+        // name="Bip01$Head"  type="Revolute" axis="[1,0,0]" group="head" radius="0.01" height="0.1" 
+        // rotation="[3.8787262E-9,0.077585526,8.486834E-8]"
+        // location="[0.0998286,-8.62694E-9,0.0]"
+        // minAngle="-80" maxAngle="80" angle="0"
+        // chainwithchild="true" chainchildname="headJointY">
+        XMLUtils.writeAttribute(w, "axis", this.axis);
+        XMLUtils.writeAttribute(w, "group", this.group);
+        XMLUtils.writeAttribute(w, "radius", this.radius);
+        XMLUtils.writeAttribute(w, "height", this.height);
+        XMLUtils.writeAttribute(w, "location", this.getLocalPrefabTranslation());
+        Quaternion localRotation = this.getLocalRotation();
+        Vector3f rotation = new Vector3f();
+        float[] angles = new float[3];
+        localRotation.toAngles(angles);
+        rotation.set(angles[0],angles[1],angles[2]);
+        rotation.multLocal(FastMath.RAD_TO_DEG);
+        XMLUtils.writeAttribute(w, "rotation", rotation);
+        XMLUtils.writeAttribute(w, "minAngle", this.minAngle);
+        XMLUtils.writeAttribute(w, "maxAngle", this.maxAngle);
+        XMLUtils.writeAttribute(w, "angle", this.currentAngle);
+        XMLUtils.writeAttribute(w, "chainwithchild", this.chainWithChild);
+        if ( chainWithChild ){
+                   XMLUtils.writeAttribute(w, "chainchildname", this.chainChildName);
+        }
+        XMLUtils.writeAttribute(w, "chainwithparen", this.chainWithParent);
+
+        boolean hasBodyElements = false;
+        for (Spatial child : this.getChildren()) {
+            if (child instanceof BodyElement) {
+                hasBodyElements = true;
+                break;
+            }
+        }
+
+        if (!hasBodyElements) {
+            w.write("/>\n");
+        } else {
+            w.write(">\n");
+            for (Spatial child : this.getChildren()) {
+                if (child instanceof BodyElement) {
+                    ((BodyElement) child).write(w, depth + 1);
+                }
+            }
+            for (int i = 0; i < depth; ++i) {
+                w.write('\t');
+            }
+            w.write("</joint>\n");
         }
     }
 }

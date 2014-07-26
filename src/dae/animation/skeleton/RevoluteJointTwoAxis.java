@@ -20,7 +20,10 @@ import com.jme3.scene.Spatial;
 import com.jme3.scene.VertexBuffer.Type;
 import com.jme3.util.BufferUtils;
 import dae.animation.skeleton.debug.BoneVisualization;
+import dae.io.XMLUtils;
 import dae.prefabs.Prefab;
+import java.io.IOException;
+import java.io.Writer;
 
 /**
  * A Revolute joint that can rotate around two axis. This is useful when
@@ -364,14 +367,14 @@ public class RevoluteJointTwoAxis extends Prefab implements BodyElement {
         return copy;
     }
 
-    void setAngleConstraints(float minAngle1, float maxAngle1, float minAngle2, float maxAngle2) {
+    public void setAngleConstraints(float minAngle1, float maxAngle1, float minAngle2, float maxAngle2) {
         this.minAngle1 = minAngle1;
         this.maxAngle1 = maxAngle1;
         this.minAngle2 = minAngle2;
         this.maxAngle2 = maxAngle2;
     }
 
-    void setInitialLocalFrame(Vector3f r) {
+    public void setInitialLocalFrame(Vector3f r) {
         Quaternion q = new Quaternion();
         q.fromAngles(r.x, r.y, r.z);
         Vector3f[] axes = new Vector3f[3];
@@ -387,7 +390,7 @@ public class RevoluteJointTwoAxis extends Prefab implements BodyElement {
         initialFrameInverted.invertLocal();
     }
 
-    void setInitialLocalFrame(Vector3f xa, Vector3f ya, Vector3f za) {
+    public void setInitialLocalFrame(Vector3f xa, Vector3f ya, Vector3f za) {
         xAxis = xa.clone();
         yAxis = ya.clone();
         zAxis = za.clone();
@@ -414,14 +417,14 @@ public class RevoluteJointTwoAxis extends Prefab implements BodyElement {
         this.chainWithParent = chainwithparent;
     }
 
-    void setChainChildName(String childName) {
+    public void setChainChildName(String childName) {
         this.chainChildName = childName;
     }
 
     /**
      * Creates a visualization of this joint.
      */
-    void createVisualization(AssetManager assetManager) {
+    public void createVisualization(AssetManager assetManager) {
         this.manager = assetManager;
         // create a visualization for the first rotation axis.
         // attach the axises as children
@@ -627,23 +630,91 @@ public class RevoluteJointTwoAxis extends Prefab implements BodyElement {
     public float getCurrentMaxAngle2Change() {
         return maxAngle2Change;
     }
-    
-     @Override
-    public void hideTargetObjects(){
+
+    @Override
+    public void hideTargetObjects() {
         for (Spatial s : children) {
             if (s instanceof BodyElement) {
-                ((BodyElement)s).hideTargetObjects();
+                ((BodyElement) s).hideTargetObjects();
             }
         }
     }
-    
-   
+
+    @Override
     public void showTargetObjects() {
-        for( Spatial s: this.getChildren())
-        {
-            if ( s instanceof BodyElement ){
-                ((BodyElement)s).showTargetObjects();
+        for (Spatial s : this.getChildren()) {
+            if (s instanceof BodyElement) {
+                ((BodyElement) s).showTargetObjects();
             }
+        }
+    }
+
+    public void write(Writer w, int depth) throws IOException {
+        for (int i = 0; i < depth; ++i) {
+            w.write('\t');
+        }
+        w.write("<joint ");
+        XMLUtils.writeAttribute(w, "name", this.getName());
+        XMLUtils.writeAttribute(w, "type", "revolute");
+
+//name="Bip01$Neck"  type="Revolute2" group="rightarm" radius="0.01"
+//location="[0.204456,8.6884E-10,7.94768E-5]"
+//refaxisx="[0.9991973,2.6645156E-7,-0.040059462]"
+//refaxisy="[-2.6645145E-7,1.0,5.3414047E-9]"
+//refaxisz="[0.040059462,5.3367843E-9,0.9991973]"
+//axis1="[0,1,0]" axislabel1="Y" 
+//angle1="0"  minangle1="-5" maxangle1="5" 
+//axis2="[1,0,0]" axislabel2="X" 
+//angle2="0" minangle2="-5" maxangle2="5"
+        
+        XMLUtils.writeAttribute(w, "group", this.group);
+        XMLUtils.writeAttribute(w, "radius", this.radius);
+        XMLUtils.writeAttribute(w, "height", this.height);
+        XMLUtils.writeAttribute(w, "location", this.getLocalPrefabTranslation());
+        Quaternion localRotation = this.getLocalRotation();
+        Vector3f rotation = new Vector3f();
+        float[] angles = new float[3];
+        localRotation.toAngles(angles);
+        rotation.set(angles[0], angles[1], angles[2]);
+        rotation.multLocal(FastMath.RAD_TO_DEG);
+        XMLUtils.writeAttribute(w, "rotation", rotation);
+        XMLUtils.writeAttribute(w, "axis1", this.axis1);
+        XMLUtils.writeAttribute(w, "axislabel1", this.labelAxis1);
+        XMLUtils.writeAttribute(w, "minAngle1", this.minAngle1);
+        XMLUtils.writeAttribute(w, "maxAngle1", this.maxAngle1);
+        XMLUtils.writeAttribute(w, "angle1", this.currentAngle1);
+        
+        XMLUtils.writeAttribute(w, "minAngle2", this.minAngle2);
+        XMLUtils.writeAttribute(w, "maxAngle2", this.maxAngle2);
+        XMLUtils.writeAttribute(w, "angle2", this.currentAngle2);
+        
+        XMLUtils.writeAttribute(w, "chainwithchild", this.chainWithChild);
+        if (chainWithChild) {
+            XMLUtils.writeAttribute(w, "chainchildname", this.chainChildName);
+        }
+        XMLUtils.writeAttribute(w, "chainwithparen", this.chainWithParent);
+
+        boolean hasBodyElements = false;
+        for (Spatial child : this.getChildren()) {
+            if (child instanceof BodyElement) {
+                hasBodyElements = true;
+                break;
+            }
+        }
+
+        if (!hasBodyElements) {
+            w.write("/>\n");
+        } else {
+            w.write(">\n");
+            for (Spatial child : this.getChildren()) {
+                if (child instanceof BodyElement) {
+                    ((BodyElement) child).write(w, depth + 1);
+                }
+            }
+            for (int i = 0; i < depth; ++i) {
+                w.write('\t');
+            }
+            w.write("</joint>\n");
         }
     }
 }

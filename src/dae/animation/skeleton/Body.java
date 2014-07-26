@@ -24,6 +24,7 @@ import dae.animation.trajectory.CurveTarget;
 import dae.animation.trajectory.FootStep;
 import dae.animation.trajectory.TargetCurve;
 import dae.prefabs.Prefab;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import mlproject.fuzzy.FuzzyRuleBlock;
@@ -32,7 +33,7 @@ import mlproject.fuzzy.FuzzyVariable;
 
 /**
  *
- * @author Koen
+ * @author Koen Samyn
  */
 public class Body extends Prefab implements BodyElement {
 
@@ -1711,4 +1712,10 @@ public class Body extends Prefab implements BodyElement {
             }
         }
     }
+
+    public void write(Writer w, int depth) {
+        
+    }
+   
+   
 }

@@ -12,6 +12,8 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Sphere;
 import dae.animation.bhv.BHVAnimationData;
+import java.io.IOException;
+import java.io.Writer;
 
 /**
  *
@@ -234,5 +236,9 @@ public class RotationJoint extends Node implements BodyElement, ChannelSupport {
                 ((BodyElement)s).showTargetObjects();
             }
         }
+    }
+
+    public void write(Writer w, int depth) throws IOException {
+        throw new UnsupportedOperationException("Rotation joint no longer supported"); //To change body of generated methods, choose Tools | Templates.
     }
 }
