@@ -31,7 +31,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
  *
  * @author Koen Samyn
  */
-public class Level extends Node implements ProjectTreeNode{
+public class Level extends Node implements ProjectTreeNode {
 
     private File location;
     private AxisEnum upAxis = AxisEnum.Z;
@@ -42,12 +42,9 @@ public class Level extends Node implements ProjectTreeNode{
     protected Project project;
     private boolean relativeLocation = true;
     private boolean createDefaultLights = true;
-    
-    private ArrayList<Prefab> defaultLights = new ArrayList<Prefab>();
-    private HashMap<String, File> exportLocations = new HashMap<String,File>();
-    
+    protected ArrayList<Prefab> defaultLights = new ArrayList<Prefab>();
+    private HashMap<String, File> exportLocations = new HashMap<String, File>();
     private boolean exportOnSave = true;
-    
     /**
      * The assetmanager to use.
      */
@@ -92,13 +89,13 @@ public class Level extends Node implements ProjectTreeNode{
         backlight.setLocalTranslation(new Vector3f(2, 2, -2));
         backlight.setLightDirection(new Vector3f(1.0f, -.6f, 0.0f).normalizeLocal());
         attachChild(backlight);
-        
+
         defaultLights.add(light1);
         defaultLights.add(light2);
         defaultLights.add(backlight);
     }
-    
-    protected Iterable<Prefab> getDefaultLights(){
+
+    protected Iterable<Prefab> getDefaultLights() {
         return defaultLights;
     }
 
@@ -163,11 +160,11 @@ public class Level extends Node implements ProjectTreeNode{
     public void setLocation(File location) {
         this.location = location;
     }
-    
+
     /**
-     * Returns the location in the 
+     * Returns the location in the
      */
-    public File getRelativeLocation(){
+    public File getRelativeLocation() {
         return location;
     }
 
@@ -199,16 +196,17 @@ public class Level extends Node implements ProjectTreeNode{
     public boolean hasLocation() {
         return location != null;
     }
-    
+
     /**
      * Returns the absolute location of the level file.
-     * @return 
+     *
+     * @return
      */
-    public File getAbsoluteLocation(){
-        if ( hasRelativeLocation()){
+    public File getAbsoluteLocation() {
+        if (hasRelativeLocation()) {
             File projectLocation = project.getProjectLocation().getParentFile();
             return new File(projectLocation, this.getRelativeLocation().getPath());
-        }else{
+        } else {
             return this.getLocation();
         }
     }
@@ -248,6 +246,7 @@ public class Level extends Node implements ProjectTreeNode{
         }
         if (this.createDefaultLights) {
             this.createLights(manager);
+            createDefaultLights = false;
         }
 
         physicsLayer.setBulletAppState(state);
@@ -262,13 +261,12 @@ public class Level extends Node implements ProjectTreeNode{
             }
         }
     }
-    
-    public AssetManager getAssetManager(){
+
+    public AssetManager getAssetManager() {
         return manager;
     }
-    
-    public void levelHidden(){
-        
+
+    public void levelHidden() {
     }
 
     /**
@@ -298,9 +296,12 @@ public class Level extends Node implements ProjectTreeNode{
             } else {
                 currentLayer = getLayer(layer);
             }
-            currentLayer.addNode(p);
+            if (!currentLayer.hasNode(p)) {
+                currentLayer.addNode(p);
+                return super.attachChild(node);
+            }
         }
-        return super.attachChild(node);
+        return -1;
     }
 
     protected int attachChildDirectly(Node node) {
@@ -514,9 +515,8 @@ public class Level extends Node implements ProjectTreeNode{
     public void setProject(Project project) {
         this.project = project;
     }
-    
-    // project tree node implementation
 
+    // project tree node implementation
     public boolean hasChildren() {
         return layers.size() > 0;
     }
@@ -526,7 +526,7 @@ public class Level extends Node implements ProjectTreeNode{
     }
 
     public boolean isLeaf() {
-        return layers.size()>0;
+        return layers.size() > 0;
     }
 
     public ProjectTreeNode getProjectChild(int index) {
@@ -540,24 +540,24 @@ public class Level extends Node implements ProjectTreeNode{
     public void setExportLocation(String key, File selected) {
         exportLocations.put(key, selected);
     }
-    
-    public File getExportLocation(String key){
+
+    public File getExportLocation(String key) {
         return exportLocations.get(key);
     }
-    
-    public boolean isExportOnSave(){
+
+    public boolean isExportOnSave() {
         return exportOnSave;
     }
-    
-    public void setExportOnSave(boolean value){
+
+    public void setExportOnSave(boolean value) {
         this.exportOnSave = value;
     }
 
     public boolean hasExportKeys() {
         return !exportLocations.isEmpty();
     }
-    
-    public Iterable<String> getExportKeys(){
+
+    public Iterable<String> getExportKeys() {
         return exportLocations.keySet();
     }
 }
