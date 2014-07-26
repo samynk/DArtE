@@ -35,13 +35,14 @@ public class AssetDirectoryPanel extends javax.swing.JPanel implements DocumentL
     private AssetTreeModel treeModel;
     private Pattern filePattern;
     private ExecutorService executor;
+    private String extension = "klatch";
 
     /**
      * Creates new form AssetPanel
      */
     public AssetDirectoryPanel() {
         // match j3o files and klatch files
-        setFilePattern(".*\\.*klatch");
+        setFilePattern(".*\\.*" + extension);
         initComponents();
         assetTree.setCellRenderer(new AssetTreeCellRenderer());
         //assetTree.setTransferHandler(new TreeTransferHandler());
@@ -222,7 +223,7 @@ public class AssetDirectoryPanel extends javax.swing.JPanel implements DocumentL
     }//GEN-LAST:event_btnNewFolderActionPerformed
 
     private void adaptFilter() {
-        setFilePattern(".*" + txtSearch.getText() + ".*\\.klatch");
+        setFilePattern(".*" + txtSearch.getText() + ".*\\." + extension);
         buildAssetTree(currentProject);
     }
 
@@ -315,8 +316,8 @@ public class AssetDirectoryPanel extends javax.swing.JPanel implements DocumentL
     public void changedUpdate(DocumentEvent e) {
         updateButton();
     }
-    
-    public void updateButton(){
+
+    public void updateButton() {
         String newDirName = txtNewDirectory.getText();
         if (newDirName.length() == 0) {
             btnNewFolder.setEnabled(false);
@@ -330,5 +331,15 @@ public class AssetDirectoryPanel extends javax.swing.JPanel implements DocumentL
             FileNode parent = node.getParentNode();
             btnNewFolder.setEnabled(!parent.hasChild(newDirName));
         }
+    }
+
+    /**
+     * Changes the files that are shown in the asset directory panel.
+     * @param extension only files with this extension (and directories) will be
+     * shown.
+     */
+    public void setFilePatternForExtension(String extension) {
+        this.extension = extension;
+        adaptFilter();
     }
 }
