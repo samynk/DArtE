@@ -6,19 +6,24 @@ package dae.project;
 
 import com.google.common.io.Files;
 import com.jme3.asset.AssetManager;
+import com.jme3.asset.AssetNotFoundException;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import dae.GlobalObjects;
+import dae.animation.rig.Rig;
+import dae.animation.rig.io.RigWriter;
 import dae.io.SceneLoader;
 import dae.io.SceneSaver;
 import dae.prefabs.Prefab;
 import dae.prefabs.standard.MeshObject;
+import dae.prefabs.ui.events.ErrorMessage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.logging.Logger;
 
 /**
@@ -30,9 +35,11 @@ import java.util.logging.Logger;
  * @author Koen Samyn
  */
 public class AssetLevel extends Level {
-
+    
     private Path asset;
     private boolean levelShown = false;
+    
+    private Node savableObject;
 
     /**
      * Creates a new AssetLevel.
@@ -47,12 +54,12 @@ public class AssetLevel extends Level {
             p.setUserData("Save", Boolean.FALSE);
         }
     }
-    
-     /**
-     * Returns the location in the 
+
+    /**
+     * Returns the location in the
      */
     @Override
-    public File getRelativeLocation(){
+    public File getRelativeLocation() {
         return asset.toFile();
     }
 
@@ -66,7 +73,17 @@ public class AssetLevel extends Level {
      */
     @Override
     public void levelShown(AssetManager manager, BulletAppState state) {
-        detachAllChildren();
+        ArrayList<Spatial> toRemove = new ArrayList<Spatial>();
+        for(Spatial s : this.getChildren())
+        {
+            if ( !defaultLights.contains(s)){
+                toRemove.add(s);
+            }
+        }
+        for ( Spatial s : toRemove){
+            s.removeFromParent();
+        }
+        
         String assetLocation = asset.toString();
         if (Files.getFileExtension(assetLocation).equalsIgnoreCase("j3o")) {
             File file = new File(project.getRelativeKlatchDirectory(), assetLocation + ".klatch");
@@ -81,7 +98,7 @@ public class AssetLevel extends Level {
                 levelShown = true;
             }
             this.asset = Paths.get(assetLocation + ".klatch");
-
+            
         } else if (Files.getFileExtension(assetLocation).equalsIgnoreCase("klatch")) {
             File file = new File(project.getRelativeKlatchDirectory(), assetLocation);
             super.setLocation(file);
@@ -89,9 +106,23 @@ public class AssetLevel extends Level {
             // must be loaded as separate 
             URL locationOnDisk = project.getResource(assetLocation);
             try {
-                SceneLoader.loadScene(locationOnDisk.openStream(), manager, this,GlobalObjects.getInstance().getObjectsTypeCategory(), null);
+                SceneLoader.loadScene(locationOnDisk.openStream(), manager, this, GlobalObjects.getInstance().getObjectsTypeCategory(), null);
+                savableObject = this;
             } catch (IOException ex) {
                 Logger.getLogger(AssetLevel.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            }
+            levelShown = true;
+        } else if (Files.getFileExtension(assetLocation).equalsIgnoreCase("rig")) {
+            File file = new File(project.getRelativeKlatchDirectory(), assetLocation);
+            super.setLocation(file);
+            super.levelShown(manager, state);
+            // must be loaded as separate 
+            try {
+                Rig rig = (Rig)manager.loadModel(assetLocation);
+                attachChild(rig);
+                savableObject = rig;
+            } catch (AssetNotFoundException ex) {
+                GlobalObjects.getInstance().postEvent(new ErrorMessage("Could not load " + assetLocation));
             }
             levelShown = true;
         }
@@ -105,7 +136,7 @@ public class AssetLevel extends Level {
             }
         }
     }
-
+    
     @Override
     public void levelHidden() {
         if (isChanged()) {
@@ -127,17 +158,21 @@ public class AssetLevel extends Level {
         }
         return changed;
     }
-
+    
     public void save() {
         String assetLocation = asset.toString();
         File file = new File(project.getKlatchDirectory(), assetLocation);
-        SceneSaver.writeScene(file, this);
+        if (assetLocation.endsWith("klatch")) {
+            SceneSaver.writeScene(file, savableObject);
+        } else  {
+            RigWriter.writeRig(file, (Rig)savableObject);
+        }
     }
-
+    
     public Path getAsset() {
         return this.asset;
     }
-
+    
     @Override
     public int attachChild(Spatial node) {
         if (node instanceof Prefab) {
@@ -146,7 +181,7 @@ public class AssetLevel extends Level {
         }
         return super.attachChild(node); //To change body of generated methods, choose Tools | Templates.
     }
-
+    
     @Override
     protected int attachChildDirectly(Node node) {
         if (node instanceof Prefab) {
