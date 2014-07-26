@@ -21,6 +21,7 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 public class AssetTreeCellRenderer extends DefaultTreeCellRenderer {
     private Icon imgJ3O;
     private Icon imgKlatch;
+    private Icon imgRig;
     
 
 
@@ -29,6 +30,7 @@ public class AssetTreeCellRenderer extends DefaultTreeCellRenderer {
 
         imgJ3O =  new ImageIcon(loader.getImage("/dae/icons/mesh.png"));
         imgKlatch = new ImageIcon(loader.getImage("/dae/icons/klatch.png"));
+        imgRig = new ImageIcon(loader.getImage("/dae/icons/body.png"));
     }
 
     @Override
@@ -41,6 +43,8 @@ public class AssetTreeCellRenderer extends DefaultTreeCellRenderer {
                     label.setIcon(imgJ3O);
                 }else if ( node.getExtension().equals("klatch")){
                     label.setIcon(imgKlatch);
+                }else if (node.getExtension().equals("rig")){
+                    label.setIcon(imgRig);
                 }
             }
         }
