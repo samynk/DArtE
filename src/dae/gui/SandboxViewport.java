@@ -51,6 +51,7 @@ import com.jme3.scene.debug.WireBox;
 import com.jme3.scene.debug.WireSphere;
 import com.jme3.shadow.AbstractShadowRenderer;
 import dae.GlobalObjects;
+import dae.animation.rig.io.RigLoader;
 import dae.animation.skeleton.BodyLoader;
 import dae.controller.ControllerLoader;
 
@@ -233,6 +234,7 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
         assetManager.registerLoader(BodyLoader.class, "skel");
         assetManager.registerLoader(ControllerLoader.class, "fcl");
         assetManager.registerLoader(SceneLoader.class, "klatch");
+        assetManager.registerLoader(RigLoader.class,"rig");
 
         objectsToCreate = (ObjectTypeCategory) assetManager.loadAsset("Objects/ObjectTypes.types");
         selectionMaterial = assetManager.loadMaterial("Materials/SelectionMaterial.j3m");
