@@ -43,7 +43,7 @@ import javax.swing.tree.TreePath;
 
 /**
  *
- * @author samyn_000
+ * @author Koen Samyn
  */
 public class ProjectPanel extends javax.swing.JPanel implements TreeSelectionListener {
 
