@@ -34,6 +34,11 @@ public class CreateKlatchDialog extends javax.swing.JDialog implements TreeSelec
     public static final int RET_OK = 1;
     private Project currentProject;
     private FileNode currentSelection;
+    
+    /**
+     * The extension to be used for the dialog (default is klatch).
+     */
+    private String extension = "klatch";
 
     /**
      * Creates new form CreateKlatchDialog
@@ -55,6 +60,23 @@ public class CreateKlatchDialog extends javax.swing.JDialog implements TreeSelec
 
         assetDirectoryPanel1.addTreeSelectionListener(this);
         txtAssemblyName.getDocument().addDocumentListener(this);
+    }
+    
+    /**
+     * Sets the extension to add to the created object.
+     * @param extension the extension to use.
+     */
+    public void setExtension(String extension){
+        this.extension = extension;
+        assetDirectoryPanel1.setFilePatternForExtension(extension);
+    }
+    
+    /**
+     * Returns the extension  that is added to the created object.
+     * @return the extension that is added to the created object.
+     */
+    public String getExtension(){
+        return extension;
     }
 
     /**
@@ -303,7 +325,8 @@ public class CreateKlatchDialog extends javax.swing.JDialog implements TreeSelec
             }
         }
         name.append(txtAssemblyName.getText());
-        name.append(".klatch");
+        name.append(".");
+        name.append(extension);
         return name.toString();
     }
 }
