@@ -16,9 +16,9 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import dae.animation.skeleton.debug.BoneVisualization;
-import dae.animation.skeleton.debug.JointVisualization;
 import dae.io.XMLUtils;
 import dae.prefabs.Prefab;
+import dae.prefabs.shapes.HingeShape;
 import java.io.IOException;
 import java.io.Writer;
 
@@ -32,14 +32,8 @@ public class RevoluteJoint extends Prefab implements BodyElement {
     private float currentAngle;
     private float startAngle;
     private Vector3f axis;
-    private Vector3f worldAxis;
     private Vector3f location;
-    private boolean counterRotating = false;
-    private Geometry jg;
     private String group;
-    private boolean parallelTargetType = false;
-    private Vector3f targetAxis;
-    private boolean targetAxisSet = false;
     private boolean logRotations = false;
     private boolean logTranslations = false;
     private float offset = 0.0f;
@@ -49,11 +43,13 @@ public class RevoluteJoint extends Prefab implements BodyElement {
     private float height;
     private boolean centered;
     private String logName = "error";
-    private Material mat;
     // needed for relative transformations
     private Matrix3f initialFrame = Matrix3f.IDENTITY;
+    private Quaternion initialFrameQuat = new Quaternion();
+    private Matrix3f initialFrameInverse = Matrix3f.IDENTITY;
     private Matrix3f rotMatrix = new Matrix3f();
     private Quaternion relativeBoneRotation = new Quaternion();
+    private Quaternion inverseRotation = new Quaternion();
     private Vector3f xAxis = Vector3f.UNIT_X;
     private Vector3f yAxis = Vector3f.UNIT_Y;
     private Vector3f zAxis = Vector3f.UNIT_Z;
@@ -69,22 +65,32 @@ public class RevoluteJoint extends Prefab implements BodyElement {
     // visualization of the joint
     private AssetManager manager;
     private ColorRGBA jointColor = ColorRGBA.Blue;
+    private Spatial visual;
     // maximum allowed changed for the angle
     private float maxAngleChange;
 
-    public RevoluteJoint(Material mat, String name, String group, String targetType, Vector3f location, Vector3f axis, float currentAngle, float minAngle, float maxAngle,
+    public RevoluteJoint() {
+        axis = Vector3f.UNIT_Y.clone();
+        location = Vector3f.ZERO;
+        currentAngle = 0;
+        minAngle = -45;
+        maxAngle = 45;
+
+        radius = 0.1f;
+        height = 0.4f;
+        centered = false;
+    }
+
+    public RevoluteJoint(Material mat, String name, String group, Vector3f location, Vector3f axis, float minAngle, float maxAngle,
             float radius, float height, boolean centered) {
         setName(name);
         this.group = group;
         this.minAngle = minAngle;
         this.maxAngle = maxAngle;
 
-        parallelTargetType = "parallel".equalsIgnoreCase(targetType);
-
         this.axis = axis;
         this.location = location.clone();
 
-        setCurrentAngle(currentAngle);
         this.setLocalTranslation(location);
 
         this.setCategory("Animation");
@@ -93,7 +99,6 @@ public class RevoluteJoint extends Prefab implements BodyElement {
         this.radius = radius;
         this.height = height;
         this.centered = centered;
-        this.mat = mat;
     }
 
     /**
@@ -140,10 +145,51 @@ public class RevoluteJoint extends Prefab implements BodyElement {
         rotMatrix.fromAxes(xAxis, yAxis, zAxis);
         rotMatrix.normalizeLocal();
         this.setLocalRotation(rotMatrix);
-        // step 4: update the bone, relative to the initial matrix
-
+        // step 5: update the bone, relative to the initial matrix
         updateBoneTransform();
+        // step 6 : if a visualization is present, counter rotate the visualization.
+        
+        if (visual != null) {
+            inverseRotation.fromAngleAxis(-dAngle * FastMath.DEG_TO_RAD, axis);
+            visual.rotate(inverseRotation);
+        }
 
+    }
+
+    /**
+     * Because the initial frame is important, recalculate.
+     *
+     * @param q
+     */
+    @Override
+    public void setLocalPrefabRotation(Quaternion q) {
+        if (visual != null) {
+            visual.setLocalRotation(Matrix3f.IDENTITY);
+        }
+        initialFrame = q.toRotationMatrix();
+        xAxis = initialFrame.getRow(0);
+        yAxis = initialFrame.getRow(1);
+        zAxis = initialFrame.getRow(2);
+
+        xAxisBackup = xAxis.clone();
+        yAxisBackup = yAxis.clone();
+        zAxisBackup = zAxis.clone();
+
+        setLocalRotation(initialFrame);
+        initialFrameInverse = initialFrame.invert();
+
+        updateTransform(axis, currentAngle);
+    }
+
+    /**
+     * Returns the initial local frame rotation.
+     *
+     * @return
+     */
+    @Override
+    public Quaternion getLocalPrefabRotation() {
+        initialFrameQuat.fromRotationMatrix(initialFrame);
+        return initialFrameQuat;
     }
 
     public void updateBoneTransform() {
@@ -157,7 +203,7 @@ public class RevoluteJoint extends Prefab implements BodyElement {
             }
         }
         if (bone != null) {
-            Matrix3f result = initialFrame.mult(rotMatrix);
+            Matrix3f result = initialFrameInverse.mult(rotMatrix);
             if (chainWithChild) {
                 Spatial child = this.getChild(chainChildName);
                 if (child != null) {
@@ -169,10 +215,6 @@ public class RevoluteJoint extends Prefab implements BodyElement {
             relativeBoneRotation.fromRotationMatrix(result);
             bone.setUserTransforms(Vector3f.ZERO, relativeBoneRotation, Vector3f.UNIT_XYZ);
         }
-    }
-
-    public boolean isParallelTargetType() {
-        return this.parallelTargetType;
     }
 
     public float moveAngleUp(float amount) {
@@ -208,14 +250,6 @@ public class RevoluteJoint extends Prefab implements BodyElement {
                 }
             }
         }
-    }
-
-    public boolean isCounterRotating() {
-        return counterRotating;
-    }
-
-    public void setCounterRotation(boolean counterRotating) {
-        this.counterRotating = counterRotating;
     }
     private Vector3f tempOrigin = new Vector3f();
     private Vector3f worldTempOrigin = new Vector3f();
@@ -253,30 +287,10 @@ public class RevoluteJoint extends Prefab implements BodyElement {
         this.group = group;
     }
 
-    /**
-     * @return the targetAxis
-     */
-    public Vector3f getTargetAxis() {
-        return targetAxis;
-    }
-
-    /**
-     * @param targetAxis the targetAxis to set
-     */
-    public void setTargetAxis(Vector3f targetAxis) {
-        this.targetAxis = targetAxis;
-        this.targetAxisSet = (targetAxis != null);
-    }
-
-    public boolean isTargetAxisSet() {
-        return targetAxisSet;
-    }
-
     public void reset() {
         setCurrentAngle(this.startAngle);
         for (Spatial s : this.getChildren()) {
             if (s instanceof BodyElement) {
-
                 ((BodyElement) s).reset();
             }
         }
@@ -347,24 +361,69 @@ public class RevoluteJoint extends Prefab implements BodyElement {
         return logTranslations;
     }
 
+    /**
+     * Sets the minimum angle of this joint.
+     *
+     * @param minAngle the new minimum angle.
+     */
+    public void setMinAngle(float minAngle) {
+        float angleBackup = currentAngle;
+        this.minAngle = minAngle;
+        if (currentAngle < minAngle) {
+            currentAngle = minAngle;
+            this.updateTransform(axis, currentAngle - angleBackup);
+        }
+    }
+
+    /**
+     * Returns the minimum angle for this joint.
+     *
+     * @return the minimum angle.
+     */
     public float getMinAngle() {
         return minAngle;
     }
 
+    /**
+     * Sets the maximum angle of this joint.
+     *
+     * @param maxAngle the new maximum angle.
+     */
+    public void setMaxAngle(float maxAngle) {
+        float angleBackup = currentAngle;
+        this.maxAngle = maxAngle;
+        if (currentAngle > maxAngle) {
+            currentAngle = maxAngle;
+            this.updateTransform(axis, currentAngle - angleBackup);
+        }
+
+    }
+
+    /**
+     * Returns the maximum angle for this joint.
+     *
+     * @return the maximum angle.
+     */
     public float getMaxAngle() {
         return maxAngle;
     }
 
     @Override
+    public void create(String name, AssetManager manager, String extraInfo) {
+        this.setName(name);
+        createVisualization(manager);
+    }
+
+    @Override
     public Spatial clone() {
-        String targetType = this.parallelTargetType ? "parallel" : "default";
         RevoluteJoint copy = new RevoluteJoint(this.getOriginalMaterial(), this.name, this.group,
-                targetType, this.location.clone(), this.axis.clone(), this.currentAngle, this.minAngle, this.maxAngle, this.radius, this.height, this.centered);
+                this.location.clone(), this.axis.clone(), this.minAngle, this.maxAngle, this.radius, this.height, this.centered);
         copy.setChaining(chainWithChild, chainWithParent);
         copy.setChainChildName(this.chainChildName);
         copy.setInitialLocalFrame(xAxisBackup, yAxisBackup, zAxisBackup);
         copy.setJointColor(this.jointColor);
         copy.createVisualization(manager);
+        copy.setCurrentAngle(this.currentAngle);
 
         for (Spatial child : this.children) {
             if (child instanceof BodyElement) {
@@ -378,16 +437,10 @@ public class RevoluteJoint extends Prefab implements BodyElement {
         this.manager = manager;
         // create a visualization for the first rotation axis.
         // attach the axises as children
-        JointVisualization jv = new JointVisualization(this.axis, this.radius, this.height, 12);
-        Geometry geo1 = new Geometry("axis1", jv); // using our custom mesh object
-        Material mat = new Material(manager,
-                "Common/MatDefs/Misc/Unshaded.j3md");
-        mat.setColor("Color", jointColor);
-        geo1.setMaterial(mat);
-
-        this.attachChild(geo1);
-
-
+        HingeShape hs = new HingeShape(this.axis, minAngle * FastMath.DEG_TO_RAD, maxAngle * FastMath.DEG_TO_RAD);
+        hs.create(manager);
+        attachChild(hs);
+        visual = hs;
     }
 
     public void setAttachedBone(Bone b) {
@@ -416,7 +469,7 @@ public class RevoluteJoint extends Prefab implements BodyElement {
         rotMatrix.fromAxes(xAxis, yAxis, zAxis);
         this.setLocalRotation(rotMatrix);
         this.initialFrame = rotMatrix.clone();
-        initialFrame.invertLocal();
+        initialFrameInverse = initialFrame.invertLocal();
     }
 
     public void setJointColor(ColorRGBA jointColor) {
@@ -467,21 +520,18 @@ public class RevoluteJoint extends Prefab implements BodyElement {
         XMLUtils.writeAttribute(w, "radius", this.radius);
         XMLUtils.writeAttribute(w, "height", this.height);
         XMLUtils.writeAttribute(w, "location", this.getLocalPrefabTranslation());
-        Quaternion localRotation = this.getLocalRotation();
-        Vector3f rotation = new Vector3f();
-        float[] angles = new float[3];
-        localRotation.toAngles(angles);
-        rotation.set(angles[0],angles[1],angles[2]);
-        rotation.multLocal(FastMath.RAD_TO_DEG);
-        XMLUtils.writeAttribute(w, "rotation", rotation);
+       
+        XMLUtils.writeAttribute(w, "refaxisx", xAxisBackup);
+        XMLUtils.writeAttribute(w, "refaxisy", yAxisBackup);
+        XMLUtils.writeAttribute(w, "refaxisz", zAxisBackup);
         XMLUtils.writeAttribute(w, "minAngle", this.minAngle);
         XMLUtils.writeAttribute(w, "maxAngle", this.maxAngle);
         XMLUtils.writeAttribute(w, "angle", this.currentAngle);
         XMLUtils.writeAttribute(w, "chainwithchild", this.chainWithChild);
-        if ( chainWithChild ){
-                   XMLUtils.writeAttribute(w, "chainchildname", this.chainChildName);
+        if (chainWithChild) {
+            XMLUtils.writeAttribute(w, "chainchildname", this.chainChildName);
         }
-        XMLUtils.writeAttribute(w, "chainwithparen", this.chainWithParent);
+        XMLUtils.writeAttribute(w, "chainwithparent", this.chainWithParent);
 
         boolean hasBodyElements = false;
         for (Spatial child : this.getChildren()) {
@@ -506,4 +556,15 @@ public class RevoluteJoint extends Prefab implements BodyElement {
             w.write("</joint>\n");
         }
     }
+
+    /**
+     * Returns an extra rotation for the gizmo.
+     * @return an extra rotation for the gizmo.
+     */
+    @Override
+    public Quaternion getGizmoRotation() {
+        return visual.getLocalRotation();
+    }
+    
+    
 }
