@@ -260,11 +260,15 @@ and open the template in the editor.
         </object>
     </collection>
     <collection name="Animation">
-         <object label="Rig" class="dae.animation.rig.Rig" defaultloader="true">
+        <object label="Rig" class="dae.animation.rig.Rig" defaultloader="true">
             <parameters section="Transform">
                 <parameter type="string" id="name"/>
                 <parameter type="float3" id="localTranslation"/>
                 <parameter type="float3" id="localPrefabRotation" converter="dae.prefabs.parameters.converter.QuaternionConverter"/>
+            </parameters>
+            <parameters section="Animation">
+                <parameter type="fuzzy" id="fuzzySystem"/>
+                <parameter type="string" collectiontype="list" id="targetKey"/>
             </parameters>
         </object>
         <object label="Skeleton" class="dae.animation.skeleton.Body" defaultloader="true">
@@ -284,9 +288,18 @@ and open the template in the editor.
         <object label="RevoluteJoint" class="dae.animation.skeleton.RevoluteJoint">
             <parameters section="Transform">
                 <parameter type="string" id="name"/>
+                <parameter type="float3" id="localPrefabTranslation"/>
+                <parameter type="float3" id="localPrefabRotation" converter="dae.prefabs.parameters.converter.QuaternionConverter"/>
                 <parameter type="float" id="currentAngle"/>
                 <parameter type="float" id="minAngle"/>
                 <parameter type="float" id="maxAngle"/>
+            </parameters>
+        </object>
+        <object label="AttachmentPoint" class="dae.animation.skeleton.AttachmentPoint">
+            <parameters section="Transform">
+                <parameter type="string" id="name"/>
+                <parameter type="float3" id="localPrefabTranslation"/>
+                <parameter type="float3" id="localPrefabRotation" converter="dae.prefabs.parameters.converter.QuaternionConverter"/>
             </parameters>
         </object>
         <object label="RevoluteJointTwoAxis" class="dae.animation.skeleton.RevoluteJointTwoAxis">
@@ -394,7 +407,7 @@ and open the template in the editor.
                 <parameter type="boolean" id="castShadow"/> 
             </parameters>
         </object>
-         <object label="AmbientLight" class="dae.prefabs.lights.AmbientLightPrefab">
+        <object label="AmbientLight" class="dae.prefabs.lights.AmbientLightPrefab">
             <parameters section="Transform">
                 <parameter type="string" id="name"/>
                 <parameter type="float3" id="localPrefabTranslation"/>
