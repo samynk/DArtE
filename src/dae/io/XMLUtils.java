@@ -18,10 +18,13 @@ import org.w3c.dom.NamedNodeMap;
 public class XMLUtils {
 
     public static void writeAttribute(Writer w, String key, String value) throws IOException {
+        if ( value == null){
+            return;
+        }
         w.write(key);
         w.write("='");
         w.write(value);
-        w.write("'");
+        w.write("' ");
     }
 
     public static void writeAttribute(Writer w, String key, boolean value) throws IOException {
@@ -32,24 +35,27 @@ public class XMLUtils {
         } else {
             w.write("false");
         }
-        w.write("'");
+        w.write("' ");
     }
 
     public static void writeAttribute(Writer w, String key, int value) throws IOException {
         w.write(key);
         w.write("='");
         w.write(Integer.toString(value));
-        w.write("'");
+        w.write("' ");
     }
 
     public static void writeAttribute(Writer w, String key, float value) throws IOException {
         w.write(key);
         w.write("='");
         w.write(Float.toString(value));
-        w.write("'");
+        w.write("' ");
     }
 
     public static void writeAttribute(Writer w, String key, Vector3f value) throws IOException {
+        if ( value == null){
+            return;
+        }
         w.write(key);
         w.write("='[");
         w.write(Float.toString(value.x));
@@ -57,7 +63,23 @@ public class XMLUtils {
         w.write(Float.toString(value.y));
         w.write(",");
         w.write(Float.toString(value.z));
-        w.write("]'");
+        w.write("]' ");
+    }
+    
+    public static void writeAttribute(Writer w, String key, Quaternion value) throws IOException {
+        if (value == null) {
+            return;
+        }
+        w.write(key);
+        w.write("='[");
+        w.write(Float.toString(value.getX()));
+        w.write(',');
+        w.write(Float.toString(value.getY()));
+        w.write(',');
+        w.write(Float.toString(value.getZ()));
+        w.write(',');
+        w.write(Float.toString(value.getW()));
+        w.write("]' ");
     }
 
     /**
