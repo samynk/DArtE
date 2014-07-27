@@ -72,20 +72,16 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="1" attributes="0">
-                  <Group type="102" attributes="0">
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="lblSearch" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="txtSearch" alignment="3" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="cboKlatchFilter" alignment="1" min="-2" max="-2" attributes="0"/>
-                          <Component id="cboMeshFilter" min="-2" max="-2" attributes="0"/>
-                          <Component id="cboRigFilter" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                  </Group>
-                  <Component id="btnSearch" min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="lblSearch" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="txtSearch" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="cboMeshFilter" alignment="1" min="-2" max="-2" attributes="0"/>
+                  <Component id="cboKlatchFilter" alignment="1" min="-2" max="-2" attributes="0"/>
+                  <Component id="cboRigFilter" alignment="1" min="-2" max="-2" attributes="0"/>
+                  <Component id="btnSearch" alignment="1" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="scrAssetPanel" pref="387" max="32767" attributes="0"/>
@@ -184,6 +180,9 @@
       <Events>
         <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="cboRigFilterItemStateChanged"/>
       </Events>
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_AddingCodePre" type="java.lang.String" value="cboMeshFilter.putClientProperty(&quot;JComponent.sizeVariant&quot;, &quot;mini&quot;);"/>
+      </AuxValues>
     </Component>
   </SubComponents>
 </Form>
