@@ -23,7 +23,9 @@ import dae.prefabs.parameters.ColorParameter;
 import dae.prefabs.parameters.DefaultSection;
 import dae.prefabs.parameters.Float3Parameter;
 import dae.prefabs.parameters.FloatParameter;
+import dae.prefabs.parameters.FuzzyParameter;
 import dae.prefabs.parameters.IntParameter;
+import dae.prefabs.parameters.ListParameter;
 import dae.prefabs.parameters.ObjectParameter;
 import dae.prefabs.parameters.Parameter;
 import dae.prefabs.parameters.ParameterSection;
@@ -144,6 +146,8 @@ public class ObjectTypeReader implements AssetLoader {
                 NamedNodeMap map = current.getAttributes();
                 String type = getAttrContent("type", map);
                 String id = getAttrContent("id", map);
+                String collectionType = getAttrContent("collectiontype",map);
+                
                 String label;
                 String converter = getAttrContent("converter",map);
                 try {
@@ -154,38 +158,29 @@ public class ObjectTypeReader implements AssetLoader {
                 Parameter p = null;
                 if ("float3".equals(type)) {
                     p = new Float3Parameter(type, id);
-                    parent.addParameter(p);
                 } else if ("string".equals(type)) {
                     p = new TextParameter(type, id);
-                    parent.addParameter(p);
                 } else if ("choice".equals(type)) {
                     ChoiceParameter cp = new ChoiceParameter(type, id);
                     readChoices(current, cp);
-                    parent.addParameter(cp);
                     p = cp;
                 } else if ("color".equals(type)) {
                     ColorParameter cp = new ColorParameter(type, id);
-                    parent.addParameter(cp);
                     p = cp;
                 } else if ("float".equals(type)) {
                     FloatParameter fp = new FloatParameter(type, id);
-                    parent.addParameter(fp);
                     p = fp;
                 } else if ("integer".equals(type)) {
                     IntParameter ip = new IntParameter(type, id);
-                    parent.addParameter(ip);
                     p = ip;
                 } else if ("magnets".equals(type)) {
                     MagnetParameter mp = new MagnetParameter(type, id);
-                    parent.addParameter(mp);
                     readMagnets(current, mp);
                     p = mp;
                 } else if ("filler".equals(type)) {
                     FillerParameter fp = new FillerParameter(type, id);
-                    parent.addParameter(fp);
                     readFiller(current, fp);
                     p = fp;
-
                 } else if ("range".equals(type)) {
                     RangeParameter rp = new RangeParameter(type, id);
                     float min = parseFloat("min", map);
@@ -194,38 +189,41 @@ public class ObjectTypeReader implements AssetLoader {
                     rp.setMin(min);
                     rp.setMax(max);
                     rp.setStep(step);
-                    parent.addParameter(rp);
                     p = rp;
                 } else if ("object".equals(type)) {
                     ObjectParameter op = new ObjectParameter(type, id);
-                    parent.addParameter(op);
                     p = op;
                 } else if ("sound".equals(type)) {
                     ObjectParameter op = new ObjectParameter(type, id);
-                    parent.addParameter(op);
                     p = op;
                 } else if ("gmf_object".equals(type)) {
                     ObjectParameter op = new ObjectParameter(type, id);
-                    parent.addParameter(op);
                     p = op;
                 } else if ("action".equals(type)) {
                     ActionParameter ap = new ActionParameter(type, id);
                     String method = this.getAttrContent("method", map);
                     ap.setMethodName(method);
-                    parent.addParameter(ap);
                     p = ap;
                 } else if ("boolean".equals(type)) {
                     BooleanParameter bp = new BooleanParameter(type, id);
-                    parent.addParameter(bp);
                     p = bp;
                 } else if ("enumlist".equals(type)) {
                     EnumListParameter elp = new EnumListParameter(type, id);
                     String enumClass = this.getAttrContent("enumclass", map);
                     elp.setEnumClass(enumClass);
-                    parent.addParameter(elp);
                     p = elp;
+                }else if ("fuzzy".equals(type)){
+                    FuzzyParameter frp = new FuzzyParameter(type,id);
+                    p = frp;
+                    
                 }
                 if (p != null) {
+                    if ( "list".equals(collectionType)){
+                        ListParameter lp = new ListParameter(type,p);
+                        parent.addParameter(lp);
+                    }else{
+                        parent.addParameter(p);
+                    }
                     p.setLabel(label);
                     p.setConverter(converter);
                 }
