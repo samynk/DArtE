@@ -109,9 +109,9 @@ public class ProjectSaver {
         if (l.hasLocation()) {
             if (l.hasRelativeLocation()) {
                 File sceneLoc = new File(projectDir, l.getLocation().getPath());
-                SceneSaver.writeScene(sceneLoc, l);
+                l.save(sceneLoc);
             } else {
-                SceneSaver.writeScene(l.getLocation(), l);
+                l.save(l.getLocation());
             }
         } else {
             // levels are written to separate subfolders.
@@ -122,7 +122,7 @@ public class ProjectSaver {
             l.setRelativeLocation(true);
             l.setLocation(levelFile);
 
-            SceneSaver.writeScene(new File(projectDir, levelFile.getPath()), l);
+            l.save(new File(projectDir, levelFile.getPath()));
         }
 
         if (l.isExportOnSave() && l.hasExportKeys()) {
