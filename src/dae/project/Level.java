@@ -13,6 +13,7 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import dae.GlobalObjects;
+import dae.io.SceneSaver;
 import dae.prefabs.AxisEnum;
 import dae.prefabs.Prefab;
 import dae.prefabs.lights.DirectionalLightPrefab;
@@ -559,5 +560,9 @@ public class Level extends Node implements ProjectTreeNode {
 
     public Iterable<String> getExportKeys() {
         return exportLocations.keySet();
+    }
+    
+    public void save(File location){
+        SceneSaver.writeScene(location, this);
     }
 }
