@@ -5,10 +5,14 @@
 package dae.animation.skeleton;
 
 import com.jme3.asset.AssetManager;
+import com.jme3.material.Material;
 import com.jme3.math.Vector3f;
+import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import dae.io.XMLUtils;
+import dae.prefabs.Prefab;
+import dae.prefabs.shapes.ArrowShape;
 import java.io.IOException;
 import java.io.Writer;
 
@@ -18,34 +22,58 @@ import java.io.Writer;
  *
  * @author Koen
  */
-public class AttachmentPoint extends Node implements BodyElement {
+public class AttachmentPoint extends Prefab implements BodyElement {
 
     private Vector3f axis1 = Vector3f.UNIT_X;
     private Vector3f axis2 = Vector3f.UNIT_Z;
-    private Handle handle;
+    
+    private Geometry gAxis1;
+    private Geometry gAxis2;
 
+    /**
+     * Empty constructor.
+     */
+    public AttachmentPoint(){
+        
+    }
+  
+    
     public AttachmentPoint(String name, AssetManager manager, Vector3f location) {
-        super(name);
+        setName(name);
         this.setLocalTranslation(location);
-        handle = new Handle();
-        handle.create(name + "_handle", manager, null);
-        handle.setLocalScale(0.25f);
-        this.attachChild(handle);
-
-
+        createArrows(manager);
     }
 
     public AttachmentPoint(String name, AssetManager manager, Vector3f location, Vector3f axis1, Vector3f axis2) {
-        super(name);
+        setName(name);
         this.setLocalTranslation(location);
         this.axis1 = axis1;
         this.axis2 = axis2;
-
-        handle = new Handle(axis1, axis2);
-        handle.create(name + "_handle", manager, null);
-        handle.setLocalScale(0.25f);
-        this.attachChild(handle);
+        createArrows(manager);
+        
     }
+
+    @Override
+    public void create(String name, AssetManager manager, String extraInfo) {
+        setName(name);
+        createArrows(manager);
+    }
+    
+    private void createArrows(AssetManager manager){
+        Material mat1 = manager.loadMaterial("Materials/XPivotMaterial.j3m");
+        ArrowShape as1 = new ArrowShape(axis1,0.75f,0.30f, 0.025f,12,true);
+        gAxis1 = new Geometry("axis1",as1);
+        gAxis1.setMaterial(mat1);
+        attachChild(gAxis1);
+        
+        Material mat2 = manager.loadMaterial("Materials/ZPivotMaterial.j3m");
+        ArrowShape as2 = new ArrowShape(axis2,0.75f,0.30f, 0.025f,12,true);
+        gAxis2 = new Geometry("axis2",as2);
+        gAxis2.setMaterial(mat2);
+        attachChild(gAxis2);
+    }
+    
+    
 
     public Vector3f getLocalAxis1() {
         return axis1;
@@ -70,8 +98,10 @@ public class AttachmentPoint extends Node implements BodyElement {
     public void reset() {
     }
 
+    @Override
     public void hideTargetObjects() {
-        handle.removeFromParent();
+        gAxis1.removeFromParent();
+        gAxis2.removeFromParent();
         for (Spatial s : this.getChildren()) {
             if (s instanceof BodyElement) {
                 ((BodyElement) s).hideTargetObjects();
@@ -79,8 +109,10 @@ public class AttachmentPoint extends Node implements BodyElement {
         }
     }
 
+    @Override
     public void showTargetObjects() {
-        this.attachChild(handle);
+        attachChild(gAxis1);
+        attachChild(gAxis2);
         for (Spatial s : this.getChildren()) {
             if (s instanceof BodyElement) {
                 ((BodyElement) s).showTargetObjects();
@@ -109,6 +141,7 @@ public class AttachmentPoint extends Node implements BodyElement {
         if (!hasBodyElements) {
             w.write("/>\n");
         } else {
+            w.write(">\n");
             for ( Spatial child : this.getChildren()){
                 if ( child instanceof BodyElement ){
                     ((BodyElement)child).write(w, depth+1);
