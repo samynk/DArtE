@@ -330,17 +330,6 @@ public class Body extends Prefab implements BodyElement {
         return this.currentController;
     }
 
-    public void setCounterRotationForGroup(String group, boolean counterRotation) {
-        ArrayList<RevoluteJoint> g = this.controllerGroups.get(group);
-        if (g != null) {
-            for (RevoluteJoint rj : g) {
-                rj.setCounterRotation(counterRotation);
-            }
-        } else {
-            System.out.println("Group not found : " + group);
-        }
-    }
-
     public void setRightFootController(FuzzySystem controller) {
         this.rightFootController = controller;
     }
@@ -414,120 +403,6 @@ public class Body extends Prefab implements BodyElement {
         }
     }
 
-    public void update(boolean updateRotations) {
-
-//        FootStep current = footSteps.getCurrentFootStep();
-//        if (currentController == null) {
-//            determineControllers(current);
-//            startArcDistance = this.calculateArcDistance(current);
-//        }
-//
-//
-//        // calculate the normal of the ground under the attachment point
-//        Vector3f normal = this.findGroundNormal(current);
-//        // distance of ap to limb
-//
-//
-//
-//        FuzzyVariable apHeightVar = currentController.getFuzzyInputVariable("height_ap");
-//        if (apHeightVar != null) {
-//            Vector3f apLoc = currentAp.getWorldTranslation();
-//            float distance = this.findGroundDistance(currentAp);
-//            apHeightVar.setCurrentValue(distance);
-//            //System.out.println("Height ap : " + distance);
-//        }
-//
-//        FuzzyVariable bodyAngleLH = currentController.getFuzzyInputVariable("body_angle_leftHipJointX");
-//        if (bodyAngleLH != null) {
-//            calculateBodyAngleLH(bodyAngleLH);
-//        }
-//
-//        FuzzyVariable bodyAngleRH = currentController.getFuzzyInputVariable("body_angle_rightHipJointX");
-//        if (bodyAngleRH != null) {
-//            calculateBodyAngleRH(bodyAngleRH);
-//        }
-//
-//        FuzzyVariable arcDistance = currentController.getFuzzyInputVariable("arc_Distance");
-//        if (arcDistance != null) {
-//            calculateArcDistance(arcDistance, current);
-//        }
-//
-//        for (RevoluteJoint joint : this.revJoints.values()) {
-//            String currentAngleName = "current_angle_" + joint.getName();
-//            FuzzyVariable currentAngle = currentController.getFuzzyInputVariable(currentAngleName);
-//            if (currentAngle != null) {
-//                currentAngle.setCurrentValue(joint.getCurrentRotation());
-//            }
-//
-//
-//            // foot target variables
-//            String inputAngleName = "angle_" + joint.getName();
-//            FuzzyVariable inputAngle = currentController.getFuzzyInputVariable(inputAngleName);
-//            String inputDistanceName = "distance_" + joint.getName();
-//            FuzzyVariable inputDistance = currentController.getFuzzyInputVariable(inputDistanceName);
-//            String inputAngleTargetName = "angle_target_" + joint.getName();
-//            FuzzyVariable inputAngle2 = currentController.getFuzzyInputVariable(inputAngleTargetName);
-//
-//            calculateInputAngleValues(current, currentAp.getWorldTranslation(), current.getLocation(), normal, joint,
-//                    inputAngle, inputAngle2, inputDistance);
-//
-//            /*
-//             String currentHeightName = "height_" + joint.getName();
-//             FuzzyVariable currentHeight = currentController.getFuzzyInputVariable(currentHeightName);
-//             if (currentHeight != null) {
-//            
-//             currentHeight.setCurrentValue(findGroundDistance(joint));
-//             }
-//             * */
-//
-//        }
-        currentController.evaluate();
-
-        for (FuzzyVariable output : currentController.getOutputs()) {
-            float result = output.getOutputValue() * 10.0f;
-            String oname = output.getName();
-            if (updateRotations) {
-                String jointName = oname.substring(oname.indexOf('_') + 1);
-                RevoluteJoint joint = revJoints.get(jointName);
-                if (joint != null) {
-                    //System.out.println("moving joint " + jointName + " : " + result / 8.0f);
-                    float realdiff = joint.moveAngleUp(result / 6.0f);
-                    if (joint.isCounterRotating()) {
-                        counterRotate(joint, -realdiff);
-                    }
-                } else {
-                    System.out.println("Could not find : " + output);
-                }
-            }
-
-        }
-
-//        // check and switch to next foot step if necessary
-//        Vector3f world = currentAp.getWorldTranslation();
-//        Vector3f stepWorld = current.getWorldTranslation();
-//        float distance = world.distance(stepWorld);
-//        //System.out.println("Distance : " + distance);
-//        if (distance < 0.25) {
-//            System.out.println("Taking next step !");
-//            //rcFootSteps.next();
-//            footSteps.next();
-//            current = footSteps.getCurrentFootStep();
-//            String type = current.getType();
-//            if ("left".equalsIgnoreCase(type)) {
-//                setCounterRotationForGroup("leftLeg", false);
-//                setCounterRotationForGroup("rightLeg", true);
-//            } else {
-//                setCounterRotationForGroup("leftLeg", true);
-//                setCounterRotationForGroup("rightLeg", false);
-//            }
-//            calculateKneeTargets(this.supportKneeEndPos, this.targetKneeEndPos, this.hipEndPos);
-//            determineControllers(current);
-//            startArcDistance = this.calculateArcDistance(current);
-//        }
-//
-//        updateSamples();
-    }
-
     private void updateSamples() {
         long currentTime = System.currentTimeMillis();
         long timeDiff = currentTime - lastSample;
@@ -568,21 +443,6 @@ public class Body extends Prefab implements BodyElement {
     private Vector3f worldAxis = new Vector3f();
     private Vector3f worldLocation = new Vector3f();
 
-    private void calculateInputAngleValues(FootStep current, Vector3f ap, Vector3f targetLoc, Vector3f normal,
-            RevoluteJoint rj,
-            FuzzyVariable inputAngle,
-            FuzzyVariable inputAngle2,
-            FuzzyVariable inputDistance) {
-        // get the joint that is 
-        if (rj.isParallelTargetType() && !rj.isCounterRotating()) {
-            calculateDirectionInputAngleValues(current, ap, targetLoc, normal,
-                    rj, inputAngle, inputAngle2, inputDistance);
-        } else {
-            calculateLocationInputAngleValues(current, ap, targetLoc, normal,
-                    rj, inputAngle, inputAngle2, inputDistance);
-        }
-    }
-
     public void calculateDirectionInputAngleValues(FootStep current, Vector3f ap, Vector3f targetLoc, Vector3f normal,
             RevoluteJoint rj,
             FuzzyVariable inputAngle,
@@ -593,15 +453,11 @@ public class Body extends Prefab implements BodyElement {
         rj.getWorldAxis(worldLocation, worldAxis);
 
         Vector3f currentVector;
-        if (rj.isTargetAxisSet()) {
-            Vector3f axis = rj.getTargetAxis();
-            Quaternion q = rj.getWorldRotation();
-            currentVector = q.mult(axis);
-        } else {
-            Vector3f limbToMoveWorldLoc = ap;
-            currentVector = limbToMoveWorldLoc.subtract(worldLocation);
 
-        }
+        Vector3f limbToMoveWorldLoc = ap;
+        currentVector = limbToMoveWorldLoc.subtract(worldLocation);
+
+
         float limbDistance = currentVector.length();
         //System.out.println(rj.getName() + normal);
         Vector3f groundVector = normal.cross(worldAxis);
@@ -668,24 +524,6 @@ public class Body extends Prefab implements BodyElement {
             angle = -angle;
         }
 
-        if (inputAngle2 != null && rj.getTargetAxis() != null) {
-            // calculate the deviation of the direction of the limb towards
-            // the target foot step
-            if (rj.isTargetAxisSet()) {
-                Vector3f axis = rj.getTargetAxis();
-                Quaternion q = rj.getWorldRotation();
-                currentVector = q.mult(axis);
-
-                float dot2 = directionVector.dot(currentVector);
-                float angle2 = FastMath.acos(dot2) * FastMath.RAD_TO_DEG;
-
-                Vector3f checkVector2 = currentVector.cross(directionVector);
-                if (checkVector2.dot(worldAxis) < 0) {
-                    angle2 = -angle2;
-                }
-                inputAngle2.setCurrentValue(angle2);
-            }
-        }
         if (inputAngle != null) {
             inputAngle.setCurrentValue(angle);
         }
@@ -927,8 +765,6 @@ public class Body extends Prefab implements BodyElement {
 
     public void reset() {
         //this.footSteps.reset();
-        setCounterRotationForGroup("leftLeg", true);
-        setCounterRotationForGroup("rightLeg", false);
         this.setLocalTranslation(new Vector3f(0, 0, 0));
         for (Spatial s : this.getChildren()) {
             if (s instanceof BodyElement) {
@@ -1162,12 +998,12 @@ public class Body extends Prefab implements BodyElement {
                                 if (rj2 != null) {
                                     if (index == 1) {
                                         if (FastMath.abs(outputVal) > FastMath.abs(rj2.getCurrentMaxAngle1Change())) {
-                                            outputVal = rj2.getCurrentMaxAngle1Change() *.9f;
+                                            outputVal = rj2.getCurrentMaxAngle1Change() * .9f;
                                         }
                                         rj2.setCurrentAngle1(rj2.getCurrentAngle1() + outputVal);
                                     } else {
                                         if (FastMath.abs(outputVal) > FastMath.abs(rj2.getCurrentMaxAngle2Change())) {
-                                            outputVal = rj2.getCurrentMaxAngle2Change() *.9f;
+                                            outputVal = rj2.getCurrentMaxAngle2Change() * .9f;
                                         }
                                         rj2.setCurrentAngle2(rj2.getCurrentAngle2() + outputVal);
                                     }
@@ -1177,7 +1013,7 @@ public class Body extends Prefab implements BodyElement {
                             } else {
                                 RevoluteJoint rj = this.revJoints.get(jointName);
                                 if (FastMath.abs(outputVal) > FastMath.abs(rj.getCurrentMaxAngleChange())) {
-                                    outputVal = rj.getCurrentMaxAngleChange() *.9f;
+                                    outputVal = rj.getCurrentMaxAngleChange() * .9f;
                                 }
                                 rj.setCurrentAngle(rj.getCurrentAngle() + outputVal);
                             }
@@ -1693,29 +1529,25 @@ public class Body extends Prefab implements BodyElement {
     void setSkeletonFile(String skeletonFile) {
         this.skeletonFile = skeletonFile;
     }
-    
+
     @Override
-    public void hideTargetObjects(){
+    public void hideTargetObjects() {
         for (Spatial s : children) {
             if (s instanceof BodyElement) {
-                ((BodyElement)s).hideTargetObjects();
+                ((BodyElement) s).hideTargetObjects();
             }
         }
     }
-    
-   @Override
+
+    @Override
     public void showTargetObjects() {
-        for( Spatial s: this.getChildren())
-        {
-            if ( s instanceof BodyElement ){
-                ((BodyElement)s).showTargetObjects();
+        for (Spatial s : this.getChildren()) {
+            if (s instanceof BodyElement) {
+                ((BodyElement) s).showTargetObjects();
             }
         }
     }
 
     public void write(Writer w, int depth) {
-        
     }
-   
-   
 }
