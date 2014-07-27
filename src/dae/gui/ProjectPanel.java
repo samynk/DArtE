@@ -351,6 +351,7 @@ public class ProjectPanel extends javax.swing.JPanel implements TreeSelectionLis
     @Subscribe
     public void nodeSelected(final SelectionEvent se)
     {
+        System.out.println("Node selected:" + se.getSelectedNode().getName());
         if (SwingUtilities.isEventDispatchThread())
         {
             selectNode(se.getSelectedNode());
