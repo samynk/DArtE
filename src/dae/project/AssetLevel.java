@@ -18,6 +18,7 @@ import dae.io.SceneSaver;
 import dae.prefabs.Prefab;
 import dae.prefabs.standard.MeshObject;
 import dae.prefabs.ui.events.ErrorMessage;
+import dae.prefabs.ui.events.LevelEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -120,6 +121,8 @@ public class AssetLevel extends Level {
             try {
                 Rig rig = (Rig)manager.loadModel(assetLocation);
                 attachChild(rig);
+                LevelEvent le = new LevelEvent(this, LevelEvent.EventType.NODEADDED, rig);
+                GlobalObjects.getInstance().postEvent(le);
                 savableObject = rig;
             } catch (AssetNotFoundException ex) {
                 GlobalObjects.getInstance().postEvent(new ErrorMessage("Could not load " + assetLocation));
@@ -139,9 +142,7 @@ public class AssetLevel extends Level {
     
     @Override
     public void levelHidden() {
-        if (isChanged()) {
-            this.save();
-        }
+       
     }
 
     /**
@@ -159,13 +160,14 @@ public class AssetLevel extends Level {
         return changed;
     }
     
-    public void save() {
+    @Override
+    public void save(File location) {
         String assetLocation = asset.toString();
-        File file = new File(project.getKlatchDirectory(), assetLocation);
+        //File file = new File(project.getKlatchDirectory(), assetLocation);
         if (assetLocation.endsWith("klatch")) {
-            SceneSaver.writeScene(file, savableObject);
+            SceneSaver.writeScene(location, savableObject);
         } else  {
-            RigWriter.writeRig(file, (Rig)savableObject);
+            RigWriter.writeRig(location, (Rig)savableObject);
         }
     }
     
