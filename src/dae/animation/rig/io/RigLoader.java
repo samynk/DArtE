@@ -10,9 +10,19 @@ import com.jme3.asset.AssetLoader;
 import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
+import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Spatial;
+import dae.GlobalObjects;
 import dae.animation.rig.Rig;
+import static dae.io.SceneLoader.parseFloat3;
+import static dae.io.SceneLoader.parseQuaternion;
+import dae.prefabs.Prefab;
+import dae.prefabs.magnets.MagnetParameter;
+import dae.prefabs.standard.MeshObject;
+import dae.prefabs.types.ObjectType;
+import dae.prefabs.types.ObjectTypeCategory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Level;
@@ -77,7 +87,7 @@ public class RigLoader implements AssetLoader {
             Element root = doc.getDocumentElement();
 
             result = new Rig();
-            result.create("rig",this.assetManager,null);
+            result.create("rig", this.assetManager, null);
 
             NodeList nl = root.getChildNodes();
             for (int i = 0; i < nl.getLength(); ++i) {
@@ -161,7 +171,76 @@ public class RigLoader implements AssetLoader {
             }
             AttachmentPoint ap = new AttachmentPoint(sname, this.assetManager, loc, axis1, axis2);
             jmeParentNode.attachBodyElement(ap);
+        } else if (docNode.getNodeName().equals("prefab")) {
+            try {
+                Prefab current = createPrefab(docNode.getAttributes(), this.assetManager, GlobalObjects.getInstance().getObjectsTypeCategory());
+                if (current != null && current instanceof MeshObject) {
+                    {
+                        MeshObject mo = (MeshObject) current;
+                        jmeParentNode.attachBodyElement(mo);
+                        NodeList nl = docNode.getChildNodes();
+                        for (int i = 0; i < nl.getLength(); ++i) {
+                            Node n = nl.item(i);
+                            constructChildren(n, mo, manager);
+                        }
+                    }
+                }
+            } catch (InstantiationException ex) {
+                Logger.getLogger(RigLoader.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IllegalAccessException ex) {
+                Logger.getLogger(RigLoader.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(RigLoader.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
+    }
+
+    public Prefab createPrefab(NamedNodeMap map, AssetManager manager, ObjectTypeCategory objectsToCreate) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+
+        String meshFile = getAttrContent("mesh", map);
+        if (meshFile == null || meshFile.length() == 0) {
+            return null;
+        }
+
+        String className = getAttrContent("class", map);
+        String label = getAttrContent("type", map);
+        String name = getAttrContent("name", map);
+        String category = getAttrContent("category", map);
+        Vector3f translation = parseFloat3(getAttrContent("translation", map));
+        Vector3f scale = parseFloat3(getAttrContent("scale", map));
+        Vector3f offset = parseFloat3(getAttrContent("offset", map));
+        Quaternion rotation = parseQuaternion(getAttrContent("rotation", map));
+        String physicsMesh = getAttrContent("physicsMesh", map);
+
+        String shadowMode = getAttrContent("shadowmode", map);
+
+
+
+        Prefab p = (Prefab) Class.forName(className).newInstance();
+        p.create(name, manager, meshFile);
+        p.setType(label);
+        p.setCategory(category);
+        p.setPhysicsMesh(physicsMesh);
+
+        ObjectType type = objectsToCreate.find(label);
+        if (type != null) {
+            MagnetParameter mp = (MagnetParameter) type.findParameter("magnets");
+            p.setMagnets(mp);
+        }
+
+        try {
+            RenderQueue.ShadowMode sm = RenderQueue.ShadowMode.valueOf(shadowMode);
+            p.setShadowMode(sm);
+        } catch (IllegalArgumentException ex) {
+        }
+
+        p.setLocalPrefabRotation(rotation);
+        p.setLocalPrefabTranslation(translation);
+        p.setLocalScale(scale);
+
+        p.setOffset(offset);
+
+        return p;
     }
 
     private BodyElement createBallJoint(Node docNode) {
@@ -203,8 +282,7 @@ public class RigLoader implements AssetLoader {
         String saxis = getAttrContent("axis", map);
         String slocation = getAttrContent("location", map);
         String sname = getAttrContent("name", map);
-        String targetType = getAttrContent("target", map);
-        String stargetaxis = getAttrContent("targetAxis", map);
+
         String sgroup = getAttrContent("group", map);
         String sangle = getAttrContent("angle", map);
         String sminangle = getAttrContent("minAngle", map);
@@ -220,7 +298,6 @@ public class RigLoader implements AssetLoader {
         String logOffset = getAttrContent("logOffset", map);
         float fOffset = logOffset.length() > 0 ? Float.parseFloat(logOffset) : 0.0f;
         String logSymbol = getAttrContent("logSymbol", map);
-        String logName = getAttrContent("logName", map);
 
         ColorRGBA jointColor = ColorRGBA.Blue;
         String sjointColor = getAttrContent("jointcolor", map);
@@ -244,16 +321,12 @@ public class RigLoader implements AssetLoader {
         float minangle = Float.parseFloat(sminangle);
         float maxangle = Float.parseFloat(smaxangle);
 
-        RevoluteJoint rj = new RevoluteJoint(revJointMaterial, sname, sgroup, targetType, location, axis, angle, minangle, maxangle, radius, height, centered);
+        RevoluteJoint rj = new RevoluteJoint(revJointMaterial, sname, sgroup, location, axis, minangle, maxangle, radius, height, centered);
         rj.setLogRotations(blog);
         rj.setLogOffset(fOffset);
         rj.setLogPostScale(fScale);
         rj.setLogSymbol(logSymbol);
         rj.setLogTranslation(blogTrans);
-        if (stargetaxis.length() > 0) {
-            Vector3f targetaxis = parseVector3f(stargetaxis);
-            rj.setTargetAxis(targetaxis);
-        }
 
         String saxisx = getAttrContent("refaxisx", map);
         String saxisy = getAttrContent("refaxisy", map);
@@ -264,6 +337,7 @@ public class RigLoader implements AssetLoader {
             Vector3f za = parseVector3f(saxisz);
             rj.setInitialLocalFrame(xa, ya, za);
         }
+        rj.setCurrentAngle(angle);
 
         String sChainWithChild = getAttrContent("chainwithchild", map);
         boolean chainwithchild = Boolean.parseBoolean(sChainWithChild);
