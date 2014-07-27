@@ -10,6 +10,7 @@ import dae.prefabs.ui.ColorParameterUI;
 import dae.prefabs.ui.EnumListParameterUI;
 import dae.prefabs.ui.Float3ParameterUI;
 import dae.prefabs.ui.FloatParameterUI;
+import dae.prefabs.ui.FuzzyParameterUI;
 import dae.prefabs.ui.IntParameterUI;
 import dae.prefabs.ui.MethodParameterUI;
 import dae.prefabs.ui.ObjectParameterUI;
@@ -34,8 +35,6 @@ public class ParameterSection {
             new ArrayList<Parameter>();
     private HashMap<String, Parameter> parameterMap =
             new HashMap<String, Parameter>();
-    
-    
 
     public ParameterSection(String name) {
         this.name = name;
@@ -123,6 +122,10 @@ public class ParameterSection {
                     EnumListParameterUI elpui = new EnumListParameterUI();
                     elpui.setParameter(p);
                     parameterPanel.addParameterUI(p.getId(), elpui, gbc);
+                } else if ("fuzzy".equals(type)) {
+                    FuzzyParameterUI fpui = new FuzzyParameterUI();
+                    fpui.setParameter(p);
+                    parameterPanel.addParameterUI(p.getId(), fpui, gbc);
                 }
 
                 gbc.gridy++;
