@@ -100,6 +100,24 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuCreateRigActionPerformed"/>
               </Events>
             </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="mnuAddRevoluteJoint">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Add Revolute Joint"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuAddRevoluteJointActionPerformed"/>
+              </Events>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="mnuAddTarget">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Add Target"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuAddTargetActionPerformed"/>
+              </Events>
+            </MenuItem>
+            <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator4">
+            </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="mnuAddSkeleton">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Add Skeleton 1"/>

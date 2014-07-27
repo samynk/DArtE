@@ -155,6 +155,9 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
         mnuPreferences = new javax.swing.JMenuItem();
         mnuAdd = new javax.swing.JMenu();
         mnuCreateRig = new javax.swing.JMenuItem();
+        mnuAddRevoluteJoint = new javax.swing.JMenuItem();
+        mnuAddTarget = new javax.swing.JMenuItem();
+        jSeparator4 = new javax.swing.JPopupMenu.Separator();
         mnuAddSkeleton = new javax.swing.JMenuItem();
         mnuSkeleton2 = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
@@ -367,6 +370,23 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
             }
         });
         mnuAdd.add(mnuCreateRig);
+
+        mnuAddRevoluteJoint.setText("Add Revolute Joint");
+        mnuAddRevoluteJoint.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuAddRevoluteJointActionPerformed(evt);
+            }
+        });
+        mnuAdd.add(mnuAddRevoluteJoint);
+
+        mnuAddTarget.setText("Add Target");
+        mnuAddTarget.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuAddTargetActionPerformed(evt);
+            }
+        });
+        mnuAdd.add(mnuAddTarget);
+        mnuAdd.add(jSeparator4);
 
         mnuAddSkeleton.setText("Add Skeleton 1");
         mnuAddSkeleton.addActionListener(new java.awt.event.ActionListener() {
@@ -645,7 +665,7 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
                     File klatchDirectory = currentProject.getKlatchDirectory();
                     klatchDirectory.mkdirs();
                     currentProject.addAssetFolder(currentProject.getKlatchDirectory());
-                    ProjectEvent pe = new ProjectEvent(currentProject,ProjectEventType.ASSETFOLDERCHANGED,this);
+                    ProjectEvent pe = new ProjectEvent(currentProject, ProjectEventType.ASSETFOLDERCHANGED, this);
                     GlobalObjects.getInstance().postEvent(pe);
                     try {
                         ProjectSaver.write(currentProject, selected);
@@ -876,20 +896,39 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
         createObjectDialog.setTitle("Create Rig");
         createObjectDialog.setCurrentProject(this.currentProject);
         createObjectDialog.setVisible(true);
-        if ( createObjectDialog.getReturnStatus() == CreateKlatchDialog.RET_OK)
-        {
+        if (createObjectDialog.getReturnStatus() == CreateKlatchDialog.RET_OK) {
             String rigLocation = createObjectDialog.getAssemblyName();
             // Create a default body.
             Rig rig = new Rig();
             File klatchDir = currentProject.getKlatchDirectory();
-            File rigFile = new File(klatchDir,rigLocation);
+            File rigFile = new File(klatchDir, rigLocation);
             RigWriter.writeRig(rigFile, rig);
-            
+
             AssetEvent ae = new AssetEvent(AssetEventType.EDIT, FileNode.createFromPath(rigLocation));
             GlobalObjects.getInstance().postEvent(ae);
-            
+
         }
     }//GEN-LAST:event_mnuCreateRigActionPerformed
+
+    private void mnuAddRevoluteJointActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAddRevoluteJointActionPerformed
+        ObjectTypeCategory otc = viewport.getObjectsToCreate();
+        ObjectType ot = otc.getObjectType("Animation", "RevoluteJoint");
+        if (ot != null) {
+            CreateObjectEvent coe = new CreateObjectEvent(ot.getObjectToCreate(), null, ot);
+            GlobalObjects.getInstance().postEvent(coe);
+        }
+
+    }//GEN-LAST:event_mnuAddRevoluteJointActionPerformed
+
+    private void mnuAddTargetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAddTargetActionPerformed
+        // TODO add your handling code here:
+        ObjectTypeCategory otc = viewport.getObjectsToCreate();
+        ObjectType ot = otc.getObjectType("Animation", "AttachmentPoint");
+        if (ot != null) {
+            CreateObjectEvent coe = new CreateObjectEvent(ot.getObjectToCreate(), null, ot);
+            GlobalObjects.getInstance().postEvent(coe);
+        }
+    }//GEN-LAST:event_mnuAddTargetActionPerformed
     /**
      * @param args the command line arguments
      */
@@ -946,6 +985,7 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator2;
     private javax.swing.JPopupMenu.Separator jSeparator3;
+    private javax.swing.JPopupMenu.Separator jSeparator4;
     private javax.swing.JMenu mnuAdd;
     private javax.swing.JMenuItem mnuAdd2HandleAxis;
     private javax.swing.JMenuItem mnuAddAmbientLight;
@@ -956,9 +996,11 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
     private javax.swing.JMenuItem mnuAddHandle;
     private javax.swing.JMenuItem mnuAddHingeJoint;
     private javax.swing.JMenuItem mnuAddPivot;
+    private javax.swing.JMenuItem mnuAddRevoluteJoint;
     private javax.swing.JMenuItem mnuAddSkeleton;
     private javax.swing.JMenuItem mnuAddSphere;
     private javax.swing.JMenuItem mnuAddSpotLight;
+    private javax.swing.JMenuItem mnuAddTarget;
     private javax.swing.JMenuItem mnuAddWaypoint;
     private javax.swing.JMenuItem mnuCreateRig;
     private javax.swing.JMenu mnuEdit;
@@ -1048,7 +1090,7 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
                     ot.setExtraInfo(asset);
                     CreateObjectEvent event = new CreateObjectEvent("dae.prefabs.Klatch", asset, ot);
                     viewport.onObjectCreation(event);
-                }else if ( extension.equals("rig")){
+                } else if (extension.equals("rig")) {
                     ObjectType ot = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Animation", "Rig");
                     ot.setExtraInfo(asset);
                     CreateObjectEvent event = new CreateObjectEvent("dae.animation.rig.Rig", asset, ot);
