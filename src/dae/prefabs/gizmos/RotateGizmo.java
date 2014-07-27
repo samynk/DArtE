@@ -15,7 +15,6 @@ import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
-import com.jme3.scene.Spatial;
 import com.jme3.scene.VertexBuffer;
 import com.jme3.util.BufferUtils;
 import dae.GlobalObjects;
@@ -165,14 +164,22 @@ public class RotateGizmo extends Node implements Gizmo {
         }
     }
 
-    private void switchSpace() {
+    private void switchSpace() {  
         switch (this.rotateGizmoSpace) {
             case LOCAL:
+                if (getParent() instanceof Prefab){
+                    Prefab thisPrefab = (Prefab)getParent();
+                    Quaternion extraQuat = thisPrefab.getGizmoRotation();
+                    if (  extraQuat != null){
+                        this.setLocalRotation(extraQuat);
+                    }else{
+                        this.setLocalRotation(Matrix3f.IDENTITY);
+                    }
+                }
                 this.setLocalRotation(Matrix3f.IDENTITY);
                 break;
             case PARENT:
                 if (getParent() != null) {
-                    // get the parent of the parent (not always possible).
                     Quaternion inverseLocalParentRot = getParent().getLocalRotation().inverse();
                     this.setLocalRotation(inverseLocalParentRot);
                 }
