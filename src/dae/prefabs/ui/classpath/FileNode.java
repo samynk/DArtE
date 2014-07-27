@@ -4,6 +4,8 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -13,6 +15,7 @@ import java.util.Iterator;
  */
 public class FileNode implements Transferable {
 
+    
     private String name;
     private String label;
     private String extension = "";
@@ -243,4 +246,25 @@ public class FileNode implements Transferable {
         }
         return count;
     }
+    
+    /**
+     * Creates a FileNode starting from a path.
+     * @param rigLocation the location of the file.
+     * @return a new filenode.
+     */
+    public static FileNode createFromPath(String rigLocation) {
+        Path p = Paths.get(rigLocation);
+        FileNode current = null;
+        for ( int i = 0; i < p.getNameCount();++i)
+        {
+            Path currentPath = p.getName(i);
+            FileNode newNode = new FileNode(currentPath.toString(),false);
+            if ( current != null){
+                current.addChild(newNode);
+            }
+            current = newNode;
+        }
+        return current; 
+    }
+
 }
