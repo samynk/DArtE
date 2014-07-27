@@ -223,6 +223,15 @@ public class Axis extends Node implements Gizmo {
     private void switchSpace() {
         switch (this.currentSpace) {
             case LOCAL:
+                 if (getParent() instanceof Prefab){
+                    Prefab thisPrefab = (Prefab)getParent();
+                    Quaternion extraQuat = thisPrefab.getGizmoRotation();
+                    if (  extraQuat != null){
+                        this.setLocalRotation(extraQuat);
+                    }else{
+                        this.setLocalRotation(Matrix3f.IDENTITY);
+                    }
+                }
                 this.setLocalRotation(Matrix3f.IDENTITY);
                 break;
             case PARENT:
