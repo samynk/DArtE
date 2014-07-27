@@ -1080,6 +1080,8 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
                         editorState = EditorState.LINKPARENT;
                     } else if (editorState == EditorState.LINKPARENT) {
                         Prefab p = (Prefab) parent;
+                        if ( p == currentChildElement)
+                            return;
                         // express the world transformation of the child as a local transformation in the parent space.
                         Matrix4f parentMatrix = new Matrix4f();
                         parentMatrix.setTranslation(p.getWorldTranslation());
@@ -1105,7 +1107,7 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
                         // remove child from its layer
                         if (previousParent instanceof Layer) {
                             Layer l = (Layer) previousParent;
-                            l.removeNode(p);
+                            l.removeNode(currentChildElement);
                         }
 
                         LevelEvent le = new LevelEvent(level, EventType.NODEMOVED, currentChildElement, previousParent, previousIndex, p);
