@@ -1035,10 +1035,10 @@ public class Prefab extends Node implements ProjectTreeNode {
                 if (pindex == index) {
                     return s;
                 }
-                ++pindex;
+                 ++pindex;
             }
         }
-        return 0;
+        return null;
     }
 
     public int getPrefabChildCount() {
@@ -1060,7 +1060,7 @@ public class Prefab extends Node implements ProjectTreeNode {
             }
             ++pindex;
         }
-        return 0;
+        return -1;
     }
 
     public void translationChanged() {
@@ -1147,5 +1147,14 @@ public class Prefab extends Node implements ProjectTreeNode {
 
     public boolean isLeaf() {
         return getPrefabChildCount() == 0;
+    }
+    
+    /**
+     * Returns an extra rotation that should be applied to the quaternion.
+     * @return null, if no extra rotation exists, or a Quaternion with an extra
+     * rotation.
+     */
+    public Quaternion getGizmoRotation(){
+        return null;
     }
 }
