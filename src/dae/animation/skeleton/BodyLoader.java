@@ -114,6 +114,8 @@ public class BodyLoader implements AssetLoader {
         }
         return body;
     }
+    
+    
 
     private void constructChildren(Node docNode, BodyElement jmeParentNode, AssetManager manager) {
         if (docNode.getNodeType() == Node.TEXT_NODE) {
@@ -226,8 +228,7 @@ public class BodyLoader implements AssetLoader {
         String saxis = getAttrContent("axis", map);
         String slocation = getAttrContent("location", map);
         String sname = getAttrContent("name", map);
-        String targetType = getAttrContent("target", map);
-        String stargetaxis = getAttrContent("targetAxis", map);
+        //String stargetaxis = getAttrContent("targetAxis", map);
         String sgroup = getAttrContent("group", map);
         String sangle = getAttrContent("angle", map);
         String sminangle = getAttrContent("minAngle", map);
@@ -267,17 +268,13 @@ public class BodyLoader implements AssetLoader {
         float minangle = Float.parseFloat(sminangle);
         float maxangle = Float.parseFloat(smaxangle);
 
-        RevoluteJoint rj = new RevoluteJoint(revJointMaterial, sname, sgroup, targetType, location, axis, angle, minangle, maxangle, radius, height, centered);
+        RevoluteJoint rj = new RevoluteJoint(revJointMaterial, sname, sgroup, location, axis, minangle, maxangle, radius, height, centered);
         rj.setLogRotations(blog);
         rj.setLogOffset(fOffset);
         rj.setLogPostScale(fScale);
         rj.setLogSymbol(logSymbol);
         rj.setLogName(logName);
         rj.setLogTranslation(blogTrans);
-        if (stargetaxis.length() > 0) {
-            Vector3f targetaxis = parseVector3f(stargetaxis);
-            rj.setTargetAxis(targetaxis);
-        }
 
         String saxisx = getAttrContent("refaxisx", map);
         String saxisy = getAttrContent("refaxisy", map);
@@ -288,6 +285,7 @@ public class BodyLoader implements AssetLoader {
             Vector3f za = parseVector3f(saxisz);
             rj.setInitialLocalFrame(xa, ya, za);
         }
+        rj.setCurrentAngle(angle);
 
         String sChainWithChild = getAttrContent("chainwithchild", map);
         boolean chainwithchild = Boolean.parseBoolean(sChainWithChild);
