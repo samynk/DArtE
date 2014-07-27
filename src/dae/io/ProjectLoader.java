@@ -130,7 +130,6 @@ public class ProjectLoader {
                             if ("file".equals(fileNode.getNodeName())) {
                                 String path = fileNode.getFirstChild().getTextContent();
                                 al = new AssetLevel(Paths.get(path));
-                                p.addLevel(al);
                             }else if ("exportsettings".equals(fileNode.getNodeName())){
                                 if ( al != null)
                                 {
