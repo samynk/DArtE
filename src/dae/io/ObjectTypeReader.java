@@ -20,7 +20,9 @@ import dae.prefabs.parameters.ActionParameter;
 import dae.prefabs.parameters.BooleanParameter;
 import dae.prefabs.parameters.ChoiceParameter;
 import dae.prefabs.parameters.ColorParameter;
+import dae.prefabs.parameters.ConnectorParameter;
 import dae.prefabs.parameters.DefaultSection;
+import dae.prefabs.parameters.DictionaryParameter;
 import dae.prefabs.parameters.Float3Parameter;
 import dae.prefabs.parameters.FloatParameter;
 import dae.prefabs.parameters.FuzzyParameter;
@@ -216,11 +218,18 @@ public class ObjectTypeReader implements AssetLoader {
                     FuzzyParameter frp = new FuzzyParameter(type,id);
                     p = frp;
                     
+                }else if ("connector".equals(type)){
+                    ConnectorParameter frp = new ConnectorParameter(type,id);
+                    p = frp;
+                    
                 }
                 if (p != null) {
                     if ( "list".equals(collectionType)){
                         ListParameter lp = new ListParameter(type,p);
                         parent.addParameter(lp);
+                    }else if ( "dictionary".equals(collectionType)){
+                        DictionaryParameter dp = new DictionaryParameter(collectionType,id, p);
+                        parent.addParameter(dp);
                     }else{
                         parent.addParameter(p);
                     }
