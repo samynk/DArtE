@@ -24,4 +24,15 @@ public class BooleanParameter extends Parameter {
     public boolean getDefaultValue() {
         return defaultValue;
     }
+
+    /**
+     * Gets the class type of this parameter.
+     * @return the class type of the parameter.
+     */
+    @Override
+    public Class getClassType() {
+        return boolean.class;
+    }
+    
+    
 }
