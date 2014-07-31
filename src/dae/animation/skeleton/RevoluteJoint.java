@@ -15,12 +15,15 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import dae.animation.rig.ConnectorType;
 import dae.animation.skeleton.debug.BoneVisualization;
 import dae.io.XMLUtils;
 import dae.prefabs.Prefab;
 import dae.prefabs.shapes.HingeShape;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -68,6 +71,28 @@ public class RevoluteJoint extends Prefab implements BodyElement {
     private Spatial visual;
     // maximum allowed changed for the angle
     private float maxAngleChange;
+    
+    // the possible connectors for this revolute joint
+    private final static ArrayList<ConnectorType> supportedInputConnectorTypes =
+            new ArrayList<ConnectorType>();
+    
+     // the possible connectors for this revolute joint
+    private final static ArrayList<ConnectorType> supportedOutputConnectorTypes =
+            new ArrayList<ConnectorType>();
+    
+    static{
+       ConnectorType ct = new ConnectorType("angletargetrevjoint" ,"Angle target", 
+               "This target calculates the angle between two vectors. "
+               + "The first vector has the joint location as its origin and the selected attachment point as endpoint."
+               + "The second vector has the joint location as its origin and the target as endpoint.", 
+               "dae.animation.rig.gui.AngleTargetConnectorPanel");
+       supportedInputConnectorTypes.add(ct);
+       
+       ConnectorType oct = new ConnectorType("anglerevjoint", "Angle",
+               "This connector increments the current angle of the joint with the output of teh controller",
+               "dae.animation.rig.gui.RevoluteJointOutputConnectorPanel");
+       supportedOutputConnectorTypes.add(oct);
+    }
 
     public RevoluteJoint() {
         axis = Vector3f.UNIT_Y.clone();
@@ -99,6 +124,22 @@ public class RevoluteJoint extends Prefab implements BodyElement {
         this.radius = radius;
         this.height = height;
         this.centered = centered;
+    }
+    
+    /**
+     * Return the supported input connector types of this joint.
+     * @return the supported input connector types.
+     */
+    public List<ConnectorType> getInputConnectorTypes(){
+        return supportedInputConnectorTypes;
+    }
+    
+    /**
+     * Return the supported output connector types of this joint.
+     * @return the supported input connector types.
+     */
+    public List<ConnectorType> getOutputConnectorTypes(){
+        return supportedOutputConnectorTypes;
     }
 
     /**
@@ -256,9 +297,10 @@ public class RevoluteJoint extends Prefab implements BodyElement {
     private Vector3f worldTempAxis = new Vector3f();
 
     public Vector3f getWorldRotationAxis() {
-        this.localToWorld(tempOrigin, worldTempOrigin);
-        this.localToWorld(axis, worldTempAxis);
-        return worldTempAxis.subtract(worldTempOrigin);
+        //this.localToWorld(tempOrigin, worldTempOrigin);
+        //this.localToWorld(axis, worldTempAxis);
+        //return worldTempAxis.subtract(worldTempOrigin);
+        return getWorldRotation().mult(axis);
     }
 
     public void getWorldAxis(Vector3f axisOrigin, Vector3f worldAxis) {
