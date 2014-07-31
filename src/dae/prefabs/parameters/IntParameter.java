@@ -24,4 +24,13 @@ public class IntParameter extends Parameter {
     public int getDefaultValue() {
         return defaultValue;
     }
+    
+     /**
+     * Gets the class type of this parameter.
+     * @return the class type of the parameter.
+     */
+    @Override
+    public Class getClassType() {
+        return int.class;
+    }
 }
