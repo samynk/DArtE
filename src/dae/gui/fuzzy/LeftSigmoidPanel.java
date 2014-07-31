@@ -4,23 +4,73 @@
  */
 package dae.gui.fuzzy;
 
+import java.awt.Color;
+import java.awt.Component;
+import javax.swing.JComponent;
+import javax.swing.UIManager;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import mlproject.fuzzy.LeftSigmoidMemberShip;
 
 /**
  *
  * @author Koen Samyn
  */
-public class LeftSigmoidPanel extends javax.swing.JPanel {
+public class LeftSigmoidPanel extends javax.swing.JPanel implements DocumentListener {
+
     private LeftSigmoidMemberShip membership;
+    private Color errorColor;
+    private Color normalColor;
+
     /**
      * Creates new form LeftSigmoidPanel
      */
     public LeftSigmoidPanel() {
         initComponents();
+        for (Component c : this.getComponents()) {
+            if (c instanceof JComponent) {
+                ((JComponent) c).putClientProperty("JComponent.sizeVariant", "small");
+            }
+        }
+        txtMembershipName.getDocument().addDocumentListener(this);
+        errorColor = UIManager.getDefaults().getColor("nimbusRed");
+        if (errorColor == null) {
+            errorColor = Color.RED;
+        }
+        normalColor = UIManager.getDefaults().getColor("text");
+        if (normalColor == null) {
+            normalColor = Color.BLACK;
+        }
     }
-    
-    public void setMemberShip(LeftSigmoidMemberShip memberShip){
+
+    public void setMemberShip(LeftSigmoidMemberShip memberShip) {
         this.membership = memberShip;
+        txtMembershipName.setText(memberShip.getName());
+        spnCenter.setValue(memberShip.getCenter());
+        spnRight.setValue(memberShip.getRight());
+    }
+
+    public void insertUpdate(DocumentEvent e) {
+        updateMemberShipName();
+    }
+
+    public void removeUpdate(DocumentEvent e) {
+        updateMemberShipName();
+    }
+
+    public void changedUpdate(DocumentEvent e) {
+        updateMemberShipName();
+    }
+
+    private void updateMemberShipName() {
+        String newName = txtMembershipName.getText();
+        this.membership.setName(newName);
+
+        if (!membership.getName().equals(newName)) {
+            txtMembershipName.setForeground(errorColor);
+        } else {
+            txtMembershipName.setForeground(normalColor);
+        }
     }
 
     /**
@@ -32,16 +82,32 @@ public class LeftSigmoidPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
+        lblName = new javax.swing.JLabel();
         txtMembershipName = new javax.swing.JTextField();
-        jLabel2 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
+        lblCenter = new javax.swing.JLabel();
+        spnCenter = new javax.swing.JSpinner();
+        lblRight = new javax.swing.JLabel();
+        spnRight = new javax.swing.JSpinner();
 
-        jLabel1.setText("Membership name :");
+        lblName.setText("Membership name :");
 
-        jLabel2.setText("jLabel2");
+        lblCenter.setText("Center : ");
 
-        jTextField1.setText("jTextField1");
+        spnCenter.setModel(new javax.swing.SpinnerNumberModel(Float.valueOf(0.0f), null, null, Float.valueOf(0.1f)));
+        spnCenter.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                spnCenterStateChanged(evt);
+            }
+        });
+
+        lblRight.setText("Right : ");
+
+        spnRight.setModel(new javax.swing.SpinnerNumberModel(Float.valueOf(0.0f), null, null, Float.valueOf(0.1f)));
+        spnRight.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                spnRightStateChanged(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -50,14 +116,14 @@ public class LeftSigmoidPanel extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtMembershipName, javax.swing.GroupLayout.DEFAULT_SIZE, 283, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextField1)))
+                    .addComponent(lblName)
+                    .addComponent(lblCenter)
+                    .addComponent(lblRight))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtMembershipName, javax.swing.GroupLayout.DEFAULT_SIZE, 216, Short.MAX_VALUE)
+                    .addComponent(spnCenter)
+                    .addComponent(spnRight))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -65,19 +131,35 @@ public class LeftSigmoidPanel extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
+                    .addComponent(lblName)
                     .addComponent(txtMembershipName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(243, Short.MAX_VALUE))
+                    .addComponent(lblCenter)
+                    .addComponent(spnCenter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblRight)
+                    .addComponent(spnRight, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void spnCenterStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spnCenterStateChanged
+        // TODO add your handling code here:
+        membership.setCenter((Float) spnCenter.getValue());
+    }//GEN-LAST:event_spnCenterStateChanged
+
+    private void spnRightStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spnRightStateChanged
+        // TODO add your handling code here:
+        membership.setRight((Float) spnRight.getValue());
+    }//GEN-LAST:event_spnRightStateChanged
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JTextField jTextField1;
+    private javax.swing.JLabel lblCenter;
+    private javax.swing.JLabel lblName;
+    private javax.swing.JLabel lblRight;
+    private javax.swing.JSpinner spnCenter;
+    private javax.swing.JSpinner spnRight;
     private javax.swing.JTextField txtMembershipName;
     // End of variables declaration//GEN-END:variables
 }
