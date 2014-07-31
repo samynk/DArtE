@@ -6,10 +6,10 @@ package dae.animation.rig;
 
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
-import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import dae.animation.skeleton.AttachmentPoint;
 import dae.animation.skeleton.RevoluteJoint;
+import dae.prefabs.standard.PrefabPlaceHolder;
 
 /**
  *
@@ -26,6 +26,10 @@ public class AngleTargetConnector implements InputConnector {
     private boolean initialized = false;
 
     public AngleTargetConnector() {
+    }
+    
+    public boolean isInitialized(){
+        return initialized;
     }
 
     /**
@@ -71,6 +75,7 @@ public class AngleTargetConnector implements InputConnector {
     }
 
     public void initialize(Rig rig) {
+        initialized = false;
         Spatial sjoint = rig.getChild(jointName);
         if (sjoint instanceof RevoluteJoint) {
             this.joint = (RevoluteJoint) sjoint;
@@ -86,12 +91,9 @@ public class AngleTargetConnector implements InputConnector {
         }
 
         // search for the target from the top level.
-        Node top = rig;
-        while (top.getParent() != null) {
-            top = top.getParent();
-        }
-        target = top.getChild(targetName);
-        if (target != null) {
+        target = rig.getTarget(targetName);
+        
+        if (target != null && !(target instanceof PrefabPlaceHolder)) {
             initialized = true;
         }
 
@@ -124,5 +126,14 @@ public class AngleTargetConnector implements InputConnector {
         toProject.x = toProject.x - dot * axis.x;
         toProject.y = toProject.y - dot * axis.y;
         toProject.z = toProject.z - dot * axis.z;
+    }
+
+    public InputConnector cloneConnector() {
+        AngleTargetConnector ac = new AngleTargetConnector();
+        ac.setAttachmentName(attachmentName);
+        ac.setJointName(jointName);
+        ac.setTargetName(targetName);
+        ac.initialized = false;
+        return ac;
     }
 }
