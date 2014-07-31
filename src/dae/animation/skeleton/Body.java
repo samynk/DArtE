@@ -965,9 +965,8 @@ public class Body extends Prefab implements BodyElement {
             while (distance > 0.0005f
                     && ((controller.isIterativeMode() && iteration < controller.getMaxIterations())
                     || iteration == 0)) {
-                FuzzyRuleBlock[] blocks = controller.getFuzzyRuleBlocks();
-                for (int i = 0; i < blocks.length; ++i) {
-                    FuzzyRuleBlock currentBlock = blocks[i];
+                Iterable<FuzzyRuleBlock> blocks = controller.getFuzzyRuleBlocks();
+                for (FuzzyRuleBlock currentBlock:blocks) {
                     if (currentBlock == null) {
                         continue;
                     }
