@@ -36,7 +36,7 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="cancelButton" linkSize="1" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <Component id="jTabbedPane1" alignment="0" pref="426" max="32767" attributes="0"/>
+                  <Component id="jTabbedPane1" alignment="0" pref="779" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -46,8 +46,8 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jTabbedPane1" max="32767" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
+              <Component id="jTabbedPane1" min="-2" pref="262" max="-2" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="cancelButton" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="okButton" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -86,6 +86,24 @@
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
               <JTabbedPaneConstraints tabName="Fuzzy Inputs">
                 <Property name="tabTitle" type="java.lang.String" value="Fuzzy Inputs"/>
+              </JTabbedPaneConstraints>
+            </Constraint>
+          </Constraints>
+        </Component>
+        <Component class="dae.gui.fuzzy.RuleBlockPanel" name="ruleBlockPanel1">
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
+              <JTabbedPaneConstraints tabName="Rules">
+                <Property name="tabTitle" type="java.lang.String" value="Rules"/>
+              </JTabbedPaneConstraints>
+            </Constraint>
+          </Constraints>
+        </Component>
+        <Component class="dae.gui.fuzzy.FuzzyOutputVariablePanel" name="fuzzyOutputVariablePanel1">
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
+              <JTabbedPaneConstraints tabName="Fuzzy Outputs">
+                <Property name="tabTitle" type="java.lang.String" value="Fuzzy Outputs"/>
               </JTabbedPaneConstraints>
             </Constraint>
           </Constraints>

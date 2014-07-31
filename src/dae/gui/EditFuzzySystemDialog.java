@@ -50,6 +50,9 @@ public class EditFuzzySystemDialog extends javax.swing.JDialog {
     
     public void setFuzzySystem(FuzzySystem fuzzySystem){
         fuzzyInputVariablePanel1.setFuzzySystem(fuzzySystem);
+        ruleBlockPanel1.setFuzzySystem(fuzzySystem);
+        fuzzyOutputVariablePanel1.setFuzzySystem(fuzzySystem);
+                
     }
 
     /**
@@ -75,6 +78,8 @@ public class EditFuzzySystemDialog extends javax.swing.JDialog {
         cancelButton = new javax.swing.JButton();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         fuzzyInputVariablePanel1 = new dae.gui.fuzzy.FuzzyInputVariablePanel();
+        ruleBlockPanel1 = new dae.gui.fuzzy.RuleBlockPanel();
+        fuzzyOutputVariablePanel1 = new dae.gui.fuzzy.FuzzyOutputVariablePanel();
 
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
@@ -97,6 +102,8 @@ public class EditFuzzySystemDialog extends javax.swing.JDialog {
         });
 
         jTabbedPane1.addTab("Fuzzy Inputs", fuzzyInputVariablePanel1);
+        jTabbedPane1.addTab("Rules", ruleBlockPanel1);
+        jTabbedPane1.addTab("Fuzzy Outputs", fuzzyOutputVariablePanel1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -110,7 +117,7 @@ public class EditFuzzySystemDialog extends javax.swing.JDialog {
                         .addComponent(okButton, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(cancelButton))
-                    .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 426, Short.MAX_VALUE))
+                    .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 779, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -120,8 +127,8 @@ public class EditFuzzySystemDialog extends javax.swing.JDialog {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jTabbedPane1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 262, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cancelButton)
                     .addComponent(okButton))
@@ -198,9 +205,11 @@ public class EditFuzzySystemDialog extends javax.swing.JDialog {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
     private dae.gui.fuzzy.FuzzyInputVariablePanel fuzzyInputVariablePanel1;
+    private dae.gui.fuzzy.FuzzyOutputVariablePanel fuzzyOutputVariablePanel1;
     private mlproject.fuzzy.gui.FuzzySystemUI fuzzySystemUI1;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JButton okButton;
+    private dae.gui.fuzzy.RuleBlockPanel ruleBlockPanel1;
     // End of variables declaration//GEN-END:variables
     private int returnStatus = RET_CANCEL;
 }
