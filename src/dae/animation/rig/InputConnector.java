@@ -18,8 +18,27 @@ public interface InputConnector {
      */
     public void initialize(Rig rig);
     /**
+     * Checks if the output is properly initialized.
+     * @return true if the connector is properly initialized, false otherwise.
+     */
+    public boolean isInitialized();
+    /**
      * Returns the calculated value.
      * @return the calculated value.
      */
     public float getValue();
+    /**
+     * Returs a copy (non initialized) of this input connector.
+     */
+    public InputConnector cloneConnector();
+    /**
+     * Sets the joint name of this input connector.
+     * @param jointName the joint name.
+     */
+    public void setJointName(String jointName);
+    /**
+     * Returns the joint name of this input connector.
+     * @return the joint name.
+     */
+    public String getJointName();
 }
