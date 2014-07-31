@@ -4,9 +4,18 @@
  */
 package dae.gui.fuzzy;
 
+import java.awt.CardLayout;
+import javax.swing.SwingUtilities;
+import mlproject.fuzzy.LeftSigmoidMemberShip;
+import mlproject.fuzzy.MemberShip;
+import mlproject.fuzzy.RightSigmoidMemberShip;
+import mlproject.fuzzy.SigmoidMemberShip;
+import mlproject.fuzzy.SingletonMemberShip;
+import mlproject.fuzzy.TrapezoidMemberShip;
+
 /**
  *
- * @author samyn_000
+ * @author Koen Samyn
  */
 public class MemberShipEditorPanel extends javax.swing.JPanel {
 
@@ -15,6 +24,7 @@ public class MemberShipEditorPanel extends javax.swing.JPanel {
      */
     public MemberShipEditorPanel() {
         initComponents();
+        SwingUtilities.updateComponentTreeUI(this);
     }
 
     /**
@@ -26,17 +36,48 @@ public class MemberShipEditorPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
-        );
+        leftSigmoidPanel1 = new dae.gui.fuzzy.LeftSigmoidPanel();
+        sigmoidPanel1 = new dae.gui.fuzzy.SigmoidPanel();
+        rightSigmoidPanel1 = new dae.gui.fuzzy.RightSigmoidPanel();
+        trapezoidSigmoidPanel1 = new dae.gui.fuzzy.TrapezoidSigmoidPanel();
+        singletonPanel1 = new dae.gui.fuzzy.SingletonPanel();
+
+        setLayout(new java.awt.CardLayout());
+        add(leftSigmoidPanel1, "leftsigmoid");
+        add(sigmoidPanel1, "sigmoid");
+        add(rightSigmoidPanel1, "rightsigmoid");
+        add(trapezoidSigmoidPanel1, "trapezoidsigmoid");
+        add(singletonPanel1, "singleton");
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private dae.gui.fuzzy.LeftSigmoidPanel leftSigmoidPanel1;
+    private dae.gui.fuzzy.RightSigmoidPanel rightSigmoidPanel1;
+    private dae.gui.fuzzy.SigmoidPanel sigmoidPanel1;
+    private dae.gui.fuzzy.SingletonPanel singletonPanel1;
+    private dae.gui.fuzzy.TrapezoidSigmoidPanel trapezoidSigmoidPanel1;
     // End of variables declaration//GEN-END:variables
+
+    public void setMemberShip(MemberShip memberShip) {
+        if ( memberShip instanceof LeftSigmoidMemberShip){
+            leftSigmoidPanel1.setMemberShip((LeftSigmoidMemberShip)memberShip);
+            CardLayout cl = (CardLayout)this.getLayout();
+            cl.show(this, "leftsigmoid");
+        }else if ( memberShip instanceof SigmoidMemberShip){
+            sigmoidPanel1.setMemberShip((SigmoidMemberShip)memberShip);
+            CardLayout cl = (CardLayout)this.getLayout();
+            cl.show(this, "sigmoid");
+        }else if ( memberShip instanceof RightSigmoidMemberShip){
+            rightSigmoidPanel1.setMemberShip((RightSigmoidMemberShip)memberShip);
+            CardLayout cl = (CardLayout)this.getLayout();
+            cl.show(this, "rightsigmoid");
+        }else if ( memberShip instanceof TrapezoidMemberShip){
+            trapezoidSigmoidPanel1.setMemberShip((TrapezoidMemberShip)memberShip);
+            CardLayout cl = (CardLayout)this.getLayout();
+            cl.show(this, "trapezoidsigmoid");
+        }else if ( memberShip instanceof SingletonMemberShip){
+            singletonPanel1.setMemberShip((SingletonMemberShip)memberShip);
+            CardLayout cl = (CardLayout)this.getLayout();
+            cl.show(this, "singleton");
+        }
+    }
 }
