@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 public class Parameter {
 
     private String type;
+    private String property;
     private String id;
     private String label;
     private PropertyConverter converter;
@@ -22,6 +23,15 @@ public class Parameter {
     public Parameter(String type, String id) {
         this.type = type;
         this.id = id;
+        this.property = Character.toUpperCase(id.charAt(0)) + id.substring(1);
+    }
+    
+    /**
+     * Gets the class of the object.
+     * @return the class of the object.
+     */
+    public Class getClassType(){
+        return Object.class;
     }
 
     public String getType() {
@@ -44,6 +54,13 @@ public class Parameter {
      */
     public void setId(String id) {
         this.id = id;
+    }
+    
+    /**
+     * Gets the id as a property name.
+     */
+    public String getProperty(){
+        return property;
     }
 
     /**
