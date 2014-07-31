@@ -26,4 +26,13 @@ public class Float3Parameter extends Parameter {
     public Vector3f getDefaultValue() {
         return defaultValue;
     }
+    
+     /**
+     * Gets the class type of this parameter.
+     * @return the class type of the parameter.
+     */
+    @Override
+    public Class getClassType() {
+        return Vector3f.class;
+    }
 }
