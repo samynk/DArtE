@@ -80,4 +80,13 @@ public class RangeParameter extends Parameter {
     public void setDefaultValue(float defaultValue) {
         this.defaultValue = defaultValue;
     }
+    
+     /**
+     * Gets the class type of this parameter.
+     * @return the class type of the parameter.
+     */
+    @Override
+    public Class getClassType() {
+        return float.class;
+    }
 }
