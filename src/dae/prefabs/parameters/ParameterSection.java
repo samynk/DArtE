@@ -7,6 +7,7 @@ package dae.prefabs.parameters;
 import dae.prefabs.ui.BooleanParameterUI;
 import dae.prefabs.ui.ChoiceParameterUI;
 import dae.prefabs.ui.ColorParameterUI;
+import dae.prefabs.ui.ConnectorParameterUI;
 import dae.prefabs.ui.EnumListParameterUI;
 import dae.prefabs.ui.Float3ParameterUI;
 import dae.prefabs.ui.FloatParameterUI;
@@ -17,6 +18,7 @@ import dae.prefabs.ui.ObjectParameterUI;
 import dae.prefabs.ui.ParameterPanel;
 import dae.prefabs.ui.RangeParameterUI;
 import dae.prefabs.ui.TextParameterUI;
+import dae.prefabs.ui.collection.DictionaryParameterUI;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.ArrayList;
@@ -126,6 +128,14 @@ public class ParameterSection {
                     FuzzyParameterUI fpui = new FuzzyParameterUI();
                     fpui.setParameter(p);
                     parameterPanel.addParameterUI(p.getId(), fpui, gbc);
+                }else if ("dictionary".equals(type)){
+                    DictionaryParameterUI dpui = new DictionaryParameterUI();
+                    dpui.setParameter(p);
+                    parameterPanel.addParameterUI(p.getId(), dpui, gbc);
+                }else if ("connector".equals(type)){
+                    ConnectorParameterUI cpui = new ConnectorParameterUI();
+                    cpui.setParameter(p);
+                    parameterPanel.addParameterUI(p.getId(), cpui, gbc);
                 }
 
                 gbc.gridy++;
