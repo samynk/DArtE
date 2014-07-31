@@ -5,6 +5,8 @@
 
 package dae.prefabs.parameters;
 
+import mlproject.fuzzy.FuzzySystem;
+
 /**
  *
  * @author Koen Samyn
@@ -17,5 +19,14 @@ public class FuzzyParameter extends Parameter{
      */
     public FuzzyParameter(String type,String id){
         super(type,id);
+    }
+    
+     /**
+     * Gets the class type of this parameter.
+     * @return the class type of the parameter.
+     */
+    @Override
+    public Class getClassType() {
+        return FuzzySystem.class;
     }
 }
