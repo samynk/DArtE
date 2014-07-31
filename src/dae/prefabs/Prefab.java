@@ -56,6 +56,8 @@ public class Prefab extends Node implements ProjectTreeNode {
             new HashMap<String, Method>();
     private final ArrayList<UpdateObject> workList =
             new ArrayList<UpdateObject>();
+    private final ArrayList<Runnable> taskList =
+            new ArrayList<Runnable>();
     private boolean selected = false;
     private Material originalMaterial;
     private float[] angles = new float[3];
@@ -327,6 +329,12 @@ public class Prefab extends Node implements ProjectTreeNode {
             workList.add(uo);
         }
     }
+    
+    public void addTask(Runnable r){
+        synchronized(taskList){
+            taskList.add(r);
+        }
+    }
 
     @Override
     public void updateLogicalState(float tpf) {
@@ -336,6 +344,12 @@ public class Prefab extends Node implements ProjectTreeNode {
                 this.setParameterFromUpdateThread(uo);
             }
             workList.clear();
+        }
+        synchronized(taskList){
+            for ( Runnable r: this.taskList){
+                r.run();
+            }
+            taskList.clear();
         }
         super.updateLogicalState(tpf);
     }
