@@ -32,8 +32,11 @@ public class BooleanParameterUI extends javax.swing.JPanel implements ParameterU
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
         cbxBooleanParameter = new javax.swing.JCheckBox();
+
+        setLayout(new java.awt.GridBagLayout());
 
         cbxBooleanParameter.setText("Label");
         cbxBooleanParameter.addItemListener(new java.awt.event.ItemListener() {
@@ -41,23 +44,12 @@ public class BooleanParameterUI extends javax.swing.JPanel implements ParameterU
                 cbxBooleanParameterItemStateChanged(evt);
             }
         });
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(cbxBooleanParameter, javax.swing.GroupLayout.DEFAULT_SIZE, 388, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(cbxBooleanParameter)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        add(cbxBooleanParameter, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void cbxBooleanParameterItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cbxBooleanParameterItemStateChanged

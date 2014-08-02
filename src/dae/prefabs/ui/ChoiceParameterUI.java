@@ -61,15 +61,15 @@ public class ChoiceParameterUI extends javax.swing.JPanel implements ParameterUI
         setLayout(new java.awt.GridBagLayout());
 
         lblLabel.setText("Label : ");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-        add(lblLabel, gridBagConstraints);
+        lblLabel.setMinimumSize(new java.awt.Dimension(100, 14));
+        lblLabel.setPreferredSize(new java.awt.Dimension(100, 14));
+        add(lblLabel, new java.awt.GridBagConstraints());
 
         cboChoice.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 0);
         add(cboChoice, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables

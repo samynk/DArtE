@@ -52,11 +52,9 @@ public class FloatParameterUI extends javax.swing.JPanel implements ParameterUI 
         setLayout(new java.awt.GridBagLayout());
 
         lblLabel.setText("Label : ");
-        lblLabel.setPreferredSize(null);
+        lblLabel.setPreferredSize(new java.awt.Dimension(100, 16));
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         add(lblLabel, gridBagConstraints);
 
         spnFloatValue.setModel(new javax.swing.SpinnerNumberModel(Float.valueOf(0.0f), null, null, Float.valueOf(1.0f)));
@@ -71,7 +69,7 @@ public class FloatParameterUI extends javax.swing.JPanel implements ParameterUI 
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 3, 0, 5);
+        gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 0);
         add(spnFloatValue, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 

@@ -52,11 +52,10 @@ public class ObjectParameterUI extends javax.swing.JPanel implements ParameterUI
         setLayout(new java.awt.GridBagLayout());
 
         lblLabel.setText("Label :");
+        lblLabel.setPreferredSize(new java.awt.Dimension(100, 14));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE;
-        gridBagConstraints.insets = new java.awt.Insets(2, 10, 0, 0);
         add(lblLabel, gridBagConstraints);
 
         txtObjectName.setEditable(false);
@@ -64,10 +63,9 @@ public class ObjectParameterUI extends javax.swing.JPanel implements ParameterUI
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 4, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 0);
         add(txtObjectName, gridBagConstraints);
 
         btnPick.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dae/icons/select.png"))); // NOI18N
@@ -80,7 +78,7 @@ public class ObjectParameterUI extends javax.swing.JPanel implements ParameterUI
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
-        gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 10);
+        gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 0);
         add(btnPick, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 

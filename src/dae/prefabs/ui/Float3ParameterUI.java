@@ -95,7 +95,6 @@ public class Float3ParameterUI extends javax.swing.JPanel implements ParameterUI
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(3, 10, 0, 0);
         add(lblLabel, gridBagConstraints);
 
         lblBracket.setText("[");
@@ -175,7 +174,7 @@ public class Float3ParameterUI extends javax.swing.JPanel implements ParameterUI
         gridBagConstraints.gridx = 7;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(3, 5, 0, 10);
+        gridBagConstraints.insets = new java.awt.Insets(3, 5, 0, 0);
         add(lblCloseBracket, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 

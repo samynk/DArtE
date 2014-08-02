@@ -48,15 +48,13 @@ public class IntParameterUI extends javax.swing.JPanel implements ParameterUI {
 
         lblLabel = new javax.swing.JLabel();
         spnIntegerValue = new javax.swing.JSpinner();
-        lblFiller = new javax.swing.JLabel();
 
         setLayout(new java.awt.GridBagLayout());
 
         lblLabel.setText("Label : ");
+        lblLabel.setPreferredSize(new java.awt.Dimension(100, 14));
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
-        gridBagConstraints.insets = new java.awt.Insets(3, 10, 0, 0);
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         add(lblLabel, gridBagConstraints);
 
         spnIntegerValue.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(1), Integer.valueOf(1), null, Integer.valueOf(1)));
@@ -68,14 +66,10 @@ public class IntParameterUI extends javax.swing.JPanel implements ParameterUI {
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
-        gridBagConstraints.insets = new java.awt.Insets(0, 3, 0, 0);
-        add(spnIntegerValue, gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
-        add(lblFiller, gridBagConstraints);
+        gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 0);
+        add(spnIntegerValue, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void spnIntegerValueStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spnIntegerValueStateChanged
@@ -89,7 +83,6 @@ public class IntParameterUI extends javax.swing.JPanel implements ParameterUI {
         }
     }//GEN-LAST:event_spnIntegerValueStateChanged
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel lblFiller;
     private javax.swing.JLabel lblLabel;
     private javax.swing.JSpinner spnIntegerValue;
     // End of variables declaration//GEN-END:variables

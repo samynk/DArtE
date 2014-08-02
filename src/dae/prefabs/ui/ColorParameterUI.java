@@ -57,17 +57,16 @@ public class ColorParameterUI extends javax.swing.JPanel implements ParameterUI 
         lblColor = new javax.swing.JLabel();
         btnChangeColor = new javax.swing.JButton();
 
-        setPreferredSize(null);
         setLayout(new java.awt.GridBagLayout());
 
         lblLabel.setText(" Color :");
+        lblLabel.setPreferredSize(new java.awt.Dimension(100, 14));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(3, 10, 0, 0);
         add(lblLabel, gridBagConstraints);
 
         lblColor.setBackground(new java.awt.Color(0, 0, 0));
@@ -76,18 +75,18 @@ public class ColorParameterUI extends javax.swing.JPanel implements ParameterUI 
         lblColor.setOpaque(true);
         lblColor.setPreferredSize(new java.awt.Dimension(50, 16));
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
-        gridBagConstraints.insets = new java.awt.Insets(12, 3, 1, 3);
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         add(lblColor, gridBagConstraints);
 
         btnChangeColor.setText("...");
+        btnChangeColor.setPreferredSize(null);
         btnChangeColor.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnChangeColorActionPerformed(evt);
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.insets = new java.awt.Insets(10, 0, 0, 3);
+        gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 0);
         add(btnChangeColor, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 

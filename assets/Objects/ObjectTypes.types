@@ -269,7 +269,7 @@ and open the template in the editor.
             <parameters section="Animation">
                 <parameter type="fuzzy" id="fuzzySystem"/>
                 <parameter type="object" collectiontype="dictionary" id="target"/>
-                <parameter type="connector" id="rig"/>
+                <parameter type="connector" id="rigconnector"/>
             </parameters>
         </object>
         <object label="Skeleton" class="dae.animation.skeleton.Body" defaultloader="true">

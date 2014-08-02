@@ -100,7 +100,7 @@ public class DictionaryParameterUI extends javax.swing.JPanel implements Paramet
         gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.gridheight = 3;
-        gridBagConstraints.insets = new java.awt.Insets(2, 0, 0, 2);
+        gridBagConstraints.insets = new java.awt.Insets(2, 0, 4, 2);
         add(btnAddKey, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
@@ -109,7 +109,7 @@ public class DictionaryParameterUI extends javax.swing.JPanel implements Paramet
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipadx = 176;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 0, 0, 2);
+        gridBagConstraints.insets = new java.awt.Insets(2, 0, 4, 2);
         add(txtNewKey, gridBagConstraints);
 
         lblPropertyName.setText("jLabel1");
@@ -119,10 +119,11 @@ public class DictionaryParameterUI extends javax.swing.JPanel implements Paramet
         gridBagConstraints.gridwidth = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(2, 0, 2, 0);
+        gridBagConstraints.insets = new java.awt.Insets(2, 0, 4, 0);
         add(lblPropertyName, gridBagConstraints);
 
         scrDictionary.setMinimumSize(new java.awt.Dimension(23, 100));
+        scrDictionary.setPreferredSize(new java.awt.Dimension(100, 100));
 
         tblDictionary.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -143,11 +144,9 @@ public class DictionaryParameterUI extends javax.swing.JPanel implements Paramet
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.ipadx = 317;
-        gridBagConstraints.ipady = 136;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 0);
         add(scrDictionary, gridBagConstraints);
 
         btnDeleteKey.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dae/icons/delete.png"))); // NOI18N
@@ -161,14 +160,14 @@ public class DictionaryParameterUI extends javax.swing.JPanel implements Paramet
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE;
-        gridBagConstraints.insets = new java.awt.Insets(2, 0, 0, 2);
+        gridBagConstraints.insets = new java.awt.Insets(2, 6, 4, 2);
         add(btnDeleteKey, gridBagConstraints);
 
         lblAddKey.setText("Add key :");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
-        gridBagConstraints.insets = new java.awt.Insets(2, 0, 0, 2);
+        gridBagConstraints.insets = new java.awt.Insets(2, 0, 4, 2);
         add(lblAddKey, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 

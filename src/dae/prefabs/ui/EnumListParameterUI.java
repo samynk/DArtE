@@ -65,9 +65,8 @@ public class EnumListParameterUI extends javax.swing.JPanel implements Parameter
         setLayout(new java.awt.GridBagLayout());
 
         lblLabel.setText("Label : ");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-        add(lblLabel, gridBagConstraints);
+        lblLabel.setPreferredSize(new java.awt.Dimension(100, 14));
+        add(lblLabel, new java.awt.GridBagConstraints());
 
         cboChoice.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         cboChoice.addItemListener(new java.awt.event.ItemListener() {
@@ -78,7 +77,7 @@ public class EnumListParameterUI extends javax.swing.JPanel implements Parameter
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 0);
         add(cboChoice, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 

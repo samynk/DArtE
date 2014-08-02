@@ -46,12 +46,13 @@ public class TextParameterUI extends javax.swing.JPanel implements ParameterUI {
 
         jLabel1.setText("jLabel1");
 
+        setMinimumSize(null);
         setLayout(new java.awt.GridBagLayout());
 
         lblLabel.setText("Label : ");
+        lblLabel.setPreferredSize(new java.awt.Dimension(100, 14));
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 3, 0);
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         add(lblLabel, gridBagConstraints);
 
         txtMessage.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -61,9 +62,8 @@ public class TextParameterUI extends javax.swing.JPanel implements ParameterUI {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 3, 5);
+        gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 0);
         add(txtMessage, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
