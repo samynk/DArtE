@@ -213,6 +213,9 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
         pnlToolbarViewport.setLayout(new java.awt.BorderLayout());
 
         pnlViewPort.setResizeWeight(0.5);
+
+        propertiesPanel1.setMinimumSize(new java.awt.Dimension(250, 200));
+        propertiesPanel1.setPreferredSize(new java.awt.Dimension(250, 200));
         pnlViewPort.setRightComponent(propertiesPanel1);
 
         pnlToolbarViewport.add(pnlViewPort, java.awt.BorderLayout.CENTER);
