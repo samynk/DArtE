@@ -107,6 +107,7 @@ public class Float3ParameterUI extends javax.swing.JPanel implements ParameterUI
 
         xSpinner.setModel(new javax.swing.SpinnerNumberModel(Float.valueOf(0.0f), null, null, Float.valueOf(0.5f)));
         xSpinner.setMinimumSize(new java.awt.Dimension(50, 22));
+        xSpinner.setPreferredSize(null);
         xSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 xSpinnerStateChanged(evt);
@@ -123,6 +124,7 @@ public class Float3ParameterUI extends javax.swing.JPanel implements ParameterUI
 
         ySpinner.setModel(new javax.swing.SpinnerNumberModel(Float.valueOf(0.0f), null, null, Float.valueOf(0.5f)));
         ySpinner.setMinimumSize(new java.awt.Dimension(50, 22));
+        ySpinner.setPreferredSize(null);
         ySpinner.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 ySpinnerStateChanged(evt);
@@ -155,6 +157,7 @@ public class Float3ParameterUI extends javax.swing.JPanel implements ParameterUI
 
         zSpinner.setModel(new javax.swing.SpinnerNumberModel(Float.valueOf(0.0f), null, null, Float.valueOf(0.5f)));
         zSpinner.setMinimumSize(new java.awt.Dimension(50, 22));
+        zSpinner.setPreferredSize(null);
         zSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 zSpinnerStateChanged(evt);
