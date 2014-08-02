@@ -40,6 +40,32 @@ public class Rig extends Prefab implements BodyElement {
         setCategory("Animation");
         setType("Rig");
     }
+    
+    /**
+     * Creates a clone of this rig object.
+     * @return a clone of this rig object.
+     */
+    @Override
+    public Spatial clone() {
+        Rig rig = new Rig();
+        for (Spatial s : children) {
+            if (s instanceof BodyElement) {
+                Spatial clone = s.clone();
+                rig.attachBodyElement((BodyElement) clone);
+            } else {
+                Spatial modelClone = s.clone();
+                rig.attachChild(modelClone);
+            }
+        }
+        rig.fuzzySystem = (FuzzySystem) fuzzySystem.clone();
+        for ( String targetKey : this.targetKeys)
+        {
+            rig.addTargetKey(targetKey);
+        }
+        AnimationListControl listControl = new AnimationListControl();
+        listControl.cloneForSpatial(rig);
+        return rig;
+    }
 
     @Override
     public void create(String name, AssetManager manager, String extraInfo) {
