@@ -15,7 +15,7 @@ import java.awt.Component;
 import java.awt.event.ItemEvent;
 import java.util.ArrayList;
 import java.util.EventObject;
-import javax.swing.CellEditor;
+import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.event.CellEditorListener;
@@ -39,6 +39,14 @@ public class PrefabCellEditor extends javax.swing.JPanel implements TableCellEdi
     public PrefabCellEditor() {
         initComponents();
         GlobalObjects.getInstance().registerListener(this);
+        for (Component c : this.getComponents()) {
+            if (c instanceof JComponent) {
+                JComponent jc = (JComponent)c;
+                jc.putClientProperty("JComponent.sizeVariant", "mini");
+                jc.updateUI();
+            }
+        }
+        
     }
 
     /**
@@ -147,6 +155,7 @@ public class PrefabCellEditor extends javax.swing.JPanel implements TableCellEdi
         for (CellEditorListener listener : copy) {
             listener.editingCanceled(ce);
         }
+        btnTogglePick.setSelected(false);
     }
 
     protected void fireEditingStopped() {
@@ -156,6 +165,7 @@ public class PrefabCellEditor extends javax.swing.JPanel implements TableCellEdi
         for (CellEditorListener listener : copy) {
             listener.editingStopped(ce);
         }
+        btnTogglePick.setSelected(false);
     }
 
     @Subscribe
