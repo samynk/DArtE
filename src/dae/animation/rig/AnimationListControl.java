@@ -28,8 +28,8 @@ public class AnimationListControl implements Control {
         AnimationListControl controller = new AnimationListControl();
         for (AnimationController ac : controllers) {
             controller.addAnimationController(ac.clone());
-
         }
+        spatial.addControl(controller);
         return controller;
     }
 
