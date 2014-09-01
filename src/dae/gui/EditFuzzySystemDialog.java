@@ -6,6 +6,8 @@ package dae.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
@@ -18,7 +20,7 @@ import mlproject.fuzzy.FuzzySystem;
  * @author Koen Samyn
  * 
  */
-public class EditFuzzySystemDialog extends javax.swing.JDialog {
+public class EditFuzzySystemDialog extends javax.swing.JDialog implements WindowListener {
 
     /**
      * A return status code - returned if Cancel button has been pressed
@@ -28,6 +30,8 @@ public class EditFuzzySystemDialog extends javax.swing.JDialog {
      * A return status code - returned if OK button has been pressed
      */
     public static final int RET_OK = 1;
+    
+    private FuzzySystem system;
 
     /**
      * Creates new form EdiitFuzzySystemDialog
@@ -46,13 +50,12 @@ public class EditFuzzySystemDialog extends javax.swing.JDialog {
                 doClose(RET_CANCEL);
             }
         });
+        addWindowListener(this);
     }
     
     public void setFuzzySystem(FuzzySystem fuzzySystem){
-        fuzzyInputVariablePanel1.setFuzzySystem(fuzzySystem);
-        ruleBlockPanel1.setFuzzySystem(fuzzySystem);
-        fuzzyOutputVariablePanel1.setFuzzySystem(fuzzySystem);
-                
+        system = fuzzySystem;
+        
     }
 
     /**
@@ -72,20 +75,25 @@ public class EditFuzzySystemDialog extends javax.swing.JDialog {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
         fuzzySystemUI1 = new mlproject.fuzzy.gui.FuzzySystemUI();
         okButton = new javax.swing.JButton();
         cancelButton = new javax.swing.JButton();
-        jTabbedPane1 = new javax.swing.JTabbedPane();
+        tabSystem = new javax.swing.JTabbedPane();
         fuzzyInputVariablePanel1 = new dae.gui.fuzzy.FuzzyInputVariablePanel();
         ruleBlockPanel1 = new dae.gui.fuzzy.RuleBlockPanel();
         fuzzyOutputVariablePanel1 = new dae.gui.fuzzy.FuzzyOutputVariablePanel();
+        lblFiller = new javax.swing.JLabel();
 
+        setTitle("Fuzzysystem editor");
+        setPreferredSize(new java.awt.Dimension(900, 350));
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 closeDialog(evt);
             }
         });
+        getContentPane().setLayout(new java.awt.GridBagLayout());
 
         okButton.setText("Save");
         okButton.addActionListener(new java.awt.event.ActionListener() {
@@ -93,6 +101,13 @@ public class EditFuzzySystemDialog extends javax.swing.JDialog {
                 okButtonActionPerformed(evt);
             }
         });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(4, 2, 4, 2);
+        getContentPane().add(okButton, gridBagConstraints);
+        getRootPane().setDefaultButton(okButton);
 
         cancelButton.setText("Cancel");
         cancelButton.addActionListener(new java.awt.event.ActionListener() {
@@ -100,42 +115,32 @@ public class EditFuzzySystemDialog extends javax.swing.JDialog {
                 cancelButtonActionPerformed(evt);
             }
         });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.ipadx = 2;
+        gridBagConstraints.insets = new java.awt.Insets(4, 2, 4, 4);
+        getContentPane().add(cancelButton, gridBagConstraints);
 
-        jTabbedPane1.addTab("Fuzzy Inputs", fuzzyInputVariablePanel1);
-        jTabbedPane1.addTab("Rules", ruleBlockPanel1);
-        jTabbedPane1.addTab("Fuzzy Outputs", fuzzyOutputVariablePanel1);
+        tabSystem.addTab("Fuzzy Inputs", fuzzyInputVariablePanel1);
+        tabSystem.addTab("Rules", ruleBlockPanel1);
+        tabSystem.addTab("Fuzzy Outputs", fuzzyOutputVariablePanel1);
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(okButton, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(cancelButton))
-                    .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 779, Short.MAX_VALUE))
-                .addContainerGap())
-        );
-
-        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {cancelButton, okButton});
-
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 262, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(cancelButton)
-                    .addComponent(okButton))
-                .addContainerGap())
-        );
-
-        getRootPane().setDefaultButton(okButton);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(1, 1, 1, 1);
+        getContentPane().add(tabSystem, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.weightx = 1.0;
+        getContentPane().add(lblFiller, gridBagConstraints);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -207,9 +212,45 @@ public class EditFuzzySystemDialog extends javax.swing.JDialog {
     private dae.gui.fuzzy.FuzzyInputVariablePanel fuzzyInputVariablePanel1;
     private dae.gui.fuzzy.FuzzyOutputVariablePanel fuzzyOutputVariablePanel1;
     private mlproject.fuzzy.gui.FuzzySystemUI fuzzySystemUI1;
-    private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JLabel lblFiller;
     private javax.swing.JButton okButton;
     private dae.gui.fuzzy.RuleBlockPanel ruleBlockPanel1;
+    private javax.swing.JTabbedPane tabSystem;
     // End of variables declaration//GEN-END:variables
     private int returnStatus = RET_CANCEL;
+
+    public void windowOpened(WindowEvent e) {
+        fuzzyInputVariablePanel1.setFuzzySystem(system);
+        ruleBlockPanel1.setFuzzySystem(system);
+        fuzzyOutputVariablePanel1.setFuzzySystem(system);
+        tabSystem.setSelectedIndex(0);
+    }
+
+    public void windowClosing(WindowEvent e) {
+        
+    }
+
+    public void windowClosed(WindowEvent e) {
+        
+    }
+
+    public void windowIconified(WindowEvent e) {
+       
+    }
+
+    public void windowDeiconified(WindowEvent e) {
+       
+    }
+
+    public void windowActivated(WindowEvent e) {
+        fuzzyInputVariablePanel1.setFuzzySystem(system);
+        ruleBlockPanel1.setFuzzySystem(system);
+        fuzzyOutputVariablePanel1.setFuzzySystem(system);
+        tabSystem.setSelectedIndex(0);
+        
+    }
+
+    public void windowDeactivated(WindowEvent e) {
+        
+    }
 }
