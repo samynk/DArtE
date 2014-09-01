@@ -5,6 +5,8 @@
 
 package dae.animation.rig;
 
+import org.w3c.dom.Node;
+
 /**
  * The input connector interface connects a calculated value (for example
  * an angle)  with the input of a controller.
@@ -41,4 +43,14 @@ public interface InputConnector {
      * @return the joint name.
      */
     public String getJointName();
+    /**
+     * Creates an xml representation of this input connector.
+     * @return this object as an xml string.
+     */
+    public String toXML();
+    /**
+     * Parses the inputnode object and adjust the properties of this inputconnector object.
+     * @param inputNode the xml element with the information for this inputconnector object.
+     */
+    public void fromXML(Node inputNode);
 }
