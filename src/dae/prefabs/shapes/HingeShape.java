@@ -54,9 +54,14 @@ public class HingeShape extends Node {
         createLimits( 12, 12, height, radius);
     }
 
+    /**
+     * Updates the limits of the HingeShape
+     * @param lowerLimit the lower limit (in degrees)
+     * @param upperLimit the upper limit (in degrees)
+     */
     public void updateLimits(float lowerLimit, float upperLimit) {
-        this.lowerLimit = lowerLimit;
-        this.upperLimit = upperLimit;
+        this.lowerLimit = lowerLimit * FastMath.DEG_TO_RAD;
+        this.upperLimit = upperLimit * FastMath.DEG_TO_RAD;
         if (this.limitGeometry != null) {
             limitGeometry.removeFromParent();
         }
