@@ -16,6 +16,8 @@ import dae.prefabs.standard.UpdateObject;
 import dae.prefabs.ui.events.PrefabChangedEvent;
 import dae.prefabs.ui.events.PrefabChangedEventType;
 import static dae.prefabs.ui.events.PrefabChangedEventType.TRANSLATION;
+import java.awt.Component;
+import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 
 /**
@@ -35,6 +37,12 @@ public class Float3ParameterUI extends javax.swing.JPanel implements ParameterUI
      */
     public Float3ParameterUI() {
         initComponents();
+        for (Component c : this.getComponents()) {
+            if (c instanceof JComponent && c != lblLabel) {
+                ((JComponent) c).putClientProperty("JComponent.sizeVariant", "small");
+            }
+        }
+        SwingUtilities.updateComponentTreeUI(this);
     }
 
     public void setLabel(String label) {
@@ -93,7 +101,8 @@ public class Float3ParameterUI extends javax.swing.JPanel implements ParameterUI
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridwidth = 6;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         add(lblLabel, gridBagConstraints);
 
@@ -102,11 +111,11 @@ public class Float3ParameterUI extends javax.swing.JPanel implements ParameterUI
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(3, 5, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(3, 2, 0, 0);
         add(lblBracket, gridBagConstraints);
 
         xSpinner.setModel(new javax.swing.SpinnerNumberModel(Float.valueOf(0.0f), null, null, Float.valueOf(0.5f)));
-        xSpinner.setMinimumSize(new java.awt.Dimension(50, 22));
+        xSpinner.setMinimumSize(new java.awt.Dimension(100, 22));
         xSpinner.setPreferredSize(null);
         xSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
@@ -119,11 +128,11 @@ public class Float3ParameterUI extends javax.swing.JPanel implements ParameterUI
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(0, 1, 0, 0);
         add(xSpinner, gridBagConstraints);
 
         ySpinner.setModel(new javax.swing.SpinnerNumberModel(Float.valueOf(0.0f), null, null, Float.valueOf(0.5f)));
-        ySpinner.setMinimumSize(new java.awt.Dimension(50, 22));
+        ySpinner.setMinimumSize(new java.awt.Dimension(100, 22));
         ySpinner.setPreferredSize(null);
         ySpinner.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
@@ -136,7 +145,7 @@ public class Float3ParameterUI extends javax.swing.JPanel implements ParameterUI
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(0, 1, 0, 0);
         add(ySpinner, gridBagConstraints);
 
         lblComma1.setText(",");
@@ -144,7 +153,7 @@ public class Float3ParameterUI extends javax.swing.JPanel implements ParameterUI
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(3, 5, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(3, 1, 0, 0);
         add(lblComma1, gridBagConstraints);
 
         lblComma2.setText(",");
@@ -152,11 +161,12 @@ public class Float3ParameterUI extends javax.swing.JPanel implements ParameterUI
         gridBagConstraints.gridx = 5;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(3, 5, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(3, 1, 0, 0);
         add(lblComma2, gridBagConstraints);
 
         zSpinner.setModel(new javax.swing.SpinnerNumberModel(Float.valueOf(0.0f), null, null, Float.valueOf(0.5f)));
-        zSpinner.setMinimumSize(new java.awt.Dimension(50, 22));
+        zSpinner.setAlignmentX(0.0F);
+        zSpinner.setMinimumSize(new java.awt.Dimension(100, 22));
         zSpinner.setPreferredSize(null);
         zSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
@@ -169,7 +179,7 @@ public class Float3ParameterUI extends javax.swing.JPanel implements ParameterUI
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(0, 1, 0, 0);
         add(zSpinner, gridBagConstraints);
 
         lblCloseBracket.setText("]");
@@ -177,7 +187,7 @@ public class Float3ParameterUI extends javax.swing.JPanel implements ParameterUI
         gridBagConstraints.gridx = 7;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(3, 5, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(3, 1, 0, 0);
         add(lblCloseBracket, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
