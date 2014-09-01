@@ -48,8 +48,12 @@ public class FuzzyOutputVariablePanel extends javax.swing.JPanel implements Item
         this.fuzzySystem = fuzzySystem;
         fuzzyOutputListModel = new FuzzyOutputListModel(fuzzySystem);
         lstFuzzyVariables.setModel(fuzzyOutputListModel);
-        
         fuzzyVariableGUI1.addItemListener(this);
+        
+        if ( fuzzyOutputListModel.getSize()> 0){
+            lstFuzzyVariables.setSelectedIndex(0);
+            fuzzyVariableGUI1.setFuzzyVariable(fuzzySystem.getFuzzyOutputAt(0));
+        }
     }
 
     /**
@@ -60,21 +64,46 @@ public class FuzzyOutputVariablePanel extends javax.swing.JPanel implements Item
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
         jButton1 = new javax.swing.JButton();
+        memberShipEditorPanel1 = new dae.gui.fuzzy.MemberShipEditorPanel();
+        pnlOutputList = new javax.swing.JPanel();
         scrVariableList = new javax.swing.JScrollPane();
         lstFuzzyVariables = new javax.swing.JList();
-        fuzzyVariableGUI1 = new mlproject.fuzzy.gui.FuzzyVariableGUI();
         btnAddFuzzyVariable = new javax.swing.JButton();
         btnDeleteVariable = new javax.swing.JButton();
-        memberShipEditorPanel1 = new dae.gui.fuzzy.MemberShipEditorPanel();
-        btnAddMembership = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        pnlMemberships = new javax.swing.JPanel();
         btnRemoveMembership = new javax.swing.JButton();
+        btnAddMembership = new javax.swing.JButton();
         cboMembershipType = new javax.swing.JComboBox();
+        fuzzyVariableGUI1 = new mlproject.fuzzy.gui.FuzzyVariableGUI();
+        lblFiller = new javax.swing.JLabel();
 
         jButton1.setText("jButton1");
 
         setPreferredSize(new java.awt.Dimension(800, 320));
+        setLayout(new java.awt.GridBagLayout());
+
+        memberShipEditorPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Membership Editor"));
+        memberShipEditorPanel1.setMinimumSize(new java.awt.Dimension(150, 23));
+        memberShipEditorPanel1.setPreferredSize(new java.awt.Dimension(150, 23));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridheight = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 4);
+        add(memberShipEditorPanel1, gridBagConstraints);
+
+        pnlOutputList.setBorder(javax.swing.BorderFactory.createTitledBorder("Outputs"));
+        pnlOutputList.setLayout(new java.awt.GridBagLayout());
+
+        scrVariableList.setMinimumSize(new java.awt.Dimension(150, 23));
+        scrVariableList.setPreferredSize(new java.awt.Dimension(150, 130));
 
         lstFuzzyVariables.setModel(new javax.swing.AbstractListModel() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
@@ -88,7 +117,16 @@ public class FuzzyOutputVariablePanel extends javax.swing.JPanel implements Item
         });
         scrVariableList.setViewportView(lstFuzzyVariables);
 
-        fuzzyVariableGUI1.setPreferredSize(new java.awt.Dimension(300, 100));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(4, 0, 4, 0);
+        pnlOutputList.add(scrVariableList, gridBagConstraints);
 
         btnAddFuzzyVariable.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dae/icons/add.png"))); // NOI18N
         btnAddFuzzyVariable.addActionListener(new java.awt.event.ActionListener() {
@@ -96,17 +134,38 @@ public class FuzzyOutputVariablePanel extends javax.swing.JPanel implements Item
                 btnAddFuzzyVariableActionPerformed(evt);
             }
         });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.insets = new java.awt.Insets(4, 2, 4, 0);
+        pnlOutputList.add(btnAddFuzzyVariable, gridBagConstraints);
 
         btnDeleteVariable.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dae/icons/delete.png"))); // NOI18N
-
-        memberShipEditorPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Membership Editor"));
-
-        btnAddMembership.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dae/icons/add.png"))); // NOI18N
-        btnAddMembership.addActionListener(new java.awt.event.ActionListener() {
+        btnDeleteVariable.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnAddMembershipActionPerformed(evt);
+                btnDeleteVariableActionPerformed(evt);
             }
         });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.insets = new java.awt.Insets(4, 0, 4, 0);
+        pnlOutputList.add(btnDeleteVariable, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.weightx = 1.0;
+        pnlOutputList.add(jLabel1, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 4);
+        add(pnlOutputList, gridBagConstraints);
+
+        pnlMemberships.setBorder(javax.swing.BorderFactory.createTitledBorder("Memberships"));
+        pnlMemberships.setLayout(new java.awt.GridBagLayout());
 
         btnRemoveMembership.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dae/icons/delete.png"))); // NOI18N
         btnRemoveMembership.addActionListener(new java.awt.event.ActionListener() {
@@ -114,58 +173,58 @@ public class FuzzyOutputVariablePanel extends javax.swing.JPanel implements Item
                 btnRemoveMembershipActionPerformed(evt);
             }
         });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridheight = 2;
+        gridBagConstraints.insets = new java.awt.Insets(4, 2, 4, 0);
+        pnlMemberships.add(btnRemoveMembership, gridBagConstraints);
+
+        btnAddMembership.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dae/icons/add.png"))); // NOI18N
+        btnAddMembership.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAddMembershipActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.insets = new java.awt.Insets(4, 2, 4, 4);
+        pnlMemberships.add(btnAddMembership, gridBagConstraints);
 
         cboMembershipType.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Singleton" }));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.insets = new java.awt.Insets(4, 2, 4, 0);
+        pnlMemberships.add(cboMembershipType, gridBagConstraints);
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(scrVariableList, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(fuzzyVariableGUI1, javax.swing.GroupLayout.DEFAULT_SIZE, 465, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnDeleteVariable)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnAddFuzzyVariable)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnRemoveMembership)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(cboMembershipType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnAddMembership)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(memberShipEditorPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 208, javax.swing.GroupLayout.PREFERRED_SIZE))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(193, 193, 193)
-                        .addComponent(btnAddFuzzyVariable))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(193, 193, 193)
-                        .addComponent(btnDeleteVariable))
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(memberShipEditorPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 207, Short.MAX_VALUE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addComponent(scrVariableList, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 176, Short.MAX_VALUE)
-                                    .addComponent(fuzzyVariableGUI1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                                    .addComponent(btnRemoveMembership)
-                                    .addComponent(cboMembershipType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(btnAddMembership))))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
+        fuzzyVariableGUI1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(100, 100, 100)));
+        fuzzyVariableGUI1.setPreferredSize(new java.awt.Dimension(300, 100));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(4, 0, 4, 0);
+        pnlMemberships.add(fuzzyVariableGUI1, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.weightx = 1.0;
+        pnlMemberships.add(lblFiller, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 4);
+        add(pnlMemberships, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void lstFuzzyVariablesValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_lstFuzzyVariablesValueChanged
@@ -185,13 +244,14 @@ public class FuzzyOutputVariablePanel extends javax.swing.JPanel implements Item
             ++index;
         }
         FuzzyVariable fv = new FuzzyVariable(name+index);
-        fv.addMemberShip(new SingletonMemberShip( "leftfast", -5));
-        fv.addMemberShip(new SingletonMemberShip( "left", -2.5f));
+        fv.addMemberShip(new SingletonMemberShip( "turnleftfast", -5));
+        fv.addMemberShip(new SingletonMemberShip( "turnleft", -2.5f));
         fv.addMemberShip(new SingletonMemberShip( "stay", 0));
-        fv.addMemberShip(new SingletonMemberShip( "right", 2.5f));
-        fv.addMemberShip(new SingletonMemberShip( "rightfast", 5));
+        fv.addMemberShip(new SingletonMemberShip( "turnright", 2.5f));
+        fv.addMemberShip(new SingletonMemberShip( "turnrightfast", 5));
         
-        fuzzyOutputListModel.addFuzzyVariable(fv);
+        int addedIndex = fuzzyOutputListModel.addFuzzyVariable(fv);
+        lstFuzzyVariables.setSelectedIndex(addedIndex);
     }//GEN-LAST:event_btnAddFuzzyVariableActionPerformed
 
     private void btnAddMembershipActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddMembershipActionPerformed
@@ -236,9 +296,17 @@ public class FuzzyOutputVariablePanel extends javax.swing.JPanel implements Item
     }//GEN-LAST:event_btnAddMembershipActionPerformed
 
     private void btnRemoveMembershipActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveMembershipActionPerformed
-        // TODO add your handling code here:
         fuzzyVariableGUI1.deleteSelection();
     }//GEN-LAST:event_btnRemoveMembershipActionPerformed
+
+    private void btnDeleteVariableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteVariableActionPerformed
+        int selectedIndex = lstFuzzyVariables.getSelectedIndex();
+        fuzzyOutputListModel.removeFuzzyVariable(selectedIndex);
+        if ( selectedIndex == fuzzyOutputListModel.getSize() ){
+            selectedIndex--;
+        }
+        lstFuzzyVariables.setSelectedIndex(selectedIndex);
+    }//GEN-LAST:event_btnDeleteVariableActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAddFuzzyVariable;
@@ -248,8 +316,12 @@ public class FuzzyOutputVariablePanel extends javax.swing.JPanel implements Item
     private javax.swing.JComboBox cboMembershipType;
     private mlproject.fuzzy.gui.FuzzyVariableGUI fuzzyVariableGUI1;
     private javax.swing.JButton jButton1;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel lblFiller;
     private javax.swing.JList lstFuzzyVariables;
     private dae.gui.fuzzy.MemberShipEditorPanel memberShipEditorPanel1;
+    private javax.swing.JPanel pnlMemberships;
+    private javax.swing.JPanel pnlOutputList;
     private javax.swing.JScrollPane scrVariableList;
     // End of variables declaration//GEN-END:variables
 
