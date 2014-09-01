@@ -45,24 +45,40 @@ public class LevelParameterPanel extends javax.swing.JPanel {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
-        jLabel1 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
+        lblName = new javax.swing.JLabel();
+        lblHideShow = new javax.swing.JLabel();
         cboTargetObjects = new javax.swing.JCheckBox();
         cboHideWaypoints = new javax.swing.JCheckBox();
         txtLevelName = new javax.swing.JTextField();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
+        lblExportSettings = new javax.swing.JLabel();
+        lblJ3OExport = new javax.swing.JLabel();
         txtJ3OFileLocation = new javax.swing.JTextField();
         btnExportAsJ3O = new javax.swing.JButton();
         cboExportOnSave = new javax.swing.JCheckBox();
+        lblFiller = new javax.swing.JLabel();
 
         setBorder(javax.swing.BorderFactory.createTitledBorder("Level"));
         setMaximumSize(new java.awt.Dimension(640, 480));
+        setLayout(new java.awt.GridBagLayout());
 
-        jLabel1.setText("Name : ");
+        lblName.setText("Name : ");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(6, 4, 0, 0);
+        add(lblName, gridBagConstraints);
 
-        jLabel3.setText("Hide/Show elements");
+        lblHideShow.setText("Hide/Show elements");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 4;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(4, 4, 0, 0);
+        add(lblHideShow, gridBagConstraints);
 
         cboTargetObjects.setText("Hide target objects");
         cboTargetObjects.addItemListener(new java.awt.event.ItemListener() {
@@ -70,14 +86,55 @@ public class LevelParameterPanel extends javax.swing.JPanel {
                 cboTargetObjectsItemStateChanged(evt);
             }
         });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(2, 4, 0, 0);
+        add(cboTargetObjects, gridBagConstraints);
 
         cboHideWaypoints.setText("Hide waypoints");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(2, 4, 0, 0);
+        add(cboHideWaypoints, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(6, 4, 0, 0);
+        add(txtLevelName, gridBagConstraints);
 
-        jLabel4.setText("Export settings :");
+        lblExportSettings.setText("Export settings :");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(2, 4, 0, 0);
+        add(lblExportSettings, gridBagConstraints);
 
-        jLabel5.setText("J3O :");
+        lblJ3OExport.setText("J3O :");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 7;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(2, 4, 0, 0);
+        add(lblJ3OExport, gridBagConstraints);
 
         txtJ3OFileLocation.setEditable(false);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 7;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(2, 4, 0, 0);
+        add(txtJ3OFileLocation, gridBagConstraints);
 
         btnExportAsJ3O.setText("...");
         btnExportAsJ3O.addActionListener(new java.awt.event.ActionListener() {
@@ -85,6 +142,11 @@ public class LevelParameterPanel extends javax.swing.JPanel {
                 btnExportAsJ3OActionPerformed(evt);
             }
         });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 7;
+        gridBagConstraints.insets = new java.awt.Insets(2, 4, 0, 4);
+        add(btnExportAsJ3O, gridBagConstraints);
 
         cboExportOnSave.setText("Export on save");
         cboExportOnSave.addItemListener(new java.awt.event.ItemListener() {
@@ -92,64 +154,17 @@ public class LevelParameterPanel extends javax.swing.JPanel {
                 cboExportOnSaveItemStateChanged(evt);
             }
         });
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtLevelName))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel3)
-                            .addComponent(jLabel4))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel5)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtJ3OFileLocation)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnExportAsJ3O))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(10, 10, 10)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(cboHideWaypoints)
-                                    .addComponent(cboTargetObjects)))
-                            .addComponent(cboExportOnSave))
-                        .addGap(246, 246, 246)))
-                .addContainerGap())
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(txtLevelName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel3)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cboTargetObjects)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(cboHideWaypoints)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel4)
-                .addGap(4, 4, 4)
-                .addComponent(cboExportOnSave)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel5)
-                    .addComponent(txtJ3OFileLocation, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnExportAsJ3O))
-                .addContainerGap(69, Short.MAX_VALUE))
-        );
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridwidth = 5;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(4, 4, 0, 0);
+        add(cboExportOnSave, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridy = 10;
+        gridBagConstraints.weighty = 1.0;
+        add(lblFiller, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void cboTargetObjectsItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cboTargetObjectsItemStateChanged
@@ -204,10 +219,11 @@ public class LevelParameterPanel extends javax.swing.JPanel {
     private javax.swing.JCheckBox cboExportOnSave;
     private javax.swing.JCheckBox cboHideWaypoints;
     private javax.swing.JCheckBox cboTargetObjects;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel lblExportSettings;
+    private javax.swing.JLabel lblFiller;
+    private javax.swing.JLabel lblHideShow;
+    private javax.swing.JLabel lblJ3OExport;
+    private javax.swing.JLabel lblName;
     private javax.swing.JTextField txtJ3OFileLocation;
     private javax.swing.JTextField txtLevelName;
     // End of variables declaration//GEN-END:variables
