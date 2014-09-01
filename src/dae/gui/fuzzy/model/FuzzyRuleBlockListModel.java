@@ -46,7 +46,7 @@ public class FuzzyRuleBlockListModel implements ListModel {
         listeners.remove(l);
     }
 
-    public void addRuleBlock(FuzzyRuleBlock rb) {
+    public int addRuleBlock(FuzzyRuleBlock rb) {
         system.addFuzzyRuleBlock(rb);
         int index = system.getIndexOfFuzzyRuleBlock(rb);
         ListDataEvent lde = new ListDataEvent(this,ListDataEvent.INTERVAL_ADDED,index,index);
@@ -55,5 +55,6 @@ public class FuzzyRuleBlockListModel implements ListModel {
                 l.intervalAdded(lde);
             }
         }
+        return index;
     }
 }

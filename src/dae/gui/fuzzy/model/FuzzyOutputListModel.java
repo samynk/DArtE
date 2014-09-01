@@ -62,12 +62,22 @@ public class FuzzyOutputListModel implements ListModel{
      * Adds a fuzzy variable to the list.
      * @param fv the fuzzy variable to add.
      */
-    public void addFuzzyVariable(FuzzyVariable fv) {
+    public int addFuzzyVariable(FuzzyVariable fv) {
         system.addFuzzyOutput(fv);
         int index = system.getOutputIndex(fv);
         ListDataEvent lde = new ListDataEvent(this, ListDataEvent.INTERVAL_ADDED,index,index);
         for(ListDataListener ldl: listeners){
             ldl.intervalAdded(lde);
+        }
+        return index;
+    }
+
+    public void removeFuzzyVariable(int selectedIndex) {
+        FuzzyVariable output = system.getFuzzyOutputAt(selectedIndex);
+        system.removeFuzzyOutput(output);
+        ListDataEvent lde = new ListDataEvent(this, ListDataEvent.INTERVAL_REMOVED,selectedIndex,selectedIndex);
+        for(ListDataListener ldl: listeners){
+            ldl.intervalRemoved(lde);
         }
     }
 }
