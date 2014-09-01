@@ -10,6 +10,7 @@ import com.jme3.math.Vector3f;
 import java.io.IOException;
 import java.io.Writer;
 import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 
 /**
  *
@@ -80,6 +81,17 @@ public class XMLUtils {
         w.write(',');
         w.write(Float.toString(value.getW()));
         w.write("]' ");
+    }
+    
+    /**
+     * Gets the attribute as a string.
+     * @param key the name of the attribute.
+     * @param map the named node map with the attribute key/value pairs.
+     * @return the attribute value or an empty string if it does not exist.
+     */
+     public static String getAttribute(String key, NamedNodeMap map) {
+        Node attr = map.getNamedItem(key);
+        return attr != null ? attr.getTextContent() : "";
     }
 
     /**
