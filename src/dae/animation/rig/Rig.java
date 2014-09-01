@@ -40,9 +40,10 @@ public class Rig extends Prefab implements BodyElement {
         setCategory("Animation");
         setType("Rig");
     }
-    
+
     /**
      * Creates a clone of this rig object.
+     *
      * @return a clone of this rig object.
      */
     @Override
@@ -58,12 +59,13 @@ public class Rig extends Prefab implements BodyElement {
             }
         }
         rig.fuzzySystem = (FuzzySystem) fuzzySystem.clone();
-        for ( String targetKey : this.targetKeys)
-        {
+        for (String targetKey : this.targetKeys) {
             rig.addTargetKey(targetKey);
         }
-        AnimationListControl listControl = new AnimationListControl();
-        listControl.cloneForSpatial(rig);
+        AnimationListControl listControl = this.getControl(AnimationListControl.class);
+        if (listControl != null) {
+            listControl.cloneForSpatial(rig);
+        }
         return rig;
     }
 
@@ -121,36 +123,42 @@ public class Rig extends Prefab implements BodyElement {
     /**
      * Get the indexed target.
      */
-    
-    public void addTargetKey( String key){
+    public void addTargetKey(String key) {
         targetKeys.add(key);
     }
-    
-    public void removeTargetKey(String key){
+
+    public void removeTargetKey(String key) {
         targetKeys.remove(key);
         targets.remove(key);
     }
-    
-    public int getNrOfTargetKeys(){
+
+    public int getNrOfTargetKeys() {
         return targetKeys.size();
     }
-    
-    public int getIndexOfTargetKey(String key){
+
+    public int getIndexOfTargetKey(String key) {
         return targetKeys.indexOf(key);
     }
-    
+
     public String getTargetKeyAt(int index) {
         return targetKeys.get(index);
     }
 
-    public void setTarget(String key, Prefab value){
-        targets.put(key,value);
-        if ( !targetKeys.contains(key)){
+    public void setTarget(String key, Prefab value) {
+        targets.put(key, value);
+        if (!targetKeys.contains(key)) {
             targetKeys.add(key);
         }
+
+        if (value != null) {
+            AnimationListControl alc = getControl(AnimationListControl.class);
+            if (alc != null) {
+                alc.initialize();
+            }
+        }
     }
-    
-    public Prefab getTarget(String key){
+
+    public Prefab getTarget(String key) {
         return targets.get(key);
     }
 }
