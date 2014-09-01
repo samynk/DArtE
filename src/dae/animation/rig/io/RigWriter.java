@@ -6,6 +6,8 @@ package dae.animation.rig.io;
 
 import com.jme3.math.Quaternion;
 import com.jme3.scene.Spatial;
+import dae.animation.rig.AnimationController;
+import dae.animation.rig.AnimationListControl;
 import dae.animation.rig.Rig;
 import dae.animation.skeleton.BodyElement;
 import dae.io.SceneSaver;
@@ -62,6 +64,7 @@ public class RigWriter {
             bw.write("\t<fuzzysystems>\n");
             writeFuzzySystem(bw, rig.getFuzzySystem());
             bw.write("\t</fuzzysystems>\n");
+            // animation targets
             bw.write("\t<animationtargets>\n");
             for (int i = 0; i < rig.getNrOfTargetKeys(); ++i) {
                 String key = rig.getTargetKeyAt(i);
@@ -74,6 +77,27 @@ public class RigWriter {
                 bw.write("/>\n");
             }
             bw.write("\t</animationtargets>\n");
+            // controller connections
+            AnimationListControl alc = rig.getControl(AnimationListControl.class);
+            if ( alc != null )
+            {
+                bw.write("\t<controllerconnections>\n");
+                for ( AnimationController ac: alc.getAnimationControllers()){
+                    bw.write("\t\t<controller ");
+                    XMLUtils.writeAttribute(bw, "system", ac.getSystemName());
+                    XMLUtils.writeAttribute(bw, "name", ac.getName());
+                    XMLUtils.writeAttribute(bw, "inputToSystem", ac.getControllerInputName());
+                    XMLUtils.writeAttribute(bw, "outputOfSystem", ac.getControllerOutputName());
+                    bw.write(">\n");
+                    bw.write("\t\t\t");
+                    bw.write( ac.getInput().toXML());
+                    bw.write("\t\t\t");
+                    bw.write(ac.getOutput().toXML());
+                    bw.write("\t\t</controller>\n");
+                            
+                }
+                bw.write("\t</controllerconnections>\n");
+            }
             bw.write("</rig>\n");
         } catch (IOException ex) {
             Logger.getLogger(SceneSaver.class.getName()).log(Level.SEVERE, null, ex);
