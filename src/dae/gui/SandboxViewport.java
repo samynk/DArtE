@@ -134,10 +134,6 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
      */
     private Node insertionElements = new Node("insertion");
     /**
-     * Root node for gizmos.
-     */
-    private Node gizmos = new Node("gizmos");
-    /**
      * The current gizmo type
      */
     private GizmoType gizmoType = GizmoType.TRANSLATE;
@@ -234,7 +230,8 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
         assetManager.registerLoader(BodyLoader.class, "skel");
         assetManager.registerLoader(ControllerLoader.class, "fcl");
         assetManager.registerLoader(SceneLoader.class, "klatch");
-        assetManager.registerLoader(RigLoader.class,"rig");
+        assetManager.registerLoader(RigLoader.class, "rig");
+        
 
         objectsToCreate = (ObjectTypeCategory) assetManager.loadAsset("Objects/ObjectTypes.types");
         selectionMaterial = assetManager.loadMaterial("Materials/SelectionMaterial.j3m");
@@ -247,7 +244,6 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
         r = new RotateGizmo(assetManager, 3, 0.15f);
 
         sceneElements.attachChild(grid);
-        rootNode.attachChild(gizmos);
         rootNode.attachChild(sceneElements);
         rootNode.attachChild(insertionElements);
 
@@ -340,7 +336,6 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
             switch (this.gizmoType) {
                 case TRANSLATE:
                     parent.attachChild(a);
-
                     break;
                 case ROTATE:
                     parent.attachChild(r);
