@@ -5,6 +5,18 @@
 package dae.gui.fuzzy;
 
 import dae.gui.fuzzy.model.FuzzyRuleBlockListModel;
+import dae.gui.fuzzy.rule.AutoSuggestor;
+import dae.gui.fuzzy.rule.SuggestorDocument;
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeListener;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.KeyStroke;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import mlproject.fuzzy.FuzzyRule;
@@ -20,20 +32,52 @@ public class RuleBlockPanel extends javax.swing.JPanel implements DocumentListen
     private FuzzyRuleBlockListModel ruleBlockModel;
     private FuzzySystem system;
     private FuzzyRuleBlock currentRuleBlock;
+    
+    private AutoSuggestor autoSuggestor;
 
     /**
      * Creates new form RuleBlockPanel
      */
     public RuleBlockPanel() {
         initComponents();
+      
+       
+    }
+    
+    @Override
+    public void addNotify(){
+        autoSuggestor = new AutoSuggestor(txtRuleList,(JDialog)getTopLevelAncestor(),
+                system,
+                Color.YELLOW,
+                Color.BLACK,
+                Color.ORANGE,
+                0.5f);
+        txtRuleList.setDocument(new SuggestorDocument(autoSuggestor));
+        txtRuleList.getDocument().addDocumentListener(this);
+        autoSuggestor.registerDocumentListener();
+        
+        ActionMap am = txtRuleList.getActionMap();
+        Action upAction = am.get("caret-up");
+        CaretUpAction cua = new CaretUpAction(autoSuggestor,upAction);
+        am.put("caret-up", cua);
+        
+        Action downAction = am.get("caret-down");
+        CaretDownAction cda = new CaretDownAction(autoSuggestor,downAction);
+        am.put("caret-down", cda);
+        super.addNotify();
     }
 
     public void setFuzzySystem(FuzzySystem system) {
         this.system = system;
+        autoSuggestor.setFuzzySystem(system);
         ruleBlockModel = new FuzzyRuleBlockListModel(system);
         lstRuleBlocks.setModel(ruleBlockModel);
 
-        txtRuleList.getDocument().addDocumentListener(this);
+        
+        if ( system.getNrOfRuleBlocks() > 0 ){
+            lstRuleBlocks.setSelectedIndex(0);
+            selectRuleBlock(system.getFuzzyRuleBlock(0));
+        }
     }
 
     /**
@@ -44,23 +88,52 @@ public class RuleBlockPanel extends javax.swing.JPanel implements DocumentListen
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
+        pnlRules = new javax.swing.JPanel();
+        scrRules = new javax.swing.JScrollPane();
+        txtRuleList = new javax.swing.JTextPane();
+        pnlRuleBlockList = new javax.swing.JPanel();
         scrRuleBlocks = new javax.swing.JScrollPane();
         lstRuleBlocks = new javax.swing.JList();
         btnAddRuleBlock = new javax.swing.JButton();
         btnDeleteRuleBlock = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        scrRules = new javax.swing.JScrollPane();
-        txtRuleList = new javax.swing.JTextPane();
+        lblFiller = new javax.swing.JLabel();
 
         setPreferredSize(new java.awt.Dimension(800, 320));
+        setLayout(new java.awt.GridBagLayout());
+
+        pnlRules.setBorder(javax.swing.BorderFactory.createTitledBorder("Rules"));
+        pnlRules.setLayout(new java.awt.BorderLayout(6, 6));
+
+        txtRuleList.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
+        scrRules.setViewportView(txtRuleList);
+
+        pnlRules.add(scrRules, java.awt.BorderLayout.CENTER);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 4);
+        add(pnlRules, gridBagConstraints);
+
+        pnlRuleBlockList.setBorder(javax.swing.BorderFactory.createTitledBorder("Rule Blocks"));
+        pnlRuleBlockList.setLayout(new java.awt.GridBagLayout());
+
+        scrRuleBlocks.setMinimumSize(new java.awt.Dimension(150, 23));
+        scrRuleBlocks.setPreferredSize(new java.awt.Dimension(150, 130));
 
         lstRuleBlocks.setModel(new javax.swing.AbstractListModel() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
             public int getSize() { return strings.length; }
             public Object getElementAt(int i) { return strings[i]; }
         });
+        lstRuleBlocks.setMaximumSize(null);
+        lstRuleBlocks.setMinimumSize(new java.awt.Dimension(130, 80));
+        lstRuleBlocks.setPreferredSize(null);
         lstRuleBlocks.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
             public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
                 lstRuleBlocksValueChanged(evt);
@@ -68,12 +141,28 @@ public class RuleBlockPanel extends javax.swing.JPanel implements DocumentListen
         });
         scrRuleBlocks.setViewportView(lstRuleBlocks);
 
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(4, 0, 0, 0);
+        pnlRuleBlockList.add(scrRuleBlocks, gridBagConstraints);
+
         btnAddRuleBlock.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dae/icons/add.png"))); // NOI18N
         btnAddRuleBlock.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnAddRuleBlockActionPerformed(evt);
             }
         });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(4, 2, 4, 0);
+        pnlRuleBlockList.add(btnAddRuleBlock, gridBagConstraints);
 
         btnDeleteRuleBlock.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dae/icons/delete.png"))); // NOI18N
         btnDeleteRuleBlock.addActionListener(new java.awt.event.ActionListener() {
@@ -81,61 +170,38 @@ public class RuleBlockPanel extends javax.swing.JPanel implements DocumentListen
                 btnDeleteRuleBlockActionPerformed(evt);
             }
         });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(4, 0, 4, 0);
+        pnlRuleBlockList.add(btnDeleteRuleBlock, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.weightx = 1.0;
+        pnlRuleBlockList.add(lblFiller, gridBagConstraints);
 
-        jLabel1.setText("Rules :");
-
-        jLabel2.setText("Rule blocks :");
-
-        scrRules.setViewportView(txtRuleList);
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel2)
-                            .addComponent(scrRuleBlocks, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(44, 44, 44)
-                        .addComponent(btnDeleteRuleBlock)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnAddRuleBlock)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addGap(0, 446, Short.MAX_VALUE))
-                    .addComponent(scrRules))
-                .addContainerGap())
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(jLabel2))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(scrRuleBlocks, javax.swing.GroupLayout.DEFAULT_SIZE, 244, Short.MAX_VALUE)
-                    .addComponent(scrRules))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnAddRuleBlock, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(btnDeleteRuleBlock, javax.swing.GroupLayout.Alignment.TRAILING))
-                .addContainerGap())
-        );
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 4);
+        add(pnlRuleBlockList, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnAddRuleBlockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddRuleBlockActionPerformed
-        // TODO add your handling code here:
+        String name = "block";
+        int index = 1;
+        while (system.hasRuleBlock(name + index)) {
+            ++index;
+        }
 
-        FuzzyRuleBlock rb = new FuzzyRuleBlock(system, "block" + system.getNrOfRuleBlocks() + 1);
-        ruleBlockModel.addRuleBlock(rb);
+        FuzzyRuleBlock rb = new FuzzyRuleBlock(system, "block" + index);
+        int newindex = ruleBlockModel.addRuleBlock(rb);
+        lstRuleBlocks.setSelectedIndex(newindex);
+        
     }//GEN-LAST:event_btnAddRuleBlockActionPerformed
 
     private void btnDeleteRuleBlockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteRuleBlockActionPerformed
@@ -143,41 +209,32 @@ public class RuleBlockPanel extends javax.swing.JPanel implements DocumentListen
     }//GEN-LAST:event_btnDeleteRuleBlockActionPerformed
 
     private void lstRuleBlocksValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_lstRuleBlocksValueChanged
-        // TODO add your handling code here:
-        FuzzyRuleBlock ruleBlock = (FuzzyRuleBlock) lstRuleBlocks.getSelectedValue();
-        StringBuilder text = new StringBuilder();
-        for (FuzzyRule rule : ruleBlock.getRules()) {
-            text.append(rule.getRuleText());
-            text.append("\n");
-        }
-        txtRuleList.getDocument().removeDocumentListener(this);
-        txtRuleList.setText(text.toString());
-        txtRuleList.getDocument().addDocumentListener(this);
-        currentRuleBlock = ruleBlock;
+        selectRuleBlock((FuzzyRuleBlock) lstRuleBlocks.getSelectedValue());
     }//GEN-LAST:event_lstRuleBlocksValueChanged
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAddRuleBlock;
     private javax.swing.JButton btnDeleteRuleBlock;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel lblFiller;
     private javax.swing.JList lstRuleBlocks;
+    private javax.swing.JPanel pnlRuleBlockList;
+    private javax.swing.JPanel pnlRules;
     private javax.swing.JScrollPane scrRuleBlocks;
     private javax.swing.JScrollPane scrRules;
     private javax.swing.JTextPane txtRuleList;
     // End of variables declaration//GEN-END:variables
 
     public void insertUpdate(DocumentEvent e) {
-        System.out.println("Insert update!");
+        //System.out.println("Insert update!");
         updateRules();
     }
 
     public void removeUpdate(DocumentEvent e) {
-        System.out.println("Remove update!");
+        //System.out.println("Remove update!");
         updateRules();
     }
 
     public void changedUpdate(DocumentEvent e) {
-        System.out.println("Changed update");
+        //System.out.println("Changed update");
         updateRules();
     }
 
@@ -191,9 +248,119 @@ public class RuleBlockPanel extends javax.swing.JPanel implements DocumentListen
                     System.out.println("Adding rule to block: " + line);
                     currentRuleBlock.addFuzzyRule(rule);
                 } else {
-                    System.out.println("Parse error:" + rule.getParseError());
+                    //System.out.println("Parse error:" + rule.getParseError());
                 }
             }
         }
+    }
+
+    private void selectRuleBlock(FuzzyRuleBlock ruleBlock) {
+        if (ruleBlock == null)
+            return;
+        StringBuilder text = new StringBuilder();
+        for (FuzzyRule rule : ruleBlock.getRules()) {
+            text.append(rule.getRuleText());
+            text.append("\n");
+        }
+        txtRuleList.getDocument().removeDocumentListener(this);
+        txtRuleList.setText(text.toString());
+        txtRuleList.repaint();
+        txtRuleList.getDocument().addDocumentListener(this);
+        currentRuleBlock = ruleBlock;
+    }
+}
+
+class CaretUpAction implements Action{
+    private AutoSuggestor suggestor;
+    private Action originalAction;
+    /**
+     * 
+     * @param suggestor 
+     */
+    public CaretUpAction(AutoSuggestor suggestor, Action originalAction)
+    {
+        this.suggestor = suggestor;
+        this.originalAction = originalAction;
+       
+    }
+
+    public void actionPerformed(ActionEvent e) {
+        if ( suggestor.getSuggestionsPanel().isVisible())
+        {
+            suggestor.previousSuggestion();
+        }else{
+            originalAction.actionPerformed(e);
+        }
+    }
+
+    public Object getValue(String key) {
+        return originalAction.getValue(key);
+    }
+
+    public void putValue(String key, Object value) {
+        originalAction.putValue(key,value);
+    }
+
+    public void setEnabled(boolean b) {
+        originalAction.setEnabled(b);
+    }
+
+    public boolean isEnabled() {
+        return originalAction.isEnabled();
+    }
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        originalAction.addPropertyChangeListener(listener);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        originalAction.removePropertyChangeListener(listener);
+    }
+}
+
+class CaretDownAction implements Action{
+    private AutoSuggestor suggestor;
+    private Action originalAction;
+    /**
+     * 
+     * @param suggestor 
+     */
+    public CaretDownAction(AutoSuggestor suggestor, Action originalAction)
+    {
+        this.suggestor = suggestor;
+        this.originalAction = originalAction;
+    }
+
+    public void actionPerformed(ActionEvent e) {
+        if ( suggestor.getSuggestionsPanel().isVisible())
+        {
+            suggestor.nextSuggestion();
+        }else{
+            originalAction.actionPerformed(e);
+        }
+    }
+
+    public Object getValue(String key) {
+        return originalAction.getValue(key);
+    }
+
+    public void putValue(String key, Object value) {
+        originalAction.putValue(key,value);
+    }
+
+    public void setEnabled(boolean b) {
+        originalAction.setEnabled(b);
+    }
+
+    public boolean isEnabled() {
+        return originalAction.isEnabled();
+    }
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        originalAction.addPropertyChangeListener(listener);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        originalAction.removePropertyChangeListener(listener);
     }
 }
