@@ -9,7 +9,14 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
 import dae.animation.skeleton.AttachmentPoint;
 import dae.animation.skeleton.RevoluteJoint;
+import dae.io.XMLUtils;
 import dae.prefabs.standard.PrefabPlaceHolder;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 
 /**
  *
@@ -135,5 +142,32 @@ public class AngleTargetConnector implements InputConnector {
         ac.setTargetName(targetName);
         ac.initialized = false;
         return ac;
+    }
+
+    /**
+     * Creates an xml representation of this input connector.
+     * @return this object as an xml string.
+     */
+    public String toXML() {
+        try {
+            StringWriter sw = new StringWriter();
+            sw.write("<input class='dae.animation.rig.AngleTargetConnector' " );
+            XMLUtils.writeAttribute( sw, "jointName", jointName);
+            XMLUtils.writeAttribute( sw, "attachmentName", attachmentName);
+            XMLUtils.writeAttribute( sw, "targetName", targetName);
+            sw.write("/>\n");
+            return sw.toString();
+        } catch (IOException ex) {
+            Logger.getLogger(AngleTargetConnector.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return "";
+    }
+    
+    public void fromXML(Node inputNode)
+    {
+        NamedNodeMap map = inputNode.getAttributes();
+        this.jointName = XMLUtils.getAttribute("jointName", map);
+        this.attachmentName = XMLUtils.getAttribute("attachmentName", map);
+        this.targetName = XMLUtils.getAttribute("targetName", map);
     }
 }
