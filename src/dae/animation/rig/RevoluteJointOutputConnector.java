@@ -7,6 +7,13 @@ package dae.animation.rig;
 import com.jme3.math.FastMath;
 import com.jme3.scene.Spatial;
 import dae.animation.skeleton.RevoluteJoint;
+import dae.io.XMLUtils;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 
 /**
  *
@@ -80,5 +87,33 @@ public class RevoluteJointOutputConnector implements OutputConnector {
      */
     public void setFactor(float factor) {
         this.factor = factor;
+    }
+    
+    /**
+     * Creates an xml representation of this input connector.
+     * @return this object as an xml string.
+     */
+    public String toXML() {
+        try {
+            StringWriter sw = new StringWriter();
+            sw.write("<output class='dae.animation.rig.RevoluteJointOutputConnector' " );
+            XMLUtils.writeAttribute( sw, "jointName", jointName);
+            XMLUtils.writeAttribute( sw, "factor", factor);
+            sw.write("/>\n");
+            return sw.toString();
+        } catch (IOException ex) {
+            Logger.getLogger(AngleTargetConnector.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return "";
+    }
+    
+    /**
+     * Fills the properties of this inputconnector from the properties in the xml file.
+     * @param outputNode the xml node with the definition of this output connector.
+     */
+    public void fromXML( Node outputNode){
+        NamedNodeMap map = outputNode.getAttributes();
+        this.jointName = XMLUtils.getAttribute("jointName", map);
+        this.factor = XMLUtils.parseFloat("factor", map);
     }
 }
