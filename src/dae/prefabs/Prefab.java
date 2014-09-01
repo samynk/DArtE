@@ -1160,7 +1160,7 @@ public class Prefab extends Node implements ProjectTreeNode {
     }
 
     public boolean isLeaf() {
-        return getPrefabChildCount() == 0;
+        return false;
     }
     
     /**
