@@ -14,6 +14,10 @@ import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.queue.RenderQueue;
 import dae.GlobalObjects;
+import dae.animation.rig.AnimationController;
+import dae.animation.rig.AnimationListControl;
+import dae.animation.rig.InputConnector;
+import dae.animation.rig.OutputConnector;
 import dae.animation.rig.PrefabPlaceHolderCallback;
 import dae.animation.rig.Rig;
 import static dae.io.SceneLoader.parseFloat3;
@@ -207,6 +211,8 @@ public class RigLoader implements AssetLoader {
             readFuzzySystems((Rig)jmeParentNode,docNode);
         } else if (docNode.getNodeName().equals("animationtargets")){
             readAnimationTargets((Rig)jmeParentNode,docNode);
+        }else if ( docNode.getNodeName().equals("controllerconnections")){
+            readControllerConnections((Rig)jmeParentNode,docNode);
         }
     }
     
@@ -715,5 +721,73 @@ public class RigLoader implements AssetLoader {
             }
         }
         
+    }
+
+    private void readControllerConnections(Rig rig, Node connections)  {
+        NodeList nl = connections.getChildNodes();
+        for ( int i = 0 ; i < nl.getLength(); ++i)
+        {
+            Node controller = nl.item(i);
+            if ( controller.getNodeName().equals("controller")){
+                NamedNodeMap map = controller.getAttributes();
+                String systemname = XMLUtils.getAttribute("system",map);
+                String name = XMLUtils.getAttribute("name",map);
+                String inputToSystem = XMLUtils.getAttribute("inputToSystem", map);
+                String outputOfSystem = XMLUtils.getAttribute("outputOfSystem", map);
+                AnimationController ac = new AnimationController(name);
+                ac.setControllerInputName(inputToSystem);
+                ac.setControllerOutputName(outputOfSystem);
+                
+                NodeList ios = controller.getChildNodes();
+                for ( int j = 0; j < ios.getLength(); ++j)
+                {
+                    Node io = ios.item(j);
+                    NamedNodeMap ioMap = io.getAttributes();
+                    if ( io.getNodeName().equals("input")){
+                        String className =  XMLUtils.getAttribute("class", ioMap);
+                        
+                        try {
+                            Class inputClass = Class.forName(className);
+                            if ( InputConnector.class.isAssignableFrom(inputClass))
+                            {
+                                InputConnector ic = (InputConnector)inputClass.newInstance();
+                                ic.fromXML(io);
+                                ac.setInput(ic);
+                            }
+                        } catch (ClassNotFoundException ex) {
+                            Logger.getLogger(RigLoader.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (InstantiationException ex) {
+                            Logger.getLogger(RigLoader.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (IllegalAccessException ex) {
+                            Logger.getLogger(RigLoader.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                        
+                    }else if ( io.getNodeName().equals("output")){
+                         String className =  XMLUtils.getAttribute("class", ioMap);
+                        try {
+                            Class outputClass = Class.forName(className);
+                            if ( OutputConnector.class.isAssignableFrom(outputClass))
+                            {
+                                OutputConnector oc = (OutputConnector)outputClass.newInstance();
+                                oc.fromXML(io);
+                                ac.setOutput(oc);
+                            }
+                        } catch (ClassNotFoundException ex) {
+                            Logger.getLogger(RigLoader.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (InstantiationException ex) {
+                            Logger.getLogger(RigLoader.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (IllegalAccessException ex) {
+                            Logger.getLogger(RigLoader.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                }
+                AnimationListControl alc = rig.getControl(AnimationListControl.class);
+                if (alc == null){
+                    alc = new AnimationListControl();
+                    rig.addControl(alc);
+                }
+                alc.addAnimationController(ac);
+            }
+        }
     }
 }
