@@ -123,7 +123,7 @@ public class AnimationController {
                 input.isInitialized() && output.isInitialized() 
                 && inputToController !=null && outputOfController != null) {
             float value = input.getValue();
-            System.out.print("Calculating " + this.name + " : " + value);
+            //System.out.print("Calculating " + this.name + " : " + value);
             inputToController.setCurrentValue(value);
             for(FuzzyRuleBlock block : system.getFuzzyRuleBlocks())
             {
@@ -131,12 +131,25 @@ public class AnimationController {
             }
             //system.evaluate();
             float result = outputOfController.getOutputValue() * tpf;
-            System.out.println("-> " + outputOfController.getOutputValue());
+            //System.out.println("-> " + outputOfController.getOutputValue());
             output.setValue(result);
         }
     }
+    
+     /**
+     * Returns the name of the controller system this AnimationController is bound with.
+     * @return the system name.
+     */
+    public String getSystemName() {
+        return "default";
+    }
 
+    @Override
     public String toString(){
         return name;
     }
+    
+    
+
+   
 }
