@@ -17,8 +17,8 @@ import java.io.File;
 import javax.swing.JFileChooser;
 
 /**
- *
- * @author samyn_000
+ * Shows the properties of the current project.
+ * @author Koen Samyn
  */
 public class ProjectParameterPanel extends javax.swing.JPanel {
     private Project currentProject;
@@ -64,7 +64,7 @@ public class ProjectParameterPanel extends javax.swing.JPanel {
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        jScrollPane1 = new javax.swing.JScrollPane();
+        scrContent = new javax.swing.JScrollPane();
         pnlProject = new javax.swing.JPanel();
         lblProjectName = new javax.swing.JLabel();
         txtProjectName = new javax.swing.JTextField();
@@ -83,7 +83,8 @@ public class ProjectParameterPanel extends javax.swing.JPanel {
         setBorder(javax.swing.BorderFactory.createTitledBorder("Project"));
         setLayout(new java.awt.BorderLayout());
 
-        jScrollPane1.setBorder(null);
+        scrContent.setBorder(null);
+        scrContent.setPreferredSize(null);
 
         pnlProject.setMinimumSize(new java.awt.Dimension(100, 100));
         pnlProject.setLayout(new java.awt.GridBagLayout());
@@ -113,8 +114,6 @@ public class ProjectParameterPanel extends javax.swing.JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 0);
         pnlProject.add(lblLevels, gridBagConstraints);
-
-        scrLevels.setPreferredSize(null);
 
         lstLevels.setModel(new javax.swing.AbstractListModel() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
@@ -188,9 +187,9 @@ public class ProjectParameterPanel extends javax.swing.JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
         pnlProject.add(pnlAssetFolderButtons, gridBagConstraints);
 
-        jScrollPane1.setViewportView(pnlProject);
+        scrContent.setViewportView(pnlProject);
 
-        add(jScrollPane1, java.awt.BorderLayout.CENTER);
+        add(scrContent, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnAddAssetFolderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddAssetFolderActionPerformed
@@ -223,7 +222,6 @@ public class ProjectParameterPanel extends javax.swing.JPanel {
     private javax.swing.JButton btnMoveDown;
     private javax.swing.JButton btnMoveUp;
     private javax.swing.JButton btnRemoveAssetFolder;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblAssets;
     private javax.swing.JLabel lblLevels;
     private javax.swing.JLabel lblProjectName;
@@ -232,6 +230,7 @@ public class ProjectParameterPanel extends javax.swing.JPanel {
     private javax.swing.JPanel pnlAssetFolderButtons;
     private javax.swing.JPanel pnlProject;
     private javax.swing.JScrollPane scrAssetFolders;
+    private javax.swing.JScrollPane scrContent;
     private javax.swing.JScrollPane scrLevels;
     private javax.swing.JTextField txtProjectName;
     // End of variables declaration//GEN-END:variables
