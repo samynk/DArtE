@@ -68,30 +68,28 @@ public class RevoluteJoint extends Prefab implements BodyElement {
     // visualization of the joint
     private AssetManager manager;
     private ColorRGBA jointColor = ColorRGBA.Blue;
-    private Spatial visual;
+    private HingeShape visual;
     // maximum allowed changed for the angle
     private float maxAngleChange;
-    
     // the possible connectors for this revolute joint
     private final static ArrayList<ConnectorType> supportedInputConnectorTypes =
             new ArrayList<ConnectorType>();
-    
-     // the possible connectors for this revolute joint
+    // the possible connectors for this revolute joint
     private final static ArrayList<ConnectorType> supportedOutputConnectorTypes =
             new ArrayList<ConnectorType>();
-    
-    static{
-       ConnectorType ct = new ConnectorType("angletargetrevjoint" ,"Angle target", 
-               "This target calculates the angle between two vectors. "
-               + "The first vector has the joint location as its origin and the selected attachment point as endpoint."
-               + "The second vector has the joint location as its origin and the target as endpoint.", 
-               "dae.animation.rig.gui.AngleTargetConnectorPanel");
-       supportedInputConnectorTypes.add(ct);
-       
-       ConnectorType oct = new ConnectorType("anglerevjoint", "Angle",
-               "This connector increments the current angle of the joint with the output of teh controller",
-               "dae.animation.rig.gui.RevoluteJointOutputConnectorPanel");
-       supportedOutputConnectorTypes.add(oct);
+
+    static {
+        ConnectorType ct = new ConnectorType("angletargetrevjoint", "Angle target",
+                "This target calculates the angle between two vectors. "
+                + "The first vector has the joint location as its origin and the selected attachment point as endpoint."
+                + "The second vector has the joint location as its origin and the target as endpoint.",
+                "dae.animation.rig.gui.AngleTargetConnectorPanel");
+        supportedInputConnectorTypes.add(ct);
+
+        ConnectorType oct = new ConnectorType("anglerevjoint", "Angle",
+                "This connector increments the current angle of the joint with the output of teh controller",
+                "dae.animation.rig.gui.RevoluteJointOutputConnectorPanel");
+        supportedOutputConnectorTypes.add(oct);
     }
 
     public RevoluteJoint() {
@@ -125,20 +123,22 @@ public class RevoluteJoint extends Prefab implements BodyElement {
         this.height = height;
         this.centered = centered;
     }
-    
+
     /**
      * Return the supported input connector types of this joint.
+     *
      * @return the supported input connector types.
      */
-    public List<ConnectorType> getInputConnectorTypes(){
+    public List<ConnectorType> getInputConnectorTypes() {
         return supportedInputConnectorTypes;
     }
-    
+
     /**
      * Return the supported output connector types of this joint.
+     *
      * @return the supported input connector types.
      */
-    public List<ConnectorType> getOutputConnectorTypes(){
+    public List<ConnectorType> getOutputConnectorTypes() {
         return supportedOutputConnectorTypes;
     }
 
@@ -189,7 +189,7 @@ public class RevoluteJoint extends Prefab implements BodyElement {
         // step 5: update the bone, relative to the initial matrix
         updateBoneTransform();
         // step 6 : if a visualization is present, counter rotate the visualization.
-        
+
         if (visual != null) {
             inverseRotation.fromAngleAxis(-dAngle * FastMath.DEG_TO_RAD, axis);
             visual.rotate(inverseRotation);
@@ -208,9 +208,9 @@ public class RevoluteJoint extends Prefab implements BodyElement {
             visual.setLocalRotation(Matrix3f.IDENTITY);
         }
         initialFrame = q.toRotationMatrix();
-        xAxis = initialFrame.getRow(0);
-        yAxis = initialFrame.getRow(1);
-        zAxis = initialFrame.getRow(2);
+        xAxis = initialFrame.getColumn(0);
+        yAxis = initialFrame.getColumn(1);
+        zAxis = initialFrame.getColumn(2);
 
         xAxisBackup = xAxis.clone();
         yAxisBackup = yAxis.clone();
@@ -411,6 +411,7 @@ public class RevoluteJoint extends Prefab implements BodyElement {
     public void setMinAngle(float minAngle) {
         float angleBackup = currentAngle;
         this.minAngle = minAngle;
+        visual.updateLimits(-minAngle, -maxAngle);
         if (currentAngle < minAngle) {
             currentAngle = minAngle;
             this.updateTransform(axis, currentAngle - angleBackup);
@@ -434,11 +435,11 @@ public class RevoluteJoint extends Prefab implements BodyElement {
     public void setMaxAngle(float maxAngle) {
         float angleBackup = currentAngle;
         this.maxAngle = maxAngle;
+        visual.updateLimits(-this.minAngle, -maxAngle);
         if (currentAngle > maxAngle) {
             currentAngle = maxAngle;
             this.updateTransform(axis, currentAngle - angleBackup);
         }
-
     }
 
     /**
@@ -479,7 +480,7 @@ public class RevoluteJoint extends Prefab implements BodyElement {
         this.manager = manager;
         // create a visualization for the first rotation axis.
         // attach the axises as children
-        HingeShape hs = new HingeShape(this.axis, minAngle * FastMath.DEG_TO_RAD, maxAngle * FastMath.DEG_TO_RAD);
+        HingeShape hs = new HingeShape(this.axis, -minAngle * FastMath.DEG_TO_RAD, -maxAngle * FastMath.DEG_TO_RAD);
         hs.create(manager);
         attachChild(hs);
         visual = hs;
@@ -562,7 +563,7 @@ public class RevoluteJoint extends Prefab implements BodyElement {
         XMLUtils.writeAttribute(w, "radius", this.radius);
         XMLUtils.writeAttribute(w, "height", this.height);
         XMLUtils.writeAttribute(w, "location", this.getLocalPrefabTranslation());
-       
+
         XMLUtils.writeAttribute(w, "refaxisx", xAxisBackup);
         XMLUtils.writeAttribute(w, "refaxisy", yAxisBackup);
         XMLUtils.writeAttribute(w, "refaxisz", zAxisBackup);
@@ -601,12 +602,11 @@ public class RevoluteJoint extends Prefab implements BodyElement {
 
     /**
      * Returns an extra rotation for the gizmo.
+     *
      * @return an extra rotation for the gizmo.
      */
     @Override
     public Quaternion getGizmoRotation() {
         return visual.getLocalRotation();
     }
-    
-    
 }
