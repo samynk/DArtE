@@ -69,6 +69,14 @@ public class Magnet {
 
     public Magnet() {
     }
+    
+    /**
+     * Checks if this magnet has a local frame that needs to be applied.
+     * @return true if the object has a local frame, false otherwise.
+     */
+    public boolean hasLocalFrame(){
+        return true;
+    }
 
     public Vector3f getLocation() {
         return location;
