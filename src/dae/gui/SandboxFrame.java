@@ -46,6 +46,7 @@ import java.awt.dnd.DropTargetDropEvent;
 import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
 import java.awt.event.ItemEvent;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -155,6 +156,7 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
         mnuOpenScene = new javax.swing.JMenuItem();
         openSeparator = new javax.swing.JPopupMenu.Separator();
         mnuSaveProject = new javax.swing.JMenuItem();
+        mnuExit = new javax.swing.JMenuItem();
         mnuEdit = new javax.swing.JMenu();
         mnuUndo = new javax.swing.JMenuItem();
         mnuRedo = new javax.swing.JMenuItem();
@@ -353,6 +355,14 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
             }
         });
         mnuFile.add(mnuSaveProject);
+
+        mnuExit.setText("Exit");
+        mnuExit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuExitActionPerformed(evt);
+            }
+        });
+        mnuFile.add(mnuExit);
 
         mnuSandboxMenu.add(mnuFile);
 
@@ -964,6 +974,10 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
         GlobalObjects.getInstance().postEvent(age);
         
     }//GEN-LAST:event_toggleAutogridItemStateChanged
+
+    private void mnuExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuExitActionPerformed
+       dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
+    }//GEN-LAST:event_mnuExitActionPerformed
     /**
      * @param args the command line arguments
      */
@@ -1039,6 +1053,7 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
     private javax.swing.JMenuItem mnuAddWaypoint;
     private javax.swing.JMenuItem mnuCreateRig;
     private javax.swing.JMenu mnuEdit;
+    private javax.swing.JMenuItem mnuExit;
     private javax.swing.JMenu mnuFile;
     private javax.swing.JMenuItem mnuHandCurve;
     private javax.swing.JMenu mnuLights;
