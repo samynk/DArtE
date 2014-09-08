@@ -209,7 +209,7 @@ public class Float3ParameterUI extends javax.swing.JPanel implements ParameterUI
         converter = p.getConverter();
         if (p.getId().equals("localTranslation") || p.getId().equals("localPrefabTranslation")) {
             eventType = PrefabChangedEventType.TRANSLATION;
-        } else if (p.getId().equals("localRotation") || p.getId().equals("localPrefabTranslation")) {
+        } else if (p.getId().equals("localRotation") || p.getId().equals("localPrefabRotation")) {
             eventType = PrefabChangedEventType.ROTATION;
         } else if (p.getId().equals("localScale")) {
             eventType = PrefabChangedEventType.SCALE;
