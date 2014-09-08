@@ -91,7 +91,7 @@ public class GlobalObjects {
                 ((UndoPrefabPropertyEdit) edit).setSignificant(true);
             }
         }
-        System.out.println("Adding edit : " + edit);
+        //System.out.println("Adding edit : " + edit);
         undoManager.addEdit(edit);
         lastEdit = edit;
     }
