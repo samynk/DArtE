@@ -5,6 +5,7 @@
 package dae.gui;
 
 import com.google.common.eventbus.Subscribe;
+import com.jme3.math.Vector3f;
 import com.jme3.system.AppSettings;
 import com.jme3.system.JmeCanvasContext;
 import dae.GlobalObjects;
@@ -15,8 +16,11 @@ import dae.animation.skeleton.RevoluteJoint;
 import dae.gui.events.ApplicationStoppedEvent;
 import dae.io.ProjectLoader;
 import dae.io.ProjectSaver;
+import dae.prefabs.AxisEnum;
+import dae.prefabs.gizmos.Axis;
 import dae.prefabs.gizmos.RotateGizmoSpace;
 import dae.prefabs.gizmos.TranslateGizmoSpace;
+import dae.prefabs.gizmos.events.AutoGridEvent;
 import dae.prefabs.gizmos.events.GizmoSpaceChangedEvent;
 import dae.prefabs.gizmos.events.RotateGizmoSpaceChangedEvent;
 import dae.prefabs.types.ObjectType;
@@ -32,7 +36,6 @@ import dae.prefabs.ui.events.ProjectEventType;
 import dae.prefabs.ui.events.ViewportReshapeEvent;
 import dae.prefabs.ui.events.ZoomEvent;
 import dae.prefabs.ui.events.ZoomEventType;
-import dae.project.AssetLevel;
 import dae.project.Project;
 import java.awt.Dimension;
 import java.awt.datatransfer.DataFlavor;
@@ -143,6 +146,9 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
         cboRotateSpace = new javax.swing.JComboBox();
         zoomToolbar = new javax.swing.JToolBar();
         btnZoomExtents = new javax.swing.JButton();
+        snapToolbar = new javax.swing.JToolBar();
+        toggleSnap = new javax.swing.JToggleButton();
+        toggleAutogrid = new javax.swing.JToggleButton();
         mnuSandboxMenu = new javax.swing.JMenuBar();
         mnuFile = new javax.swing.JMenu();
         mnuNewProject = new javax.swing.JMenuItem();
@@ -293,6 +299,27 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
         zoomToolbar.add(btnZoomExtents);
 
         pnlToolbar.add(zoomToolbar);
+
+        snapToolbar.setRollover(true);
+
+        toggleSnap.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dae/icons/enablesnaptool.png"))); // NOI18N
+        toggleSnap.setFocusable(false);
+        toggleSnap.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        toggleSnap.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        snapToolbar.add(toggleSnap);
+
+        toggleAutogrid.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dae/icons/autogrid.png"))); // NOI18N
+        toggleAutogrid.setFocusable(false);
+        toggleAutogrid.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        toggleAutogrid.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        toggleAutogrid.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                toggleAutogridItemStateChanged(evt);
+            }
+        });
+        snapToolbar.add(toggleAutogrid);
+
+        pnlToolbar.add(snapToolbar);
 
         pnlToolbarViewport.add(pnlToolbar, java.awt.BorderLayout.NORTH);
 
@@ -924,7 +951,6 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
     }//GEN-LAST:event_mnuAddRevoluteJointActionPerformed
 
     private void mnuAddTargetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAddTargetActionPerformed
-        // TODO add your handling code here:
         ObjectTypeCategory otc = viewport.getObjectsToCreate();
         ObjectType ot = otc.getObjectType("Animation", "AttachmentPoint");
         if (ot != null) {
@@ -932,6 +958,12 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
             GlobalObjects.getInstance().postEvent(coe);
         }
     }//GEN-LAST:event_mnuAddTargetActionPerformed
+
+    private void toggleAutogridItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_toggleAutogridItemStateChanged
+        AutoGridEvent age = new AutoGridEvent(evt.getStateChange() == ItemEvent.SELECTED, AxisEnum.Y);
+        GlobalObjects.getInstance().postEvent(age);
+        
+    }//GEN-LAST:event_toggleAutogridItemStateChanged
     /**
      * @param args the command line arguments
      */
@@ -1034,6 +1066,9 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
     private dae.gui.ProjectPanel projectPanel1;
     private dae.prefabs.ui.PropertiesPanel propertiesPanel1;
     private javax.swing.JFileChooser sceneChooser;
+    private javax.swing.JToolBar snapToolbar;
+    private javax.swing.JToggleButton toggleAutogrid;
+    private javax.swing.JToggleButton toggleSnap;
     private javax.swing.JToolBar zoomToolbar;
     // End of variables declaration//GEN-END:variables
 
