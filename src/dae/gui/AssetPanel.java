@@ -116,6 +116,9 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
         assetPopupMenu = new javax.swing.JPopupMenu();
         mnuEditObject = new javax.swing.JMenuItem();
         mnuDelete = new javax.swing.JMenuItem();
+        rigPopupMenu = new javax.swing.JPopupMenu();
+        mnuEditRig = new javax.swing.JMenuItem();
+        mnuDeleteRig = new javax.swing.JMenuItem();
         scrAssetPanel = new javax.swing.JScrollPane();
         assetTree = new javax.swing.JTree();
         txtSearch = new javax.swing.JTextField();
@@ -142,6 +145,17 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
             }
         });
         assetPopupMenu.add(mnuDelete);
+
+        mnuEditRig.setText("Edit Rig ...");
+        mnuEditRig.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuEditRigActionPerformed(evt);
+            }
+        });
+        rigPopupMenu.add(mnuEditRig);
+
+        mnuDeleteRig.setText("Delete Rig");
+        rigPopupMenu.add(mnuDeleteRig);
 
         javax.swing.tree.DefaultMutableTreeNode treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("Assets");
         assetTree.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));
@@ -293,6 +307,16 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
         adaptFilter();
     }//GEN-LAST:event_cboRigFilterItemStateChanged
 
+    private void mnuEditRigActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuEditRigActionPerformed
+        // TODO add your handling code here:
+        Object o = this.assetTree.getLastSelectedPathComponent();
+        if (o != null && o instanceof FileNode) {
+            FileNode fn = (FileNode) o;
+            AssetEvent ae = new AssetEvent(AssetEventType.EDIT, fn);
+            GlobalObjects.getInstance().postEvent(ae);
+        }
+    }//GEN-LAST:event_mnuEditRigActionPerformed
+
     private void adaptFilter() {
         int count = 0;
         boolean klatches = cboKlatchFilter.isSelected();
@@ -302,32 +326,32 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
         boolean rigs = cboRigFilter.isSelected();
         count += rigs ? 1 : 0;
 
-        if ( count == 1 ){
-            if ( klatches ){
+        if (count == 1) {
+            if (klatches) {
                 filePattern = Pattern.compile(".*" + txtSearch.getText() + ".*\\.klatch");
-            }else if ( meshes){
+            } else if (meshes) {
                 filePattern = Pattern.compile(".*" + txtSearch.getText() + ".*\\.j3o");
-            }else if ( rigs ){
+            } else if (rigs) {
                 filePattern = Pattern.compile(".*" + txtSearch.getText() + ".*\\.rig");
             }
-        }else if ( count > 1 ){
+        } else if (count > 1) {
             String pattern = "";
-            if ( klatches) {
+            if (klatches) {
                 pattern += "klatch";
             }
-            if ( meshes ){
-                if ( pattern.length() > 0 ){
+            if (meshes) {
+                if (pattern.length() > 0) {
                     pattern += "|";
                 }
                 pattern += "j3o";
             }
-            if ( rigs ){
-                if ( pattern.length() > 0){
+            if (rigs) {
+                if (pattern.length() > 0) {
                     pattern += "|";
                 }
                 pattern += "rig";
             }
-            filePattern = Pattern.compile(".*" + txtSearch.getText() + ".*\\.(?:"+pattern+")");
+            filePattern = Pattern.compile(".*" + txtSearch.getText() + ".*\\.(?:" + pattern + ")");
         } else {
             //System.out.println("no search results");
             assetTree.setModel(new AssetTreeModel(new FileNode("no search results", false)));
@@ -348,7 +372,12 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
         tree.setSelectionPath(path);
         FileNode selected = (FileNode) path.getLastPathComponent();
         if (selected.isFile()) {
-            this.assetPopupMenu.show(tree, evt.getX(), evt.getY());
+            String ext = selected.getExtension();
+            if (ext.equalsIgnoreCase("j3o")) {
+                this.assetPopupMenu.show(tree, evt.getX(), evt.getY());
+            } else if (ext.equalsIgnoreCase("rig")) {
+                this.rigPopupMenu.show(tree, evt.getX(), evt.getY());
+            }
         }
     }
 
@@ -661,7 +690,10 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
     private javax.swing.JToggleButton cboRigFilter;
     private javax.swing.JLabel lblSearch;
     private javax.swing.JMenuItem mnuDelete;
+    private javax.swing.JMenuItem mnuDeleteRig;
     private javax.swing.JMenuItem mnuEditObject;
+    private javax.swing.JMenuItem mnuEditRig;
+    private javax.swing.JPopupMenu rigPopupMenu;
     private javax.swing.JScrollPane scrAssetPanel;
     private javax.swing.JTextField txtSearch;
     // End of variables declaration//GEN-END:variables
