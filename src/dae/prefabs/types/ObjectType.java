@@ -10,7 +10,6 @@ import dae.prefabs.parameters.Parameter;
 import dae.prefabs.parameters.Float3Parameter;
 import com.jme3.math.Vector3f;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 /**
  *
