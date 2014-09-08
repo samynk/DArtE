@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
@@ -174,6 +176,28 @@ public class Project implements ProjectTreeNode{
         for (Level l : this.levels) {
             if (l.getName().equals(name)) {
                 return true;
+            }
+        }
+        return false;
+    }
+    
+    
+    /**
+     * Checks if there is an asset level present for the given assetLocation.
+     * @param assetLocation the assetlocation to check.
+     * @return true if an assetlevel is present, false otherwise.
+     */
+    public boolean hasAssetLevelForFile(String assetLocation) {
+        Path p = Paths.get(assetLocation);
+        for(Level l: this.levels)
+        {
+            if ( l instanceof AssetLevel){
+                AssetLevel al = (AssetLevel)l;
+                String path = al.getAsset().toString();
+                System.out.println("Comparing " + path + " to " + p);
+                if ( al.getAsset().equals(p)){
+                    return true;
+                }
             }
         }
         return false;
@@ -346,4 +370,5 @@ public class Project implements ProjectTreeNode{
     public boolean isLeaf() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
 }
