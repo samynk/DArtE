@@ -5,7 +5,6 @@
 package dae.gui;
 
 import com.google.common.eventbus.Subscribe;
-import com.jme3.asset.AssetManager;
 import com.jme3.math.Transform;
 import com.jme3.scene.Node;
 import dae.GlobalObjects;
@@ -292,8 +291,10 @@ public class ProjectPanel extends javax.swing.JPanel implements TreeSelectionLis
     // End of variables declaration//GEN-END:variables
 
     public void valueChanged(TreeSelectionEvent e) {
-        if ( silentSelection )
+        if (silentSelection) {
             return;
+        }
+       
         Object selected = e.getPath().getLastPathComponent();
         if (selected instanceof Level) {
             Level l = (Level) selected;
@@ -330,10 +331,12 @@ public class ProjectPanel extends javax.swing.JPanel implements TreeSelectionLis
         if (event.getAssetEventType() == AssetEventType.EDIT) {
             FileNode asset = event.getFileNode();
             String assetLocation = asset.getFullName();
-
-            AssetLevel aLevel = new AssetLevel(Paths.get(assetLocation));
-            currentProject.addLevel(aLevel);
-            treeModel.fireInsertLevelEvent(aLevel, currentProject.getIndexOfLevel(aLevel));
+            // check if asset is not open already.
+            if ( !currentProject.hasAssetLevelForFile(assetLocation)) {
+                AssetLevel aLevel = new AssetLevel(Paths.get(assetLocation));
+                currentProject.addLevel(aLevel);
+                treeModel.fireInsertLevelEvent(aLevel, currentProject.getIndexOfLevel(aLevel));
+            }
         }
     }
 
@@ -347,15 +350,15 @@ public class ProjectPanel extends javax.swing.JPanel implements TreeSelectionLis
             });
         }
     }
-    
+
     @Subscribe
-    public void nodeSelected(final SelectionEvent se)
-    {
+    public void nodeSelected(final SelectionEvent se) {
+        if ( se.getSource() == this)
+            return;
         System.out.println("Node selected:" + se.getSelectedNode().getName());
-        if (SwingUtilities.isEventDispatchThread())
-        {
+        if (SwingUtilities.isEventDispatchThread()) {
             selectNode(se.getSelectedNode());
-        }else{
+        } else {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     selectNode(se.getSelectedNode());
@@ -363,11 +366,11 @@ public class ProjectPanel extends javax.swing.JPanel implements TreeSelectionLis
             });
         }
     }
-    
-    private void selectNode(Prefab node){
+
+    private void selectNode(Prefab node) {
         silentSelection = true;
         Object[] path = treeModel.createPathForNode(node);
-        TreePath tp= new TreePath(path);
+        TreePath tp = new TreePath(path);
         projectTree.setSelectionPath(new TreePath(path));
         projectTree.scrollPathToVisible(tp);
         silentSelection = false;
