@@ -26,6 +26,15 @@ public class GridMagnet extends Magnet {
         grid = new Vector3f(gridx, gridy, gridz);
         setRotationRange(GlobalObjects.getInstance().getDefaultRotationRange());
     }
+  
+     /**
+     * Checks if this magnet has a local frame that needs to be applied.
+     * @return true if the object has a local frame, false otherwise.
+     */
+    @Override
+    public boolean hasLocalFrame(){
+        return false;
+    }
 
     /**
      * This method will always return true.
