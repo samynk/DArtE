@@ -36,10 +36,9 @@ import java.util.logging.Logger;
  * @author Koen Samyn
  */
 public class AssetLevel extends Level {
-    
+
     private Path asset;
     private boolean levelShown = false;
-    
     private Node savableObject;
 
     /**
@@ -75,16 +74,26 @@ public class AssetLevel extends Level {
     @Override
     public void levelShown(AssetManager manager, BulletAppState state) {
         ArrayList<Spatial> toRemove = new ArrayList<Spatial>();
-        for(Spatial s : this.getChildren())
-        {
-            if ( !defaultLights.contains(s)){
+        for (Spatial s : this.getChildren()) {
+            if (!defaultLights.contains(s) && !(s instanceof Grid)) {
                 toRemove.add(s);
             }
         }
-        for ( Spatial s : toRemove){
-            s.removeFromParent();
+        for (Spatial s : toRemove) {
+            Node parentNode = s.getParent();
+            if ( parentNode instanceof ProjectTreeNode && s instanceof ProjectTreeNode)
+            {
+                ProjectTreeNode child = (ProjectTreeNode)s;
+                ProjectTreeNode ptn = child.getProjectParent();
+                int index = ptn.getIndexOfChild(child);
+                s.removeFromParent();
+                LevelEvent le = new LevelEvent(this, LevelEvent.EventType.NODEREMOVED, (Node) s, ptn, index);
+                GlobalObjects.getInstance().postEvent(le);
+            }else{
+                s.removeFromParent();
+            }
         }
-        
+
         String assetLocation = asset.toString();
         if (Files.getFileExtension(assetLocation).equalsIgnoreCase("j3o")) {
             File file = new File(project.getRelativeKlatchDirectory(), assetLocation + ".klatch");
@@ -99,7 +108,7 @@ public class AssetLevel extends Level {
                 levelShown = true;
             }
             this.asset = Paths.get(assetLocation + ".klatch");
-            
+
         } else if (Files.getFileExtension(assetLocation).equalsIgnoreCase("klatch")) {
             File file = new File(project.getRelativeKlatchDirectory(), assetLocation);
             super.setLocation(file);
@@ -119,7 +128,7 @@ public class AssetLevel extends Level {
             super.levelShown(manager, state);
             // must be loaded as separate 
             try {
-                Rig rig = (Rig)manager.loadModel(assetLocation);
+                Rig rig = (Rig) manager.loadModel(assetLocation);
                 attachChild(rig);
                 LevelEvent le = new LevelEvent(this, LevelEvent.EventType.NODEADDED, rig);
                 GlobalObjects.getInstance().postEvent(le);
@@ -139,10 +148,9 @@ public class AssetLevel extends Level {
             }
         }
     }
-    
+
     @Override
     public void levelHidden() {
-       
     }
 
     /**
@@ -159,22 +167,22 @@ public class AssetLevel extends Level {
         }
         return changed;
     }
-    
+
     @Override
     public void save(File location) {
         String assetLocation = asset.toString();
         //File file = new File(project.getKlatchDirectory(), assetLocation);
         if (assetLocation.endsWith("klatch")) {
             SceneSaver.writeScene(location, savableObject);
-        } else  {
-            RigWriter.writeRig(location, (Rig)savableObject);
+        } else {
+            RigWriter.writeRig(location, (Rig) savableObject);
         }
     }
-    
+
     public Path getAsset() {
         return this.asset;
     }
-    
+
     @Override
     public int attachChild(Spatial node) {
         if (node instanceof Prefab) {
@@ -183,7 +191,7 @@ public class AssetLevel extends Level {
         }
         return super.attachChild(node); //To change body of generated methods, choose Tools | Templates.
     }
-    
+
     @Override
     protected int attachChildDirectly(Node node) {
         if (node instanceof Prefab) {
