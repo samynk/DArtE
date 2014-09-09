@@ -5,19 +5,15 @@
 package dae.gui;
 
 import com.google.common.eventbus.Subscribe;
-import com.jme3.math.Vector3f;
 import com.jme3.system.AppSettings;
 import com.jme3.system.JmeCanvasContext;
 import dae.GlobalObjects;
 import dae.animation.rig.Rig;
 import dae.animation.rig.io.RigWriter;
-import dae.animation.skeleton.Body;
-import dae.animation.skeleton.RevoluteJoint;
 import dae.gui.events.ApplicationStoppedEvent;
 import dae.io.ProjectLoader;
 import dae.io.ProjectSaver;
 import dae.prefabs.AxisEnum;
-import dae.prefabs.gizmos.Axis;
 import dae.prefabs.gizmos.RotateGizmoSpace;
 import dae.prefabs.gizmos.TranslateGizmoSpace;
 import dae.prefabs.gizmos.events.AutoGridEvent;
@@ -111,6 +107,7 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
         viewport.startCanvas();
 
         pnlViewPort.setLeftComponent(ctx.getCanvas());
+        propertiesPanel1.validate();
 
         createProjectDialog = new CreateProjectDialog(this, true);
         createObjectDialog = new CreateKlatchDialog(this, true);
@@ -190,6 +187,8 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
         mnuAddHingeJoint = new javax.swing.JMenuItem();
         mnuMetaData = new javax.swing.JMenu();
         mnuAddPivot = new javax.swing.JMenuItem();
+        mnuHelp = new javax.swing.JMenu();
+        mnuGettingStarted = new javax.swing.JMenuItem();
 
         sceneChooser.setAcceptAllFileFilterUsed(false);
         sceneChooser.setFileFilter(new FileNameExtensionFilter("Sandbox files","zbk"));
@@ -220,10 +219,12 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
 
         pnlToolbarViewport.setLayout(new java.awt.BorderLayout());
 
-        pnlViewPort.setResizeWeight(0.5);
+        pnlViewPort.setResizeWeight(0.6);
+        pnlViewPort.setMinimumSize(null);
+        pnlViewPort.setPreferredSize(null);
 
-        propertiesPanel1.setMinimumSize(new java.awt.Dimension(250, 200));
-        propertiesPanel1.setPreferredSize(new java.awt.Dimension(250, 200));
+        propertiesPanel1.setMinimumSize(null);
+        propertiesPanel1.setPreferredSize(null);
         pnlViewPort.setRightComponent(propertiesPanel1);
 
         pnlToolbarViewport.add(pnlViewPort, java.awt.BorderLayout.CENTER);
@@ -593,6 +594,18 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
         mnuMetaData.add(mnuAddPivot);
 
         mnuSandboxMenu.add(mnuMetaData);
+
+        mnuHelp.setText("Help");
+
+        mnuGettingStarted.setText("Getting started");
+        mnuGettingStarted.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuGettingStartedActionPerformed(evt);
+            }
+        });
+        mnuHelp.add(mnuGettingStarted);
+
+        mnuSandboxMenu.add(mnuHelp);
 
         setJMenuBar(mnuSandboxMenu);
 
@@ -978,6 +991,10 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
     private void mnuExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuExitActionPerformed
        dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
     }//GEN-LAST:event_mnuExitActionPerformed
+
+    private void mnuGettingStartedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuGettingStartedActionPerformed
+        
+    }//GEN-LAST:event_mnuGettingStartedActionPerformed
     /**
      * @param args the command line arguments
      */
@@ -1055,7 +1072,9 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
     private javax.swing.JMenu mnuEdit;
     private javax.swing.JMenuItem mnuExit;
     private javax.swing.JMenu mnuFile;
+    private javax.swing.JMenuItem mnuGettingStarted;
     private javax.swing.JMenuItem mnuHandCurve;
+    private javax.swing.JMenu mnuHelp;
     private javax.swing.JMenu mnuLights;
     private javax.swing.JMenu mnuMetaData;
     private javax.swing.JMenuItem mnuNewProject;
