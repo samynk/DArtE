@@ -81,12 +81,13 @@ public class ProjectParameterPanel extends javax.swing.JPanel {
         btnMoveDown = new javax.swing.JButton();
 
         setBorder(javax.swing.BorderFactory.createTitledBorder("Project"));
+        setMinimumSize(null);
         setLayout(new java.awt.BorderLayout());
 
         scrContent.setBorder(null);
-        scrContent.setPreferredSize(null);
 
-        pnlProject.setMinimumSize(new java.awt.Dimension(100, 100));
+        pnlProject.setMinimumSize(null);
+        pnlProject.setPreferredSize(new java.awt.Dimension(80, 10));
         pnlProject.setLayout(new java.awt.GridBagLayout());
 
         lblProjectName.setText("Project name: ");
@@ -104,7 +105,7 @@ public class ProjectParameterPanel extends javax.swing.JPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 2, 0, 10);
+        gridBagConstraints.insets = new java.awt.Insets(5, 2, 0, 2);
         pnlProject.add(txtProjectName, gridBagConstraints);
 
         lblLevels.setText("Levels:");
@@ -114,6 +115,8 @@ public class ProjectParameterPanel extends javax.swing.JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 0);
         pnlProject.add(lblLevels, gridBagConstraints);
+
+        scrLevels.setPreferredSize(null);
 
         lstLevels.setModel(new javax.swing.AbstractListModel() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
@@ -130,7 +133,7 @@ public class ProjectParameterPanel extends javax.swing.JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.5;
-        gridBagConstraints.insets = new java.awt.Insets(2, 10, 0, 10);
+        gridBagConstraints.insets = new java.awt.Insets(2, 10, 0, 2);
         pnlProject.add(scrLevels, gridBagConstraints);
 
         lblAssets.setText("Asset Folders:");
@@ -155,9 +158,11 @@ public class ProjectParameterPanel extends javax.swing.JPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.5;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 10);
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 2);
         pnlProject.add(scrAssetFolders, gridBagConstraints);
 
+        pnlAssetFolderButtons.setMinimumSize(null);
+        pnlAssetFolderButtons.setPreferredSize(null);
         pnlAssetFolderButtons.setLayout(new javax.swing.BoxLayout(pnlAssetFolderButtons, javax.swing.BoxLayout.PAGE_AXIS));
 
         btnAddAssetFolder.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dae/icons/folder_add.png"))); // NOI18N
@@ -185,6 +190,7 @@ public class ProjectParameterPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridy = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 2);
         pnlProject.add(pnlAssetFolderButtons, gridBagConstraints);
 
         scrContent.setViewportView(pnlProject);
