@@ -31,6 +31,7 @@ public class PreferencesDialog extends javax.swing.JDialog {
      * A return status code - returned if OK button has been pressed
      */
     public static final int RET_OK = 1;
+    
 
     /**
      * Creates new form PreferencesDialog
@@ -50,16 +51,7 @@ public class PreferencesDialog extends javax.swing.JDialog {
             }
         });
 
-        Vector3f grid = GlobalObjects.getInstance().getGrid();
-        spnGridX.setValue(grid.x);
-        spnGridY.setValue(grid.y);
-        spnGridZ.setValue(grid.z);
         
-        AxisEnum upAxis  = GlobalObjects.getInstance().getUpAxis();
-        this.cboUpAxis.setSelectedItem(upAxis);
-        
-        List<File> recentFiles = GlobalObjects.getInstance().getRecentFiles();
-        lstRecentFiles.setListData(recentFiles.toArray());
     }
 
     /**
@@ -77,34 +69,25 @@ public class PreferencesDialog extends javax.swing.JDialog {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
         spnGridY1 = new javax.swing.JSpinner();
         okButton = new javax.swing.JButton();
         cancelButton = new javax.swing.JButton();
-        lblTitle = new javax.swing.JLabel();
-        jSeparator1 = new javax.swing.JSeparator();
-        jSeparator2 = new javax.swing.JSeparator();
-        lblUpAxis = new javax.swing.JLabel();
-        cboUpAxis = new javax.swing.JComboBox();
-        lblGrid = new javax.swing.JLabel();
-        jLabel1 = new javax.swing.JLabel();
-        spnGridX = new javax.swing.JSpinner();
-        jLabel2 = new javax.swing.JLabel();
-        spnGridY = new javax.swing.JSpinner();
-        jLabel3 = new javax.swing.JLabel();
-        spnGridZ = new javax.swing.JSpinner();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        lstRecentFiles = new javax.swing.JList();
-        lblRecentFileList = new javax.swing.JLabel();
-        btnClearRecentFileList = new javax.swing.JButton();
+        preferencesTab = new javax.swing.JTabbedPane();
+        editingOptionPanel1 = new dae.gui.preferences.EditingOptionPanel();
+        keyboardOptionPanel1 = new dae.gui.preferences.KeyboardOptionPanel();
+        lblFiller = new javax.swing.JLabel();
 
         spnGridY1.setModel(new javax.swing.SpinnerNumberModel(Float.valueOf(0.0f), null, null, Float.valueOf(0.1f)));
 
+        setTitle("Preferences");
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 closeDialog(evt);
             }
         });
+        getContentPane().setLayout(new java.awt.GridBagLayout());
 
         okButton.setText("OK");
         okButton.addActionListener(new java.awt.event.ActionListener() {
@@ -112,6 +95,12 @@ public class PreferencesDialog extends javax.swing.JDialog {
                 okButtonActionPerformed(evt);
             }
         });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        getContentPane().add(okButton, gridBagConstraints);
+        getRootPane().setDefaultButton(okButton);
 
         cancelButton.setText("Cancel");
         cancelButton.addActionListener(new java.awt.event.ActionListener() {
@@ -119,141 +108,37 @@ public class PreferencesDialog extends javax.swing.JDialog {
                 cancelButtonActionPerformed(evt);
             }
         });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.ipadx = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        getContentPane().add(cancelButton, gridBagConstraints);
 
-        lblTitle.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        lblTitle.setText("Preferences");
+        preferencesTab.addTab("Editing options", editingOptionPanel1);
+        preferencesTab.addTab("Key Bindings", keyboardOptionPanel1);
 
-        lblUpAxis.setText("Default Up Axis :");
-
-        cboUpAxis.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "X", "Y", "Z" }));
-        cboUpAxis.setSelectedIndex(1);
-
-        lblGrid.setText("Grid");
-
-        jLabel1.setText("X:");
-
-        spnGridX.setModel(new javax.swing.SpinnerNumberModel(Float.valueOf(0.0f), null, null, Float.valueOf(0.1f)));
-
-        jLabel2.setText("Y");
-
-        spnGridY.setModel(new javax.swing.SpinnerNumberModel(Float.valueOf(0.0f), null, null, Float.valueOf(0.1f)));
-
-        jLabel3.setText("Z");
-
-        spnGridZ.setModel(new javax.swing.SpinnerNumberModel(Float.valueOf(0.0f), null, null, Float.valueOf(0.1f)));
-
-        jScrollPane1.setViewportView(lstRecentFiles);
-
-        lblRecentFileList.setText("Recent file list:");
-
-        btnClearRecentFileList.setText("Clear");
-        btnClearRecentFileList.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnClearRecentFileListActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jSeparator1)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 285, Short.MAX_VALUE)
-                        .addComponent(okButton, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(cancelButton))
-                    .addComponent(jSeparator2, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblTitle)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblUpAxis)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cboUpAxis, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(lblRecentFileList)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(lblGrid)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(jLabel1)))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(spnGridX, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel2)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(spnGridY, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel3)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(spnGridZ, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 358, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnClearRecentFileList)))
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
-        );
-
-        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {cancelButton, okButton});
-
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(lblTitle)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblUpAxis)
-                    .addComponent(cboUpAxis, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblGrid)
-                    .addComponent(jLabel1)
-                    .addComponent(spnGridX, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2)
-                    .addComponent(spnGridY, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel3)
-                    .addComponent(spnGridZ, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lblRecentFileList)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 122, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(cancelButton)
-                            .addComponent(okButton)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnClearRecentFileList)
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
-        );
-
-        getRootPane().setDefaultButton(okButton);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(6, 2, 2, 2);
+        getContentPane().add(preferencesTab, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.weightx = 1.0;
+        getContentPane().add(lblFiller, gridBagConstraints);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
-        String axis = cboUpAxis.getSelectedItem().toString();
-        AxisEnum upAxis = AxisEnum.valueOf(axis);
-        GlobalObjects.getInstance().setUpAxis(upAxis);
         doClose(RET_OK);
-
-        float x = (Float) spnGridX.getValue();
-        float y = (Float) spnGridY.getValue();
-        float z = (Float) spnGridZ.getValue();
-        GlobalObjects.getInstance().setGrid(new Vector3f(x, y, z));
     }//GEN-LAST:event_okButtonActionPerformed
 
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
@@ -266,11 +151,6 @@ public class PreferencesDialog extends javax.swing.JDialog {
     private void closeDialog(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_closeDialog
         doClose(RET_CANCEL);
     }//GEN-LAST:event_closeDialog
-
-    private void btnClearRecentFileListActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearRecentFileListActionPerformed
-        // TODO add your handling code here:
-        GlobalObjects.getInstance().clearRecentFileList();
-    }//GEN-LAST:event_btnClearRecentFileListActionPerformed
 
     private void doClose(int retStatus) {
         returnStatus = retStatus;
@@ -320,25 +200,13 @@ public class PreferencesDialog extends javax.swing.JDialog {
         });
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnClearRecentFileList;
     private javax.swing.JButton cancelButton;
-    private javax.swing.JComboBox cboUpAxis;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JSeparator jSeparator2;
-    private javax.swing.JLabel lblGrid;
-    private javax.swing.JLabel lblRecentFileList;
-    private javax.swing.JLabel lblTitle;
-    private javax.swing.JLabel lblUpAxis;
-    private javax.swing.JList lstRecentFiles;
+    private dae.gui.preferences.EditingOptionPanel editingOptionPanel1;
+    private dae.gui.preferences.KeyboardOptionPanel keyboardOptionPanel1;
+    private javax.swing.JLabel lblFiller;
     private javax.swing.JButton okButton;
-    private javax.swing.JSpinner spnGridX;
-    private javax.swing.JSpinner spnGridY;
+    private javax.swing.JTabbedPane preferencesTab;
     private javax.swing.JSpinner spnGridY1;
-    private javax.swing.JSpinner spnGridZ;
     // End of variables declaration//GEN-END:variables
     private int returnStatus = RET_CANCEL;
 }
