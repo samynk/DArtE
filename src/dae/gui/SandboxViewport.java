@@ -18,6 +18,7 @@ import com.jme3.collision.CollisionResult;
 import com.jme3.collision.CollisionResults;
 import com.jme3.cursors.plugins.JmeCursor;
 import com.jme3.font.BitmapText;
+import com.jme3.input.FlyByCamera;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
 import com.jme3.input.RawInputListener;
@@ -50,8 +51,8 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.debug.WireBox;
 import com.jme3.scene.debug.WireSphere;
-import com.jme3.scene.shape.Quad;
 import com.jme3.shadow.AbstractShadowRenderer;
+import dae.DAECamAppState;
 import dae.GlobalObjects;
 import dae.animation.rig.io.RigLoader;
 import dae.animation.skeleton.BodyLoader;
@@ -156,6 +157,8 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
      */
     private Prefab currentChildElement;
 
+    
+
     /**
      * The editor state.
      */
@@ -234,11 +237,15 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
      */
     private boolean autoGridEnabled = false;
     private AxisEnum autoGridAxis = AxisEnum.Y;
+    
+    public SandboxViewport(){
+        super( new DAECamAppState() );
+    }
 
     @Override
     public void simpleInitApp() {
-        flyCam.setUpVector(Vector3f.UNIT_Y);
-        flyCam.setDragToRotate(true);
+        
+        
         assetManager.registerLoader(ObjectTypeReader.class, "types");
         assetManager.registerLoader(BodyLoader.class, "skel");
         assetManager.registerLoader(ControllerLoader.class, "fcl");
@@ -294,11 +301,13 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
 
         stateManager.attach(bulletAppState);
 
-        flyCam.setMoveSpeed(5.0f);
+       
 
 
 
         GlobalObjects.getInstance().setAssetManager(assetManager);
+        GlobalObjects.getInstance().setInputManager(this.inputManager);
+        
 
         wireBoxMaterial = assetManager.loadMaterial("Materials/SelectionBoxMaterial.j3m");
         wireBoxGeometry = new Geometry("wireframe cube", wireBox);
@@ -324,7 +333,6 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
         this.textBackground = new QuadShape(1, 1);
         this.textBackgroundGeometry = new Geometry("linktext", textBackground);
         textBackgroundGeometry.setMaterial(assetManager.loadMaterial("Materials/LinkTextBackgroundMaterial.j3m"));
-
     }
 
     public void adaptSelectionBox() {
@@ -1658,5 +1666,9 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
                 autoGridAxis = age.getMainAxis();
             }
         });
+    }
+    
+    public void setFlyByCamera(FlyByCamera flyCam) {
+        this.flyCam = flyCam;
     }
 }
