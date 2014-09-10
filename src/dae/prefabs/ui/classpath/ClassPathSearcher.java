@@ -3,12 +3,15 @@ package dae.prefabs.ui.classpath;
 import dae.gui.watchservice.WatchServiceThread;
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -143,7 +146,7 @@ public class ClassPathSearcher {
 
             System.out.println(url.getPath());
             try {
-                File newFile = new File(url.getPath());
+                File newFile = new File(url.toURI());
                 if (newFile.isDirectory()) {
                     Path dir = newFile.toPath();
                     serviceThread.register(dir);
@@ -154,6 +157,8 @@ public class ClassPathSearcher {
             } catch (IOException e) {
                 System.out.println(e.getMessage());
 
+            } catch (URISyntaxException ex) {
+                Logger.getLogger(ClassPathSearcher.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
         return rootNode;
