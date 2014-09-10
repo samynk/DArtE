@@ -18,7 +18,7 @@ import java.util.logging.Logger;
  * This class describes a Sandbox project, with all the available relevant meta
  * data.
  *
- * @author samyn_000
+ * @author Koen Samyn
  */
 public class Project implements ProjectTreeNode{
 
@@ -368,7 +368,7 @@ public class Project implements ProjectTreeNode{
     }
 
     public boolean isLeaf() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return false;
     }
 
 }
