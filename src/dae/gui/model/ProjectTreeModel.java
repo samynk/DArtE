@@ -13,6 +13,7 @@ import dae.project.Level;
 import dae.project.Project;
 import dae.project.ProjectTreeNode;
 import java.util.ArrayList;
+import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
@@ -45,11 +46,9 @@ public class ProjectTreeModel implements TreeModel {
             return l.getLevelChild(index);
         } else if (parent instanceof Layer) {
             Layer layer = (Layer) parent;
-            System.out.println("Getting child at : " + index + " from " + layer.getName());
             return layer.getChild(index);
         } else if (parent instanceof Prefab) {
             Prefab p = (Prefab) parent;
-            System.out.println("Getting child at : " + index + " from " + p.getName());
             return p.getPrefabChildAt(index);
         } else {
             return null;
@@ -58,20 +57,16 @@ public class ProjectTreeModel implements TreeModel {
 
     public int getChildCount(Object parent) {
         if (parent == project) {
-            System.out.println("Child count of project :" + project.getNrOfLevels());
             return project.getNrOfLevels();
         } else if (parent instanceof Level) {
             Level l = (Level) parent;
             return l.getChildCount();
         } else if (parent instanceof Layer) {
             Layer layer = (Layer) parent;
-            int layerChildCount = layer.getChildCount();
-            System.out.println("Child count of layer " + layer.getName() + " is " + layerChildCount);
             return layer.getChildCount();
         } else if (parent instanceof Prefab) {
             Prefab p = (Prefab) parent;
             int childCount = p.getPrefabChildCount();
-            System.out.println("Child count of " + p.getName() + " is " + childCount);
             return childCount;
         } else {
             return 0;
@@ -83,7 +78,6 @@ public class ProjectTreeModel implements TreeModel {
         if (node instanceof Prefab) {
             Prefab p = (Prefab) node;
             boolean isLeaf = p.isLeaf();
-            System.out.println("node " + p.getName() + " is a leaf :" + isLeaf);
             return p.isLeaf();
         } else {
             return false;
@@ -109,14 +103,13 @@ public class ProjectTreeModel implements TreeModel {
     }
 
     public int getIndexOfChild(Object parent, Object child) {
-        System.out.println("index of child query : " + parent + "," + child);
         if (parent instanceof ProjectTreeNode && child instanceof ProjectTreeNode) {
             ProjectTreeNode parentNode = (ProjectTreeNode) parent;
             ProjectTreeNode childNode = (ProjectTreeNode) child;
             int index = parentNode.getIndexOfChild(childNode);
-            System.out.println(" index : " + index);
             return index;
         } else {
+            Logger.getLogger("DArtE").log(java.util.logging.Level.WARNING, "Index of {0} in {1} is -1", new Object[]{child, parent});
             return -1;
         }
     }
@@ -138,7 +131,7 @@ public class ProjectTreeModel implements TreeModel {
         if (le.getEventType() == LevelEvent.EventType.NODEADDED) {
             for (Node n : le.getNodes()) {
 
-                TreeModelEvent event = createInsertTreeModelEvent((ProjectTreeNode)n);
+                TreeModelEvent event = createInsertTreeModelEvent((ProjectTreeNode) n);
                 for (TreeModelListener tml : listeners) {
                     tml.treeNodesInserted(event);
                 }
@@ -152,6 +145,8 @@ public class ProjectTreeModel implements TreeModel {
                         Prefab p = (Prefab) n;
                         Layer l = le.getLevel().getLayer(p.getLayerName());
                         l.removeNode(p);
+                    }else{
+                        Logger.getLogger("DArtE").log(java.util.logging.Level.WARNING, "{0} is not an instanceof dae.prefabs.Prefab");
                     }
                     for (TreeModelListener tml : listeners) {
                         tml.treeNodesRemoved(event);
@@ -172,15 +167,13 @@ public class ProjectTreeModel implements TreeModel {
             // tree structure changed for parent node.
 
 
-            TreeModelEvent event = createInsertTreeModelEvent((ProjectTreeNode)le.getCurrentParent());
+            TreeModelEvent event = createInsertTreeModelEvent((ProjectTreeNode) le.getCurrentParent());
             for (TreeModelListener tml : listeners) {
                 tml.treeStructureChanged(event);
 
             }
         }
     }
-
-    
 
     public Object[] createPathForNode(ProjectTreeNode start) {
         int depth = 1;
@@ -229,7 +222,6 @@ public class ProjectTreeModel implements TreeModel {
         int[] indices = {previousIndex};
         Object[] objects = {n};
 
-        System.out.println("Deleting " + n.getName() + " at index " + previousIndex);
         return new TreeModelEvent(this, path, indices, objects);
     }
 
@@ -254,7 +246,6 @@ public class ProjectTreeModel implements TreeModel {
         int[] indices = {index};
         Object[] objects = {n};
 
-        //System.out.println("Inserting " + n.getName() + " at index " + index);
         return new TreeModelEvent(this, path, indices, objects);
     }
 
@@ -290,6 +281,4 @@ public class ProjectTreeModel implements TreeModel {
             tml.treeNodesRemoved(event);
         }
     }
-
-    
 }
