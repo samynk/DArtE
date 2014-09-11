@@ -170,8 +170,6 @@ public class PrefabCellEditor extends javax.swing.JPanel implements TableCellEdi
 
     @Subscribe
     public void objectPicked(PickEvent pe) {
-        //System.out.println("Object picked");
-
         if (!this.parentPrefab.getName().equals(pe.getPickProperty())) {
             return;
         }
