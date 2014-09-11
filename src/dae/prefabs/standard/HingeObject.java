@@ -10,6 +10,8 @@ import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
 import dae.prefabs.Prefab;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -27,7 +29,6 @@ public class HingeObject extends Prefab {
 
     @Override
     public final void create(String name, AssetManager manager, String extraInfo) {
-        System.out.println("Creating hinge object");
         this.setName(name);
         this.assetManager = manager;
 
@@ -56,7 +57,7 @@ public class HingeObject extends Prefab {
             this.attachChild(hingeObjectNode);
             hingeObject = object;
         } catch (Exception ex) {
-            System.out.println(ex.getMessage());
+            Logger.getLogger("DArtE").log(Level.SEVERE, null,ex);
         }
     }
 
