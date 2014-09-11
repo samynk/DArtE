@@ -47,8 +47,10 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 import java.util.prefs.Preferences;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFileChooser;
@@ -913,12 +915,10 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
     }//GEN-LAST:event_cboRotateSpaceItemStateChanged
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-        if (  !currentProject.hasFileLocation() || !currentProject.getSaved() )
-        {
-            int option = JOptionPane.showConfirmDialog(this,"<html><h3>Save changes to " + currentProject.getProjectName() + " before closing?</h3>" + 
-                    "If you close without saving your changes will be discarded.","Save project",JOptionPane.YES_NO_OPTION);
-            if ( option == JOptionPane.YES_OPTION)
-            {   
+        if (!currentProject.hasFileLocation() || !currentProject.getSaved()) {
+            int option = JOptionPane.showConfirmDialog(this, "<html><h3>Save changes to " + currentProject.getProjectName() + " before closing?</h3>"
+                    + "If you close without saving your changes will be discarded.", "Save project", JOptionPane.YES_NO_OPTION);
+            if (option == JOptionPane.YES_OPTION) {
                 saveProject();
             }
         }
@@ -1015,6 +1015,30 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
+                Logger logger = Logger.getLogger("DArtE");
+                FileHandler fh;
+
+                try {
+                    File logDir = new File(System.getProperty("user.dir")+"/logs");
+                    if ( !logDir.exists()){
+                        logDir.mkdir();
+                    }
+                    // This block configure the logger with handler and formatter  
+                    fh = new FileHandler(System.getProperty("user.dir")+"/logs/darte.log");
+                    
+                    logger.addHandler(fh);
+                    SimpleFormatter formatter = new SimpleFormatter();
+                    fh.setFormatter(formatter);
+
+                    // the following statement is used to log any messages  
+                    logger.setUseParentHandlers(false);
+
+                } catch (IOException ex) {
+                    Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
+                } catch (SecurityException ex) {
+                    Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
+                } 
+
                 new SandboxFrame().setVisible(true);
             }
         });
