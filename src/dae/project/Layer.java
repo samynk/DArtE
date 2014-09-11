@@ -273,7 +273,6 @@ public class Layer implements ProjectTreeNode{
                 public void run() {
                     if (!Layer.this.visible) {
                         for (Node n : nodes) {
-                            //System.out.println("trying to remove : " + n.getName());
                             n.removeFromParent();
                         }
                     } else {
