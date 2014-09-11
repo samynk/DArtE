@@ -91,7 +91,6 @@ public class AutoSuggestor {
         tH = 0;
 
         if (variable != null && !variable.isEmpty()) {
-            //System.out.println("doing completion for : " + typedWord);
             boolean added = doMemberShipSuggestion(variable, typedWord);
 
             if (!added) {
@@ -114,7 +113,6 @@ public class AutoSuggestor {
         String text = textComp.getText();
         int currentCaretLocation = textComp.getCaretPosition();
         if (currentCaretLocation == 0 || currentCaretLocation > (text.length())) {
-            //System.out.println("invalid caretlocation : " + currentCaretLocation + "," + text.length());
             return "";
         }
         int index;
@@ -123,7 +121,6 @@ public class AutoSuggestor {
         for (index = currentCaretLocation; index >= 0; --index) {
             try {
                 char c = d.getText(index, 1).charAt(0);
-                System.out.println("Found char : |" + c + "|");
                 if (Character.isWhitespace(c)) {
                     break;
                 }
@@ -133,8 +130,6 @@ public class AutoSuggestor {
             }
         }
         if (index > 0) {
-//            System.out.println("found index was : " + index);
-//            System.out.println("Caret location is : " + currentCaretLocation);
             String currentWord;
             try {
                 currentWord = d.getText(index + 1, count);
@@ -142,14 +137,9 @@ public class AutoSuggestor {
             } catch (BadLocationException ex) {
                 return "";
             }
-            //System.out.println("Current word : " + currentWord);
-
         } else {
-            //System.out.println("found index was zero : " + index);
             return "";
         }
-
-
     }
 
     private int matchWordReverse( int startLocation) {
@@ -226,8 +216,6 @@ public class AutoSuggestor {
         } catch (BadLocationException ex) {
             return "";
         }
-
-        System.out.println("Variable : " + var + "| operator " + operator + "|");
         if (operator.equals("is") || operator.equals("isnot")) {
             return var;
         } else {
@@ -265,8 +253,6 @@ public class AutoSuggestor {
         if (autoSuggestionPopUpWindow.getParent() == null) {
             container.getLayeredPane().add(autoSuggestionPopUpWindow, JLayeredPane.POPUP_LAYER);
         }
-        //show the pop up
-        System.out.println("Showing popup at : " + windowX + "," + windowY);
         autoSuggestionPopUpWindow.setLocation(windowX, windowY);
         autoSuggestionPopUpWindow.setSelectedIndex(0);
         autoSuggestionPopUpWindow.setVisible(true);
@@ -285,7 +271,6 @@ public class AutoSuggestor {
         if (variable.isEmpty()) {
             return false;
         }
-        //System.out.println("Typed word: " + typedWord);
 
         boolean suggestionAdded = false;
         FuzzyVariable var = system.getFuzzyInputVariable(variable);
@@ -310,12 +295,10 @@ public class AutoSuggestor {
     }
 
     public void windowGainedFocus(WindowEvent e) {
-        System.out.println("Dialog window gained focus");
         textComp.requestFocusInWindow();
     }
 
     public void windowLostFocus(WindowEvent e) {
-        System.out.println("Dialog window lost focus");
     }
 
     void insertCurrentSuggestion() {
