@@ -34,17 +34,13 @@ public class ClassPathSearcher {
         String[] pathElements = classPath.split(System
                 .getProperty("path.separator"));
         for (String element : pathElements) {
-            //System.out.println(element);
             try {
                 File newFile = new File(element);
                 if (newFile.isDirectory()) {
                     findResourceInDirectory(rootNode, rootNode, newFile, m);
-                } else {
-                    //findResourceInFile(rootNode, newFile, fileNamePattern);
-                }
+                } 
             } catch (IOException e) {
-                System.out.println(e.getMessage());
-
+                Logger.getLogger("DArtE").log(Level.INFO, null,e);
             }
         }
         return rootNode;
@@ -64,8 +60,6 @@ public class ClassPathSearcher {
         URLClassLoader urlClassLoader = (URLClassLoader) classLoader;
 
         for (URL url : urlClassLoader.getURLs()) {
-
-            System.out.println(url.getPath());
             try {
                 File newFile = new File(url.getPath());
                 if (newFile.isDirectory()) {
@@ -74,8 +68,7 @@ public class ClassPathSearcher {
                     //findResourceInFile(rootNode, newFile, fileNamePattern);
                 }
             } catch (IOException e) {
-                System.out.println(e.getMessage());
-
+                Logger.getLogger("DArtE").log(Level.SEVERE, null, e);
             }
         }
         return rootNode;
@@ -86,7 +79,6 @@ public class ClassPathSearcher {
 
         if (resourceFile.canRead()
                 && resourceFile.getAbsolutePath().endsWith(".jar")) {
-            System.out.println("jar file found: " + resourceFile.getAbsolutePath());
             JarFile jarFile = new JarFile(resourceFile);
             Enumeration<JarEntry> entries = jarFile.entries();
             while (entries.hasMoreElements()) {
@@ -143,8 +135,6 @@ public class ClassPathSearcher {
         URLClassLoader urlClassLoader = (URLClassLoader) classLoader;
 
         for (URL url : urlClassLoader.getURLs()) {
-
-            System.out.println(url.getPath());
             try {
                 File newFile = new File(url.toURI());
                 if (newFile.isDirectory()) {
@@ -155,10 +145,9 @@ public class ClassPathSearcher {
                     //findResourceInFile(rootNode, newFile, fileNamePattern);
                 }
             } catch (IOException e) {
-                System.out.println(e.getMessage());
-
+                Logger.getLogger("DArtE").log(Level.SEVERE, null, e);
             } catch (URISyntaxException ex) {
-                Logger.getLogger(ClassPathSearcher.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
             }
         }
         return rootNode;
@@ -172,7 +161,6 @@ public class ClassPathSearcher {
             if (matcher.matches()) {
                 FileNode matchedFile = new FileNode(currentFile.getName(), true);
                 parentNode.addChild(matchedFile);
-                //System.out.println("current file name: " + currentFile.getAbsolutePath());
             } else if (currentFile.isDirectory()) {
                 Path toWatch = currentFile.toPath();
                 service.register(toWatch);

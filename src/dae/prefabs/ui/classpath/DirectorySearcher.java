@@ -58,8 +58,6 @@ public class DirectorySearcher implements FileVisitor<Path> {
     public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
         Path relative = startDirectory.relativize(dir);
         createSubdirs(rootNode, relative);
-
-        System.out.println("Path found : " + relative);
         return FileVisitResult.CONTINUE;
     }
 
