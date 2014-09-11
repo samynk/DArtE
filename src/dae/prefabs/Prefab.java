@@ -201,7 +201,6 @@ public class Prefab extends Node implements ProjectTreeNode {
                     boolean equal = value.equals(oldValue);
                     if (!equal) {
                         m.invoke(this, value);
-                        //System.out.println("Setting property " + property + " from  " + oldValue + " to  " + value);
                         if (undoableEdit) {
                             GlobalObjects go = GlobalObjects.getInstance();
                             //System.out.println("Adding UndoPrefabPropertyEdit :" + this.getName() + " : " + oldValue + "," + value);
@@ -211,15 +210,14 @@ public class Prefab extends Node implements ProjectTreeNode {
                         changed = true;
                     }
                 } catch (IllegalAccessException ex) {
-                    Logger.getLogger(Prefab.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
                 } catch (InvocationTargetException ex) {
-                    Logger.getLogger(Prefab.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
                 } catch (IllegalArgumentException ex) {
-                    System.out.println("Problem setting " + property + ", on prefab" + this.getName() + ":" + value);
-                    System.out.println("type of value is : " + value.getClass().getName());
-                    System.out.println("Method is : " + m.getName());
-                    System.out.println("Type is :" + m.getParameterTypes()[0].getName());
-                    Logger.getLogger(Prefab.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger("DArtE").log(Level.SEVERE, "Problem setting {0}, on prefab{1}:{2}", new Object[]{property, this.getName(), value});
+                    Logger.getLogger("DArtE").log(Level.SEVERE, "type of value is : {0}", value.getClass().getName());
+                    Logger.getLogger("DArtE").log(Level.SEVERE, "Method is : {0}", m.getName());
+                    Logger.getLogger("DArtE").log(Level.SEVERE, "Type is :{0}", m.getParameterTypes()[0].getName());
                 }
             }
         } else {
@@ -306,14 +304,13 @@ public class Prefab extends Node implements ProjectTreeNode {
             try {
                 return m.invoke(this);
             } catch (IllegalAccessException ex) {
-                Logger.getLogger(Prefab.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
             } catch (InvocationTargetException ex) {
-                Logger.getLogger(Prefab.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
             } catch (IllegalArgumentException ex) {
-                Logger.getLogger(Prefab.class.getName()).log(Level.SEVERE, null, ex);
-                System.out.println("Problem getting " + property + ", on prefab" + this.getName());
-                System.out.println("type of return value is : " + m.getReturnType().getName());
-                System.out.println("Method is : " + m.getName());
+                Logger.getLogger("DArtE").log(Level.SEVERE, "Problem getting {0}, on prefab{1}", new Object[]{property, this.getName()});
+                Logger.getLogger("DArtE").log(Level.SEVERE, "type of return value is : {0}", m.getReturnType().getName());
+                Logger.getLogger("DArtE").log(Level.SEVERE, "Method is : {0}", m.getName());
             }
         }
         return null;
@@ -329,9 +326,9 @@ public class Prefab extends Node implements ProjectTreeNode {
             workList.add(uo);
         }
     }
-    
-    public void addTask(Runnable r){
-        synchronized(taskList){
+
+    public void addTask(Runnable r) {
+        synchronized (taskList) {
             taskList.add(r);
         }
     }
@@ -345,8 +342,8 @@ public class Prefab extends Node implements ProjectTreeNode {
             }
             workList.clear();
         }
-        synchronized(taskList){
-            for ( Runnable r: this.taskList){
+        synchronized (taskList) {
+            for (Runnable r : this.taskList) {
                 r.run();
             }
             taskList.clear();
@@ -656,8 +653,6 @@ public class Prefab extends Node implements ProjectTreeNode {
                 //ray.setLimit(q.getMaxLength());
                 results = new CollisionResults();
                 sceneElements.collideWith(ray, results);
-                System.out.println("Start of ray : " + startWorld);
-                System.out.println("Direction of ray : " + dirWorld);
                 CollisionResult cr = results.getClosestCollision();
 
                 if (cr != null) {
@@ -680,20 +675,20 @@ public class Prefab extends Node implements ProjectTreeNode {
                 if (cr != null && cr.getDistance() < q.getMaxLength()) {
                     Prefab other = findPrefabParent(cr.getGeometry(), sceneElements);
                     if (other == null) {
-                        System.out.println("no prefab parent!");
+                        //System.out.println("no prefab parent!");
                         return;
                     }
                     FillerParameter otherfp = other.getFillerParameter();
                     if (otherfp == null) {
-                        System.out.println("No filler found!");
+                        //System.out.println("No filler found!");
                         continue;
                     }
                     Quad otherQuad = otherfp.getQuad(cr.getTriangleIndex());
                     if (otherQuad == null) {
-                        System.out.println("No quad found for triangle index : " + cr.getTriangleIndex());
+                        //System.out.println("No quad found for triangle index : " + cr.getTriangleIndex());
                         continue;
                     }
-                    System.out.println("Connecting " + q.getName() + " to " + otherQuad.getName());
+                    //System.out.println("Connecting " + q.getName() + " to " + otherQuad.getName());
                     Vector3f lps[] = new Vector3f[8];
 
                     lps[0] = q.getP1();
@@ -724,17 +719,14 @@ public class Prefab extends Node implements ProjectTreeNode {
                     // angle of 45 degrees
                     // todo , make it configurable
 
-                    boolean extruded = false;
+                    
                     if (Math.abs(diff.dot(dirWorld)) < 0.707) {
-                        System.out.println("extruding the raycast quad :" + cr.getDistance());
+                        //System.out.println("extruding the raycast quad :" + cr.getDistance());
                         dirWorld.multLocal(cr.getDistance());
                         for (int i = 0; i < 4; ++i) {
                             wps[i + 4] = dirWorld.add(wps[i]);
                         }
-                        extruded = true;
                     }
-
-
                     ConnectorPrefab cp = new ConnectorPrefab();
                     cp.setPoints(wps, q.isClockWise());
 
@@ -1049,7 +1041,7 @@ public class Prefab extends Node implements ProjectTreeNode {
                 if (pindex == index) {
                     return s;
                 }
-                 ++pindex;
+                ++pindex;
             }
         }
         return null;
@@ -1162,13 +1154,14 @@ public class Prefab extends Node implements ProjectTreeNode {
     public boolean isLeaf() {
         return false;
     }
-    
+
     /**
      * Returns an extra rotation that should be applied to the quaternion.
+     *
      * @return null, if no extra rotation exists, or a Quaternion with an extra
      * rotation.
      */
-    public Quaternion getGizmoRotation(){
+    public Quaternion getGizmoRotation() {
         return null;
     }
 }
