@@ -1,9 +1,10 @@
 Material My Material : Common/MatDefs/Misc/Unshaded.j3md {
      MaterialParameters {
-        Color : 0.2 0.5529412 0.91764706 1.0
+        Color : 0.2 0.5529412 0.91764706 0.75
      }
    AdditionalRenderState {
       DepthTest Off
       DepthWrite On
+      Blend Alpha
     }
 }
