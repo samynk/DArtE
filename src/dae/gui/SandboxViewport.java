@@ -428,14 +428,13 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
                 try {
                     GlobalObjects.getInstance().undo();
                 } catch (CannotUndoException ex) {
-                    System.out.println("cannot undo");
-                } catch (Exception ex) {
-                }
+                    Logger.getLogger("DArtE").log(Level.WARNING, "Cannot undo.",ex);
+                } 
             } else if (name.equals("REDO") && !keyPressed) {
                 try {
                     GlobalObjects.getInstance().redo();
                 } catch (CannotRedoException ex) {
-                    System.out.println("cannot redo");
+                    Logger.getLogger("DArtE").log(Level.WARNING, "Cannot redo.",ex);
                 }
             }
         }
@@ -467,46 +466,24 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
             //System.out.println("onAnalog : " + name);
             if (editorState == EditorState.INSERTION) {
                 if ("ACCEPT_INSERTION".equals(name)) {
-                    System.out.println("Accepting insertion");
                     clearSelection();
                     addToScene();
-                    /*
-                     for (Spatial p : insertionElements.getChildren()) {
-                     addToSelection((Node) p);
-                     sceneElements.attachChild(p);
-                     AddPrefabEdit edit = new AddPrefabEdit((Node) p);
-                     GlobalObjects.getInstance().addEdit(edit);
-
-                     LevelEvent le = new LevelEvent(level, LevelEvent.EventType.NODEADDED, (Node) p);
-                     GlobalObjects.getInstance().postEvent(le);
-                     }
-
-
-                     insertionElements.detachAllChildren();
-                     editorState = EditorState.IDLE;
-                     */
                 } else if ("REJECT_INSERTION".equals(name)) {
                     clearSelection();
-                    //System.out.println("Detaching all children");
                     linkGeometry.removeFromParent();
                     wireBoxGeometryLinkParent.removeFromParent();
                     insertionElements.detachAllChildren();
                     editorState = EditorState.IDLE;
                 } else if ("ROTATION_UP".equals(name)) {
-                    //System.out.println("Next rotation value : "+ currentPickElement);
                     if (currentPickElement != null) {
-                        //System.out.println("Next rotation value : "+ currentPickElement);
                         currentPickElement.nextRotationValue();
                     }
                 } else if ("ROTATION_DOWN".equals(name)) {
-                    //System.out.println("Previous rotation value : "+ currentPickElement);
                     if (currentPickElement != null) {
-                        //System.out.println("Previous rotation value" + currentPickElement);
                         currentPickElement.previousRotationValue();
                     }
                 }
             } else if (editorState == EditorState.IDLE) {
-                //System.out.println("Name : " + name);
                 if ("DELETE_SELECTION".equals(name)) {
                     for (Node n : currentSelection) {
                         removeNode(level, n);
@@ -581,7 +558,6 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
 
 
             for (Node n : currentSelection) {
-                //System.out.println("Setting world pos : " + worldPos);
                 Vector3f oldValue = n.getLocalTranslation().clone();
 
                 Vector3f pa = new Vector3f();
@@ -602,7 +578,6 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
                     diff1 = b2.subtract(b1);
                 } else {
                     if (RayIntersect.rayIntersect(p1, p2, pickOffset, pickOffset.add(pickAxis1), pa, pb, t)) {
-                        //  System.out.println("Diff : " + b2.subtract(b1));
                         Vector3f b1 = n.getParent().worldToLocal(pickOffset, null);
                         Vector3f b2 = n.getParent().worldToLocal(pb, null);
                         diff1 = b2.subtract(b1);
@@ -617,7 +592,6 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
                 } else {
                     n.setLocalTranslation(baseTranslation.add(diff1));
                 }
-                // System.out.println("Setting local translation to : " + b2);
                 Vector3f newValue = n.getLocalTranslation().clone();
                 UndoPrefabPropertyEdit edit = new UndoPrefabPropertyEdit(n, "localPrefabTranslation", oldValue, newValue);
                 GlobalObjects.getInstance().addEdit(edit);
@@ -734,8 +708,6 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
 //                    break;
             }
         }
-
-        //System.out.println("alt:" + altIsDown + ",ctrl:" + controlIsDown + ",shift:" + shiftIsDown);
     }
 
     @Override
@@ -763,7 +735,6 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
 
         if (editorState == EditorState.INSERTIONEVENT) {
             // wait until the mouse is back in a normal state.
-            //System.out.println("EditorState : " + editorState);
             try {
                 Prefab p;
                 if (objectTypeToCreate.usesDefaultLoader()) {
@@ -793,11 +764,11 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
 
                 editorState = EditorState.INSERTION;
             } catch (IllegalAccessException ex) {
-                Logger.getLogger(SandboxViewport.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
             } catch (InstantiationException ex) {
-                Logger.getLogger(SandboxViewport.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
             } catch (ClassNotFoundException ex) {
-                Logger.getLogger(SandboxViewport.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
             }
         }
         if (editorState == EditorState.INSERTION) {
@@ -842,7 +813,6 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
         // Adjust gizmo scale
         float d = cam.getLocation().distance(a.getWorldTranslation());
         float rd = (d - cam.getFrustumNear()) / (cam.getFrustumFar() - cam.getFrustumNear());
-        //System.out.println("Real distance : " + rd);
         Vector3f ws = a.getParent() != null ? a.getParent().getWorldScale() : Vector3f.UNIT_XYZ;
         switch (gizmoType) {
             case TRANSLATE:
@@ -892,14 +862,13 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
 
         CollisionResult result = results.getClosestCollision();
         if (result == null) {
-            System.out.println("No result");
             return;
         }
 
         Geometry g = result.getGeometry();
         Prefab prefab = findPrefabParent(g);
         this.currentPickElement = prefab;
-        //System.out.println("Triangle index : " + result.getTriangleIndex());
+        
         Vector3f point = result.getContactPoint().clone();
         result.getTriangle(contactTriangle);
 
@@ -909,7 +878,6 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
         }
 
         if (g.getParent() instanceof MagnetObject) {
-            System.out.println("Parent is magnetobject");
             MagnetObject mo = (MagnetObject) g.getParent();
             Magnet m = mo.getMagnet();
             Vector3f magnetLoc = m.getLocation();
@@ -923,7 +891,6 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
                 currentInsertion.setLocalTranslation(magnetLocWorld);
             }
         } else if (prefab == null) {
-            System.out.println("prefab is null");
             if (currentInsertion instanceof Prefab) {
                 ((Prefab) currentInsertion).setLocalPrefabTranslation(point);
                 ((Prefab) currentInsertion).setLocalPrefabRotation(rotation);
@@ -934,7 +901,6 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
 
         } else {
             if (prefab.hasMagnets()) {
-                System.out.println("Prefab has magnets");
                 float distance = Float.MAX_VALUE;
                 Magnet closestMagnet = null;
                 Vector3f worldLoc = new Vector3f();
@@ -945,9 +911,7 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
                         local.addLocal(prefab.getOffset());
                         //System.out.println("Local point : " + local);
                         if (m.isInside(local)) {
-                            System.out.println("found magnet area!");
                             closestMagnet = m;
-
                             break;
                         }
                     } else {
@@ -967,13 +931,12 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
 
                     }
                     prefab.setAttachMagnet(closestMagnet);
-                    //System.out.println("Closest magnet : " + closestMagnet.getName() + " , rotation : " + closestMagnet.getRotation());
+                    
                     Matrix3f rot = closestMagnet.getLocalFrame();
                     Quaternion world = prefab.getWorldRotation();
                     Quaternion local = new Quaternion();
                     local.fromRotationMatrix(rot);
                     Quaternion insertRotation = local.mult(world);
-                    //System.out.println("insertRotation : "+insertRotation);
 
                     Vector3f magnetLoc = closestMagnet.getLocation();
                     Vector3f offsetLoc = magnetLoc.subtract(prefab.getOffset());
@@ -999,9 +962,7 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
                 }
 
             } else {
-                System.out.println("Prefab has no magnets");
                 if (currentInsertion instanceof Prefab) {
-                    System.out.println("Current insertion is prefab");
                     Prefab p = (Prefab) currentInsertion;
                     p.setLocalPrefabTranslation(point.subtract(p.getPivot()));
                     p.setLocalPrefabRotation(rotation);
@@ -1016,7 +977,6 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
     }
 
     private Quaternion createRotationFromNormal(Vector3f normal, AxisEnum mainAxis) {
-        System.out.println("Create rotation matrix from normal : " + normal);
         Vector3f x, y;
         Quaternion result = new Quaternion();
         if (normal.x > normal.y && normal.x > normal.z) {
@@ -1048,10 +1008,6 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
                 result.fromAxes(x, y, normal);
                 break;
         }
-
-//        System.out.println("x : " + x);
-//        System.out.println("y : " + y);
-//        System.out.println("z : " + normal);
         return result;
     }
 
@@ -1086,10 +1042,8 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
                     rootNode.attachChild(wireBoxGeometryLinkParent);
                 }
             }
-            //System.out.println("linking to : " + prefab.getName());
             linkText.setText(currentChildElement.getName() + "->" + prefab.getName());
             linkText.setLocalTranslation(click2d.x, click2d.y, 0.01f);
-            //System.out.println("text dimension :" + linkText.getLineWidth() +"," +linkText.getLineHeight());
             textBackground.setDimension(linkText.getLineWidth()+2, linkText.getLineHeight()+4);
             textBackgroundGeometry.updateModelBound();
             textBackgroundGeometry.setLocalTranslation(click2d.x-1, click2d.y- linkText.getLineHeight()-2,0f);
@@ -1313,37 +1267,28 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
     private void setupTranslateTransform(Geometry g, Vector3f contactPoint) {
         String transform = g.getUserData("Transform");
         if ("translate_X".equals(transform)) {
-            //System.out.println("translatex");
             editorState = EditorState.TRANSLATEX;
             a.getWorldRotation().mult(new Vector3f(1, 0, 0), pickAxis1);
         } else if ("translate_Y".equals(transform)) {
-            //System.out.println("translatey");
             editorState = EditorState.TRANSLATEY;
             a.getWorldRotation().mult(new Vector3f(0, 1, 0), pickAxis1);
         } else if ("translate_Z".equals(transform)) {
-            //System.out.println("translatez");
             editorState = EditorState.TRANSLATEZ;
             a.getWorldRotation().mult(new Vector3f(0, 0, 1), pickAxis1);
         } else if ("translate_XY".equals(transform)) {
-            //System.out.println("Translatexy");
             a.getWorldRotation().mult(new Vector3f(1, 0, 0), pickAxis1);
             a.getWorldRotation().mult(new Vector3f(0, 1, 0), pickAxis2);
             editorState = EditorState.TRANSLATETWOAXIS;
         } else if ("translate_YZ".equals(transform)) {
-            //System.out.println("Translateyz");
             a.getWorldRotation().mult(new Vector3f(0, 1, 0), pickAxis1);
             a.getWorldRotation().mult(new Vector3f(0, 0, 1), pickAxis2);
             editorState = EditorState.TRANSLATETWOAXIS;
         } else if ("translate_XZ".equals(transform)) {
-            //System.out.println("Translatexz");
             a.getWorldRotation().mult(new Vector3f(1, 0, 0), pickAxis1);
             a.getWorldRotation().mult(new Vector3f(0, 0, 1), pickAxis2);
             editorState = EditorState.TRANSLATETWOAXIS;
         }
-        // System.out.println("Current editorstate : " + editorState);
-        // arrows start out as pointing in the z direction.
         pickOffset = contactPoint.clone();
-        // helperSphere1.setLocalTranslation(contactPoint.clone());
 
         for (Node n : currentSelection) {
             n.setUserData("BaseTranslation", n.getLocalTranslation().clone());
@@ -1527,7 +1472,6 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
             ModelKey mk = new ModelKey(asset.getFullName());
             DesktopAssetManager dt = (DesktopAssetManager) assetManager;
             dt.deleteFromCache(mk);
-            //System.out.println("Asset was deleted from cache: " + deleteFromCache);
         }
         if (project != null) {
             String fullName = asset.getFullName();
@@ -1641,10 +1585,8 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
 
     private void enableShadowRenderer(AbstractShadowRenderer renderer, boolean enable) {
         if (enable) {
-            System.out.println("Enabling directional lighting");
             this.viewPort.addProcessor(renderer);
         } else {
-            System.out.println("Disabling directional lighting");
             this.viewPort.removeProcessor(renderer);
         }
     }
