@@ -194,7 +194,6 @@ public class Project implements ProjectTreeNode{
             if ( l instanceof AssetLevel){
                 AssetLevel al = (AssetLevel)l;
                 String path = al.getAsset().toString();
-                System.out.println("Comparing " + path + " to " + p);
                 if ( al.getAsset().equals(p)){
                     return true;
                 }
@@ -300,7 +299,7 @@ public class Project implements ProjectTreeNode{
             try {
                 urls[i] = assetFolders.get(i).toURI().toURL();
             } catch (MalformedURLException ex) {
-                System.out.println(ex.getMessage());
+                Logger.getLogger("DArtE").log(java.util.logging.Level.INFO, null, ex);
             }
         }
         return urls;
