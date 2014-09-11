@@ -60,7 +60,7 @@ public class WatchServiceThread extends Thread {
                 WatchEvent.Kind<?> kind = event.kind();
 
                 if (kind == OVERFLOW) {
-                    System.out.println("type is overflow!");
+                    Logger.getLogger("DArtE").log(Level.SEVERE, "Too many entries in the watch service: overflow error");
                     continue;
                 }
 
@@ -74,23 +74,19 @@ public class WatchServiceThread extends Thread {
                     Path subDir = dir.resolve(file);
                     
                     if (Files.isDirectory(subDir)) {
-                        System.out.println("Directory created : " + subDir);
                         register(subDir);
                         for (WatchServiceListener l : listeners) {
                             l.pathCreated(subDir);
                         }
                     }else{
-                        System.out.println("Asset created : " + subDir);
                         for (WatchServiceListener l : listeners) {
                             l.assetCreated(subDir);
                         }
                     }
                 } else if (ev.kind() == ENTRY_DELETE) {
                     Path subDir = dir.resolve(file);
-                    System.out.println("delete entry :" + subDir);
                     WatchKey toCancel = mapKeys.get(subDir);
                     if (toCancel != null) {
-                        System.out.println("Canceling watch on :" + subDir);
                         toCancel.cancel();
                         mapKeys.remove(subDir);
 
@@ -104,7 +100,6 @@ public class WatchServiceThread extends Thread {
                     }
                 } else if (ev.kind() == ENTRY_MODIFY) {
                     Path subDir = dir.resolve(file);
-                    System.out.println("Entry modified :" + subDir);
                     if (Files.isDirectory(subDir)) {
                         for (WatchServiceListener l : listeners) {
                             l.pathModified(subDir);
@@ -131,7 +126,8 @@ public class WatchServiceThread extends Thread {
             mapKeys.put(toWatch, key);
             allKeys.add(key);
         } catch (IOException ex) {
-            Logger.getLogger(WatchServiceThread.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger("DArtE").log(Level.SEVERE, "Could not register {0}", toWatch);
+            Logger.getLogger("DArtE").log(Level.SEVERE, "Register exception: ", ex);
         }
 
     }
