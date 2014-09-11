@@ -39,17 +39,4 @@ public class EnumListParameter extends Parameter{
     public Object[] getChoices() {
         return choices;
     }
-    
-    public static void main(String[] args) {
-        try {
-            Class<?> enumClass = Class.forName("com.jme3.renderer.queue.RenderQueue$ShadowMode");
-            Object[] choices = enumClass.getEnumConstants();
-            for( Object o : choices){
-                System.out.println(o.toString());
-            }
-                   
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(EnumListParameter.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
 }
