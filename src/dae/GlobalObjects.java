@@ -31,6 +31,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
@@ -100,7 +102,6 @@ public class GlobalObjects {
                 ((UndoPrefabPropertyEdit) edit).setSignificant(true);
             }
         }
-        //System.out.println("Adding edit : " + edit);
         undoManager.addEdit(edit);
         lastEdit = edit;
     }
@@ -323,8 +324,7 @@ public class GlobalObjects {
     public void installCameraKeys(FlyByCamera flyCam, InputManager inputManager) {
         InputContext ic = InputContext.getInstance();
         Locale l = ic.getLocale();
-        System.out.println("language : " + l.getLanguage());
-        System.out.println("Country : " + l.getCountry());
+        Logger.getLogger("DArtE").log(Level.INFO, "Keyboard language : {0} , country : {1}", new Object[]{l.getLanguage(), l.getCountry()});
         ResourceBundle cameraKeyBundle = ResourceBundle.getBundle("i18n.camerakeys", ic.getLocale());
         if (cameraKeyBundle == null) {
             cameraKeyBundle = ResourceBundle.getBundle("camerakeys");
@@ -367,7 +367,6 @@ public class GlobalObjects {
 
     private KeyTrigger getKeyCode(String key, ResourceBundle bundle) {
         String sKeyCode = bundle.getString(key);
-        KeyInput ki;
         return new KeyTrigger(Integer.parseInt(sKeyCode, 16));
     }
 }
