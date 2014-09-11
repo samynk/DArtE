@@ -224,17 +224,14 @@ public class RuleBlockPanel extends javax.swing.JPanel implements DocumentListen
     // End of variables declaration//GEN-END:variables
 
     public void insertUpdate(DocumentEvent e) {
-        //System.out.println("Insert update!");
         updateRules();
     }
 
     public void removeUpdate(DocumentEvent e) {
-        //System.out.println("Remove update!");
         updateRules();
     }
 
     public void changedUpdate(DocumentEvent e) {
-        //System.out.println("Changed update");
         updateRules();
     }
 
@@ -245,11 +242,8 @@ public class RuleBlockPanel extends javax.swing.JPanel implements DocumentListen
             for (String line : text) {
                 FuzzyRule rule = new FuzzyRule(line);
                 if (rule.isParsed()) {
-                    System.out.println("Adding rule to block: " + line);
                     currentRuleBlock.addFuzzyRule(rule);
-                } else {
-                    //System.out.println("Parse error:" + rule.getParseError());
-                }
+                } 
             }
         }
     }
