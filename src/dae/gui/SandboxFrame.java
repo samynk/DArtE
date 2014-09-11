@@ -34,6 +34,7 @@ import dae.prefabs.ui.events.ZoomEvent;
 import dae.prefabs.ui.events.ZoomEventType;
 import dae.project.Project;
 import java.awt.Dimension;
+import java.awt.HeadlessException;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.DropTarget;
@@ -51,6 +52,7 @@ import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -220,8 +222,6 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
         pnlToolbarViewport.setLayout(new java.awt.BorderLayout());
 
         pnlViewPort.setResizeWeight(0.6);
-        pnlViewPort.setMinimumSize(null);
-        pnlViewPort.setPreferredSize(null);
 
         propertiesPanel1.setMinimumSize(null);
         propertiesPanel1.setPreferredSize(null);
@@ -693,42 +693,15 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
         // TODO add your handling code here:
         ObjectTypeCategory otc = viewport.getObjectsToCreate();
         ObjectType ot = otc.getObjectType("Animation", "Skeleton");
-        ot.setExtraInfo("Skeleton/Cathy/body.skel");
         if (ot != null) {
+            ot.setExtraInfo("Skeleton/Cathy/body.skel");
             CreateObjectEvent coe = new CreateObjectEvent(ot.getObjectToCreate(), "Skeleton/Cathy/body.skel", ot);
             GlobalObjects.getInstance().postEvent(coe);
         }
     }//GEN-LAST:event_mnuAddSkeletonActionPerformed
 
     private void mnuSaveProjectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSaveProjectActionPerformed
-        // TODO add your handling code here:
-
-        if (currentProject != null) {
-            if (currentProject.hasFileLocation()) {
-                try {
-                    ProjectSaver.write(currentProject, currentProject.getProjectLocation());
-                } catch (IOException ex) {
-                    Logger.getLogger(SandboxFrame.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            } else {
-                int result = sceneChooser.showSaveDialog(this);
-                if (result == JFileChooser.APPROVE_OPTION) {
-                    File selected = sceneChooser.getSelectedFile();
-                    currentProject.setProjectLocation(selected);
-                    File klatchDirectory = currentProject.getKlatchDirectory();
-                    klatchDirectory.mkdirs();
-                    currentProject.addAssetFolder(currentProject.getKlatchDirectory());
-                    ProjectEvent pe = new ProjectEvent(currentProject, ProjectEventType.ASSETFOLDERCHANGED, this);
-                    GlobalObjects.getInstance().postEvent(pe);
-                    try {
-                        ProjectSaver.write(currentProject, selected);
-                        GlobalObjects.getInstance().addRecentFile(selected);
-                    } catch (IOException ex) {
-                        Logger.getLogger(SandboxFrame.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-            }
-        }
+        saveProject();
     }//GEN-LAST:event_mnuSaveProjectActionPerformed
 
     private void mnuAddHandleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAddHandleActionPerformed
@@ -940,26 +913,36 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
     }//GEN-LAST:event_cboRotateSpaceItemStateChanged
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-        // TODO add your handling code here:
+        if (  !currentProject.hasFileLocation() || !currentProject.getSaved() )
+        {
+            int option = JOptionPane.showConfirmDialog(this,"<html><h3>Save changes to " + currentProject.getProjectName() + " before closing?</h3>" + 
+                    "If you close without saving your changes will be discarded.","Save project",JOptionPane.YES_NO_OPTION);
+            if ( option == JOptionPane.YES_OPTION)
+            {   
+                saveProject();
+            }
+        }
         GlobalObjects.getInstance().postEvent(new ApplicationStoppedEvent());
     }//GEN-LAST:event_formWindowClosing
 
     private void mnuCreateRigActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuCreateRigActionPerformed
-        // TODO add your handling code here:
-        createObjectDialog.setTitle("Create Rig");
-        createObjectDialog.setCurrentProject(this.currentProject);
-        createObjectDialog.setVisible(true);
-        if (createObjectDialog.getReturnStatus() == CreateKlatchDialog.RET_OK) {
-            String rigLocation = createObjectDialog.getAssemblyName();
-            // Create a default body.
-            Rig rig = new Rig();
-            File klatchDir = currentProject.getKlatchDirectory();
-            File rigFile = new File(klatchDir, rigLocation);
-            RigWriter.writeRig(rigFile, rig);
+        if (currentProject.hasFileLocation()) {
+            createObjectDialog.setTitle("Create Rig");
+            createObjectDialog.setCurrentProject(this.currentProject);
+            createObjectDialog.setVisible(true);
+            if (createObjectDialog.getReturnStatus() == CreateKlatchDialog.RET_OK) {
+                String rigLocation = createObjectDialog.getAssemblyName();
+                // Create a default body.
+                Rig rig = new Rig();
+                File klatchDir = currentProject.getKlatchDirectory();
+                File rigFile = new File(klatchDir, rigLocation);
+                RigWriter.writeRig(rigFile, rig);
 
-            AssetEvent ae = new AssetEvent(AssetEventType.EDIT, FileNode.createFromPath(rigLocation));
-            GlobalObjects.getInstance().postEvent(ae);
-
+                AssetEvent ae = new AssetEvent(AssetEventType.EDIT, FileNode.createFromPath(rigLocation));
+                GlobalObjects.getInstance().postEvent(ae);
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "<html>You must save the project before<br> you can create a rig!", "Project not saved", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_mnuCreateRigActionPerformed
 
@@ -985,15 +968,14 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
     private void toggleAutogridItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_toggleAutogridItemStateChanged
         AutoGridEvent age = new AutoGridEvent(evt.getStateChange() == ItemEvent.SELECTED, AxisEnum.Y);
         GlobalObjects.getInstance().postEvent(age);
-        
+
     }//GEN-LAST:event_toggleAutogridItemStateChanged
 
     private void mnuExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuExitActionPerformed
-       dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
+        dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
     }//GEN-LAST:event_mnuExitActionPerformed
 
     private void mnuGettingStartedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuGettingStartedActionPerformed
-        
     }//GEN-LAST:event_mnuGettingStartedActionPerformed
     /**
      * @param args the command line arguments
@@ -1224,6 +1206,37 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
                 case PICK:
                 default:
                     this.gizmoButtonGroup.clearSelection();
+            }
+        }
+    }
+
+    private void saveProject() throws HeadlessException {
+        // TODO add your handling code here:
+
+        if (currentProject != null) {
+            if (currentProject.hasFileLocation()) {
+                try {
+                    ProjectSaver.write(currentProject, currentProject.getProjectLocation());
+                } catch (IOException ex) {
+                    Logger.getLogger(SandboxFrame.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } else {
+                int result = sceneChooser.showSaveDialog(this);
+                if (result == JFileChooser.APPROVE_OPTION) {
+                    File selected = sceneChooser.getSelectedFile();
+                    currentProject.setProjectLocation(selected);
+                    File klatchDirectory = currentProject.getKlatchDirectory();
+                    klatchDirectory.mkdirs();
+                    currentProject.addAssetFolder(currentProject.getKlatchDirectory());
+                    ProjectEvent pe = new ProjectEvent(currentProject, ProjectEventType.ASSETFOLDERCHANGED, this);
+                    GlobalObjects.getInstance().postEvent(pe);
+                    try {
+                        ProjectSaver.write(currentProject, selected);
+                        GlobalObjects.getInstance().addRecentFile(selected);
+                    } catch (IOException ex) {
+                        Logger.getLogger(SandboxFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
             }
         }
     }
