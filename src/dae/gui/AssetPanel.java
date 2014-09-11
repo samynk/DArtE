@@ -393,6 +393,7 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
 
     public void pathModified(Path path) {
         System.out.println("Path modified: " + path);
+        Logger.getLogger("DArtE").log(Level.INFO, "Path modified: {0}", path.toString());
     }
 
     public void assetModified(Path path) {
@@ -516,7 +517,7 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
             parent = current;
             Path p = classpathDir.getName(element);
             if (p == null) {
-                System.out.println("Problem getting path element " + element + " from " + classpathDir + " with " + nameCount + " elements!");
+                Logger.getLogger("DArtE").log(Level.WARNING, "Problem getting path element {0} from {1} with {2} elements!", new Object[]{element, classpathDir, nameCount});
                 break;
             } else {
                 current = current.getChild(classpathDir.getName(element).toString());
