@@ -306,7 +306,7 @@ public class AutoSuggestor {
         try {
             textComp.getDocument().insertString(textComp.getCaretPosition(), wordToInsert, null);
         } catch (BadLocationException ex) {
-            Logger.getLogger(AutoSuggestor.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
         }
     }
 

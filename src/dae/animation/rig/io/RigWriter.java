@@ -100,12 +100,12 @@ public class RigWriter {
             }
             bw.write("</rig>\n");
         } catch (IOException ex) {
-            Logger.getLogger(SceneSaver.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
         } finally {
             try {
                 bw.close();
             } catch (IOException ex) {
-                Logger.getLogger(SceneSaver.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
             }
         }
     }

@@ -287,7 +287,7 @@ public class Project implements ProjectTreeNode{
             try {
                 projectAssetsLoader.close();
             } catch (IOException ex) {
-                Logger.getLogger(Project.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+                Logger.getLogger("DArtE").log(java.util.logging.Level.SEVERE, null, ex);
             }
         }
         projectAssetsLoader = new URLClassLoader(getClassPathUrls(), this.getClass().getClassLoader());

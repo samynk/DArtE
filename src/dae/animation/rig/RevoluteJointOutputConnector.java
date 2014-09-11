@@ -102,7 +102,7 @@ public class RevoluteJointOutputConnector implements OutputConnector {
             sw.write("/>\n");
             return sw.toString();
         } catch (IOException ex) {
-            Logger.getLogger(AngleTargetConnector.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
         }
         return "";
     }

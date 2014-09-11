@@ -169,11 +169,11 @@ public class InputConnectorPanel extends javax.swing.JPanel {
             currentPanelId = ict.getId();
             cl.show(pnlConnectorTypes, ict.getId());
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(InputConnectorPanel.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            Logger.getLogger(InputConnectorPanel.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            Logger.getLogger(InputConnectorPanel.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
         }
     }
 

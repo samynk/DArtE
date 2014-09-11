@@ -50,7 +50,7 @@ public class DirectorySearcher implements FileVisitor<Path> {
             Files.walkFileTree(startDirectory, this);
             return rootNode;
         } catch (IOException ex) {
-            Logger.getLogger(DirectorySearcher.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
         }
         return new FileNode("<error>", false);
     }

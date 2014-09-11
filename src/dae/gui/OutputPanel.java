@@ -49,7 +49,7 @@ public class OutputPanel extends javax.swing.JPanel {
         try {
             outputDocument.insertString(outputDocument.getLength(), message.getText() + "\n",errorStyle);
         } catch (BadLocationException ex) {
-            Logger.getLogger(OutputPanel.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
         }
     }
 

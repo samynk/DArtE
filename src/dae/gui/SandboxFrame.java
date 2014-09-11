@@ -658,7 +658,7 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
 
                 GlobalObjects.getInstance().addRecentFile(projectFile);
             } catch (IOException ex) {
-                Logger.getLogger(SandboxFrame.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
             }
         }
     }//GEN-LAST:event_mnuNewProjectActionPerformed
@@ -998,17 +998,13 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(SandboxFrame.class
-                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger("DArtE").log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(SandboxFrame.class
-                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger("DArtE").log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(SandboxFrame.class
-                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger("DArtE").log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(SandboxFrame.class
-                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger("DArtE").log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 
@@ -1019,13 +1015,13 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
                 FileHandler fh;
 
                 try {
-                    File logDir = new File(System.getProperty("user.dir")+"/logs");
-                    if ( !logDir.exists()){
+                    File logDir = new File(System.getProperty("user.dir") + "/logs");
+                    if (!logDir.exists()) {
                         logDir.mkdir();
                     }
                     // This block configure the logger with handler and formatter  
-                    fh = new FileHandler(System.getProperty("user.dir")+"/logs/darte.log");
-                    
+                    fh = new FileHandler(System.getProperty("user.dir") + "/logs/darte.log");
+
                     logger.addHandler(fh);
                     SimpleFormatter formatter = new SimpleFormatter();
                     fh.setFormatter(formatter);
@@ -1037,7 +1033,7 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
                     Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
                 } catch (SecurityException ex) {
                     Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
-                } 
+                }
 
                 new SandboxFrame().setVisible(true);
             }
@@ -1177,11 +1173,9 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
 
             }
         } catch (UnsupportedFlavorException ex) {
-            Logger.getLogger(SandboxFrame.class
-                    .getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(SandboxFrame.class
-                    .getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
         }
     }
 
@@ -1242,7 +1236,7 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
                 try {
                     ProjectSaver.write(currentProject, currentProject.getProjectLocation());
                 } catch (IOException ex) {
-                    Logger.getLogger(SandboxFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
                 }
             } else {
                 int result = sceneChooser.showSaveDialog(this);
@@ -1258,7 +1252,7 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
                         ProjectSaver.write(currentProject, selected);
                         GlobalObjects.getInstance().addRecentFile(selected);
                     } catch (IOException ex) {
-                        Logger.getLogger(SandboxFrame.class.getName()).log(Level.SEVERE, null, ex);
+                        Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
                     }
                 }
             }

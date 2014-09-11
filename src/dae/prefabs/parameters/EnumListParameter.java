@@ -32,7 +32,7 @@ public class EnumListParameter extends Parameter{
             Class<?> enumClass = Class.forName(className);
             choices = enumClass.getEnumConstants();
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(EnumListParameter.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
         }
     }
 

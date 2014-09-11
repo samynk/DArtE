@@ -72,7 +72,7 @@ public class GameSceneLoader {
             is = new BufferedInputStream(new FileInputStream(location));
             loadScene(is, am, scene);
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(dae.io.SceneLoader.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
         }
     }
 
@@ -90,22 +90,22 @@ public class GameSceneLoader {
             NodeList nl = root.getChildNodes();
             readNodeChildren(nl, am, scene);
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(dae.io.SceneLoader.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            Logger.getLogger(dae.io.SceneLoader.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            Logger.getLogger(dae.io.SceneLoader.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
         } catch (SAXException ex) {
-            Logger.getLogger(dae.io.SceneLoader.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
         } catch (ParserConfigurationException ex) {
-            Logger.getLogger(dae.io.SceneLoader.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(dae.io.SceneLoader.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
         } finally {
             try {
                 is.close();
             } catch (IOException ex) {
-                Logger.getLogger(dae.io.SceneLoader.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
             }
         }
     }

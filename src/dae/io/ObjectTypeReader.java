@@ -90,13 +90,13 @@ public class ObjectTypeReader implements AssetLoader {
 
             return result;
         } catch (SAXException ex) {
-            Logger.getLogger(ObjectTypeReader.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
             return result;
         } catch (ParserConfigurationException ex) {
-            Logger.getLogger(ObjectTypeReader.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
             return result;
         } catch (IOException ex) {
-            Logger.getLogger(ObjectTypeReader.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
             return result;
         }
     }

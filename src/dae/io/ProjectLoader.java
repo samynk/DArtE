@@ -68,11 +68,11 @@ public class ProjectLoader {
                 } 
             }
         } catch (ParserConfigurationException ex) {
-            Logger.getLogger(ProjectLoader.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
         } catch (SAXException ex) {
-            Logger.getLogger(ProjectLoader.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(ProjectLoader.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
         }
         return p;
     }

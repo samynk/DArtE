@@ -81,7 +81,7 @@ public class SceneLoader implements AssetLoader {
             is = new BufferedInputStream(new FileInputStream(location));
             loadScene(is, am, scene, objectsToCreate, selectionMaterial);
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(SceneLoader.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
         }
     }
 
@@ -99,22 +99,22 @@ public class SceneLoader implements AssetLoader {
             NodeList nl = root.getChildNodes();
             readNodeChildren(nl, am, objectsToCreate, scene);
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(SceneLoader.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            Logger.getLogger(SceneLoader.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            Logger.getLogger(SceneLoader.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
         } catch (SAXException ex) {
-            Logger.getLogger(SceneLoader.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
         } catch (ParserConfigurationException ex) {
-            Logger.getLogger(SceneLoader.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(SceneLoader.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
         } finally {
             try {
                 is.close();
             } catch (IOException ex) {
-                Logger.getLogger(SceneLoader.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
             }
         }
     }

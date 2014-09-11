@@ -69,7 +69,7 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
             thread = new WatchServiceThread(service);
             thread.addWatchServiceListener(this);
         } catch (IOException ex) {
-            Logger.getLogger(AssetPanel.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
         }
 
         if (registerListener) {
@@ -442,7 +442,7 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
                 // scan items that might have been copied together with the directory.
                 searcher.findResourceInDirectory(newDir, baseNode, subDir.toFile(), filePattern.matcher(""), thread);
             } catch (IOException ex) {
-                Logger.getLogger(AssetPanel.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
             }
 
             treeModel.fireNodeAdded(tme);
@@ -679,7 +679,7 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
         try {
             service.close();
         } catch (IOException ex) {
-            Logger.getLogger(AssetPanel.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
         }
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables

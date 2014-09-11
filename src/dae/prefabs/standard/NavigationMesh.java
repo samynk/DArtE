@@ -178,7 +178,7 @@ public class NavigationMesh extends Prefab {
                 try {
                     be.save(geom, new File(pathToCompiledMesh));
                 } catch (IOException ex) {
-                    Logger.getLogger(NavigationMesh.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
                 }
             }
         } else {

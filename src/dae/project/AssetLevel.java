@@ -119,7 +119,7 @@ public class AssetLevel extends Level {
                 SceneLoader.loadScene(locationOnDisk.openStream(), manager, this, GlobalObjects.getInstance().getObjectsTypeCategory(), null);
                 savableObject = this;
             } catch (IOException ex) {
-                Logger.getLogger(AssetLevel.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+                Logger.getLogger("DArtE").log(java.util.logging.Level.SEVERE, null, ex);
             }
             levelShown = true;
         } else if (Files.getFileExtension(assetLocation).equalsIgnoreCase("rig")) {
