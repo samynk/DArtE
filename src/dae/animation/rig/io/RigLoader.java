@@ -122,7 +122,6 @@ public class RigLoader implements AssetLoader {
             return;
         }
         String name = docNode.getNodeName();
-        //System.out.println("Local name is :" + name);
         if (name.equals("joint") || name.equals("limb")) {
             BodyElement current = null;
             if (docNode.hasAttributes()) {
@@ -130,7 +129,6 @@ public class RigLoader implements AssetLoader {
                 Node type = map.getNamedItem("type");
                 
                 String stype = type.getTextContent();
-                System.out.println("type is : " + stype);
                 if (stype.equalsIgnoreCase("Ball")) {
                     current = createBallJoint(docNode);
                     jmeParentNode.attachBodyElement(current);
@@ -706,12 +704,10 @@ public class RigLoader implements AssetLoader {
                 NamedNodeMap map = target.getAttributes();
                 final String key = getAttrContent("key", map);
                 String prefab = getAttrContent("target", map);
-                System.out.println("found key : " + key + "," + prefab);
                 PrefabPlaceHolder placeHolder = new PrefabPlaceHolder(prefab,
                         new PrefabPlaceHolderCallback() {
 
                     public void prefabFound(Prefab actualPrefab, PrefabPlaceHolder placeHolder) {
-                        System.out.println("Found the actual prefab : " + actualPrefab);
                         rig.setTarget(key, actualPrefab);
                         placeHolder.removeFromParent();
                     }
