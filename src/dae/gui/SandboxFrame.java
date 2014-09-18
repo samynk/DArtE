@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.gui;
 
 import com.google.common.eventbus.Subscribe;
@@ -33,6 +29,7 @@ import dae.prefabs.ui.events.ViewportReshapeEvent;
 import dae.prefabs.ui.events.ZoomEvent;
 import dae.prefabs.ui.events.ZoomEventType;
 import dae.project.Project;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.HeadlessException;
 import java.awt.datatransfer.DataFlavor;
@@ -976,6 +973,12 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
     }//GEN-LAST:event_mnuExitActionPerformed
 
     private void mnuGettingStartedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuGettingStartedActionPerformed
+        File indexFile = new File(System.getProperty("user.dir"),"docs/html/index.html");
+        try {
+            Desktop.getDesktop().browse(indexFile.toURI());
+        } catch (IOException ex) {
+            Logger.getLogger(SandboxFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_mnuGettingStartedActionPerformed
     /**
      * @param args the command line arguments
