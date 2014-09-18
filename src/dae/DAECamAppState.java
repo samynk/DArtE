@@ -19,16 +19,16 @@ import dae.gui.SandboxViewport;
 public class DAECamAppState extends AbstractAppState {
 
     private Application app;
-    private FlyByCamera flyCam;
+    private DAEFlyByCamera flyCam;
 
     /**
      * This is called by SimpleApplication during initialize().
      */
-    void setCamera(FlyByCamera cam) {
+    void setCamera(DAEFlyByCamera cam) {
         this.flyCam = cam;
     }
 
-    public FlyByCamera getCamera() {
+    public DAEFlyByCamera getCamera() {
         return flyCam;
     }
 
@@ -43,13 +43,14 @@ public class DAECamAppState extends AbstractAppState {
                 flyCam.setUpVector(Vector3f.UNIT_Y);
                 flyCam.setDragToRotate(true);
                 flyCam.setMoveSpeed(5.0f);
+                GlobalObjects.getInstance().setCamera(flyCam);
                 if ( app instanceof SandboxViewport)
                 {
                     SandboxViewport sv = (SandboxViewport)app;
                     sv.setFlyByCamera(flyCam);
                 }
             }
-            GlobalObjects.getInstance().installCameraKeys(flyCam, app.getInputManager());
+            GlobalObjects.getInstance().installCameraKeys(flyCam, app.getInputManager(),false);
         }
     }
 
