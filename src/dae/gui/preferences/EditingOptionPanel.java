@@ -7,7 +7,6 @@ package dae.gui.preferences;
 
 import com.jme3.math.Vector3f;
 import dae.GlobalObjects;
-import static dae.gui.PreferencesDialog.RET_OK;
 import dae.prefabs.AxisEnum;
 import java.io.File;
 import java.util.List;
@@ -16,7 +15,7 @@ import java.util.List;
  *
  * @author Koen Samyn
  */
-public class EditingOptionPanel extends javax.swing.JPanel {
+public class EditingOptionPanel extends javax.swing.JPanel implements PreferencePanel{
 
     /** Creates new form EditingOptionPanel */
     public EditingOptionPanel() {
@@ -42,6 +41,18 @@ public class EditingOptionPanel extends javax.swing.JPanel {
         float y = (Float) spnGridY.getValue();
         float z = (Float) spnGridZ.getValue();
         GlobalObjects.getInstance().setGrid(new Vector3f(x, y, z));
+    }
+    
+    public void createBackup() {
+        
+    }
+
+    public void commitChanges() {
+        doOk();
+    }
+
+    public void revertChanges() {
+        
     }
 
     /** This method is called from within the constructor to
@@ -211,5 +222,7 @@ public class EditingOptionPanel extends javax.swing.JPanel {
     private javax.swing.JSpinner spnGridY;
     private javax.swing.JSpinner spnGridZ;
     // End of variables declaration//GEN-END:variables
+
+
 
 }
