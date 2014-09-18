@@ -119,6 +119,9 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
         rigPopupMenu = new javax.swing.JPopupMenu();
         mnuEditRig = new javax.swing.JMenuItem();
         mnuDeleteRig = new javax.swing.JMenuItem();
+        klatchPopupMenu = new javax.swing.JPopupMenu();
+        mnuEditKlatch = new javax.swing.JMenuItem();
+        mnuDeleteRig1 = new javax.swing.JMenuItem();
         scrAssetPanel = new javax.swing.JScrollPane();
         assetTree = new javax.swing.JTree();
         txtSearch = new javax.swing.JTextField();
@@ -156,6 +159,17 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
 
         mnuDeleteRig.setText("Delete Rig");
         rigPopupMenu.add(mnuDeleteRig);
+
+        mnuEditKlatch.setText("Edit Assembly ...");
+        mnuEditKlatch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuEditKlatchActionPerformed(evt);
+            }
+        });
+        klatchPopupMenu.add(mnuEditKlatch);
+
+        mnuDeleteRig1.setText("Delete Assembly");
+        klatchPopupMenu.add(mnuDeleteRig1);
 
         javax.swing.tree.DefaultMutableTreeNode treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("Assets");
         assetTree.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));
@@ -317,6 +331,16 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
         }
     }//GEN-LAST:event_mnuEditRigActionPerformed
 
+    private void mnuEditKlatchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuEditKlatchActionPerformed
+        // TODO add your handling code here:
+        Object o = this.assetTree.getLastSelectedPathComponent();
+        if (o != null && o instanceof FileNode) {
+            FileNode fn = (FileNode) o;
+            AssetEvent ae = new AssetEvent(AssetEventType.EDIT, fn);
+            GlobalObjects.getInstance().postEvent(ae);
+        }
+    }//GEN-LAST:event_mnuEditKlatchActionPerformed
+
     private void adaptFilter() {
         int count = 0;
         boolean klatches = cboKlatchFilter.isSelected();
@@ -374,9 +398,11 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
         if (selected.isFile()) {
             String ext = selected.getExtension();
             if (ext.equalsIgnoreCase("j3o")) {
-                this.assetPopupMenu.show(tree, evt.getX(), evt.getY());
+                this.assetPopupMenu.show(tree, evt.getX(), evt.getY()+5);
             } else if (ext.equalsIgnoreCase("rig")) {
-                this.rigPopupMenu.show(tree, evt.getX(), evt.getY());
+                this.rigPopupMenu.show(tree, evt.getX(), evt.getY()+5);
+            } else if ( ext.equalsIgnoreCase("klatch")){
+                this.klatchPopupMenu.show(tree, evt.getX(), evt.getY()+5);
             }
         }
     }
@@ -689,9 +715,12 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
     private javax.swing.JToggleButton cboKlatchFilter;
     private javax.swing.JToggleButton cboMeshFilter;
     private javax.swing.JToggleButton cboRigFilter;
+    private javax.swing.JPopupMenu klatchPopupMenu;
     private javax.swing.JLabel lblSearch;
     private javax.swing.JMenuItem mnuDelete;
     private javax.swing.JMenuItem mnuDeleteRig;
+    private javax.swing.JMenuItem mnuDeleteRig1;
+    private javax.swing.JMenuItem mnuEditKlatch;
     private javax.swing.JMenuItem mnuEditObject;
     private javax.swing.JMenuItem mnuEditRig;
     private javax.swing.JPopupMenu rigPopupMenu;
