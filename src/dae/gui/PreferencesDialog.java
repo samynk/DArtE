@@ -1,16 +1,9 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.gui;
 
-import com.jme3.math.Vector3f;
-import dae.GlobalObjects;
-import dae.prefabs.AxisEnum;
+import dae.gui.preferences.PreferencePanel;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.io.File;
-import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
@@ -18,8 +11,9 @@ import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 
 /**
+ * Dialog that enables the user to change the settings of the application.
  *
- * @author samyn_000
+ * @author Koen Samyn
  */
 public class PreferencesDialog extends javax.swing.JDialog {
 
@@ -31,7 +25,6 @@ public class PreferencesDialog extends javax.swing.JDialog {
      * A return status code - returned if OK button has been pressed
      */
     public static final int RET_OK = 1;
-    
 
     /**
      * Creates new form PreferencesDialog
@@ -51,7 +44,7 @@ public class PreferencesDialog extends javax.swing.JDialog {
             }
         });
 
-        
+
     }
 
     /**
@@ -85,6 +78,9 @@ public class PreferencesDialog extends javax.swing.JDialog {
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 closeDialog(evt);
+            }
+            public void windowOpened(java.awt.event.WindowEvent evt) {
+                formWindowOpened(evt);
             }
         });
         getContentPane().setLayout(new java.awt.GridBagLayout());
@@ -152,10 +148,36 @@ public class PreferencesDialog extends javax.swing.JDialog {
         doClose(RET_CANCEL);
     }//GEN-LAST:event_closeDialog
 
+    private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
+        // TODO add your handling code here:
+        for (Component c : this.preferencesTab.getComponents()) {
+            if (c instanceof PreferencePanel) {
+                PreferencePanel pp = (PreferencePanel) c;
+                pp.createBackup();
+            }
+        }
+    }//GEN-LAST:event_formWindowOpened
+
     private void doClose(int retStatus) {
         returnStatus = retStatus;
         setVisible(false);
         dispose();
+
+        if (retStatus == RET_CANCEL) {
+            for (Component c : this.preferencesTab.getComponents()) {
+                if (c instanceof PreferencePanel) {
+                    PreferencePanel pp = (PreferencePanel) c;
+                    pp.revertChanges();
+                }
+            }
+        }else{
+            for (Component c : this.preferencesTab.getComponents()) {
+                if (c instanceof PreferencePanel) {
+                    PreferencePanel pp = (PreferencePanel) c;
+                    pp.commitChanges();
+                }
+            }
+        }
     }
 
     /**
