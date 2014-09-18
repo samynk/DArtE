@@ -121,8 +121,11 @@ public class ProjectSaver {
             File levelFile = new File("levels/" + l.getName() + "/" + l.getName() + ".scene");
             l.setRelativeLocation(true);
             l.setLocation(levelFile);
-
-            l.save(new File(projectDir, levelFile.getPath()));
+            try {
+                l.save(new File(projectDir, levelFile.getPath()));
+            } catch (Exception ex) {
+                Logger.getLogger("DArtE").log(java.util.logging.Level.SEVERE, "Could not write level " + l.getName(),ex);
+            }
         }
 
         if (l.isExportOnSave() && l.hasExportKeys()) {
