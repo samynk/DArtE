@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.gui;
 
 import com.google.common.eventbus.Subscribe;
@@ -418,7 +414,6 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
     }
 
     public void pathModified(Path path) {
-        System.out.println("Path modified: " + path);
         Logger.getLogger("DArtE").log(Level.INFO, "Path modified: {0}", path.toString());
     }
 
