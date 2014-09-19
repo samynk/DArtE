@@ -75,6 +75,7 @@ import dae.prefabs.prefab.undo.DeletePrefabEdit;
 import dae.prefabs.prefab.undo.UndoPrefabPropertyEdit;
 import dae.prefabs.shapes.LineShape;
 import dae.prefabs.shapes.QuadShape;
+import dae.prefabs.standard.CameraFrame;
 import dae.prefabs.standard.MagnetObject;
 import dae.prefabs.standard.MeshObject;
 import dae.prefabs.types.ObjectType;
@@ -284,6 +285,9 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
         GlobalObjects.getInstance().registerListener(this);
 
         cam.setFrustumPerspective(45f, (float) cam.getWidth() / cam.getHeight(), 0.01f, 1000f);
+        cam.setLocation(new Vector3f(5,2,0));
+        cam.lookAt(new Vector3f(0,0,0), new Vector3f(0,1,0));
+        
         initKeys();
 
 //        this.helperSphere1 = createDebugSphere(this.assetManager, 0.02f, ColorRGBA.White);
@@ -796,6 +800,13 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
                 editorState = EditorState.IDLE;
 
                 bas.getPhysicsSpace().addAll(level);
+                
+                CameraFrame cf = level.getLastCamera();
+                if (cf != null){
+                    this.cam.setLocation(cf.getTranslation().clone());
+                    this.cam.setRotation(cf.getRotation().clone());
+                    this.cam.setProjectionMatrix(cf.getProjectionMatrix().clone());
+                }
             }
         }
 
