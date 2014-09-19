@@ -1,6 +1,8 @@
 package dae.gui;
 
 import com.google.common.eventbus.Subscribe;
+import com.google.common.io.Files;
+import com.jme3.asset.AssetManager;
 import com.jme3.system.AppSettings;
 import com.jme3.system.JmeCanvasContext;
 import dae.GlobalObjects;
@@ -9,6 +11,7 @@ import dae.animation.rig.io.RigWriter;
 import dae.gui.events.ApplicationStoppedEvent;
 import dae.io.ProjectLoader;
 import dae.io.ProjectSaver;
+import dae.io.SceneLoader;
 import dae.prefabs.AxisEnum;
 import dae.prefabs.gizmos.RotateGizmoSpace;
 import dae.prefabs.gizmos.TranslateGizmoSpace;
@@ -23,6 +26,7 @@ import dae.prefabs.ui.events.AssetEventType;
 import dae.prefabs.ui.events.CreateObjectEvent;
 import dae.prefabs.ui.events.GizmoEvent;
 import dae.prefabs.ui.events.GizmoType;
+import dae.prefabs.ui.events.LevelEvent;
 import dae.prefabs.ui.events.ProjectEvent;
 import dae.prefabs.ui.events.ProjectEventType;
 import dae.prefabs.ui.events.ViewportReshapeEvent;
@@ -65,6 +69,8 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
     private SandboxViewport viewport;
     private CreateProjectDialog createProjectDialog;
     private CreateKlatchDialog createObjectDialog;
+    private FileNameExtensionFilter sandboxFilter = new FileNameExtensionFilter("Sandbox Files", "zbk");
+    private FileNameExtensionFilter sceneFilter = new FileNameExtensionFilter("Scene files", "scene");
     /**
      * The current project.
      */
@@ -152,6 +158,7 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
         mnuFile = new javax.swing.JMenu();
         mnuNewProject = new javax.swing.JMenuItem();
         mnuOpenScene = new javax.swing.JMenuItem();
+        mnuImportScene = new javax.swing.JMenuItem();
         openSeparator = new javax.swing.JPopupMenu.Separator();
         mnuSaveProject = new javax.swing.JMenuItem();
         mnuExit = new javax.swing.JMenuItem();
@@ -159,6 +166,8 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
         mnuUndo = new javax.swing.JMenuItem();
         mnuRedo = new javax.swing.JMenuItem();
         mnuPreferences = new javax.swing.JMenuItem();
+        mnuEntities = new javax.swing.JMenu();
+        mnuAddCamera = new javax.swing.JMenuItem();
         mnuAdd = new javax.swing.JMenu();
         mnuCreateRig = new javax.swing.JMenuItem();
         mnuAddRevoluteJoint = new javax.swing.JMenuItem();
@@ -248,7 +257,6 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
 
         gizmoButtonGroup.add(btnMove);
         btnMove.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dae/icons/transform_move.png"))); // NOI18N
-        btnMove.setSelected(true);
         btnMove.setFocusable(false);
         btnMove.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnMove.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -346,6 +354,14 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
             }
         });
         mnuFile.add(mnuOpenScene);
+
+        mnuImportScene.setText("Import Scene ...");
+        mnuImportScene.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuImportSceneActionPerformed(evt);
+            }
+        });
+        mnuFile.add(mnuImportScene);
         mnuFile.add(openSeparator);
 
         mnuSaveProject.setText("Save Project");
@@ -400,6 +416,18 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
         mnuEdit.add(mnuPreferences);
 
         mnuSandboxMenu.add(mnuEdit);
+
+        mnuEntities.setText("Entities");
+
+        mnuAddCamera.setText("Add Camera");
+        mnuAddCamera.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuAddCameraActionPerformed(evt);
+            }
+        });
+        mnuEntities.add(mnuAddCamera);
+
+        mnuSandboxMenu.add(mnuEntities);
 
         mnuAdd.setText("Animation");
 
@@ -631,6 +659,7 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
         if (file.exists()) {
             sceneChooser.setCurrentDirectory(file.getParentFile());
         }
+        sceneChooser.setFileFilter(this.sandboxFilter);
         int choice = sceneChooser.showOpenDialog(this);
         if (choice == JFileChooser.APPROVE_OPTION) {
             File projectFile = sceneChooser.getSelectedFile();
@@ -973,13 +1002,62 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
     }//GEN-LAST:event_mnuExitActionPerformed
 
     private void mnuGettingStartedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuGettingStartedActionPerformed
-        File indexFile = new File(System.getProperty("user.dir"),"docs/html/index.html");
+        File indexFile = new File(System.getProperty("user.dir"), "docs/html/index.html");
         try {
             Desktop.getDesktop().browse(indexFile.toURI());
         } catch (IOException ex) {
             Logger.getLogger(SandboxFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_mnuGettingStartedActionPerformed
+
+    private void mnuAddCameraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAddCameraActionPerformed
+        ObjectTypeCategory otc = viewport.getObjectsToCreate();
+        ObjectType ot = otc.getObjectType("Standard", "Camera");
+        if (ot != null) {
+            CreateObjectEvent coe = new CreateObjectEvent(ot.getObjectToCreate(), null, ot);
+            GlobalObjects.getInstance().postEvent(coe);
+        }
+    }//GEN-LAST:event_mnuAddCameraActionPerformed
+
+    private void mnuImportSceneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuImportSceneActionPerformed
+        if (currentProject.hasFileLocation()) {
+            sceneChooser.setFileFilter(sceneFilter);
+            int option = this.sceneChooser.showOpenDialog(this);
+            if (option == JFileChooser.APPROVE_OPTION) {
+                File sceneFile = sceneChooser.getSelectedFile();
+                System.out.println("selected file : " + sceneFile);
+                String levelName = Files.getNameWithoutExtension(sceneFile.getName());
+                if (!currentProject.hasLevel(levelName)) {
+                    dae.project.Level newLevel = new dae.project.Level(levelName, false);
+                    File projectLocation = currentProject.getProjectLocation();
+                    File levelDir = new File(projectLocation.getParentFile(), "levels/" + levelName);
+                    if (!levelDir.exists()) {
+                        levelDir.mkdir();
+                    }
+
+                    File dest = new File(levelDir, sceneFile.getName());
+                    try {
+                        Files.copy(sceneFile, dest);
+                        File relativeLocation = new File("levels/"+levelName+"/"+sceneFile.getName());
+                        newLevel.setLocation(relativeLocation);
+                        newLevel.setRelativeLocation(true);
+                        AssetManager manager = GlobalObjects.getInstance().getAssetManager();
+                        SceneLoader.loadScene(sceneFile, manager, newLevel, GlobalObjects.getInstance().getObjectsTypeCategory(),
+                                manager.loadMaterial("Materials/SelectionMaterial.j3m"));
+                        currentProject.addLevel(newLevel);
+                        newLevel.setChanged();
+                        ProjectEvent pe = new ProjectEvent(currentProject, ProjectEventType.LEVELADDED, this);
+                        pe.setLevel(newLevel);
+                        GlobalObjects.getInstance().postEvent(pe);
+                    } catch (IOException ex) {
+                        Logger.getLogger("DArtE").log(Level.SEVERE, "Could not copy {0} to {1}", new Object[]{sceneFile.getPath(), dest.getPath()});
+                    }
+                }
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Save the project first before you import a scene!", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_mnuImportSceneActionPerformed
     /**
      * @param args the command line arguments
      */
@@ -1060,6 +1138,7 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
     private javax.swing.JMenu mnuAdd;
     private javax.swing.JMenuItem mnuAdd2HandleAxis;
     private javax.swing.JMenuItem mnuAddAmbientLight;
+    private javax.swing.JMenuItem mnuAddCamera;
     private javax.swing.JMenuItem mnuAddCharacterPath;
     private javax.swing.JMenuItem mnuAddCrate;
     private javax.swing.JMenuItem mnuAddCylinder;
@@ -1075,11 +1154,13 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
     private javax.swing.JMenuItem mnuAddWaypoint;
     private javax.swing.JMenuItem mnuCreateRig;
     private javax.swing.JMenu mnuEdit;
+    private javax.swing.JMenu mnuEntities;
     private javax.swing.JMenuItem mnuExit;
     private javax.swing.JMenu mnuFile;
     private javax.swing.JMenuItem mnuGettingStarted;
     private javax.swing.JMenuItem mnuHandCurve;
     private javax.swing.JMenu mnuHelp;
+    private javax.swing.JMenuItem mnuImportScene;
     private javax.swing.JMenu mnuLights;
     private javax.swing.JMenu mnuMetaData;
     private javax.swing.JMenuItem mnuNewProject;
@@ -1242,6 +1323,7 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
                     Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
                 }
             } else {
+                sceneChooser.setFileFilter(sandboxFilter);
                 int result = sceneChooser.showSaveDialog(this);
                 if (result == JFileChooser.APPROVE_OPTION) {
                     File selected = sceneChooser.getSelectedFile();
