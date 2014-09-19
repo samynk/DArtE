@@ -103,6 +103,7 @@ public class ProjectLoader {
             if ("level".equals(level.getNodeName())) {
                 String type = getAttrContent("type", level.getAttributes());
                 String levelName = getAttrContent("name", level.getAttributes());
+                boolean relativeLocation = XMLUtils.parseBoolean("relative", level.getAttributes());
                 if (type == null || type.length() == 0 || type.equals("scene")) {
                     dae.project.Level l = new dae.project.Level(levelName, false);
                     NodeList levelChildren = level.getChildNodes();
@@ -110,11 +111,12 @@ public class ProjectLoader {
                         Node fileNode = levelChildren.item(j);
                         if (fileNode != null) {
                             if ("file".equals(fileNode.getNodeName())) {
-
+                                String relativeFile = fileNode.getFirstChild().getTextContent();
                                 File sceneFile = new File(projectDir, fileNode.getFirstChild().getTextContent());
                                 SceneLoader.loadScene(sceneFile, manager, l, GlobalObjects.getInstance().getObjectsTypeCategory(),
                                         manager.loadMaterial("Materials/SelectionMaterial.j3m"));
-
+                                l.setLocation(new File(relativeFile));
+                                l.setRelativeLocation(relativeLocation);
                             }else if ("exportsettings".equals(fileNode.getNodeName())){
                                 readExportSettings(fileNode, l);
                             }
@@ -130,6 +132,8 @@ public class ProjectLoader {
                             if ("file".equals(fileNode.getNodeName())) {
                                 String path = fileNode.getFirstChild().getTextContent();
                                 al = new AssetLevel(Paths.get(path));
+                                al.setLocation(new File(path));
+                                al.setRelativeLocation(relativeLocation);
                             }else if ("exportsettings".equals(fileNode.getNodeName())){
                                 if ( al != null)
                                 {
