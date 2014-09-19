@@ -267,6 +267,32 @@ public class Level extends Node implements ProjectTreeNode {
     }
     
     /**
+     * Checks if this Level object has changed.
+     *
+     * @return true if the level has changed, false otherwise.
+     */
+    public boolean isChanged() {
+        boolean changed = false;
+        for (Spatial s : this.children) {
+            if (s instanceof Prefab) {
+                changed |= ((Prefab) s).isChanged(true);
+            }
+        }
+        return changed;
+    }
+    
+    /**
+     * Sets the level to the changed status.
+     */
+    public void setChanged() {
+        for (Spatial s: this.children){
+            if ( s instanceof Prefab){
+                ((Prefab)s).setChanged(true, false);
+            }
+        }
+    }
+    
+    /**
      * Returns the last know camera frame.
      * @return the last camera frame that was used for this level.
      */
@@ -586,4 +612,6 @@ public class Level extends Node implements ProjectTreeNode {
     public void save(File location) {
         SceneSaver.writeScene(location, this);
     }
+
+    
 }
