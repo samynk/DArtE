@@ -100,24 +100,30 @@ public class ProjectPanel extends javax.swing.JPanel implements TreeSelectionLis
 
     @Subscribe
     public void projectSelected(final ProjectEvent event) {
-        if (event.getSource() != this
-                && (event.getEventType() == ProjectEventType.CREATED || event.getEventType() == ProjectEventType.SELECTED)) {
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    currentProject = event.getProject();
-                    treeModel = new ProjectTreeModel(event.getProject());
-                    projectTree.setModel(treeModel);
-                    projectTree.addTreeSelectionListener(ProjectPanel.this);
-                    if (event.getProject().hasLevels()) {
-                        Level level = event.getProject().getLevel(0);
-                        if (level != null) {
-                            TreePath path = new TreePath(new Object[]{event.getProject(), level});
-                            projectTree.setSelectionPath(path);
+        if (event.getSource() != this) {
+
+
+            if (event.getEventType() == ProjectEventType.CREATED || event.getEventType() == ProjectEventType.SELECTED) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        currentProject = event.getProject();
+                        treeModel = new ProjectTreeModel(event.getProject());
+                        projectTree.setModel(treeModel);
+                        projectTree.addTreeSelectionListener(ProjectPanel.this);
+                        if (event.getProject().hasLevels()) {
+                            Level level = event.getProject().getLevel(0);
+                            if (level != null) {
+                                TreePath path = new TreePath(new Object[]{event.getProject(), level});
+                                projectTree.setSelectionPath(path);
+                            }
                         }
+                        projectTree.updateUI();
                     }
-                    projectTree.updateUI();
-                }
-            });
+                });
+            } else if (event.getEventType() == ProjectEventType.LEVELADDED){
+                Level level = event.getLevel();
+                treeModel.fireInsertLevelEvent(level, currentProject.getIndexOfLevel(level));
+            }
         }
     }
 
@@ -207,6 +213,7 @@ public class ProjectPanel extends javax.swing.JPanel implements TreeSelectionLis
             String levelName = createLayerDialog.getLevelName();
             if (!this.currentProject.hasLevel(levelName)) {
                 Level level = new Level(levelName, true);
+                level.setChanged();
                 int index = currentProject.addLevel(level);
                 treeModel.fireInsertLevelEvent(level, index);
             }
@@ -294,7 +301,7 @@ public class ProjectPanel extends javax.swing.JPanel implements TreeSelectionLis
         if (silentSelection) {
             return;
         }
-       
+
         Object selected = e.getPath().getLastPathComponent();
         if (selected instanceof Level) {
             Level l = (Level) selected;
@@ -332,7 +339,7 @@ public class ProjectPanel extends javax.swing.JPanel implements TreeSelectionLis
             FileNode asset = event.getFileNode();
             String assetLocation = asset.getFullName();
             // check if asset is not open already.
-            if ( !currentProject.hasAssetLevelForFile(assetLocation)) {
+            if (!currentProject.hasAssetLevelForFile(assetLocation)) {
                 AssetLevel aLevel = new AssetLevel(Paths.get(assetLocation));
                 currentProject.addLevel(aLevel);
                 treeModel.fireInsertLevelEvent(aLevel, currentProject.getIndexOfLevel(aLevel));
@@ -353,8 +360,9 @@ public class ProjectPanel extends javax.swing.JPanel implements TreeSelectionLis
 
     @Subscribe
     public void nodeSelected(final SelectionEvent se) {
-        if ( se.getSource() == this)
+        if (se.getSource() == this) {
             return;
+        }
         if (SwingUtilities.isEventDispatchThread()) {
             selectNode(se.getSelectedNode());
         } else {
