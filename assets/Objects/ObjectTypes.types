@@ -168,20 +168,17 @@ and open the template in the editor.
                 <parameter type="float" id="zTranslation"/>
             </parameters>
         </object>
-        <object label="Camera" class="motum.objects.prefab.CameraEntity">
+        <object label="Camera" class="dae.prefabs.standard.CameraEntity">
             <parameters section="Transform">
                 <parameter type="string" id="name"/>
                 <parameter type="string" id="cameraId"/>
-                <parameter type="float" id="xTranslation"/>
-                <parameter type="float" id="yTranslation"/>
-                <parameter type="float" id="zTranslation"/>
-                <parameter type="range" id="xRotation" min="0" max="360" step="1"/>
-                <parameter type="range" id="yRotation" min="0" max="360" step="1"/>
-                <parameter type="range" id="zRotation" min="0" max="360" step="1"/>
+                <parameter type="float3" id="localPrefabTranslation"/>
+                <parameter type="float3" id="localPrefabRotation"/>
                 <parameter type="boolean" id="startCam"/>
+                <parameter type="offscreenrender"/>
             </parameters>
         </object>
-        <object label="Sound" class="motum.objects.prefab.SoundEntity">
+        <object label="Sound" class="dae.prefabs.standard.SoundEntity">
             <parameters section="Transform">
                 <parameter type="string" id="name"/>
                 <parameter type="sound" id="soundFile"/>
@@ -191,7 +188,7 @@ and open the template in the editor.
                 <parameter type="float3" id="localTranslation"/>
             </parameters>
         </object>
-        <object label="PlayerStart" class="motum.objects.prefab.PlayerStartEntity">
+        <object label="PlayerStart" class="dae.prefabs.standard.PlayerStartEntity">
             <parameters section="Transform">
                 <parameter type="string" id="name"/>
                 <parameter type="float" id="xTranslation"/>
@@ -202,7 +199,7 @@ and open the template in the editor.
                 <parameter type="range" id="zRotation" min="0" max="360" step="1"/>
             </parameters>
         </object>
-        <object label="NPCLocation" class="motum.objects.prefab.NPCLocationEntity">
+        <object label="NPCLocation" class="dae.prefabs.standard.NPCLocationEntity">
             <parameters section="Transform">
                 <parameter type="string" id="name"/>
                 <parameter type="float" id="xTranslation"/>
@@ -213,7 +210,7 @@ and open the template in the editor.
                 <parameter type="string" id="animation"/>
             </parameters>
         </object>
-        <object label="Waypoint" class="motum.objects.prefab.WayPointEntity">
+        <object label="Waypoint" class="dae.prefabs.standard.WayPointEntity">
             <parameters section="Transform">
                 <parameter type="string" id="name"/>
                 <parameter type="string" id="waypointId"/>
@@ -226,7 +223,7 @@ and open the template in the editor.
                 
             </parameters>
         </object>
-        <object label="NavigationMesh" class="motum.objects.prefab.NavigationMesh">
+        <object label="NavigationMesh" class="dae.prefabs.standard.NavigationMesh">
             <parameters section="Transform">
                 <parameter type="string" id="name"/>
                 <parameter type="object" id="sourceMesh"/>
