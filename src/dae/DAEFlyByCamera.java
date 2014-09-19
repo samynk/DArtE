@@ -1,13 +1,10 @@
 package dae;
 
 
-import com.jme3.collision.MotionAllowedListener;
 import com.jme3.input.FlyByCamera;
 import com.jme3.input.InputManager;
 import com.jme3.input.Joystick;
-import com.jme3.input.JoystickAxis;
-import com.jme3.math.FastMath;
-import com.jme3.math.Matrix3f;
+import com.jme3.math.Matrix4f;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
@@ -24,13 +21,14 @@ import com.jme3.renderer.Camera;
  *  - QZ keys raise or lower the camera
  */
 public class DAEFlyByCamera extends FlyByCamera {
-
+   
     /**
      * Creates a new FlyByCamera to control the given Camera object.
      * @param cam
      */
     public DAEFlyByCamera(Camera cam){
         super(cam);
+   
     }
 
     /**
@@ -49,5 +47,26 @@ public class DAEFlyByCamera extends FlyByCamera {
                 mapJoystick(j);
             }
         }
+    }
+    
+    /**
+     * @return a copy of the camera location.
+     */
+    public Vector3f getTranslation(){
+        return cam.getLocation().clone();
+    }
+    
+    /**
+     * @return a copy of the camera rotation.
+     */
+    public Quaternion getRotation(){
+        return cam.getRotation().clone();
+    }
+    
+    /**
+     * @return the projection matrix of the camera.
+     */
+    public Matrix4f getProjectionMatrix(){
+        return cam.getProjectionMatrix();
     }
 }
