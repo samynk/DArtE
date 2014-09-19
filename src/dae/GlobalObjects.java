@@ -768,4 +768,12 @@ public class GlobalObjects {
     public void setCamera(DAEFlyByCamera flyCam) {
         this.camera = flyCam;
     }
+
+    /**
+     * Returns the camera object.
+     * @return the camera object.
+     */
+    public DAEFlyByCamera getCamera() {
+        return camera;
+    }
 }
