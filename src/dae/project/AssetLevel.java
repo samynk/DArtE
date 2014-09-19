@@ -151,6 +151,7 @@ public class AssetLevel extends Level {
 
     @Override
     public void levelHidden() {
+        super.levelHidden();
     }
 
     /**
