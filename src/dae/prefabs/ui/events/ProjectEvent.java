@@ -1,9 +1,6 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.prefabs.ui.events;
 
+import dae.project.Level;
 import dae.project.Project;
 
 /**
@@ -16,6 +13,7 @@ public class ProjectEvent {
     private Project project;
     private ProjectEventType eventType = ProjectEventType.SELECTED;
     private Object source;
+    private Level level;
 
     public ProjectEvent(Project project, Object source) {
         this.project = project;
@@ -38,5 +36,20 @@ public class ProjectEvent {
 
     public Object getSource() {
         return source;
+    }
+
+    /**
+     * Sets the level that was added or removed (only for ProjectEventType.LEVELADDED).
+     * @param newLevel 
+     */
+    public void setLevel(Level newLevel) {
+        this.level = newLevel;
+    }
+
+    /**
+     * @return the level that was added or removed (only for ProjectEventType.LEVELADDED).
+     */
+    public Level getLevel() {
+        return level;
     }
 }
