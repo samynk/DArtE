@@ -154,21 +154,6 @@ public class AssetLevel extends Level {
         super.levelHidden();
     }
 
-    /**
-     * Checks if this AssetLevel object has changed.
-     *
-     * @return true if the level has changed, false otherwise.
-     */
-    public boolean isChanged() {
-        boolean changed = false;
-        for (Spatial s : this.children) {
-            if (s instanceof Prefab) {
-                changed |= ((Prefab) s).isChanged(true);
-            }
-        }
-        return changed;
-    }
-
     @Override
     public void save(File location) {
         String assetLocation = asset.toString();
