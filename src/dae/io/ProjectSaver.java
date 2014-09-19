@@ -68,11 +68,20 @@ public class ProjectSaver {
                 if (l instanceof AssetLevel) {
                     writeAttribute(bw, "type", "klatch");
                 }
+                if (l.hasLocation()) {
+                    writeAttribute(bw, "relativelocation", l.hasRelativeLocation());
+                } else {
+                    writeAttribute(bw, "relativelocation", true);
+                }
                 bw.write(">\n");
                 bw.write("\t\t\t<file><![CDATA[");
-                if (l.hasLocation()) {
-                    bw.write(l.getRelativeLocation().getPath());
+                if (!l.hasLocation()) {
+                    File levelFile = new File("levels/" + l.getName() + "/" + l.getName() + ".scene");
+                    l.setRelativeLocation(true);
+                    l.setLocation(levelFile);
                 }
+                bw.write(l.getLocation().getPath());
+
                 bw.write("]]></file>\n");
                 writeExportSettings(bw, l);
                 bw.write("\t\t</level>\n");
@@ -106,6 +115,9 @@ public class ProjectSaver {
     }
 
     private static void writeLevel(File projectDir, Level l) {
+        if (!l.isChanged()) {
+            return;
+        }
         if (l.hasLocation()) {
             if (l.hasRelativeLocation()) {
                 File sceneLoc = new File(projectDir, l.getLocation().getPath());
@@ -124,7 +136,7 @@ public class ProjectSaver {
             try {
                 l.save(new File(projectDir, levelFile.getPath()));
             } catch (Exception ex) {
-                Logger.getLogger("DArtE").log(java.util.logging.Level.SEVERE, "Could not write level " + l.getName(),ex);
+                Logger.getLogger("DArtE").log(java.util.logging.Level.SEVERE, "Could not write level " + l.getName(), ex);
             }
         }
 
