@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.gui;
 
 import dae.gui.model.AssetTreeModel;
@@ -25,7 +21,7 @@ import javax.swing.tree.TreePath;
 
 /**
  *
- * @author samyn_000
+ * @author Koen Samyn
  */
 public class AssetDirectoryPanel extends javax.swing.JPanel implements DocumentListener {
 
