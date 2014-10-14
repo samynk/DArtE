@@ -181,11 +181,14 @@ and open the template in the editor.
         <object label="Sound" class="dae.prefabs.standard.SoundEntity">
             <parameters section="Transform">
                 <parameter type="string" id="name"/>
+                <parameter type="float3" id="localTranslation"/>
                 <parameter type="sound" id="soundFile"/>
-                <parameter type="range" id="volume" min="0" max="1" step="0.01"/>
+                <parameter type="range" id="volume" min="0" max="10" step="0.1"/>
                 <parameter type="boolean" id="looping"/>
                 <parameter type="boolean" id="positional"/>
-                <parameter type="float3" id="localTranslation"/>
+                <parameter type="float" id="refDistance"/>
+                <parameter type="float" id="maxDistance"/>
+                <parameter type="action" id="playSound" method="playSound"/>
             </parameters>
         </object>
         <object label="PlayerStart" class="dae.prefabs.standard.PlayerStartEntity">
