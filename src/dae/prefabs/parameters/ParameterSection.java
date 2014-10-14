@@ -17,6 +17,7 @@ import dae.prefabs.ui.MethodParameterUI;
 import dae.prefabs.ui.ObjectParameterUI;
 import dae.prefabs.ui.ParameterPanel;
 import dae.prefabs.ui.RangeParameterUI;
+import dae.prefabs.ui.SoundParameterUI;
 import dae.prefabs.ui.TextParameterUI;
 import dae.prefabs.ui.collection.DictionaryParameterUI;
 import java.awt.GridBagConstraints;
@@ -136,6 +137,10 @@ public class ParameterSection {
                     ConnectorParameterUI cpui = new ConnectorParameterUI();
                     cpui.setParameter(p);
                     parameterPanel.addParameterUI(p.getId(), cpui, gbc);
+                }else if ("sound".equals(type)){
+                    SoundParameterUI spui = new SoundParameterUI();
+                    spui.setParameter(p);
+                    parameterPanel.addParameterUI(p.getId(), spui, gbc);
                 }
 
                 gbc.gridy++;
