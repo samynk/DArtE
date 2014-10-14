@@ -334,17 +334,18 @@ public class Level extends Node implements ProjectTreeNode {
     public int attachChild(Spatial node) {
         if (node instanceof Prefab) {
             Prefab p = (Prefab) node;
+            p.setChanged(true,false);
             String layer = p.getLayerName();
             
-            Layer currentLayer = null;
-            if (!this.hasLayer(layer)) {
-                currentLayer = this.addLayer(layer);
-                LayerEvent le = new LayerEvent(currentLayer, LayerEventType.CREATED);
-                GlobalObjects.getInstance().postEvent(le);
-            } else {
-                currentLayer = getLayer(layer);
-            }
-            if (!currentLayer.hasNode(p)) {
+            if (!(this.getChildIndex(node) > -1 )) {
+                Layer currentLayer;
+                if (!this.hasLayer(layer)) {
+                    currentLayer = this.addLayer(layer);
+                    LayerEvent le = new LayerEvent(currentLayer, LayerEventType.CREATED);
+                    GlobalObjects.getInstance().postEvent(le);
+                } else {
+                    currentLayer = getLayer(layer);
+                }
                 currentLayer.addNode(p);
                 return super.attachChild(node);
             }
