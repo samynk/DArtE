@@ -523,15 +523,6 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
     }
 
     /**
-     * Loads a scene from the file system.
-     *
-     * @param sceneFile
-     */
-    void loadScene(File sceneFile) {
-        SceneLoader.loadScene(sceneFile, assetManager, sceneElements, objectsToCreate, selectionMaterial);
-    }
-
-    /**
      *
      */
     @Override
@@ -800,6 +791,9 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
                 editorState = EditorState.IDLE;
 
                 bas.getPhysicsSpace().addAll(level);
+                
+                // for nodes that need the physics space to create physics controls.
+                
                 
                 CameraFrame cf = level.getLastCamera();
                 if (cf != null){
