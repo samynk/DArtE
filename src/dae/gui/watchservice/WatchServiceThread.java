@@ -1,11 +1,10 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.gui.watchservice;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.google.common.eventbus.Subscribe;
+import dae.GlobalObjects;
+import dae.gui.events.ApplicationStoppedEvent;
 import java.io.IOException;
 import java.nio.file.ClosedWatchServiceException;
 import java.nio.file.Files;
@@ -31,7 +30,9 @@ public class WatchServiceThread extends Thread {
             new ArrayList<WatchServiceListener>();
 
     public WatchServiceThread(WatchService service) {
+        this.setDaemon(true);
         this.service = service;
+        GlobalObjects.getInstance().registerListener(this);
     }
 
     public void clearWatchService() {
@@ -51,9 +52,9 @@ public class WatchServiceThread extends Thread {
             try {
                 key = service.take();
             } catch (InterruptedException x) {
-                return;
+                break;
             } catch( ClosedWatchServiceException ex){
-                return;
+                break;
             }
             Path dir = mapKeys.inverse().get(key);
             for (WatchEvent<?> event : key.pollEvents()) {
@@ -130,6 +131,15 @@ public class WatchServiceThread extends Thread {
             Logger.getLogger("DArtE").log(Level.SEVERE, "Register exception: ", ex);
         }
 
+    }
+    
+    @Subscribe
+    public void applicationStopped(ApplicationStoppedEvent event){
+        try {
+            service.close();
+        } catch (IOException ex) {
+            Logger.getLogger("DArtE").log(Level.SEVERE, "Error while closing the watch service during application stop.");
+        }
     }
 
     public void addWatchServiceListener(WatchServiceListener listener) {
