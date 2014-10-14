@@ -68,12 +68,11 @@ and open the template in the editor.
                 <parameter type="float" id="length"/>
             </parameters>
         </object>
-        <object label="Trigger" class="motum.objects.prefab.TriggerBox">
+        <object label="Trigger" class="dae.prefabs.standard.TriggerBox">
             <parameters section="Transform">
                 <parameter type="string" id="id"/>
-                <parameter type="float" id="xTranslation"/>
-                <parameter type="float" id="yTranslation"/>
-                <parameter type="float" id="zTranslation"/>
+                <parameter type="float3" id="localTranslation"/>
+                <parameter type="float3" id="localPrefabRotation" converter="dae.prefabs.parameters.converter.QuaternionConverter"/>
                 <parameter type="float" id="width"/>
                 <parameter type="float" id="height"/>
                 <parameter type="float" id="length"/>
