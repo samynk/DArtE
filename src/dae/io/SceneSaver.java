@@ -328,6 +328,8 @@ public class SceneSaver {
         writeAttribute(bw, "volume", se.getVolume());
         writeAttribute(bw, "translation", child.getLocalTranslation());
         writeAttribute(bw, "rotation", child.getLocalRotation());
+        writeAttribute(bw, "refDistance", se.getRefDistance());
+        writeAttribute(bw, "maxDistance", se.getMaxDistance());
         if (!hasChildren) {
             bw.write("/>\n");
             return "";
