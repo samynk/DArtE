@@ -22,6 +22,7 @@ public class AssetTreeCellRenderer extends DefaultTreeCellRenderer {
     private Icon imgJ3O;
     private Icon imgKlatch;
     private Icon imgRig;
+    private Icon imgSound;
     
 
 
@@ -31,6 +32,7 @@ public class AssetTreeCellRenderer extends DefaultTreeCellRenderer {
         imgJ3O =  new ImageIcon(loader.getImage("/dae/icons/mesh.png"));
         imgKlatch = new ImageIcon(loader.getImage("/dae/icons/klatch.png"));
         imgRig = new ImageIcon(loader.getImage("/dae/icons/body.png"));
+        imgSound = new ImageIcon(loader.getImage("/dae/icons/sound.png"));
     }
 
     @Override
@@ -45,6 +47,8 @@ public class AssetTreeCellRenderer extends DefaultTreeCellRenderer {
                     label.setIcon(imgKlatch);
                 }else if (node.getExtension().equals("rig")){
                     label.setIcon(imgRig);
+                }else if (node.getExtension().equals("ogg") || node.getExtension().equals("wav")){
+                    label.setIcon(imgSound);
                 }
             }
         }
