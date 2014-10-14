@@ -26,7 +26,6 @@ import dae.prefabs.ui.events.AssetEventType;
 import dae.prefabs.ui.events.CreateObjectEvent;
 import dae.prefabs.ui.events.GizmoEvent;
 import dae.prefabs.ui.events.GizmoType;
-import dae.prefabs.ui.events.LevelEvent;
 import dae.prefabs.ui.events.ProjectEvent;
 import dae.prefabs.ui.events.ProjectEventType;
 import dae.prefabs.ui.events.ViewportReshapeEvent;
@@ -62,7 +61,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  *
- * @author samyn_000
+ * @author Koen Samyn
  */
 public class SandboxFrame extends javax.swing.JFrame implements DropTargetListener {
 
@@ -168,6 +167,7 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
         mnuPreferences = new javax.swing.JMenuItem();
         mnuEntities = new javax.swing.JMenu();
         mnuAddCamera = new javax.swing.JMenuItem();
+        mnuAddSound = new javax.swing.JMenuItem();
         mnuAdd = new javax.swing.JMenu();
         mnuCreateRig = new javax.swing.JMenuItem();
         mnuAddRevoluteJoint = new javax.swing.JMenuItem();
@@ -426,6 +426,14 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
             }
         });
         mnuEntities.add(mnuAddCamera);
+
+        mnuAddSound.setText("Add Sound");
+        mnuAddSound.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuAddSoundActionPerformed(evt);
+            }
+        });
+        mnuEntities.add(mnuAddSound);
 
         mnuSandboxMenu.add(mnuEntities);
 
@@ -1058,6 +1066,15 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
             JOptionPane.showMessageDialog(this, "Save the project first before you import a scene!", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_mnuImportSceneActionPerformed
+
+    private void mnuAddSoundActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAddSoundActionPerformed
+        ObjectTypeCategory otc = viewport.getObjectsToCreate();
+        ObjectType ot = otc.getObjectType("Standard", "Sound");
+        if (ot != null) {
+            CreateObjectEvent coe = new CreateObjectEvent(ot.getObjectToCreate(), null, ot);
+            GlobalObjects.getInstance().postEvent(coe);
+        }
+    }//GEN-LAST:event_mnuAddSoundActionPerformed
     /**
      * @param args the command line arguments
      */
@@ -1148,6 +1165,7 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
     private javax.swing.JMenuItem mnuAddPivot;
     private javax.swing.JMenuItem mnuAddRevoluteJoint;
     private javax.swing.JMenuItem mnuAddSkeleton;
+    private javax.swing.JMenuItem mnuAddSound;
     private javax.swing.JMenuItem mnuAddSphere;
     private javax.swing.JMenuItem mnuAddSpotLight;
     private javax.swing.JMenuItem mnuAddTarget;
@@ -1252,6 +1270,11 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
                     ObjectType ot = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Animation", "Rig");
                     ot.setExtraInfo(asset);
                     CreateObjectEvent event = new CreateObjectEvent("dae.animation.rig.Rig", asset, ot);
+                    viewport.onObjectCreation(event);
+                }else if ( extension.equals("wav") || extension.equals("ogg")){
+                    ObjectType ot = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Standard", "Sound");
+                    ot.setExtraInfo(asset);
+                    CreateObjectEvent event = new CreateObjectEvent("dae.prefabs.standard.SoundEntity", asset, ot);
                     viewport.onObjectCreation(event);
                 }
 
