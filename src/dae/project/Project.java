@@ -6,7 +6,9 @@ package dae.project;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
@@ -345,6 +347,35 @@ public class Project implements ProjectTreeNode{
     public URL getResource(String fullName) {
         return this.projectAssetsLoader.findResource(fullName);
     }
+  
+    /**
+     * Returns the resource as a stream.
+     * @param fullName The full name of the resource.
+     * @return the inputstream, it is the responsability of the caller to
+     * close the stream.
+     */
+    public InputStream openResource(String fullName){
+        return this.projectAssetsLoader.getResourceAsStream(fullName);
+    }
+    
+    /**
+     * Returns the resource as a File object.
+     * @param
+     */
+    public File getResourceAsFile(String fullName){
+        URL r = getResource(fullName);
+        if ( r != null ){
+            try {
+                return new File(r.toURI());
+            } catch (URISyntaxException ex) {
+                Logger.getLogger("DArtE").log(java.util.logging.Level.SEVERE, "Could not convert {0} to file.",fullName);
+                return null;
+            }
+        }else{
+            return null;
+        }
+    }
+    
 
     public void removeLevel(Level level) {
         this.levels.remove(level);
