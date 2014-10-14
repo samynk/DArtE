@@ -31,6 +31,7 @@ import java.util.regex.Pattern;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TreeModelEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;
 
 /**
@@ -54,7 +55,7 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
      */
     public AssetPanel() {
         // match j3o files and klatch files
-        setFilePattern(".*\\.(?:j3o|klatch|rig)");
+        setFilePattern(".*\\.(?:j3o|klatch|rig|wav|ogg)");
         initComponents();
         assetTree.setCellRenderer(new AssetTreeCellRenderer());
         assetTree.setTransferHandler(new TreeTransferHandler());
@@ -72,6 +73,32 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
             GlobalObjects.getInstance().registerListener(this);
         }
         executor = Executors.newSingleThreadExecutor();
+    }
+    
+    public void adjustToggleButtonsToFilePattern(String pattern) {
+        // todo central information about file types.
+        cboRigFilter.setSelected(pattern.contains("rig"));
+        cboKlatchFilter.setSelected(pattern.contains("klatch"));
+        cboMeshFilter.setSelected(pattern.contains("j3o"));
+        cboSoundFilter.setSelected(pattern.contains("wav") || pattern.contains("ogg"));
+    }
+    
+    /**
+     * Adds a tree selection listener to this asset panel.
+     */
+    public void addTreeSelectionListener(TreeSelectionListener selectionListener){
+        assetTree.addTreeSelectionListener(selectionListener);
+    }
+    
+    /**
+     * Disables or enables the usage of the toggle buttons.
+     * @param enabled true if the toggle buttons should be enabled, false otherwise.
+     */
+    public void setToggleButtonsEnabled(boolean enabled){
+        cboKlatchFilter.setEnabled(enabled);
+        cboMeshFilter.setEnabled(enabled);
+        cboRigFilter.setEnabled(enabled);
+        cboSoundFilter.setEnabled(enabled);
     }
 
     public void setFilePattern(String pattern) {
@@ -127,6 +154,7 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
         cboMeshFilter = new javax.swing.JToggleButton();
         cboKlatchFilter = new javax.swing.JToggleButton();
         cboRigFilter = new javax.swing.JToggleButton();
+        cboSoundFilter = new javax.swing.JToggleButton();
 
         mnuEditObject.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dae/icons/editobject.png"))); // NOI18N
         mnuEditObject.setText("Create Assembly ...");
@@ -220,11 +248,19 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
             }
         });
 
+        cboSoundFilter.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dae/icons/sound.png"))); // NOI18N
+        cboSoundFilter.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                cboSoundFilterItemStateChanged(evt);
+            }
+        });
+
         txtSearch.putClientProperty("JComponent.sizeVariant", "small");
         txtSearch.putClientProperty("JComponent.sizeVariant", "small");
         cboMeshFilter.putClientProperty("JComponent.sizeVariant", "mini");
         cboKlatchFilter.putClientProperty("JComponent.sizeVariant", "mini");
-        cboMeshFilter.putClientProperty("JComponent.sizeVariant", "mini");
+        cboRigFilter.putClientProperty("JComponent.sizeVariant", "mini");
+        cboSoundFilter.putClientProperty("JComponent.sizeVariant", "mini");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -240,7 +276,9 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
                         .addComponent(cboKlatchFilter)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(cboRigFilter)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 172, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cboSoundFilter)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 117, Short.MAX_VALUE)
                         .addComponent(btnSearch))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblSearch)
@@ -257,10 +295,12 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
                     .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(cboMeshFilter, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(cboKlatchFilter, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(cboRigFilter, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(btnSearch, javax.swing.GroupLayout.Alignment.TRAILING))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(cboMeshFilter, javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addComponent(cboKlatchFilter, javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addComponent(cboRigFilter, javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addComponent(btnSearch, javax.swing.GroupLayout.Alignment.TRAILING))
+                    .addComponent(cboSoundFilter))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(scrAssetPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 387, Short.MAX_VALUE)
                 .addContainerGap())
@@ -337,6 +377,10 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
         }
     }//GEN-LAST:event_mnuEditKlatchActionPerformed
 
+    private void cboSoundFilterItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cboSoundFilterItemStateChanged
+        adaptFilter();
+    }//GEN-LAST:event_cboSoundFilterItemStateChanged
+
     private void adaptFilter() {
         int count = 0;
         boolean klatches = cboKlatchFilter.isSelected();
@@ -345,6 +389,8 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
         count += meshes ? 1 : 0;
         boolean rigs = cboRigFilter.isSelected();
         count += rigs ? 1 : 0;
+        boolean sounds = cboSoundFilter.isSelected();
+        count += sounds ? 1 : 0;
 
         if (count == 1) {
             if (klatches) {
@@ -353,6 +399,8 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
                 filePattern = Pattern.compile(".*" + txtSearch.getText() + ".*\\.j3o");
             } else if (rigs) {
                 filePattern = Pattern.compile(".*" + txtSearch.getText() + ".*\\.rig");
+            }else if (sounds){
+                filePattern = Pattern.compile(".*" + txtSearch.getText() + "\\.(?:wav|ogg)");
             }
         } else if (count > 1) {
             String pattern = "";
@@ -370,6 +418,12 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
                     pattern += "|";
                 }
                 pattern += "rig";
+            }
+            if (sounds){
+                if ( pattern.length() > 0){
+                    pattern +="|";
+                }
+                pattern += " wav|ogg";
             }
             filePattern = Pattern.compile(".*" + txtSearch.getText() + ".*\\.(?:" + pattern + ")");
         } else {
@@ -710,6 +764,7 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
     private javax.swing.JToggleButton cboKlatchFilter;
     private javax.swing.JToggleButton cboMeshFilter;
     private javax.swing.JToggleButton cboRigFilter;
+    private javax.swing.JToggleButton cboSoundFilter;
     private javax.swing.JPopupMenu klatchPopupMenu;
     private javax.swing.JLabel lblSearch;
     private javax.swing.JMenuItem mnuDelete;
@@ -724,8 +779,10 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
     // End of variables declaration//GEN-END:variables
 
     private void buildAssetTree(final Project project) {
-
+        if ( project == null )
+            return;
         if (!thread.isAlive()) {
+            thread.setDaemon(true);
             thread.start();
         }
         this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
@@ -744,5 +801,12 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
                 });
             }
         });
+    }
+
+    void setProject(Project currentProject) {
+       if ( this.currentProject != currentProject ){
+           this.currentProject = currentProject;
+           this.buildAssetTree(currentProject);
+       }
     }
 }

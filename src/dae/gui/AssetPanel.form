@@ -97,7 +97,9 @@
                       <Component id="cboKlatchFilter" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="cboRigFilter" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="172" max="32767" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="cboSoundFilter" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace pref="117" max="32767" attributes="0"/>
                       <Component id="btnSearch" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" attributes="0">
@@ -120,10 +122,13 @@
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="cboMeshFilter" alignment="1" min="-2" max="-2" attributes="0"/>
-                  <Component id="cboKlatchFilter" alignment="1" min="-2" max="-2" attributes="0"/>
-                  <Component id="cboRigFilter" alignment="1" min="-2" max="-2" attributes="0"/>
-                  <Component id="btnSearch" alignment="1" min="-2" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="cboMeshFilter" alignment="1" min="-2" max="-2" attributes="0"/>
+                      <Component id="cboKlatchFilter" alignment="1" min="-2" max="-2" attributes="0"/>
+                      <Component id="cboRigFilter" alignment="1" min="-2" max="-2" attributes="0"/>
+                      <Component id="btnSearch" alignment="1" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <Component id="cboSoundFilter" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="scrAssetPanel" pref="387" max="32767" attributes="0"/>
@@ -223,7 +228,20 @@
         <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="cboRigFilterItemStateChanged"/>
       </Events>
       <AuxValues>
-        <AuxValue name="JavaCodeGenerator_AddingCodePre" type="java.lang.String" value="cboMeshFilter.putClientProperty(&quot;JComponent.sizeVariant&quot;, &quot;mini&quot;);"/>
+        <AuxValue name="JavaCodeGenerator_AddingCodePre" type="java.lang.String" value="cboRigFilter.putClientProperty(&quot;JComponent.sizeVariant&quot;, &quot;mini&quot;);"/>
+      </AuxValues>
+    </Component>
+    <Component class="javax.swing.JToggleButton" name="cboSoundFilter">
+      <Properties>
+        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+          <Image iconType="3" name="/dae/icons/sound.png"/>
+        </Property>
+      </Properties>
+      <Events>
+        <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="cboSoundFilterItemStateChanged"/>
+      </Events>
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_AddingCodePre" type="java.lang.String" value="cboSoundFilter.putClientProperty(&quot;JComponent.sizeVariant&quot;, &quot;mini&quot;);"/>
       </AuxValues>
     </Component>
   </SubComponents>
