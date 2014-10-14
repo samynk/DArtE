@@ -6,7 +6,6 @@ package dae;
 
 import com.google.common.eventbus.EventBus;
 import com.jme3.asset.AssetManager;
-import com.jme3.input.FlyByCamera;
 import com.jme3.input.InputManager;
 import com.jme3.input.KeyInput;
 import com.jme3.input.KeyNames;
@@ -17,11 +16,16 @@ import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
+import dae.gui.SelectAssetDialog;
 import dae.gui.preferences.GameKeyDefinition;
 import dae.prefabs.AxisEnum;
 import dae.prefabs.prefab.undo.UndoPrefabPropertyEdit;
 import dae.prefabs.standard.RotationRange;
 import dae.prefabs.types.ObjectTypeCategory;
+import dae.prefabs.ui.classpath.FileNode;
+import dae.project.Project;
+import java.awt.Component;
+import java.awt.Frame;
 import java.awt.event.KeyEvent;
 import java.awt.im.InputContext;
 import java.io.File;
@@ -205,7 +209,8 @@ public class GlobalObjects {
 
     public ArrayList<File> getRecentFiles() {
         String recentFiles = preferences.get("RecentFiles", "");
-        String[] filenames = recentFiles.split("\0");
+        String[] filenames;
+        filenames = recentFiles.split("\0");
 
         ArrayList<File> files = new ArrayList<File>();
         for (String filename : filenames) {
@@ -775,5 +780,34 @@ public class GlobalObjects {
      */
     public DAEFlyByCamera getCamera() {
         return camera;
+    }
+    
+    private SelectAssetDialog dialog;
+    
+    /**
+     * Select an asset with an asset panel
+     * @param rootComponent the root frame component.
+     * @param relative place the dialog relative to this component.
+     * @param title the title for the dialog.
+     * @param extensions the extensions (separated by |) that need to be displayed.
+     * in the asset panel.
+     */
+    public FileNode selectAsset( Frame rootComponent, Component relative, Project currentProject, String title, String extensions )
+    {
+        if ( dialog == null ){
+            dialog = new SelectAssetDialog(rootComponent, true);
+        }
+        dialog.setLocationRelativeTo(relative);
+        dialog.setTitle(title);
+        dialog.setExtensions(extensions);
+        dialog.setProject(currentProject);
+        
+        dialog.setVisible(true);
+        if ( dialog.getReturnStatus() == dialog.RET_OK)
+        {
+            return dialog.getSelectedFileNode();
+        }else{
+            return null;
+        }
     }
 }
