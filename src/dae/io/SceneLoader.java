@@ -428,6 +428,9 @@ public class SceneLoader implements AssetLoader {
 
                 String sVolume = getAttrContent("volume", map);
                 float volume = sVolume != null ? Float.parseFloat(sVolume) : 1.0f;
+                
+                float refDistance = XMLUtils.parseFloat("refDistance", map);
+                float maxDistance = XMLUtils.parseFloat("maxDistance", map);
 
                 Vector3f loc = parseFloat3(getAttrContent("translation", map));
                 se.create(name, am, null);
@@ -436,6 +439,8 @@ public class SceneLoader implements AssetLoader {
                 se.setPositional(positional);
                 se.setLooping(looping);
                 se.setVolume(volume);
+                se.setRefDistance(refDistance);
+                se.setMaxDistance(maxDistance);
                 currentPrefab = se;
             } else if ("playerstart".equals(n.getNodeName())) {
                 PlayerStartEntity pse = new PlayerStartEntity();
