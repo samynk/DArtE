@@ -193,6 +193,7 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
         mnuAddCrate = new javax.swing.JMenuItem();
         mnuAddSphere = new javax.swing.JMenuItem();
         mnuAddCylinder = new javax.swing.JMenuItem();
+        mnuAddTriggerBox = new javax.swing.JMenuItem();
         jSeparator3 = new javax.swing.JPopupMenu.Separator();
         mnuAddHingeJoint = new javax.swing.JMenuItem();
         mnuMetaData = new javax.swing.JMenu();
@@ -606,6 +607,14 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
             }
         });
         mnuPhysics.add(mnuAddCylinder);
+
+        mnuAddTriggerBox.setText("Add Triggerbox");
+        mnuAddTriggerBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuAddTriggerBoxActionPerformed(evt);
+            }
+        });
+        mnuPhysics.add(mnuAddTriggerBox);
         mnuPhysics.add(jSeparator3);
 
         mnuAddHingeJoint.setText("Add Hinge Joint");
@@ -1046,7 +1055,7 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
                     File dest = new File(levelDir, sceneFile.getName());
                     try {
                         Files.copy(sceneFile, dest);
-                        File relativeLocation = new File("levels/"+levelName+"/"+sceneFile.getName());
+                        File relativeLocation = new File("levels/" + levelName + "/" + sceneFile.getName());
                         newLevel.setLocation(relativeLocation);
                         newLevel.setRelativeLocation(true);
                         AssetManager manager = GlobalObjects.getInstance().getAssetManager();
@@ -1068,13 +1077,22 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
     }//GEN-LAST:event_mnuImportSceneActionPerformed
 
     private void mnuAddSoundActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAddSoundActionPerformed
+        createObject("Standard", "Sound");
+    }//GEN-LAST:event_mnuAddSoundActionPerformed
+
+    private void mnuAddTriggerBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAddTriggerBoxActionPerformed
+        createObject("Standard", "Trigger");
+    }//GEN-LAST:event_mnuAddTriggerBoxActionPerformed
+
+    private void createObject(String category, String type) {
         ObjectTypeCategory otc = viewport.getObjectsToCreate();
-        ObjectType ot = otc.getObjectType("Standard", "Sound");
+        ObjectType ot = otc.getObjectType(category, type);
         if (ot != null) {
             CreateObjectEvent coe = new CreateObjectEvent(ot.getObjectToCreate(), null, ot);
             GlobalObjects.getInstance().postEvent(coe);
         }
-    }//GEN-LAST:event_mnuAddSoundActionPerformed
+    }
+
     /**
      * @param args the command line arguments
      */
@@ -1169,6 +1187,7 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
     private javax.swing.JMenuItem mnuAddSphere;
     private javax.swing.JMenuItem mnuAddSpotLight;
     private javax.swing.JMenuItem mnuAddTarget;
+    private javax.swing.JMenuItem mnuAddTriggerBox;
     private javax.swing.JMenuItem mnuAddWaypoint;
     private javax.swing.JMenuItem mnuCreateRig;
     private javax.swing.JMenu mnuEdit;
@@ -1271,7 +1290,7 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
                     ot.setExtraInfo(asset);
                     CreateObjectEvent event = new CreateObjectEvent("dae.animation.rig.Rig", asset, ot);
                     viewport.onObjectCreation(event);
-                }else if ( extension.equals("wav") || extension.equals("ogg")){
+                } else if (extension.equals("wav") || extension.equals("ogg")) {
                     ObjectType ot = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Standard", "Sound");
                     ot.setExtraInfo(asset);
                     CreateObjectEvent event = new CreateObjectEvent("dae.prefabs.standard.SoundEntity", asset, ot);
