@@ -103,7 +103,7 @@ public class ProjectLoader {
             if ("level".equals(level.getNodeName())) {
                 String type = getAttrContent("type", level.getAttributes());
                 String levelName = getAttrContent("name", level.getAttributes());
-                boolean relativeLocation = XMLUtils.parseBoolean("relative", level.getAttributes());
+                boolean relativeLocation = XMLUtils.parseBoolean("relativelocation", level.getAttributes());
                 if (type == null || type.length() == 0 || type.equals("scene")) {
                     dae.project.Level l = new dae.project.Level(levelName, false);
                     NodeList levelChildren = level.getChildNodes();
