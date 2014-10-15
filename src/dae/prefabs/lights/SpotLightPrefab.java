@@ -157,6 +157,9 @@ public class SpotLightPrefab extends Prefab implements ShadowCastSupport {
             attachChild(outerLightCone);
         }
         attachChild(lightGizmo);
+        // light cones should not be pickable, as they interfere with normal picking.
+        innerLightCone.setUserData("Pickable",Boolean.FALSE);
+        outerLightCone.setUserData("Pickable",Boolean.FALSE);
     }
 
     public float getSpotInnerAngle() {
