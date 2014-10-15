@@ -859,11 +859,19 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
 
         sceneElements.collideWith(ray, results);
 
-        CollisionResult result = results.getClosestCollision();
-        if (result == null) {
-            return;
+        int index = 0;
+        for ( ; index < results.size() ; ++index)
+        {
+            Geometry g  = results.getCollision(index).getGeometry();
+            Boolean pickable = g.getUserData("Pickable");
+            if ( pickable == null || pickable == true){
+                break;
+            }
         }
-
+        if ( index == results.size())
+            return;
+        
+        CollisionResult result = results.getCollision(index);
         Geometry g = result.getGeometry();
         Prefab prefab = findPrefabParent(g);
         this.currentPickElement = prefab;
