@@ -120,7 +120,7 @@ public class ProjectPanel extends javax.swing.JPanel implements TreeSelectionLis
                         projectTree.updateUI();
                     }
                 });
-            } else if (event.getEventType() == ProjectEventType.LEVELADDED){
+            } else if (event.getEventType() == ProjectEventType.LEVELADDED) {
                 Level level = event.getLevel();
                 treeModel.fireInsertLevelEvent(level, currentProject.getIndexOfLevel(level));
             }
@@ -376,11 +376,13 @@ public class ProjectPanel extends javax.swing.JPanel implements TreeSelectionLis
 
     private void selectNode(Prefab node) {
         silentSelection = true;
-        Object[] path = treeModel.createPathForNode(node);
-        TreePath tp = new TreePath(path);
-        projectTree.setSelectionPath(new TreePath(path));
-        projectTree.scrollPathToVisible(tp);
-        silentSelection = false;
+        if (treeModel != null) {
+            Object[] path = treeModel.createPathForNode(node);
+            TreePath tp = new TreePath(path);
+            projectTree.setSelectionPath(new TreePath(path));
+            projectTree.scrollPathToVisible(tp);
+            silentSelection = false;
+        }
     }
 
     private void deleteNode() {
