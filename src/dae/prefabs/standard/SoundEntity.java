@@ -55,6 +55,9 @@ public class SoundEntity extends Prefab {
         Sphere s2 = new Sphere(12, 12, maxDistance);
         maxDistanceGeometry = new Geometry("refDistanceGizmo", s2);
         maxDistanceGeometry.setMaterial(maxSoundMaterial);
+        
+        refDistanceGeometry.setUserData("Pickable", Boolean.FALSE);
+        maxDistanceGeometry.setUserData("Pickable", Boolean.FALSE);
     }
 
     private void detachSoundSpheres() {
