@@ -158,8 +158,6 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
      */
     private Prefab currentChildElement;
 
-    
-
     /**
      * The editor state.
      */
@@ -238,15 +236,15 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
      */
     private boolean autoGridEnabled = false;
     private AxisEnum autoGridAxis = AxisEnum.Y;
-    
-    public SandboxViewport(){
-        super( new DAECamAppState() );
+
+    public SandboxViewport() {
+        super(new DAECamAppState());
     }
 
     @Override
     public void simpleInitApp() {
-        
-        
+
+
         assetManager.registerLoader(ObjectTypeReader.class, "types");
         assetManager.registerLoader(BodyLoader.class, "skel");
         assetManager.registerLoader(ControllerLoader.class, "fcl");
@@ -285,9 +283,9 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
         GlobalObjects.getInstance().registerListener(this);
 
         cam.setFrustumPerspective(45f, (float) cam.getWidth() / cam.getHeight(), 0.01f, 1000f);
-        cam.setLocation(new Vector3f(5,2,0));
-        cam.lookAt(new Vector3f(0,0,0), new Vector3f(0,1,0));
-        
+        cam.setLocation(new Vector3f(5, 2, 0));
+        cam.lookAt(new Vector3f(0, 0, 0), new Vector3f(0, 1, 0));
+
         initKeys();
 
 //        this.helperSphere1 = createDebugSphere(this.assetManager, 0.02f, ColorRGBA.White);
@@ -305,13 +303,13 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
 
         stateManager.attach(bulletAppState);
 
-       
+
 
 
 
         GlobalObjects.getInstance().setAssetManager(assetManager);
         GlobalObjects.getInstance().setInputManager(this.inputManager);
-        
+
 
         wireBoxMaterial = assetManager.loadMaterial("Materials/SelectionBoxMaterial.j3m");
         wireBoxGeometry = new Geometry("wireframe cube", wireBox);
@@ -432,13 +430,13 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
                 try {
                     GlobalObjects.getInstance().undo();
                 } catch (CannotUndoException ex) {
-                    Logger.getLogger("DArtE").log(Level.WARNING, "Cannot undo.",ex);
-                } 
+                    Logger.getLogger("DArtE").log(Level.WARNING, "Cannot undo.", ex);
+                }
             } else if (name.equals("REDO") && !keyPressed) {
                 try {
                     GlobalObjects.getInstance().redo();
                 } catch (CannotRedoException ex) {
-                    Logger.getLogger("DArtE").log(Level.WARNING, "Cannot redo.",ex);
+                    Logger.getLogger("DArtE").log(Level.WARNING, "Cannot redo.", ex);
                 }
             }
         }
@@ -791,12 +789,12 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
                 editorState = EditorState.IDLE;
 
                 bas.getPhysicsSpace().addAll(level);
-                
+
                 // for nodes that need the physics space to create physics controls.
-                
-                
+
+
                 CameraFrame cf = level.getLastCamera();
-                if (cf != null){
+                if (cf != null) {
                     this.cam.setLocation(cf.getTranslation().clone());
                     this.cam.setRotation(cf.getRotation().clone());
                     this.cam.setProjectionMatrix(cf.getProjectionMatrix().clone());
@@ -873,7 +871,7 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
         Geometry g = result.getGeometry();
         Prefab prefab = findPrefabParent(g);
         this.currentPickElement = prefab;
-        
+
         Vector3f point = result.getContactPoint().clone();
         result.getTriangle(contactTriangle);
 
@@ -936,7 +934,7 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
 
                     }
                     prefab.setAttachMagnet(closestMagnet);
-                    
+
                     Matrix3f rot = closestMagnet.getLocalFrame();
                     Quaternion world = prefab.getWorldRotation();
                     Quaternion local = new Quaternion();
@@ -1049,9 +1047,9 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
             }
             linkText.setText(currentChildElement.getName() + "->" + prefab.getName());
             linkText.setLocalTranslation(click2d.x, click2d.y, 0.01f);
-            textBackground.setDimension(linkText.getLineWidth()+2, linkText.getLineHeight()+4);
+            textBackground.setDimension(linkText.getLineWidth() + 2, linkText.getLineHeight() + 4);
             textBackgroundGeometry.updateModelBound();
-            textBackgroundGeometry.setLocalTranslation(click2d.x-1, click2d.y- linkText.getLineHeight()-2,0f);
+            textBackgroundGeometry.setLocalTranslation(click2d.x - 1, click2d.y - linkText.getLineHeight() - 2, 0f);
             return result.getContactPoint();
         } else {
             wireBoxGeometryLinkParent.removeFromParent();
@@ -1082,6 +1080,10 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
         // Collect intersections between ray and all nodes in results list.
         sceneElements.collideWith(ray, results);
 
+        if ( results.size() == 0){
+            return;
+        }
+        
         // check if the axis is in there.
         for (Iterator<CollisionResult> it = results.iterator(); it.hasNext();) {
             CollisionResult cr = it.next();
@@ -1092,98 +1094,107 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
         }
 
         if (editorState == EditorState.IDLE || editorState == EditorState.LINK || editorState == EditorState.LINKPARENT || editorState == EditorState.PICK) {
-            if (results.size() > 1) {
-                Geometry g = results.getClosestCollision().getGeometry();
-                Node parent = g.getParent();
-                boolean hasKlatchParent = false;
-                boolean hasPrefabParent = false;
-
-                Node check = parent;
-                while (check != this.sceneElements) {
-                    if (check instanceof Prefab) {
-                        hasPrefabParent = true;
-                    }
-                    if (check instanceof Klatch) {
-                        hasKlatchParent = true;
-                    }
-                    check = check.getParent();
+            int index = 0;
+            for (; index < results.size(); ++index) {
+                Geometry g = results.getCollision(index).getGeometry();
+                Boolean pickable = (Boolean) g.getUserData("Pickable");
+                if (pickable == null || pickable == true) {
+                    break;
                 }
+            }
+            if (index == results.size()) {
+                return;
+            }
 
-                if (hasKlatchParent) {
-                    while (!(parent instanceof Klatch) && parent != this.sceneElements) {
-                        parent = parent.getParent();
-                    }
-                } else if (hasPrefabParent) {
-                    while (!(parent instanceof Prefab) && parent != this.sceneElements) {
-                        parent = parent.getParent();
-                    }
-                } else {
-                    return;
+            Geometry g = results.getCollision(index).getGeometry();
+            Node parent = g.getParent();
+            boolean hasKlatchParent = false;
+            boolean hasPrefabParent = false;
+
+            Node check = parent;
+            while (check != this.sceneElements) {
+                if (check instanceof Prefab) {
+                    hasPrefabParent = true;
                 }
+                if (check instanceof Klatch) {
+                    hasKlatchParent = true;
+                }
+                check = check.getParent();
+            }
 
-                if (parent != this.sceneElements) {
-                    if (editorState == EditorState.IDLE) {
-                        clearSelection();
-                        this.addToSelection(parent);
-                    } else if (editorState == EditorState.PICK) {
-                        PickEvent pe = new PickEvent((Prefab) parent, this, pickProperty);
-                        GlobalObjects.getInstance().postEvent(pe);
-                        clearSelection();
-                        this.newGizmoType = GizmoType.TRANSLATE;
-                        editorState = EditorState.IDLE;
-                    } else if (editorState == EditorState.LINK) {
-                        this.currentChildElement = (Prefab) parent;
-                        addToSelection(currentChildElement);
-                        rootNode.attachChild(linkGeometry);
-                        editorState = EditorState.LINKPARENT;
-                    } else if (editorState == EditorState.LINKPARENT) {
-                        Prefab p = (Prefab) parent;
-                        if (p == currentChildElement) {
-                            return;
-                        }
-                        // express the world transformation of the child as a local transformation in the parent space.
-                        Matrix4f parentMatrix = new Matrix4f();
-                        parentMatrix.setTranslation(p.getWorldTranslation());
-                        parentMatrix.setRotationQuaternion(p.getWorldRotation());
-                        parentMatrix.setScale(p.getWorldScale());
-                        parentMatrix.invertLocal();
+            if (hasKlatchParent) {
+                while (!(parent instanceof Klatch) && parent != this.sceneElements) {
+                    parent = parent.getParent();
+                }
+            } else if (hasPrefabParent) {
+                while (!(parent instanceof Prefab) && parent != this.sceneElements) {
+                    parent = parent.getParent();
+                }
+            } else {
+                return;
+            }
 
-                        Matrix4f childMatrix = new Matrix4f();
-                        childMatrix.setTranslation(currentChildElement.getWorldTranslation());
-                        childMatrix.setRotationQuaternion(currentChildElement.getWorldRotation());
-                        childMatrix.setScale(currentChildElement.getWorldScale());
-
-                        Matrix4f local = parentMatrix.mult(childMatrix);
-
-                        currentChildElement.setLocalTranslation(local.toTranslationVector());
-                        currentChildElement.setLocalRotation(local.toRotationQuat());
-                        currentChildElement.setLocalScale(local.toScaleVector());
-
-                        // child element is moved from one place to another.
-                        ProjectTreeNode previousParent = currentChildElement.getProjectParent();
-                        int previousIndex = previousParent.getIndexOfChild(currentChildElement);
-                        p.attachChild(currentChildElement);
-                        // remove child from its layer
-                        if (previousParent instanceof Layer) {
-                            Layer l = (Layer) previousParent;
-                            l.removeNode(currentChildElement);
-                        }
-
-                        LevelEvent le = new LevelEvent(level, EventType.NODEMOVED, currentChildElement, previousParent, previousIndex, p);
-                        GlobalObjects.getInstance().postEvent(le);
-
-                        editorState = EditorState.IDLE;
-                        newGizmoType = GizmoType.TRANSLATE;
-                        linkGeometry.removeFromParent();
-                        wireBoxGeometryLinkParent.removeFromParent();
-
-                        guiNode.detachChild(linkText);
-                        guiNode.detachChild(textBackgroundGeometry);
+            if (parent != this.sceneElements) {
+                if (editorState == EditorState.IDLE) {
+                    clearSelection();
+                    this.addToSelection(parent);
+                } else if (editorState == EditorState.PICK) {
+                    PickEvent pe = new PickEvent((Prefab) parent, this, pickProperty);
+                    GlobalObjects.getInstance().postEvent(pe);
+                    clearSelection();
+                    this.newGizmoType = GizmoType.TRANSLATE;
+                    editorState = EditorState.IDLE;
+                } else if (editorState == EditorState.LINK) {
+                    this.currentChildElement = (Prefab) parent;
+                    addToSelection(currentChildElement);
+                    rootNode.attachChild(linkGeometry);
+                    editorState = EditorState.LINKPARENT;
+                } else if (editorState == EditorState.LINKPARENT) {
+                    Prefab p = (Prefab) parent;
+                    if (p == currentChildElement) {
+                        return;
                     }
+                    // express the world transformation of the child as a local transformation in the parent space.
+                    Matrix4f parentMatrix = new Matrix4f();
+                    parentMatrix.setTranslation(p.getWorldTranslation());
+                    parentMatrix.setRotationQuaternion(p.getWorldRotation());
+                    parentMatrix.setScale(p.getWorldScale());
+                    parentMatrix.invertLocal();
+
+                    Matrix4f childMatrix = new Matrix4f();
+                    childMatrix.setTranslation(currentChildElement.getWorldTranslation());
+                    childMatrix.setRotationQuaternion(currentChildElement.getWorldRotation());
+                    childMatrix.setScale(currentChildElement.getWorldScale());
+
+                    Matrix4f local = parentMatrix.mult(childMatrix);
+
+                    currentChildElement.setLocalTranslation(local.toTranslationVector());
+                    currentChildElement.setLocalRotation(local.toRotationQuat());
+                    currentChildElement.setLocalScale(local.toScaleVector());
+
+                    // child element is moved from one place to another.
+                    ProjectTreeNode previousParent = currentChildElement.getProjectParent();
+                    int previousIndex = previousParent.getIndexOfChild(currentChildElement);
+                    p.attachChild(currentChildElement);
+                    // remove child from its layer
+                    if (previousParent instanceof Layer) {
+                        Layer l = (Layer) previousParent;
+                        l.removeNode(currentChildElement);
+                    }
+
+                    LevelEvent le = new LevelEvent(level, EventType.NODEMOVED, currentChildElement, previousParent, previousIndex, p);
+                    GlobalObjects.getInstance().postEvent(le);
+
+                    editorState = EditorState.IDLE;
+                    newGizmoType = GizmoType.TRANSLATE;
+                    linkGeometry.removeFromParent();
+                    wireBoxGeometryLinkParent.removeFromParent();
+
+                    guiNode.detachChild(linkText);
+                    guiNode.detachChild(textBackgroundGeometry);
                 }
             }
         }
-
     }
 
     private boolean hasGizmoParent(Geometry g) {
@@ -1315,6 +1326,9 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
                     copy.disablePhysics();
                     copy.setUserData("DuplicateParent", n.getParent());
                     copy.setName(this.createName(this.level, copy.getPrefix()));
+
+                    BulletAppState bas = this.getStateManager().getState(BulletAppState.class);
+                    copy.addPhysics(bas.getPhysicsSpace());
                 }
             }
             clearSelection();
@@ -1614,7 +1628,7 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
             }
         });
     }
-    
+
     public void setFlyByCamera(FlyByCamera flyCam) {
         this.flyCam = flyCam;
     }
