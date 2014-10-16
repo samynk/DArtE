@@ -1478,9 +1478,6 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
 
     @Subscribe
     public void editAsset(final AssetEvent ae) {
-
-
-
         if (ae.getAssetEventType() == AssetEventType.MODIFIED) {
             submitViewportTask(new Runnable() {
                 public void run() {
