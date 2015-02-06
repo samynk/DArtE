@@ -1,14 +1,9 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package dae.io;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.export.binary.BinaryExporter;
 import com.jme3.scene.Node;
-import dae.io.export.Exporter;
+import dae.io.writers.Exporter;
 import dae.io.game.GameSceneLoader;
 import dae.project.Level;
 import java.io.File;
