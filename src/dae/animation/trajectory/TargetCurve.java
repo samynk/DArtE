@@ -9,10 +9,12 @@ import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import dae.GlobalObjects;
 import dae.animation.event.TransformListener;
 import dae.animation.event.TransformType;
 import dae.animation.skeleton.Handle;
 import dae.prefabs.Prefab;
+import dae.prefabs.types.ObjectType;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -65,22 +67,19 @@ public class TargetCurve extends Prefab implements TransformListener{
         // create two handles to manipulate.
 
         start = new Handle();
-        start.create("start", manager, null);
+        ObjectType type = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Animation", "TwoAxisHandle");
+        start.create("start", manager, type, null);
         this.attachChild(start);
 
         end = new Handle();
-        end.create("end", manager, null);
+        end.create("end", manager, type, null);
         end.setLocalTranslation(2,0,0);
         this.attachChild(end);
         
         this.attachChild(manager.loadModel("Skeleton/Helpers/Handle.j3o"));
-        
-        start.addTransformListener(this);
-        end.addTransformListener(this);
+       
         // listen to the changes in the handles
         attachChild(debugNode);
-        addTransformListener(this);
-        
         this.manager = manager;
     }
     
@@ -165,8 +164,8 @@ public class TargetCurve extends Prefab implements TransformListener{
     protected void createHandle(String name, Vector3f location, Quaternion rotation)
     {
         Handle h = new Handle();
-        
-        h.create(name, manager, null);
+        ObjectType type = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Animation", "TwoAxisHandle");
+        h.create(name, manager, type, null);
         h.setLocalTranslation(location);
         h.setLocalRotation(rotation);
         debugNode.attachChild(h);
