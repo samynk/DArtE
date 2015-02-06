@@ -14,9 +14,9 @@ import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
 import dae.GlobalObjects;
 import dae.animation.skeleton.BodyElement;
-import static dae.io.SceneSaver.writeAttribute;
 import dae.io.XMLUtils;
 import dae.prefabs.Prefab;
+import dae.prefabs.gizmos.Gizmo;
 import dae.prefabs.ui.events.ErrorMessage;
 import java.io.IOException;
 import java.io.Writer;
@@ -74,7 +74,9 @@ public class MeshObject extends Prefab implements BodyElement {
         mo.setPhysicsMesh(this.getPhysicsMesh());
 
         for (Spatial s : this.children) {
-            mo.attachChild(s.clone(true));
+            if (!(s instanceof Gizmo)) {
+                mo.attachChild(s.clone(true));
+            }
         }
 
         return mo;
