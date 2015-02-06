@@ -84,6 +84,17 @@ public class XMLUtils {
     }
     
     /**
+     * Writes the specified number of tabs to the writer.
+     * @param w the output writer.
+     * @param nrOfTabs the number of tabs. 
+     */
+    public static void writeTabs(Writer w, int nrOfTabs) throws IOException{
+        for(int i = 0 ; i < nrOfTabs; ++i){
+            w.write("\t");
+        }
+    }
+    
+    /**
      * Gets the attribute as a string.
      * @param key the name of the attribute.
      * @param map the named node map with the attribute key/value pairs.
@@ -213,4 +224,6 @@ public class XMLUtils {
         org.w3c.dom.Node attr = map.getNamedItem(attributeName);
         return attr != null ? Boolean.parseBoolean(attr.getTextContent()) : false;
     }
+
+
 }
