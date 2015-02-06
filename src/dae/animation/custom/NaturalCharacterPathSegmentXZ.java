@@ -91,11 +91,11 @@ public class NaturalCharacterPathSegmentXZ implements PathSegment {
                 }
                 float x = turnRadius * FastMath.cos(angle);
                 float z = turnRadius * FastMath.sin(angle);
-                result.set(circle1Center.x + x, 0, circle1Center.z + z);
+                result.set(circle1Center.x + x, p1.y + (p2.y-p1.y)*t, circle1Center.z + z);
             } else if (length < length1 + length2) {
                 float lineLength = length - length1;
                 float u = lineLength / t1.distance(t2);
-                result.set(t1.x + u * (t2.x - t1.x), 0, t1.z + u * (t2.z - t1.z));
+                result.set(t1.x + u * (t2.x - t1.x), p1.y + (p2.y-p1.y)*t, t1.z + u * (t2.z - t1.z));
             } else {
                 float arcLength = length - (length1 + length2);
 
@@ -107,7 +107,7 @@ public class NaturalCharacterPathSegmentXZ implements PathSegment {
                 }
                 float x = turnRadius * FastMath.cos(angle);
                 float z = turnRadius * FastMath.sin(angle);
-                result.set(circle2Center.x + x, 0, circle2Center.z + z);
+                result.set(circle2Center.x + x, p1.y + (p2.y-p1.y)*t, circle2Center.z + z);
             }
         }
     }
