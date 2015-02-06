@@ -1,19 +1,22 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.prefabs.parameters;
 
 import com.jme3.math.ColorRGBA;
+import dae.components.ComponentType;
 
 /**
  *
- * @author Koen
+ * @author Koen Samyn
  */
 public class ColorParameter extends Parameter {
 
-    public ColorParameter(String label, String id) {
-        super(label, id);
+    /**
+     * Creates a new Parameter object.
+     * @param componentType the component of the parameter object.
+     * @param type the type of the parameter object.
+     * @param id the id of the parameter object.
+     */
+    public ColorParameter(ComponentType componentType, String type, String id) {
+        super(componentType, type, id);
     }
     
      /**

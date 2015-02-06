@@ -1,9 +1,6 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.prefabs.parameters;
 
+import dae.components.ComponentType;
 import dae.prefabs.Prefab;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -35,11 +32,12 @@ public class DictionaryParameter extends Parameter {
     /**
      * Creates a new IndexedParameter object.
      *
+     * @param componentType the componentType of the parameter.
      * @param id the id of the parameter.
      * @param baseType the base type of the parameter.
      */
-    public DictionaryParameter(String type, String id, Parameter baseType) {
-        super(type, id);
+    public DictionaryParameter(ComponentType componentType, String type, String id, Parameter baseType) {
+        super(componentType, type, id);
         this.baseType = baseType;
     }
 

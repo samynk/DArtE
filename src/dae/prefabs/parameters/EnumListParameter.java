@@ -1,10 +1,6 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package dae.prefabs.parameters;
 
+import dae.components.ComponentType;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -16,11 +12,12 @@ public class EnumListParameter extends Parameter{
     private Object[] choices;
     /**
      * Creates a new EnumListParameter object.
+     * @param componentType componentType the component type of the parameter.
      * @param type the type of the parameter
      * @param id the id of the parameter.
      */
-    public EnumListParameter(String type, String id){
-        super(type,id);
+    public EnumListParameter(ComponentType componentType, String type, String id){
+        super(componentType, type, id);
     }
     
     /**
@@ -36,6 +33,10 @@ public class EnumListParameter extends Parameter{
         }
     }
 
+    /**
+     * Gets the list of choices from this EnumList parameter.
+     * @return the list of choices as an array.
+     */
     public Object[] getChoices() {
         return choices;
     }

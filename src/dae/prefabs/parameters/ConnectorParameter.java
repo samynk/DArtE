@@ -1,9 +1,6 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package dae.prefabs.parameters;
+
+import dae.components.ComponentType;
 
 /**
  *
@@ -12,11 +9,13 @@ package dae.prefabs.parameters;
 public class ConnectorParameter extends Parameter{
 
     /**
-     * Creates a new Fuzzy Parameter UI.
-     * @param id 
+     * Creates a new ConnectorParameter object.
+     * @param componentType the component of the parameter object.
+     * @param type the type of the parameter object.
+     * @param id the id of the parameter object.
      */
-    public ConnectorParameter(String type,String id){
-        super(type,id);
+    public ConnectorParameter(ComponentType componentType, String type, String id){
+        super(componentType, type, id);
     }
     
      /**

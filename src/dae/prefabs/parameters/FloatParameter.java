@@ -1,26 +1,40 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.prefabs.parameters;
 
+import dae.components.ComponentType;
+
 /**
- *
+ * Describes a float parameter.
  * @author Koen
  */
 public class FloatParameter extends Parameter {
 
     private float defaultValue;
 
-    public FloatParameter(String label, String id) {
-        super(label, id);
+    /**
+     * Creates a new FloatParameter object.
+     * @param componentType componentType the component type of the parameter.
+     * @param type the type of the parameter
+     * @param id the id of the parameter.
+     */
+    public FloatParameter(ComponentType componentType, String type, String id) {
+        super(componentType, type, id);
     }
 
-    public FloatParameter(String label, String id, float defaultValue) {
-        super(label, id);
+    /**
+     * Creates a new FloatParameter object.
+     * @param componentType componentType the component type of the parameter.
+     * @param type the type of the parameter
+     * @param id the id of the parameter.
+     */
+    public FloatParameter(ComponentType componentType, String type, String id, float defaultValue) {
+        super(componentType, type, id);
         this.defaultValue = defaultValue;
     }
 
+    /**
+     * Returns the default value of this float parameter object.
+     * @return the default value.
+     */
     public float getDefaultValue() {
         return defaultValue;
     }

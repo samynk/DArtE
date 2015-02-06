@@ -4,6 +4,8 @@
  */
 package dae.prefabs.parameters;
 
+import dae.components.ComponentType;
+
 /**
  *
  * @author Koen
@@ -12,15 +14,20 @@ public class BooleanParameter extends Parameter {
 
     private boolean defaultValue;
 
-    public BooleanParameter(String label, String id) {
-        super(label, id);
+    /**
+     * Creates a new action parameter.
+     * @param componentType the component type of the action parameter.
+     * @param type the type of the parameter (string, int, float, color, ...)
+     * @param id the id of the property of the prefab or component.
+     */
+    public BooleanParameter(ComponentType componentType, String type, String id) {
+        super(componentType, type, id);
     }
 
-    public BooleanParameter(String label, String id, boolean defaultValue) {
-        super(label, id);
-        this.defaultValue = defaultValue;
-    }
-
+    /**
+     * Returns the default value for the parameter.
+     * @return the default value for the parameter.
+     */
     public boolean getDefaultValue() {
         return defaultValue;
     }
@@ -33,6 +40,4 @@ public class BooleanParameter extends Parameter {
     public Class getClassType() {
         return boolean.class;
     }
-    
-    
 }

@@ -1,8 +1,6 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.prefabs.parameters;
+
+import dae.components.ComponentType;
 
 /**
  *
@@ -15,13 +13,29 @@ public class RangeParameter extends Parameter {
     private float step;
     private float defaultValue;
     
-    public RangeParameter(String label, String id) {
-        super(label, id);
+    /**
+     * Creates a new RangeParameter object.
+     *
+     * @param componentType componentType the component type of the parameter.
+     * @param type the type of the parameter
+     * @param id the id of the parameter.
+     *
+     */
+    public RangeParameter(ComponentType componentType, String type, String id) {
+        super(componentType, type, id);
         this.defaultValue = 0.0f;
     }
 
-    public RangeParameter(String label, String id, float defaultValue) {
-        super(label, id);
+    /**
+     * Creates a new RangeParameter object.
+     *
+     * @param componentType componentType the component type of the parameter.
+     * @param type the type of the parameter
+     * @param id the id of the parameter.
+     * @param defaultValue the default value for this range parameter.
+     */
+    public RangeParameter(ComponentType componentType, String type, String id, float defaultValue) {
+        super(componentType, type, id);
         this.defaultValue = defaultValue;
     }
 
