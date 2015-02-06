@@ -9,6 +9,7 @@ import dae.GlobalObjects;
 import dae.animation.rig.Rig;
 import dae.animation.rig.io.RigWriter;
 import dae.gui.events.ApplicationStoppedEvent;
+import dae.gui.renderers.TransformSpaceRenderer;
 import dae.io.ProjectLoader;
 import dae.io.ProjectSaver;
 import dae.io.SceneLoader;
@@ -23,6 +24,7 @@ import dae.prefabs.types.ObjectTypeCategory;
 import dae.prefabs.ui.classpath.FileNode;
 import dae.prefabs.ui.events.AssetEvent;
 import dae.prefabs.ui.events.AssetEventType;
+import dae.prefabs.ui.events.ComponentEvent;
 import dae.prefabs.ui.events.CreateObjectEvent;
 import dae.prefabs.ui.events.GizmoEvent;
 import dae.prefabs.ui.events.GizmoType;
@@ -90,6 +92,10 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
 
         cboTranslateSpace.setSelectedItem(TranslateGizmoSpace.LOCAL);
         cboRotateSpace.setSelectedItem(RotateGizmoSpace.LOCAL);
+        
+        cboTranslateSpace.setRenderer(new TransformSpaceRenderer());
+        cboRotateSpace.setRenderer(new TransformSpaceRenderer());
+        
         SwingUtilities.updateComponentTreeUI(this);
         GlobalObjects.getInstance().registerListener(this);
 
@@ -140,11 +146,13 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
         outputPanel1 = new dae.gui.OutputPanel();
         pnlToolbarViewport = new javax.swing.JPanel();
         pnlViewPort = new javax.swing.JSplitPane();
+        scrProperties = new javax.swing.JScrollPane();
         propertiesPanel1 = new dae.prefabs.ui.PropertiesPanel();
         pnlToolbar = new javax.swing.JPanel();
         gizmoToolbar = new javax.swing.JToolBar();
         btnLink = new javax.swing.JToggleButton();
         btnMove = new javax.swing.JToggleButton();
+        pnlTranslateSpaceChoice = new javax.swing.JPanel();
         cboTranslateSpace = new javax.swing.JComboBox();
         btnRotate = new javax.swing.JToggleButton();
         cboRotateSpace = new javax.swing.JComboBox();
@@ -165,9 +173,23 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
         mnuUndo = new javax.swing.JMenuItem();
         mnuRedo = new javax.swing.JMenuItem();
         mnuPreferences = new javax.swing.JMenuItem();
+        mnuComponents = new javax.swing.JMenu();
+        mnuAddPhysicsBox = new javax.swing.JMenuItem();
+        mnuConvexShape = new javax.swing.JMenuItem();
+        mnuAddCollider = new javax.swing.JMenuItem();
+        mnuPhysicsTerrain = new javax.swing.JMenuItem();
+        mnuCharacterController = new javax.swing.JMenuItem();
+        jSeparator5 = new javax.swing.JPopupMenu.Separator();
+        mnuAddAnimationComponent = new javax.swing.JMenuItem();
+        mnuAddPath = new javax.swing.JMenuItem();
+        jSeparator6 = new javax.swing.JPopupMenu.Separator();
+        mnuAddPersonalityComponent = new javax.swing.JMenuItem();
+        mnuStandardObjects = new javax.swing.JMenu();
+        mnuTerrain = new javax.swing.JMenuItem();
         mnuEntities = new javax.swing.JMenu();
         mnuAddCamera = new javax.swing.JMenuItem();
         mnuAddSound = new javax.swing.JMenuItem();
+        mnuAddNPC = new javax.swing.JMenuItem();
         mnuAdd = new javax.swing.JMenu();
         mnuCreateRig = new javax.swing.JMenuItem();
         mnuAddRevoluteJoint = new javax.swing.JMenuItem();
@@ -234,13 +256,17 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
 
         propertiesPanel1.setMinimumSize(null);
         propertiesPanel1.setPreferredSize(null);
-        pnlViewPort.setRightComponent(propertiesPanel1);
+        scrProperties.setViewportView(propertiesPanel1);
+
+        pnlViewPort.setRightComponent(scrProperties);
 
         pnlToolbarViewport.add(pnlViewPort, java.awt.BorderLayout.CENTER);
 
         pnlToolbar.setMinimumSize(new java.awt.Dimension(70, 40));
         pnlToolbar.setPreferredSize(new java.awt.Dimension(70, 50));
-        pnlToolbar.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        java.awt.FlowLayout flowLayout1 = new java.awt.FlowLayout(java.awt.FlowLayout.LEFT);
+        flowLayout1.setAlignOnBaseline(true);
+        pnlToolbar.setLayout(flowLayout1);
 
         gizmoToolbar.setRollover(true);
 
@@ -257,7 +283,7 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
         gizmoToolbar.add(btnLink);
 
         gizmoButtonGroup.add(btnMove);
-        btnMove.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dae/icons/transform_move.png"))); // NOI18N
+        btnMove.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dae/icons/flat/translate.png"))); // NOI18N
         btnMove.setFocusable(false);
         btnMove.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnMove.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -267,6 +293,9 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
             }
         });
         gizmoToolbar.add(btnMove);
+
+        pnlTranslateSpaceChoice.setLayout(new javax.swing.BoxLayout(pnlTranslateSpaceChoice, javax.swing.BoxLayout.X_AXIS));
+        gizmoToolbar.add(pnlTranslateSpaceChoice);
 
         cboTranslateSpace.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
@@ -418,6 +447,88 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
 
         mnuSandboxMenu.add(mnuEdit);
 
+        mnuComponents.setText("Components");
+
+        mnuAddPhysicsBox.setText("Add Physics Box");
+        mnuAddPhysicsBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuAddPhysicsBoxActionPerformed(evt);
+            }
+        });
+        mnuComponents.add(mnuAddPhysicsBox);
+
+        mnuConvexShape.setText("Add Physics Mesh");
+        mnuConvexShape.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuConvexShapeActionPerformed(evt);
+            }
+        });
+        mnuComponents.add(mnuConvexShape);
+
+        mnuAddCollider.setText("Add Physics Collider");
+        mnuAddCollider.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuAddColliderActionPerformed(evt);
+            }
+        });
+        mnuComponents.add(mnuAddCollider);
+
+        mnuPhysicsTerrain.setText("Add Physics Terrain");
+        mnuPhysicsTerrain.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuPhysicsTerrainActionPerformed(evt);
+            }
+        });
+        mnuComponents.add(mnuPhysicsTerrain);
+
+        mnuCharacterController.setText("Add Character Controller");
+        mnuCharacterController.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuCharacterControllerActionPerformed(evt);
+            }
+        });
+        mnuComponents.add(mnuCharacterController);
+        mnuComponents.add(jSeparator5);
+
+        mnuAddAnimationComponent.setText("Add Animation Control");
+        mnuAddAnimationComponent.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuAddAnimationComponentActionPerformed(evt);
+            }
+        });
+        mnuComponents.add(mnuAddAnimationComponent);
+
+        mnuAddPath.setText("Add Path Control");
+        mnuAddPath.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuAddPathActionPerformed(evt);
+            }
+        });
+        mnuComponents.add(mnuAddPath);
+        mnuComponents.add(jSeparator6);
+
+        mnuAddPersonalityComponent.setText("Add Personality Component");
+        mnuAddPersonalityComponent.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuAddPersonalityComponentActionPerformed(evt);
+            }
+        });
+        mnuComponents.add(mnuAddPersonalityComponent);
+
+        mnuSandboxMenu.add(mnuComponents);
+
+        mnuStandardObjects.setText("Create");
+
+        mnuTerrain.setText("Terrain");
+        mnuTerrain.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuTerrainActionPerformed(evt);
+            }
+        });
+        mnuStandardObjects.add(mnuTerrain);
+
+        mnuSandboxMenu.add(mnuStandardObjects);
+
         mnuEntities.setText("Entities");
 
         mnuAddCamera.setText("Add Camera");
@@ -435,6 +546,14 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
             }
         });
         mnuEntities.add(mnuAddSound);
+
+        mnuAddNPC.setText("Add NPC");
+        mnuAddNPC.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuAddNPCActionPerformed(evt);
+            }
+        });
+        mnuEntities.add(mnuAddNPC);
 
         mnuSandboxMenu.add(mnuEntities);
 
@@ -1084,11 +1203,57 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
         createObject("Standard", "Trigger");
     }//GEN-LAST:event_mnuAddTriggerBoxActionPerformed
 
-    private void createObject(String category, String type) {
+    private void mnuAddNPCActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAddNPCActionPerformed
+        // TODO add your handling code here:
+        createObject("Standard", "J3ONPC","Characters/Male/Character1/character1.j3o");
+    }//GEN-LAST:event_mnuAddNPCActionPerformed
+
+    private void mnuAddPhysicsBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAddPhysicsBoxActionPerformed
+        GlobalObjects.getInstance().postEvent(new ComponentEvent("PhysicsBoxComponent"));
+    }//GEN-LAST:event_mnuAddPhysicsBoxActionPerformed
+
+    private void mnuAddAnimationComponentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAddAnimationComponentActionPerformed
+         GlobalObjects.getInstance().postEvent(new ComponentEvent("AnimationComponent"));
+    }//GEN-LAST:event_mnuAddAnimationComponentActionPerformed
+
+    private void mnuTerrainActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuTerrainActionPerformed
+        createObject("Standard","Terrain");
+    }//GEN-LAST:event_mnuTerrainActionPerformed
+
+    private void mnuPhysicsTerrainActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuPhysicsTerrainActionPerformed
+        GlobalObjects.getInstance().postEvent(new ComponentEvent("PhysicsTerrainComponent"));
+    }//GEN-LAST:event_mnuPhysicsTerrainActionPerformed
+
+    private void mnuCharacterControllerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuCharacterControllerActionPerformed
+        GlobalObjects.getInstance().postEvent(new ComponentEvent("CharacterControllerComponent"));
+    }//GEN-LAST:event_mnuCharacterControllerActionPerformed
+
+    private void mnuAddPathActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAddPathActionPerformed
+        GlobalObjects.getInstance().postEvent(new ComponentEvent("PathComponent"));
+    }//GEN-LAST:event_mnuAddPathActionPerformed
+
+    private void mnuConvexShapeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuConvexShapeActionPerformed
+        GlobalObjects.getInstance().postEvent(new ComponentEvent("PhysicsConvexComponent"));
+    }//GEN-LAST:event_mnuConvexShapeActionPerformed
+
+    private void mnuAddColliderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAddColliderActionPerformed
+        GlobalObjects.getInstance().postEvent(new ComponentEvent("PhysicsConcaveComponent"));
+    }//GEN-LAST:event_mnuAddColliderActionPerformed
+
+    private void mnuAddPersonalityComponentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAddPersonalityComponentActionPerformed
+        GlobalObjects.getInstance().postEvent(new ComponentEvent("PersonalityComponent"));
+    }//GEN-LAST:event_mnuAddPersonalityComponentActionPerformed
+
+     private void createObject(String category, String type) {
+         createObject(category,type,null);
+    }
+    
+    private void createObject(String category, String type, String extraInfo) {
         ObjectTypeCategory otc = viewport.getObjectsToCreate();
         ObjectType ot = otc.getObjectType(category, type);
         if (ot != null) {
-            CreateObjectEvent coe = new CreateObjectEvent(ot.getObjectToCreate(), null, ot);
+            CreateObjectEvent coe = new CreateObjectEvent(ot.getObjectToCreate(), extraInfo, ot);
+            ot.setExtraInfo(extraInfo);
             GlobalObjects.getInstance().postEvent(coe);
         }
     }
@@ -1170,16 +1335,24 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
     private javax.swing.JPopupMenu.Separator jSeparator2;
     private javax.swing.JPopupMenu.Separator jSeparator3;
     private javax.swing.JPopupMenu.Separator jSeparator4;
+    private javax.swing.JPopupMenu.Separator jSeparator5;
+    private javax.swing.JPopupMenu.Separator jSeparator6;
     private javax.swing.JMenu mnuAdd;
     private javax.swing.JMenuItem mnuAdd2HandleAxis;
     private javax.swing.JMenuItem mnuAddAmbientLight;
+    private javax.swing.JMenuItem mnuAddAnimationComponent;
     private javax.swing.JMenuItem mnuAddCamera;
     private javax.swing.JMenuItem mnuAddCharacterPath;
+    private javax.swing.JMenuItem mnuAddCollider;
     private javax.swing.JMenuItem mnuAddCrate;
     private javax.swing.JMenuItem mnuAddCylinder;
     private javax.swing.JMenuItem mnuAddDirectionalLight;
     private javax.swing.JMenuItem mnuAddHandle;
     private javax.swing.JMenuItem mnuAddHingeJoint;
+    private javax.swing.JMenuItem mnuAddNPC;
+    private javax.swing.JMenuItem mnuAddPath;
+    private javax.swing.JMenuItem mnuAddPersonalityComponent;
+    private javax.swing.JMenuItem mnuAddPhysicsBox;
     private javax.swing.JMenuItem mnuAddPivot;
     private javax.swing.JMenuItem mnuAddRevoluteJoint;
     private javax.swing.JMenuItem mnuAddSkeleton;
@@ -1189,6 +1362,9 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
     private javax.swing.JMenuItem mnuAddTarget;
     private javax.swing.JMenuItem mnuAddTriggerBox;
     private javax.swing.JMenuItem mnuAddWaypoint;
+    private javax.swing.JMenuItem mnuCharacterController;
+    private javax.swing.JMenu mnuComponents;
+    private javax.swing.JMenuItem mnuConvexShape;
     private javax.swing.JMenuItem mnuCreateRig;
     private javax.swing.JMenu mnuEdit;
     private javax.swing.JMenu mnuEntities;
@@ -1203,12 +1379,15 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
     private javax.swing.JMenuItem mnuNewProject;
     private javax.swing.JMenuItem mnuOpenScene;
     private javax.swing.JMenu mnuPhysics;
+    private javax.swing.JMenuItem mnuPhysicsTerrain;
     private javax.swing.JMenuItem mnuPreferences;
     private javax.swing.JMenuItem mnuRedo;
     private javax.swing.JMenuBar mnuSandboxMenu;
     private javax.swing.JMenuItem mnuSaveProject;
     private javax.swing.JMenuItem mnuSkeleton2;
     private javax.swing.JMenuItem mnuSpotLight;
+    private javax.swing.JMenu mnuStandardObjects;
+    private javax.swing.JMenuItem mnuTerrain;
     private javax.swing.JMenuItem mnuUndo;
     private javax.swing.JMenuItem munAddFootcurve;
     private javax.swing.JPopupMenu.Separator openSeparator;
@@ -1219,10 +1398,12 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
     private javax.swing.JTabbedPane pnlTabOutputs;
     private javax.swing.JPanel pnlToolbar;
     private javax.swing.JPanel pnlToolbarViewport;
+    private javax.swing.JPanel pnlTranslateSpaceChoice;
     private javax.swing.JSplitPane pnlViewPort;
     private dae.gui.ProjectPanel projectPanel1;
     private dae.prefabs.ui.PropertiesPanel propertiesPanel1;
     private javax.swing.JFileChooser sceneChooser;
+    private javax.swing.JScrollPane scrProperties;
     private javax.swing.JToolBar snapToolbar;
     private javax.swing.JToggleButton toggleAutogrid;
     private javax.swing.JToggleButton toggleSnap;
@@ -1275,7 +1456,7 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
             int dotIndex = asset.lastIndexOf('.');
             if (dotIndex > 0) {
                 String extension = asset.substring(dotIndex + 1).toLowerCase();
-                if (extension.equals("j3o")) {
+                if (extension.equals("j3o")  || extension.equals("ovm")) {
                     ObjectType ot = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Standard", "Mesh");
                     ot.setExtraInfo(asset);
                     CreateObjectEvent event = new CreateObjectEvent("dae.prefabs.standard.MeshObject", asset, ot);
