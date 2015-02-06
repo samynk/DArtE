@@ -6,12 +6,14 @@ package dae.project;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.bullet.BulletAppState;
+import com.jme3.light.DirectionalLight;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import com.jme3.util.SkyFactory;
 import dae.DAEFlyByCamera;
 import dae.GlobalObjects;
 import dae.io.SceneSaver;
@@ -19,6 +21,7 @@ import dae.prefabs.AxisEnum;
 import dae.prefabs.Prefab;
 import dae.prefabs.lights.DirectionalLightPrefab;
 import dae.prefabs.standard.CameraFrame;
+import dae.prefabs.types.ObjectType;
 import dae.prefabs.ui.events.LayerEvent;
 import dae.prefabs.ui.events.LayerEvent.LayerEventType;
 import dae.prefabs.ui.events.LevelEvent;
@@ -35,7 +38,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
  * @author Koen Samyn
  */
 public class Level extends Node implements ProjectTreeNode {
-    
+
     private File location;
     private AxisEnum upAxis = AxisEnum.Z;
     protected Grid ground;
@@ -49,6 +52,10 @@ public class Level extends Node implements ProjectTreeNode {
     private HashMap<String, File> exportLocations = new HashMap<String, File>();
     private boolean exportOnSave = true;
     private CameraFrame lastCamera;
+    /**
+     * Render settings
+     */
+    private String skyBoxTexture = "";
     /**
      * The assetmanager to use.
      */
@@ -73,32 +80,31 @@ public class Level extends Node implements ProjectTreeNode {
      * Create some default lighting.
      */
     protected void createLights(AssetManager manager) {
-        DirectionalLightPrefab light1 = new DirectionalLightPrefab();
-        light1.create("Light1", manager, null);
+        ObjectType type = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Light", "DirectionalLight");
+        
+        DirectionalLightPrefab light1 = (DirectionalLightPrefab)type.create(manager,"Light1");
         light1.setDirectionalLightColor(new ColorRGBA(0.97f, 0.91f, 0.69f, 1.0f).mult(0.75f));
         light1.setLocalTranslation(new Vector3f(2, 2, 2));
         light1.setLightDirection(new Vector3f(FastMath.cos(FastMath.PI * 2 / 3), -.6f, FastMath.sin(FastMath.PI * 2 / 3)));
         attachChild(light1);
-        
-        DirectionalLightPrefab light2 = new DirectionalLightPrefab();
-        light2.create("Light2", manager, null);
+
+        DirectionalLightPrefab light2 = (DirectionalLightPrefab)type.create(manager,"Light2");
         light2.setDirectionalLightColor(new ColorRGBA(0.97f, 0.91f, 0.69f, 1.0f).mult(0.75f));
         light2.setLocalTranslation(new Vector3f(-2, 2, 2));
         light2.setLightDirection(new Vector3f(FastMath.cos(FastMath.PI * 4 / 3), -.6f, FastMath.sin(FastMath.PI * 4 / 3)).normalizeLocal());
         attachChild(light2);
-        
-        DirectionalLightPrefab backlight = new DirectionalLightPrefab();
-        backlight.create("Backlight", manager, null);
+
+        DirectionalLightPrefab backlight = (DirectionalLightPrefab)type.create(manager,"Backlight");
         backlight.setDirectionalLightColor(new ColorRGBA(0.65f, 0.65f, 0.78f, 1.0f).mult(0.75f));
         backlight.setLocalTranslation(new Vector3f(2, 2, -2));
         backlight.setLightDirection(new Vector3f(1.0f, -.6f, 0.0f).normalizeLocal());
         attachChild(backlight);
-        
+
         defaultLights.add(light1);
         defaultLights.add(light2);
         defaultLights.add(backlight);
     }
-    
+
     protected Iterable<Prefab> getDefaultLights() {
         return defaultLights;
     }
@@ -246,13 +252,13 @@ public class Level extends Node implements ProjectTreeNode {
             this.attachChild(ground);
             LevelEvent le = new LevelEvent(this, EventType.NODEADDED, ground);
             GlobalObjects.getInstance().postEvent(le);
-            
+
         }
         if (this.createDefaultLights) {
             this.createLights(manager);
             createDefaultLights = false;
         }
-        
+
         physicsLayer.setBulletAppState(state);
 
         // find lights that have shadow enabled and activate
@@ -265,7 +271,7 @@ public class Level extends Node implements ProjectTreeNode {
             }
         }
     }
-    
+
     /**
      * Checks if this Level object has changed.
      *
@@ -280,26 +286,27 @@ public class Level extends Node implements ProjectTreeNode {
         }
         return changed;
     }
-    
+
     /**
      * Sets the level to the changed status.
      */
     public void setChanged() {
-        for (Spatial s: this.children){
-            if ( s instanceof Prefab){
-                ((Prefab)s).setChanged(true, false);
+        for (Spatial s : this.children) {
+            if (s instanceof Prefab) {
+                ((Prefab) s).setChanged(true, false);
             }
         }
     }
-    
+
     /**
      * Returns the last know camera frame.
+     *
      * @return the last camera frame that was used for this level.
      */
-    public CameraFrame getLastCamera(){
+    public CameraFrame getLastCamera() {
         return lastCamera;
     }
-    
+
     public AssetManager getAssetManager() {
         return manager;
     }
@@ -334,10 +341,10 @@ public class Level extends Node implements ProjectTreeNode {
     public int attachChild(Spatial node) {
         if (node instanceof Prefab) {
             Prefab p = (Prefab) node;
-            p.setChanged(true,false);
+            p.setChanged(true, false);
             String layer = p.getLayerName();
-            
-            if (!(this.getChildIndex(node) > -1 )) {
+
+            if (!(this.getChildIndex(node) > -1)) {
                 Layer currentLayer;
                 if (!this.hasLayer(layer)) {
                     currentLayer = this.addLayer(layer);
@@ -352,11 +359,11 @@ public class Level extends Node implements ProjectTreeNode {
         }
         return -1;
     }
-    
+
     protected int attachChildDirectly(Node node) {
         return super.attachChild(node);
     }
-    
+
     private int getLayerCount() {
         int layerCount = 0;
         for (Layer l : layers) {
@@ -455,12 +462,12 @@ public class Level extends Node implements ProjectTreeNode {
     public Layer getParentLayer(String layerName, int layerIndex) {
         helper.delete(0, helper.length());
         String[] components = layerName.split("\\.");
-        
+
         for (int i = 0; i <= layerIndex && i < components.length; ++i) {
             helper.append(components[i]);
             helper.append('.');
         }
-        
+
         helper.deleteCharAt(helper.length() - 1);
         String parentLayerName = helper.toString();
         return this.getLayer(parentLayerName);
@@ -495,11 +502,11 @@ public class Level extends Node implements ProjectTreeNode {
     public void postTask(Runnable executor) {
         todoQueue.add(executor);
     }
-    
+
     @Override
     public void updateLogicalState(float tpf) {
-        
-        
+
+
         Runnable r = todoQueue.poll();
         while (r != null) {
             r.run();
@@ -508,7 +515,7 @@ public class Level extends Node implements ProjectTreeNode {
         super.updateLogicalState(tpf);
     }
     private boolean showTargetObjects = true;
-    
+
     public void showTargetObjects(boolean show) {
         if (show != showTargetObjects) {
             if (show) {
@@ -527,7 +534,7 @@ public class Level extends Node implements ProjectTreeNode {
             showTargetObjects = show;
         }
     }
-    
+
     public boolean getShowsTargetObjects() {
         return showTargetObjects;
     }
@@ -569,50 +576,75 @@ public class Level extends Node implements ProjectTreeNode {
     public boolean hasChildren() {
         return layers.size() > 0;
     }
-    
+
     public int getIndexOfChild(ProjectTreeNode object) {
         return layers.indexOf(object);
     }
-    
+
     public boolean isLeaf() {
         return layers.size() > 0;
     }
-    
+
     public ProjectTreeNode getProjectChild(int index) {
         return layers.get(index);
     }
-    
+
     public ProjectTreeNode getProjectParent() {
         return this.project;
     }
-    
+
     public void setExportLocation(String key, File selected) {
         exportLocations.put(key, selected);
     }
-    
+
     public File getExportLocation(String key) {
         return exportLocations.get(key);
     }
-    
+
     public boolean isExportOnSave() {
         return exportOnSave;
     }
-    
+
     public void setExportOnSave(boolean value) {
         this.exportOnSave = value;
     }
-    
+
     public boolean hasExportKeys() {
         return !exportLocations.isEmpty();
     }
-    
+
     public Iterable<String> getExportKeys() {
         return exportLocations.keySet();
     }
-    
+
     public void save(File location) {
         SceneSaver.writeScene(location, this);
     }
 
-    
+    /**
+     * Returns the skybox texture.
+     *
+     * @return the path to the skybox texture.
+     */
+    public String getSkyBoxTexture() {
+        return skyBoxTexture;
+    }
+
+    /**
+     * Sets the skybox texture.
+     *
+     * @param texture the texture to set.
+     */
+    public void setSkyBoxTexture(String texture) {
+        if (!texture.equals(this.skyBoxTexture)) {
+            System.out.println("Setting sky box texture.");
+            this.skyBoxTexture = texture;
+            postTask(new Runnable() {
+                public void run() {
+                    getParent().attachChild(SkyFactory.createSky(
+                            manager, skyBoxTexture, false));
+                }
+            });
+        }
+    }
 }
