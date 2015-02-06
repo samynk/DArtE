@@ -11,7 +11,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import static dae.io.XMLUtils.*;
-import dae.io.export.Exporter;
+import dae.io.export.OVSceneExporter;
+import dae.io.writers.Exporter;
 import dae.project.AssetLevel;
 import dae.project.Level;
 import java.io.Writer;
@@ -29,6 +30,7 @@ public class ProjectSaver {
 
     static {
         registeredExporters.put("j3o", new SceneToJ3OExporter());
+        registeredExporters.put("ov", new OVSceneExporter());
     }
 
     public static void write(Project project, File file) throws IOException {
