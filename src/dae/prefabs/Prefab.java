@@ -10,7 +10,6 @@ import com.jme3.bullet.control.PhysicsControl;
 import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.collision.CollisionResult;
 import com.jme3.collision.CollisionResults;
-import com.jme3.material.MatParam;
 import com.jme3.material.Material;
 import com.jme3.math.*;
 import com.jme3.scene.Geometry;
@@ -19,7 +18,9 @@ import com.jme3.scene.Spatial;
 import com.jme3.texture.Texture;
 import dae.GlobalObjects;
 import dae.animation.event.TransformListener;
-import dae.animation.event.TransformType;
+import dae.components.ComponentList;
+import dae.components.PrefabComponent;
+import dae.prefabs.events.ComponentListener;
 import dae.prefabs.gizmos.Axis;
 import dae.prefabs.gizmos.Gizmo;
 import dae.prefabs.gizmos.RotateGizmo;
@@ -27,21 +28,16 @@ import dae.prefabs.magnets.FillerParameter;
 import dae.prefabs.magnets.Magnet;
 import dae.prefabs.magnets.MagnetParameter;
 import dae.prefabs.magnets.Quad;
-import dae.prefabs.prefab.undo.UndoPrefabPropertyEdit;
+import dae.prefabs.parameters.Parameter;
 import dae.prefabs.standard.ConnectorPrefab;
 import dae.prefabs.standard.UpdateObject;
-import dae.prefabs.ui.events.PrefabChangedEvent;
-import dae.prefabs.ui.events.PrefabChangedEventType;
+import dae.prefabs.types.ObjectType;
 import dae.project.ProjectTreeNode;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -50,14 +46,11 @@ import java.util.logging.Logger;
 public class Prefab extends Node implements ProjectTreeNode {
 
     private String prefix = "prefab";
-    private HashMap<String, Method> getMethods =
-            new HashMap<String, Method>();
-    private HashMap<String, Method> setMethods =
-            new HashMap<String, Method>();
     private final ArrayList<UpdateObject> workList =
             new ArrayList<UpdateObject>();
     private final ArrayList<Runnable> taskList =
             new ArrayList<Runnable>();
+    protected ObjectType objectType;
     private boolean selected = false;
     private Material originalMaterial;
     private float[] angles = new float[3];
@@ -67,8 +60,13 @@ public class Prefab extends Node implements ProjectTreeNode {
     private String physicsMesh;
     private String layerName = "default";
     private ArrayList<TransformListener> transformListeners;
+    private ArrayList<ComponentListener> componentListeners;
     private Vector3f pivot = Vector3f.ZERO;
     private boolean changed = false;
+    private HashMap<String, PrefabComponent> componentMap =
+            new HashMap<String, PrefabComponent>();
+    private ArrayList<PrefabComponent> sortedComponents =
+            new ArrayList<PrefabComponent>();
     /**
      * Defines if this prefab can have children.
      */
@@ -100,7 +98,6 @@ public class Prefab extends Node implements ProjectTreeNode {
      * Creates a new empty prefab object.
      */
     public Prefab() {
-        pcs = new PropertyChangeSupport(this);
     }
 
     /**
@@ -119,6 +116,15 @@ public class Prefab extends Node implements ProjectTreeNode {
      */
     public void setLayerName(String layerName) {
         this.layerName = layerName;
+    }
+
+    /**
+     * Returns the object type of this prefab object.
+     *
+     * @return the object type of the prefab object.
+     */
+    public ObjectType getObjectType() {
+        return objectType;
     }
 
     public String getType() {
@@ -159,166 +165,86 @@ public class Prefab extends Node implements ProjectTreeNode {
         return prefix;
     }
 
-    public void create(String name, AssetManager manager, String extraInfo) {
+    /**
+     * Creates a new prefab object.
+     *
+     * @param name the name of the prefab.
+     * @param manager the asset manager to load assets.
+     * @param objectType the object type of the prefab.
+     * @param extraInfo extra info for the creation process.
+     */
+    public void create(String name, AssetManager manager, ObjectType objectType, String extraInfo) {
+        this.objectType = objectType;
+        create(name, manager, extraInfo);
     }
 
-    public void setParameter(String property, Object value, boolean undoableEdit) {
-        if (locked && !"locked".equals(property)) {
+    /**
+     * Creates a new prefab object.
+     *
+     * @param name the name of the prefab.
+     * @param manager the asset manager to load assets.
+     * @param extraInfo extra info for the creation process.
+     */
+    protected void create(String name, AssetManager manager, String extraInfo) {
+    }
+
+    /**
+     * Sets a parameter on this object.
+     *
+     * @param property the property to set.
+     * @param value the value to set.
+     * @param undoableEdit true if this is an undoable edit, false otherwise.
+     */
+    public void setParameter(Parameter property, Object value, boolean undoableEdit) {
+        if (locked && !"locked".equals(property.getProperty())) {
             return;
         }
-
         this.addUpdateObject(new UpdateObject(property, value, undoableEdit));
     }
 
     private void setParameterFromUpdateThread(UpdateObject uo) {
-        String property = uo.getProperty();
-        if (uo.hasParameter()) {
-            Object value = uo.getValue();
-            Method m = setMethods.get(property);
-            if (m == null) {
-                // get declared method
-                Method[] methods = this.getClass().getMethods();
-                String p = "set" + Character.toUpperCase(property.charAt(0)) + property.substring(1);
-                for (int i = 0; i < methods.length; ++i) {
-
-                    if (methods[i].getName().equals(p) && methods[i].getParameterTypes().length == 1) {
-                        Class pc = methods[i].getParameterTypes()[0];
-                        Class vc = getPrimitiveType(value.getClass());
-                        if (pc.equals(vc) || pc.isAssignableFrom(vc)) {
-                            m = methods[i];
-                            setMethods.put(property, m);
-                            break;
-                        }
-                    }
-                }
-            }
-            boolean undoableEdit = uo.isUndoableEdit();
-
-            if (m != null) {
-                try {
-                    Object oldValue = getParameter(property);
-                    oldValue = this.clone(oldValue);
-                    boolean equal = value.equals(oldValue);
-                    if (!equal) {
-                        m.invoke(this, value);
-                        if (undoableEdit) {
-                            GlobalObjects go = GlobalObjects.getInstance();
-                            //System.out.println("Adding UndoPrefabPropertyEdit :" + this.getName() + " : " + oldValue + "," + value);
-                            go.addEdit(new UndoPrefabPropertyEdit(this, property, oldValue, value));
-                            pcs.firePropertyChange(property, oldValue, value);
-                        }
-                        changed = true;
-                    }
-                } catch (IllegalAccessException ex) {
-                    Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
-                } catch (InvocationTargetException ex) {
-                    Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
-                } catch (IllegalArgumentException ex) {
-                    Logger.getLogger("DArtE").log(Level.SEVERE, "Problem setting {0}, on prefab{1}:{2}", new Object[]{property, this.getName(), value});
-                    Logger.getLogger("DArtE").log(Level.SEVERE, "type of value is : {0}", value.getClass().getName());
-                    Logger.getLogger("DArtE").log(Level.SEVERE, "Method is : {0}", m.getName());
-                    Logger.getLogger("DArtE").log(Level.SEVERE, "Type is :{0}", m.getParameterTypes()[0].getName());
-                }
-            }
-        } else {
-            Method m;
-            try {
-                m = this.getClass().getMethod(property);
-                if (m != null) {
-                    m.invoke(this);
-                }
-            } catch (NoSuchMethodException ex) {
-                Logger.getLogger(Prefab.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (SecurityException ex) {
-                Logger.getLogger(Prefab.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IllegalAccessException ex) {
-                Logger.getLogger(Prefab.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IllegalArgumentException ex) {
-                Logger.getLogger(Prefab.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (InvocationTargetException ex) {
-                Logger.getLogger(Prefab.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
+        PropertyReflector pr = ReflectionManager.getInstance().getPropertyReflector(this.getClass());
+        uo.execute(this, uo.isUndoableEdit());
+        /*
+         String property = uo.getProperty();
+         if (uo.hasParameter()) {
+         Object value = uo.getValue();
+         Object oldValue = pr.invokeGetMethod(this, property);
+         oldValue = pr.clone(oldValue);
+         changed = !oldValue.equals(value);
+         boolean undoableEdit = uo.isUndoableEdit();
+         if (changed) {
+         changed = pr.invokeSetMethod( this, property, value);
+         if (undoableEdit && changed) {
+         GlobalObjects go = GlobalObjects.getInstance();
+         go.addEdit(new UndoPrefabPropertyEdit(this, property, oldValue, value));
+         pcs.firePropertyChange(property, oldValue, value);
+         }
+         }
+         } else {
+         Method m;
+         try {
+         m = this.getClass().getMethod(property);
+         if (m != null) {
+         m.invoke(this);
+         }
+         } catch (NoSuchMethodException ex) {
+         Logger.getLogger(Prefab.class.getName()).log(Level.SEVERE, null, ex);
+         } catch (SecurityException ex) {
+         Logger.getLogger(Prefab.class.getName()).log(Level.SEVERE, null, ex);
+         } catch (IllegalAccessException ex) {
+         Logger.getLogger(Prefab.class.getName()).log(Level.SEVERE, null, ex);
+         } catch (IllegalArgumentException ex) {
+         Logger.getLogger(Prefab.class.getName()).log(Level.SEVERE, null, ex);
+         } catch (InvocationTargetException ex) {
+         Logger.getLogger(Prefab.class.getName()).log(Level.SEVERE, null, ex);
+         }
+         }
+         */
     }
 
-    public Class getPrimitiveType(Class clazz) {
-        if (clazz.equals(Boolean.class)) {
-            return boolean.class;
-        } else if (clazz.equals(Float.class)) {
-            return float.class;
-        } else if (clazz.equals(Double.class)) {
-            return double.class;
-        } else if (clazz.equals(Integer.class)) {
-            return int.class;
-        } else if (clazz.equals(Short.class)) {
-            return short.class;
-        } else if (clazz.equals(Long.class)) {
-            return long.class;
-        } else if (clazz.equals(Byte.class)) {
-            return byte.class;
-        } else if (clazz.equals(Character.class)) {
-            return char.class;
-        } else {
-            return clazz;
-        }
-    }
-
-    private Object clone(Object toClone) {
-        if (toClone instanceof Cloneable) {
-            try {
-                Method clone = toClone.getClass().getMethod("clone");
-                if (clone != null && Modifier.isPublic(clone.getModifiers())) {
-                    return clone.invoke(toClone);
-                } else {
-                    return toClone;
-                }
-            } catch (NoSuchMethodException ex) {
-                Logger.getLogger(Prefab.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (SecurityException ex) {
-                Logger.getLogger(Prefab.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IllegalAccessException ex) {
-                Logger.getLogger(Prefab.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IllegalArgumentException ex) {
-                Logger.getLogger(Prefab.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (InvocationTargetException ex) {
-                Logger.getLogger(Prefab.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-        return toClone;
-    }
-
-    public Object getParameter(String property) {
-        Method m = getMethods.get(property);
-        if (m == null) {
-            try {
-                String p = Character.toUpperCase(property.charAt(0)) + property.substring(1);
-                m = this.getClass().getMethod("get" + p);
-                getMethods.put(property, m);
-            } catch (NoSuchMethodException ex) {
-                //Logger.getLogger(Prefab.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (SecurityException ex) {
-                //Logger.getLogger(Prefab.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-        if (m != null) {
-            try {
-                return m.invoke(this);
-            } catch (IllegalAccessException ex) {
-                Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
-            } catch (InvocationTargetException ex) {
-                Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
-            } catch (IllegalArgumentException ex) {
-                Logger.getLogger("DArtE").log(Level.SEVERE, "Problem getting {0}, on prefab{1}", new Object[]{property, this.getName()});
-                Logger.getLogger("DArtE").log(Level.SEVERE, "type of return value is : {0}", m.getReturnType().getName());
-                Logger.getLogger("DArtE").log(Level.SEVERE, "Method is : {0}", m.getName());
-            }
-        }
-        return null;
-
-    }
-
-    public void call(String methodName) {
-        this.addUpdateObject(new UpdateObject(methodName, false));
+    public void call(Parameter parameter) {
+        this.addUpdateObject(new UpdateObject(parameter, null, false));
     }
 
     public void addUpdateObject(UpdateObject uo) {
@@ -348,6 +274,10 @@ public class Prefab extends Node implements ProjectTreeNode {
             }
             taskList.clear();
         }
+        for ( PrefabComponent pc : this.getComponents()){
+            pc.update(tpf);
+        }
+        
         super.updateLogicalState(tpf);
     }
 
@@ -363,21 +293,6 @@ public class Prefab extends Node implements ProjectTreeNode {
      */
     public void setSelected(boolean selected) {
         this.selected = selected;
-        /*
-         if (this.getChildren().size() > 0) {
-         Spatial s = this.getChildren().get(0);
-         if (s instanceof Geometry) {
-         Geometry g = (Geometry) s;
-         if (selected) {
-         System.out.println("Setting selected to : " + selectionMaterial);
-         g.setMaterial(selectionMaterial);
-         } else {
-         //System.out.println("setting material back to original");
-         g.setMaterial(originalMaterial);
-         }
-         }
-         }
-         * */
     }
 
     /**
@@ -418,106 +333,6 @@ public class Prefab extends Node implements ProjectTreeNode {
                 ((Prefab) s).setChanged(changed, recursively);
             }
         }
-    }
-
-    public void setDiffuseColor(ColorRGBA color) {
-        if (originalMaterial != null) {
-            MatParam mp = originalMaterial.getParam("m_Diffuse");
-            if (mp != null) {
-                mp.setValue(color);
-            }
-        }
-    }
-
-    public ColorRGBA getDiffuseColor() {
-        if (originalMaterial != null) {
-            MatParam mp = originalMaterial.getParam("m_Diffuse");
-            if (mp != null) {
-                return (ColorRGBA) mp.getValue();
-            } else {
-                return ColorRGBA.White;
-            }
-        } else {
-            return ColorRGBA.White;
-        }
-    }
-
-    public void setXRotation(float xRot) {
-        this.getLocalRotation().toAngles(angles);
-        Quaternion q = new Quaternion();
-        q.fromAngles(FastMath.DEG_TO_RAD * xRot, angles[1], angles[2]);
-        this.setLocalRotation(q);
-    }
-
-    public float getXRotation() {
-        this.getLocalRotation().toAngles(angles);
-        float angle = angles[0];
-        if (angle < 0) {
-            angle += FastMath.TWO_PI;
-        }
-        return angle * FastMath.RAD_TO_DEG;
-    }
-
-    public void setYRotation(float yRot) {
-        this.getLocalRotation().toAngles(angles);
-        Quaternion q = new Quaternion();
-        q.fromAngles(angles[0], FastMath.DEG_TO_RAD * yRot, angles[2]);
-        this.setLocalRotation(q);
-    }
-
-    public float getYRotation() {
-        this.getLocalRotation().toAngles(angles);
-        float angle = angles[1];
-        if (angle < 0) {
-            angle += FastMath.TWO_PI;
-        }
-        return angle * FastMath.RAD_TO_DEG;
-    }
-
-    public void setZRotation(float zRot) {
-        this.getLocalRotation().toAngles(angles);
-        Quaternion q = new Quaternion();
-        q.fromAngles(angles[0], angles[1], FastMath.DEG_TO_RAD * zRot);
-        this.setLocalRotation(q);
-    }
-
-    public float getZRotation() {
-        this.getLocalRotation().toAngles(angles);
-        float angle = angles[2];
-        if (angle < 0) {
-            angle += FastMath.TWO_PI;
-        }
-        return angle * FastMath.RAD_TO_DEG;
-    }
-
-    public float getXTranslation() {
-        return this.getLocalTranslation().x;
-    }
-
-    public void setXTranslation(float x) {
-        float y = this.getLocalTranslation().y;
-        float z = this.getLocalTranslation().z;
-        this.setLocalTranslation(x, y, z);
-    }
-
-    public float getYTranslation() {
-        return this.getLocalTranslation().y;
-    }
-
-    public void setYTranslation(float y) {
-        float x = this.getLocalTranslation().x;
-        float z = this.getLocalTranslation().z;
-        this.setLocalTranslation(x, y, z);
-    }
-
-    public float getZTranslation() {
-        return this.getLocalTranslation().z;
-    }
-
-    public void setZTranslation(float z) {
-        float y = this.getLocalTranslation().y;
-        float x = this.getLocalTranslation().x;
-        this.setLocalTranslation(x, y, z);
     }
 
     public void setOffset(Vector3f offset) {
@@ -719,7 +534,7 @@ public class Prefab extends Node implements ProjectTreeNode {
                     // angle of 45 degrees
                     // todo , make it configurable
 
-                    
+
                     if (Math.abs(diff.dot(dirWorld)) < 0.707) {
                         //System.out.println("extruding the raycast quad :" + cr.getDistance());
                         dirWorld.multLocal(cr.getDistance());
@@ -854,54 +669,23 @@ public class Prefab extends Node implements ProjectTreeNode {
     public void notifyLoaded() {
     }
 
-    // Events
-    public void addTransformListener(TransformListener listener) {
-        if (this.transformListeners == null) {
-            transformListeners = new ArrayList<TransformListener>();
-        }
-        transformListeners.add(listener);
-    }
-
-    public void removeTransformListener(TransformListener listener) {
-        if (this.transformListeners != null) {
-            transformListeners.remove(listener);
-        }
-    }
-
-    private void notifyListeners(TransformType type) {
-        if (transformListeners != null) {
-            for (TransformListener listener : transformListeners) {
-                listener.transformChanged(this, type);
-            }
-        }
-        PrefabChangedEvent pe = null;
-        switch (type) {
-            case ROTATION:
-                pe = new PrefabChangedEvent(this, PrefabChangedEventType.ROTATION);
-                break;
-            case TRANSLATION:
-                pe = new PrefabChangedEvent(this, PrefabChangedEventType.TRANSLATION);
-                break;
-            case SCALE:
-                pe = new PrefabChangedEvent(this, PrefabChangedEventType.SCALE);
-                break;
-        }
-        if (pe != null) {
-            GlobalObjects.getInstance().postEvent(pe);
-        }
-    }
-
     @Override
     public void setLocalRotation(Matrix3f rotation) {
         super.setLocalRotation(rotation);
-        notifyListeners(TransformType.ROTATION);
+        Parameter prot = this.getObjectType().findParameter("TransformComponent", "rotation");
+        if (prot != null) {
+            prot.notifyChangeInValue(this);
+        }
         rotationChanged();
     }
 
     @Override
     public void setLocalRotation(Quaternion quaternion) {
         super.setLocalRotation(quaternion);
-        notifyListeners(TransformType.ROTATION);//To change body of generated methods, choose Tools | Templates.
+        Parameter prot = this.getObjectType().findParameter("TransformComponent", "rotation");
+        if (prot != null) {
+            prot.notifyChangeInValue(this);
+        }
         rotationChanged();
     }
 
@@ -950,8 +734,9 @@ public class Prefab extends Node implements ProjectTreeNode {
         if (locked) {
             return;
         }
-        super.setLocalScale(localScale); //To change body of generated methods, choose Tools | Templates.
-        notifyListeners(TransformType.SCALE);
+        super.setLocalScale(localScale);
+        Parameter pscale = this.getObjectType().findParameter("TransformComponent", "scale");
+        pscale.notifyChangeInValue(this);
         scaleChanged();
     }
 
@@ -960,8 +745,11 @@ public class Prefab extends Node implements ProjectTreeNode {
         if (locked) {
             return;
         }
-        super.setLocalScale(x, y, z); //To change body of generated methods, choose Tools | Templates.
-        notifyListeners(TransformType.SCALE);
+        super.setLocalScale(x, y, z);
+        Parameter pscale = this.getObjectType().findParameter("TransformComponent", "scale");
+        if (pscale != null) {
+            pscale.notifyChangeInValue(this);
+        }
         scaleChanged();
     }
 
@@ -970,9 +758,11 @@ public class Prefab extends Node implements ProjectTreeNode {
         if (locked) {
             return;
         }
-        super.setLocalScale(localScale); //To change body of generated methods, choose Tools | Templates.
-        notifyListeners(TransformType.SCALE);
-        scaleChanged();
+        super.setLocalScale(localScale);
+        Parameter pscale = this.getObjectType().findParameter("TransformComponent", "scale");
+        if (pscale != null) {
+            pscale.notifyChangeInValue(this);
+        }
     }
 
     public void setLocalPrefabTranslation(Vector3f localTranslation) {
@@ -987,8 +777,6 @@ public class Prefab extends Node implements ProjectTreeNode {
         } else {
             this.setLocalTranslation(localTranslation);
         }
-        notifyListeners(TransformType.TRANSLATION);
-        translationChanged();
     }
 
     public Vector3f getLocalPrefabTranslation() {
@@ -1000,7 +788,26 @@ public class Prefab extends Node implements ProjectTreeNode {
         } else {
             return getLocalTranslation();
         }
+    }
 
+    @Override
+    public void setLocalTranslation(Vector3f localTranslation) {
+        super.setLocalTranslation(localTranslation);
+        Parameter ptrans = this.getObjectType().findParameter("TransformComponent", "translation");
+        if (ptrans != null) {
+            ptrans.notifyChangeInValue(this);
+        }
+        translationChanged();
+    }
+
+    @Override
+    public void setLocalTranslation(float x, float y, float z) {
+        super.setLocalTranslation(x, y, z);
+        Parameter ptrans = this.getObjectType().findParameter("TransformComponent", "translation");
+        if (ptrans != null) {
+            ptrans.notifyChangeInValue(this);
+        }
+        translationChanged();
     }
 
     /**
@@ -1069,15 +876,6 @@ public class Prefab extends Node implements ProjectTreeNode {
         return -1;
     }
 
-    public void translationChanged() {
-    }
-
-    public void rotationChanged() {
-    }
-
-    public void scaleChanged() {
-    }
-
     public void addPhysics(PhysicsSpace space) {
     }
 
@@ -1105,18 +903,7 @@ public class Prefab extends Node implements ProjectTreeNode {
         }
         return super.attachChild(child); //To change body of generated methods, choose Tools | Templates.
     }
-    private PropertyChangeSupport pcs;
-
-    /**
-     * Adds a property change listener for a specific property.
-     *
-     * @param property the property to listen for
-     * @param pcl the property change listener to add.
-     */
-    public void addPropertyListener(String property, PropertyChangeListener pcl) {
-        pcs.addPropertyChangeListener(property, pcl);
-    }
-
+    
     public boolean hasChildren() {
         return this.getPrefabChildCount() > 0;
     }
@@ -1164,4 +951,137 @@ public class Prefab extends Node implements ProjectTreeNode {
     public Quaternion getGizmoRotation() {
         return null;
     }
+
+    /**
+     * Adds all the components in the list to this prefab object.
+     *
+     * @param cl the component list to add.
+     */
+    public void addComponents(ComponentList cl) {
+        for (PrefabComponent c : cl.getComponents()) {
+            addPrefabComponent(c,true);
+        }
+    }
+
+    /**
+     * Adds a single PrefabComponent to the list of components. The PrefabComponent
+     * will be installed immediately.
+     *
+     * @param pc the PrefabComponent to add.
+     */
+    public void addPrefabComponent(PrefabComponent pc) {
+        addPrefabComponent(pc, true);
+    }
+    
+    /**
+     * Adds a component with the option to install it immediately or not.
+     * @param pc the prefab component to add.
+     * @param install true if the component should be installed , false otherwise.
+     */
+    public void addPrefabComponent(PrefabComponent pc, boolean install) {
+        this.componentMap.put(pc.getId(), pc);
+        this.sortedComponents.add(pc);
+        Collections.sort(sortedComponents);
+        if ( install ){
+             pc.install(this);
+        }
+        notifyComponentAdded(pc);
+    }
+    
+    public void installAllComponents() {
+        Collections.sort(sortedComponents);
+        
+        System.out.println("Installing components for : " + this.getName());
+        for(PrefabComponent pc: sortedComponents){
+            System.out.println("Installing : " + pc.getId());
+            pc.install(this);
+        }
+    }
+
+    /**
+     * Returns the PrefabComponent with the given id, or null if no component is
+     * found.
+     *
+     * @param id the id of the prefab component.
+     * @return the PrefabComponent.
+     */
+    public PrefabComponent getComponent(String id) {
+        return componentMap.get(id);
+    }
+
+    /**
+     * Checks if this prefab has components.
+     *
+     * @return true if the prefab has components, false otherwise.
+     */
+    public boolean hasComponents() {
+        return componentMap.size() > 0;
+    }
+
+    /**
+     * Returns a list of components.
+     *
+     * @return the list of components.
+     */
+    public Iterable<PrefabComponent> getComponents() {
+        return sortedComponents;
+    }
+
+    /**
+     * Adds a component listener to the list of listeners to receive component
+     * added or removed events.
+     *
+     * @param cl the ComponentListener to add.
+     */
+    public void addComponentListener(ComponentListener cl) {
+        if (componentListeners == null) {
+            componentListeners = new ArrayList<ComponentListener>();
+        }
+        componentListeners.add(cl);
+    }
+
+    /**
+     * Removes a component listener from the list of listeners to receive
+     * component added or removed events.
+     *
+     * @param cl the ComponentListener to add.
+     */
+    public void removeComponentListener(ComponentListener cl) {
+        if (componentListeners != null) {
+            componentListeners.remove(cl);
+        }
+    }
+
+    private void notifyComponentAdded(PrefabComponent pc) {
+        if (componentListeners != null) {
+            for (ComponentListener cl : componentListeners) {
+                cl.componentAdded(this, pc);
+            }
+        }
+    }
+    
+    /**
+     * This is a notification for subclasses that the rotation has changed.
+     */
+    public void rotationChanged(){
+        
+    }
+    
+    /**
+     * This is a notification for subclasses that the translation has changed.
+     */
+    public void translationChanged(){
+        
+    }
+    
+    /**
+     * This is a notification for subclasses that the scale has changed.
+     */
+    public void scaleChanged(){
+        
+    }
+
+   
+
+    
 }
