@@ -55,6 +55,10 @@ public class DictionaryParameterUI extends javax.swing.JPanel implements Paramet
     public void setParameter(Parameter p) {
         parameter = (DictionaryParameter) p;
     }
+    
+    public Parameter getParameter(){
+        return parameter;
+    }
 
     /**
      * Sets the current selected node.
@@ -202,6 +206,14 @@ public class DictionaryParameterUI extends javax.swing.JPanel implements Paramet
         btnDeleteKey.setEnabled(tblDictionary.getSelectedRow() > -1);
     }
 
+    /**
+     * Checks if a label should be created for the UI.
+     * @return true if a label should be created, false othwerise.
+     */
+    public boolean needsLabel(){
+        return true;
+    }
+    
     private void btnAddKeyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddKeyActionPerformed
         tableModel.addPropertyKey(txtNewKey.getText());
         txtNewKey.setText("");
