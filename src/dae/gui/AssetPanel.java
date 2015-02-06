@@ -55,7 +55,7 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
      */
     public AssetPanel() {
         // match j3o files and klatch files
-        setFilePattern(".*\\.(?:j3o|klatch|rig|wav|ogg)");
+        setFilePattern(".*\\.(?:j3o|klatch|rig|wav|ogg|ovm|animset|dds|png|jpg)");
         initComponents();
         assetTree.setCellRenderer(new AssetTreeCellRenderer());
         assetTree.setTransferHandler(new TreeTransferHandler());
@@ -101,8 +101,9 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
         cboSoundFilter.setEnabled(enabled);
     }
 
-    public void setFilePattern(String pattern) {
+    public final void setFilePattern(String pattern) {
         filePattern = Pattern.compile(pattern);
+        buildAssetTree(currentProject);
     }
 
     public String getFilePattern() {
