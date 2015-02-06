@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.prefabs.standard;
 
 import com.jme3.asset.AssetManager;
@@ -26,7 +22,7 @@ public class NPCLocationEntity extends Prefab {
     }
 
     @Override
-    public void create(String name, AssetManager manager, String extraInfo) {
+    protected void create(String name, AssetManager manager, String extraInfo) {
         this.setName(name);
         npcLoc = manager.loadModel("Entities/M_Playerstart.j3o");
         this.attachChild(npcLoc);
