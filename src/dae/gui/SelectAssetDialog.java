@@ -82,6 +82,7 @@ public class SelectAssetDialog extends javax.swing.JDialog implements TreeSelect
         fileInformationPanel2 = new dae.gui.components.FileInformationPanel();
 
         setTitle("Select Asset");
+        setPreferredSize(new java.awt.Dimension(600, 500));
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowActivated(java.awt.event.WindowEvent evt) {
                 formWindowActivated(evt);
@@ -119,6 +120,9 @@ public class SelectAssetDialog extends javax.swing.JDialog implements TreeSelect
         gridBagConstraints.gridy = 1;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 2);
         getContentPane().add(cancelButton, gridBagConstraints);
+
+        assetPanel1.setMinimumSize(null);
+        assetPanel1.setPreferredSize(null);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -134,10 +138,12 @@ public class SelectAssetDialog extends javax.swing.JDialog implements TreeSelect
         gridBagConstraints.ipady = 10;
         gridBagConstraints.weightx = 1.0;
         getContentPane().add(lblFiller, gridBagConstraints);
+
+        fileInformationPanel2.setMinimumSize(null);
+        fileInformationPanel2.setPreferredSize(null);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.ipadx = 100;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(10, 0, 12, 0);
@@ -162,6 +168,7 @@ public class SelectAssetDialog extends javax.swing.JDialog implements TreeSelect
     }//GEN-LAST:event_closeDialog
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
+        fileInformationPanel2.showEmptyPreview();
         fileInformationPanel2.startTimer();
     }//GEN-LAST:event_formWindowActivated
 
@@ -206,8 +213,9 @@ public class SelectAssetDialog extends javax.swing.JDialog implements TreeSelect
     }
 
     public void setExtensions(String extensions) {
-        assetPanel1.setFilePattern(extensions);
+        
         assetPanel1.adjustToggleButtonsToFilePattern(extensions);
+        assetPanel1.setFilePattern(".*\\.(?:"+extensions+")");
     }
 
     public void setProject(Project currentProject) {
