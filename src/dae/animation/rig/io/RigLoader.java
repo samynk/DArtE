@@ -101,8 +101,9 @@ public class RigLoader implements AssetLoader {
             
             Element root = doc.getDocumentElement();
             
+            ObjectType objectType = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Animation", "Rig");
             result = new Rig();
-            result.create("rig", this.assetManager, null);
+            result.create("rig", this.assetManager, objectType, null);
             
             NodeList nl = root.getChildNodes();
             for (int i = 0; i < nl.getLength(); ++i) {
@@ -234,14 +235,14 @@ public class RigLoader implements AssetLoader {
         String shadowMode = getAttrContent("shadowmode", map);
         
         
-        
+        ObjectType type = objectsToCreate.find(label);
         Prefab p = (Prefab) Class.forName(className).newInstance();
-        p.create(name, manager, meshFile);
+        p.create(name, manager, type, meshFile);
         p.setType(label);
         p.setCategory(category);
         p.setPhysicsMesh(physicsMesh);
         
-        ObjectType type = objectsToCreate.find(label);
+        
         if (type != null) {
             MagnetParameter mp = (MagnetParameter) type.findParameter("magnets");
             p.setMagnets(mp);
@@ -478,7 +479,8 @@ public class RigLoader implements AssetLoader {
         Vector3f rotation = parseVector3f(srotation);
         
         Handle result = new Handle();
-        result.create(sname, this.assetManager, null);
+        ObjectType objectType = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Animation", "Handle");
+        result.create(sname, this.assetManager, objectType, null);
         result.setTransformation(location, rotation);
         return result;
     }
