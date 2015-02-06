@@ -42,17 +42,12 @@ public class Handle extends Prefab implements BodyElement {
 
     public Handle() {
         setLayerName("animation");
-        setCategory("Animation");
-        setType("TwoAxisHandle");
-
     }
 
     public Handle(Vector3f axis1, Vector3f axis2) {
         this.axis1 = axis1.clone();
         this.axis2 = axis2.clone();
         setLayerName("animation");
-        setCategory("Animation");
-        setType("TwoAxisHandle");
     }
 
     @Override
@@ -79,7 +74,7 @@ public class Handle extends Prefab implements BodyElement {
     @Override
     public Spatial clone() {
         Handle h = new Handle(axis1, axis2);
-        h.create(this.name, assetManager, null);
+        h.create(this.name, assetManager, getObjectType(), null);
         h.setTransformation(translation, rotation);
         return h;
     }
