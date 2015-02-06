@@ -17,6 +17,7 @@ import dae.io.SceneLoader;
 import dae.io.SceneSaver;
 import dae.prefabs.Prefab;
 import dae.prefabs.standard.MeshObject;
+import dae.prefabs.types.ObjectType;
 import dae.prefabs.ui.events.ErrorMessage;
 import dae.prefabs.ui.events.LevelEvent;
 import java.io.File;
@@ -81,15 +82,14 @@ public class AssetLevel extends Level {
         }
         for (Spatial s : toRemove) {
             Node parentNode = s.getParent();
-            if ( parentNode instanceof ProjectTreeNode && s instanceof ProjectTreeNode)
-            {
-                ProjectTreeNode child = (ProjectTreeNode)s;
+            if (parentNode instanceof ProjectTreeNode && s instanceof ProjectTreeNode) {
+                ProjectTreeNode child = (ProjectTreeNode) s;
                 ProjectTreeNode ptn = child.getProjectParent();
                 int index = ptn.getIndexOfChild(child);
                 s.removeFromParent();
                 LevelEvent le = new LevelEvent(this, LevelEvent.EventType.NODEREMOVED, (Node) s, ptn, index);
                 GlobalObjects.getInstance().postEvent(le);
-            }else{
+            } else {
                 s.removeFromParent();
             }
         }
@@ -103,7 +103,8 @@ public class AssetLevel extends Level {
                 MeshObject mo = new MeshObject();
                 mo.setType("Mesh");
                 mo.setCategory("Standard");
-                mo.create(asset.getFileName().toString(), manager, assetLocation);
+                ObjectType type = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Mesh", "Standard");
+                mo.create(asset.getFileName().toString(), manager, type, assetLocation);
                 this.attachChild(mo);
                 levelShown = true;
             }
