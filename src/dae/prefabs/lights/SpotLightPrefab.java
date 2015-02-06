@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.prefabs.lights;
 
 import com.jme3.asset.AssetManager;
@@ -60,8 +56,7 @@ public class SpotLightPrefab extends Prefab implements ShadowCastSupport {
         addControl(lc);
     }
 
-    public SpotLightPrefab(Vector3f translation,
-            Quaternion rotation,
+    public SpotLightPrefab(
             float spotinnerangle,
             float spotouterangle,
             float spotrange,
@@ -70,8 +65,6 @@ public class SpotLightPrefab extends Prefab implements ShadowCastSupport {
         spotLight = new SpotLight();
         LightControl lc = new LightControl(spotLight);
         addControl(lc);
-        this.setLocalRotation(rotation);
-        this.setLocalTranslation(translation);
 
         spotLight.setSpotInnerAngle(spotinnerangle * FastMath.DEG_TO_RAD);
         spotLight.setSpotOuterAngle(spotouterangle * FastMath.DEG_TO_RAD);
@@ -124,7 +117,7 @@ public class SpotLightPrefab extends Prefab implements ShadowCastSupport {
         sl.setLocalPrefabTranslation(this.getLocalPrefabTranslation());
         sl.setLocalPrefabRotation(this.getLocalPrefabRotation());
         sl.setLocalScale(this.getLocalScale());
-        sl.create(this.getName(), assetManager, null);
+        sl.create(this.getName(), assetManager, getObjectType(), null);
         sl.setSpotLightIntensity(this.spotLightIntensity);
         sl.setSpotLightColor(this.spotLightColor.clone());
         sl.setSpotRange(this.spotLight.getSpotRange());
