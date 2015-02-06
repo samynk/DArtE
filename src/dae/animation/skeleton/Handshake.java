@@ -14,7 +14,9 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.debug.WireSphere;
 import com.jme3.scene.shape.Sphere;
+import dae.GlobalObjects;
 import dae.prefabs.Prefab;
+import dae.prefabs.types.ObjectType;
 
 /**
  * This is a utility class that defines a hand shake. A handshake
@@ -43,7 +45,8 @@ public class Handshake extends Prefab{
         this.assetManager = manager;
         
         handle1 = new Handle();
-        handle1.create(name+".handle1", manager, extraInfo);
+        ObjectType type = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Animation", "TwoAxisHandle");
+        handle1.create(name+".handle1", manager, type, extraInfo);
         handle1.setLocalTranslation(0,0,0.1f);
         Quaternion q1 = new Quaternion();
         q1.fromAngles(-90*FastMath.DEG_TO_RAD,0,0);
@@ -51,7 +54,7 @@ public class Handshake extends Prefab{
         attachChild(handle1);
         
         handle2 = new Handle();
-        handle2.create(name+".handle2",manager, extraInfo);
+        handle2.create(name+".handle2",manager, type, extraInfo);
         handle2.setLocalTranslation(0,0,-0.1f);
         Quaternion q2= new Quaternion();
         q2.fromAngles(-90*FastMath.DEG_TO_RAD,180*FastMath.DEG_TO_RAD,0);
