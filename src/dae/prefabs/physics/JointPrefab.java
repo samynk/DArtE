@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.prefabs.physics;
 
 import com.jme3.asset.AssetManager;
@@ -12,11 +8,13 @@ import com.jme3.math.FastMath;
 import com.jme3.math.Transform;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
+import dae.GlobalObjects;
 import dae.animation.event.TransformListener;
 import dae.animation.event.TransformType;
 import dae.prefabs.Prefab;
 import dae.prefabs.shapes.HingeShape;
 import dae.prefabs.standard.CrateObject;
+import dae.prefabs.types.ObjectType;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
@@ -58,28 +56,24 @@ public class JointPrefab extends Prefab implements PropertyChangeListener, Trans
         // once the hinge joint is added to the scene the children will be detached
         // and added to main scene.
         CrateObject co1 = new CrateObject(new Vector3f(.1f, .1f, .1f));
-        co1.create("Object A", manager, null);
+        ObjectType type = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Standard", "Crate");
+        co1.create("Object A", manager, type, null);
         co1.setType("Crate");
         co1.setCategory("Standard");
         this.objectA = co1;
         objectAPivot = new Vector3f(0.5f, 0, 0);
         co1.setLocalTranslation(objectAPivot.negate());
 
-        co1.addTransformListener(this);
-
         attachChild(co1);
 
         CrateObject co2 = new CrateObject(new Vector3f(.6f, 0.9f, .05f));
-        co2.create("Object B", manager, null);
+        co2.create("Object B", manager, type, null);
         co2.setType("Crate");
         co2.setCategory("Standard");
         this.objectB = co2;
         objectBPivot = new Vector3f(-0.3f, 0, 0);
         co2.setLocalTranslation(objectBPivot.negate());
         attachChild(co2);
-
-
-        objectB.addPropertyListener("dimension", this);
 
         hingeShape = new HingeShape(this.axis, this.lowerLimit, this.upperLimit);
         hingeShape.create(manager);
