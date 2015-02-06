@@ -52,6 +52,9 @@ public class FileInformationPanel extends javax.swing.JPanel implements ActionLi
         txtModificationTime = new javax.swing.JTextField();
         pnlSpecificInfo = new javax.swing.JPanel();
         soundInfo1 = new dae.gui.components.SoundInfo();
+        imageInfo1 = new dae.gui.components.ImageInfo();
+        animationSetInfo1 = new dae.gui.components.AnimationSetInfo();
+        pnlEmpty = new javax.swing.JPanel();
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -121,7 +124,19 @@ public class FileInformationPanel extends javax.swing.JPanel implements ActionLi
         add(txtModificationTime, gridBagConstraints);
 
         pnlSpecificInfo.setLayout(new java.awt.CardLayout());
+
+        soundInfo1.setMinimumSize(null);
+        soundInfo1.setPreferredSize(null);
         pnlSpecificInfo.add(soundInfo1, "sound");
+
+        imageInfo1.setPreferredSize(null);
+        pnlSpecificInfo.add(imageInfo1, "image");
+
+        animationSetInfo1.setPreferredSize(null);
+        pnlSpecificInfo.add(animationSetInfo1, "animset");
+
+        pnlEmpty.setPreferredSize(null);
+        pnlSpecificInfo.add(pnlEmpty, "empty");
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridy = 4;
@@ -133,10 +148,13 @@ public class FileInformationPanel extends javax.swing.JPanel implements ActionLi
         add(pnlSpecificInfo, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private dae.gui.components.AnimationSetInfo animationSetInfo1;
+    private dae.gui.components.ImageInfo imageInfo1;
     private javax.swing.JLabel lblExtension;
     private javax.swing.JLabel lblFileSize;
     private javax.swing.JLabel lblFileSize1;
     private javax.swing.JLabel lblName;
+    private javax.swing.JPanel pnlEmpty;
     private javax.swing.JPanel pnlSpecificInfo;
     private dae.gui.components.SoundInfo soundInfo1;
     private javax.swing.JTextField txtExtension;
@@ -159,6 +177,7 @@ public class FileInformationPanel extends javax.swing.JPanel implements ActionLi
         if (fn.isDirectory()) {
             txtFileSize.setText("");
             txtModificationTime.setText("");
+             ((CardLayout) pnlSpecificInfo.getLayout()).show(pnlSpecificInfo, "empty");
         }
 
         if (project != null && fn.isFile()) {
@@ -179,6 +198,8 @@ public class FileInformationPanel extends javax.swing.JPanel implements ActionLi
                     Logger.getLogger("DArtE").log(Level.SEVERE, "Could not close stream {0}", fn.getFullName());
                 }
             }
+        }else{
+            ((CardLayout) pnlSpecificInfo.getLayout()).show(pnlSpecificInfo, "empty");
         }
     }
 
@@ -216,6 +237,18 @@ public class FileInformationPanel extends javax.swing.JPanel implements ActionLi
         if (extension.equals("ogg") || extension.equals("wav")) {
             ((CardLayout) pnlSpecificInfo.getLayout()).show(pnlSpecificInfo, "sound");
             soundInfo1.setFileNode(currentFileNode);
+        } else if (extension.equals("dds") || extension.equals("png") || extension.equals("jpg")) {
+
+            try {
+                imageInfo1.setFileNode(currentFileNode);
+                ((CardLayout) pnlSpecificInfo.getLayout()).show(pnlSpecificInfo, "image");
+            } catch (IOException ex) {
+            }
+        } else if (extension.equals("animset")) {
+            animationSetInfo1.setFileNode(currentFileNode);
+            ((CardLayout) pnlSpecificInfo.getLayout()).show(pnlSpecificInfo, "animset");
+        }else{
+             ((CardLayout) pnlSpecificInfo.getLayout()).show(pnlSpecificInfo, "empty");
         }
     }
 
@@ -228,6 +261,8 @@ public class FileInformationPanel extends javax.swing.JPanel implements ActionLi
     public void setProject(Project currentProject) {
         this.project = currentProject;
         this.soundInfo1.setProject(currentProject);
+        this.imageInfo1.setProject(currentProject);
+        this.animationSetInfo1.setProject(currentProject);
     }
 
     public void startTimer() {
@@ -238,5 +273,9 @@ public class FileInformationPanel extends javax.swing.JPanel implements ActionLi
     public void stopTimer() {
         this.selectionTimer.stop();
         soundInfo1.deactivatePlayer();
+    }
+
+    public void showEmptyPreview() {
+         ((CardLayout) pnlSpecificInfo.getLayout()).show(pnlSpecificInfo, "empty");
     }
 }
