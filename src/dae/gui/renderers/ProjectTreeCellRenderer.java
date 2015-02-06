@@ -45,7 +45,7 @@ public class ProjectTreeCellRenderer extends DefaultTreeCellRenderer {
         imgBody = new ImageIcon(loader.getImage("/dae/icons/body.png"));
         imgPrefab = new ImageIcon(loader.getImage("/dae/icons/prefab.png"));
         
-        imgJ3O =  new ImageIcon(loader.getImage("/dae/icons/mesh.png"));
+        imgJ3O =  new ImageIcon(loader.getImage("/dae/icons/flat/mesh2.png"));
         imgKlatch = new ImageIcon(loader.getImage("/dae/icons/klatch.png"));
     }
 
