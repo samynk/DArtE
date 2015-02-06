@@ -77,6 +77,7 @@ public class SoundInfo extends javax.swing.JPanel implements LineListener, Actio
         txtBitsPerSample = new javax.swing.JTextField();
         lblBitRate = new javax.swing.JLabel();
         txtBitRate = new javax.swing.JTextField();
+        nonCollapsibleHeader1 = new dae.gui.components.NonCollapsibleHeader();
         pnlMiniPlayer = new javax.swing.JPanel();
         sliderPosition = new javax.swing.JSlider();
         lblFiller = new javax.swing.JLabel();
@@ -85,17 +86,18 @@ public class SoundInfo extends javax.swing.JPanel implements LineListener, Actio
         btnFastForward = new javax.swing.JButton();
         btnPlayPause = new javax.swing.JToggleButton();
         lblEndTime = new javax.swing.JLabel();
+        nonCollapsibleHeader2 = new dae.gui.components.NonCollapsibleHeader();
         jLabel1 = new javax.swing.JLabel();
 
         setLayout(new java.awt.GridBagLayout());
 
-        pnlCommonProperties.setBorder(javax.swing.BorderFactory.createTitledBorder("Sound properties"));
+        pnlCommonProperties.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 1, 0, new java.awt.Color(0, 0, 0)));
         pnlCommonProperties.setLayout(new java.awt.GridBagLayout());
 
         lblChannels.setText("Channels:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.ipadx = 20;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 0);
@@ -104,7 +106,7 @@ public class SoundInfo extends javax.swing.JPanel implements LineListener, Actio
         txtChannels.setEditable(false);
         txtChannels.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
@@ -114,7 +116,7 @@ public class SoundInfo extends javax.swing.JPanel implements LineListener, Actio
         lblSampleRate.setText("Sample rate:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.ipadx = 20;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 0);
@@ -124,7 +126,7 @@ public class SoundInfo extends javax.swing.JPanel implements LineListener, Actio
         txtSampleRate.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(0, 2, 1, 2);
@@ -132,7 +134,7 @@ public class SoundInfo extends javax.swing.JPanel implements LineListener, Actio
 
         lblBitsPerSample.setText("Bits per sample:");
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.ipadx = 20;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 0);
@@ -141,7 +143,7 @@ public class SoundInfo extends javax.swing.JPanel implements LineListener, Actio
         txtBitsPerSample.setEditable(false);
         txtBitsPerSample.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(0, 2, 1, 2);
@@ -149,7 +151,7 @@ public class SoundInfo extends javax.swing.JPanel implements LineListener, Actio
 
         lblBitRate.setText("Bits per sample:");
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.ipadx = 20;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 0);
@@ -158,11 +160,19 @@ public class SoundInfo extends javax.swing.JPanel implements LineListener, Actio
         txtBitRate.setEditable(false);
         txtBitRate.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(0, 2, 1, 2);
         pnlCommonProperties.add(txtBitRate, gridBagConstraints);
+
+        nonCollapsibleHeader1.setTitle("Sound properties");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 4, 0);
+        pnlCommonProperties.add(nonCollapsibleHeader1, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -172,7 +182,7 @@ public class SoundInfo extends javax.swing.JPanel implements LineListener, Actio
         gridBagConstraints.weightx = 1.0;
         add(pnlCommonProperties, gridBagConstraints);
 
-        pnlMiniPlayer.setBorder(javax.swing.BorderFactory.createTitledBorder("Mini player"));
+        pnlMiniPlayer.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 1, 0, new java.awt.Color(0, 0, 0)));
         pnlMiniPlayer.setLayout(new java.awt.GridBagLayout());
 
         sliderPosition.setMajorTickSpacing(10);
@@ -180,7 +190,7 @@ public class SoundInfo extends javax.swing.JPanel implements LineListener, Actio
         sliderPosition.setEnabled(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 2);
@@ -202,7 +212,7 @@ public class SoundInfo extends javax.swing.JPanel implements LineListener, Actio
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.insets = new java.awt.Insets(10, 0, 0, 0);
         pnlMiniPlayer.add(btnStop, gridBagConstraints);
 
@@ -215,7 +225,7 @@ public class SoundInfo extends javax.swing.JPanel implements LineListener, Actio
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.insets = new java.awt.Insets(10, 0, 0, 0);
         pnlMiniPlayer.add(btnRewind, gridBagConstraints);
 
@@ -229,7 +239,7 @@ public class SoundInfo extends javax.swing.JPanel implements LineListener, Actio
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.insets = new java.awt.Insets(10, 0, 0, 0);
         pnlMiniPlayer.add(btnFastForward, gridBagConstraints);
 
@@ -243,7 +253,7 @@ public class SoundInfo extends javax.swing.JPanel implements LineListener, Actio
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.insets = new java.awt.Insets(10, 0, 0, 0);
         pnlMiniPlayer.add(btnPlayPause, gridBagConstraints);
 
@@ -258,6 +268,12 @@ public class SoundInfo extends javax.swing.JPanel implements LineListener, Actio
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         pnlMiniPlayer.add(lblEndTime, gridBagConstraints);
+
+        nonCollapsibleHeader2.setTitle("Mini player");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        pnlMiniPlayer.add(nonCollapsibleHeader2, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridy = 1;
@@ -460,6 +476,8 @@ public class SoundInfo extends javax.swing.JPanel implements LineListener, Actio
     private javax.swing.JLabel lblEndTime;
     private javax.swing.JLabel lblFiller;
     private javax.swing.JLabel lblSampleRate;
+    private dae.gui.components.NonCollapsibleHeader nonCollapsibleHeader1;
+    private dae.gui.components.NonCollapsibleHeader nonCollapsibleHeader2;
     private javax.swing.JPanel pnlCommonProperties;
     private javax.swing.JPanel pnlMiniPlayer;
     private javax.swing.JSlider sliderPosition;
