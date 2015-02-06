@@ -20,9 +20,16 @@ import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
 import com.jme3.texture.Texture;
 import dae.GlobalObjects;
+import dae.animation.custom.CharacterPath;
+import dae.animation.custom.Waypoint;
 import dae.animation.skeleton.Body;
+import dae.components.ComponentType;
+import dae.components.PrefabComponent;
+import dae.io.readers.DefaultPrefabImporter;
 import dae.prefabs.Klatch;
 import dae.prefabs.Prefab;
+import dae.prefabs.PropertyReflector;
+import dae.prefabs.ReflectionManager;
 import dae.prefabs.gizmos.PivotGizmo;
 import dae.prefabs.lights.AmbientLightPrefab;
 import dae.prefabs.lights.DirectionalLightPrefab;
@@ -36,8 +43,8 @@ import dae.prefabs.standard.NavigationMesh;
 import dae.prefabs.standard.PlayerStartEntity;
 import dae.prefabs.standard.SituationEntity;
 import dae.prefabs.standard.SoundEntity;
+import dae.prefabs.standard.Terrain;
 import dae.prefabs.standard.TriggerBox;
-import dae.prefabs.standard.WayPointEntity;
 import dae.prefabs.types.ObjectType;
 import dae.prefabs.types.ObjectTypeCategory;
 import dae.prefabs.ui.events.ErrorMessage;
@@ -58,6 +65,8 @@ import org.xml.sax.SAXException;
  * @author Koen
  */
 public class SceneLoader implements AssetLoader {
+
+    private static DefaultPrefabImporter importer = new DefaultPrefabImporter();
 
     /**
      * Loads a scene from the specified location into the scene element.
@@ -170,8 +179,9 @@ public class SceneLoader implements AssetLoader {
         String actorName = getAttrContent("actorName", map);
         String actorId = getAttrContent("actorId", map);
 
+        ObjectType type = objectsToCreate.find(label);
         J3ONPC p = (J3ONPC) Class.forName(className).newInstance();
-        p.create(name, manager, meshFile);
+        p.create(name, manager, type, meshFile);
         p.setType(label);
         p.setCategory(category);
         p.setPhysicsMesh(physicsMesh);
@@ -179,7 +189,7 @@ public class SceneLoader implements AssetLoader {
         p.setActorName(actorName);
         p.setActorId(actorId);
 
-        ObjectType type = objectsToCreate.find(label);
+
         if (type != null) {
             MagnetParameter mp = (MagnetParameter) type.findParameter("magnets");
             p.setMagnets(mp);
@@ -202,23 +212,22 @@ public class SceneLoader implements AssetLoader {
         String label = getAttrContent("type", map);
         String name = getAttrContent("name", map);
         String category = getAttrContent("category", map);
-        Vector3f translation = parseFloat3(getAttrContent("translation", map));
-        Vector3f scale = parseFloat3(getAttrContent("scale", map));
+
         Vector3f offset = parseFloat3(getAttrContent("offset", map));
-        Quaternion rotation = parseQuaternion(getAttrContent("rotation", map));
         String physicsMesh = getAttrContent("physicsMesh", map);
 
         String shadowMode = getAttrContent("shadowmode", map);
 
 
+        ObjectType type = objectsToCreate.find(label);
 
         Prefab p = (Prefab) Class.forName(className).newInstance();
-        p.create(name, manager, meshFile);
+        p.create(name, manager, type, meshFile);
         p.setType(label);
         p.setCategory(category);
         p.setPhysicsMesh(physicsMesh);
 
-        ObjectType type = objectsToCreate.find(label);
+
         if (type != null) {
             MagnetParameter mp = (MagnetParameter) type.findParameter("magnets");
             p.setMagnets(mp);
@@ -229,10 +238,6 @@ public class SceneLoader implements AssetLoader {
             p.setShadowMode(sm);
         } catch (IllegalArgumentException ex) {
         }
-
-        p.setLocalPrefabRotation(rotation);
-        p.setLocalPrefabTranslation(translation);
-        p.setLocalScale(scale);
 
         p.setOffset(offset);
 
@@ -268,7 +273,7 @@ public class SceneLoader implements AssetLoader {
             Geometry box = new Geometry("Box", b);
             Material boxmat = manager.loadMaterial("Materials/ErrorMaterial.j3m");
             box.setMaterial(boxmat);
-            k.setPivot(new Vector3f(0,-0.25f,0));
+            k.setPivot(new Vector3f(0, -0.25f, 0));
             k.attachChild(box);
             GlobalObjects.getInstance().postEvent(new ErrorMessage("Could not load assembly :" + klatchFile));
         }
@@ -384,6 +389,7 @@ public class SceneLoader implements AssetLoader {
     private static void readNodeChildren(NodeList nl, AssetManager am, ObjectTypeCategory objectsToCreate, Node parentNode) throws IllegalAccessException, NumberFormatException, ClassNotFoundException, InstantiationException {
         for (int i = 0; i < nl.getLength(); ++i) {
             org.w3c.dom.Node n = nl.item(i);
+            System.out.println("Reading node : " + n.getNodeName());
             NamedNodeMap map = n.getAttributes();
             Prefab currentPrefab = null;
             if ("body".equals(n.getNodeName())) {
@@ -395,22 +401,24 @@ public class SceneLoader implements AssetLoader {
             } else if ("klatch".equals(n.getNodeName())) {
                 currentPrefab = createKlatch(map, am, objectsToCreate);
             } else if ("situation".equals(n.getNodeName())) {
+                ObjectType objectType = objectsToCreate.getObjectType("Standard", "Situation");
                 SituationEntity se = new SituationEntity();
                 String name = getAttrContent("name", map);
                 String eventid = getAttrContent("eventid", map);
-                se.create(name, am, null);
+                se.create(name, am, objectType, null);
                 se.setEventId(eventid);
                 Vector3f loc = parseFloat3(getAttrContent("translation", map));
                 se.setLocalTranslation(loc);
                 currentPrefab = se;
             } else if ("camera".equals(n.getNodeName())) {
+                ObjectType objectType = objectsToCreate.getObjectType("Standard", "Camera");
                 CameraEntity ce = new CameraEntity();
                 String name = getAttrContent("name", map);
                 String cameraid = getAttrContent("cameraid", map);
                 Vector3f loc = parseFloat3(getAttrContent("translation", map));
                 Quaternion rotation = parseQuaternion(getAttrContent("rotation", map));
                 boolean startCam = parseBoolean("startcam", map);
-                ce.create(name, am, null);
+                ce.create(name, am, objectType, null);
                 ce.setCameraId(cameraid);
                 ce.setLocalTranslation(loc);
                 ce.setLocalRotation(rotation);
@@ -428,12 +436,13 @@ public class SceneLoader implements AssetLoader {
 
                 String sVolume = getAttrContent("volume", map);
                 float volume = sVolume != null ? Float.parseFloat(sVolume) : 1.0f;
-                
+
                 float refDistance = XMLUtils.parseFloat("refDistance", map);
                 float maxDistance = XMLUtils.parseFloat("maxDistance", map);
 
                 Vector3f loc = parseFloat3(getAttrContent("translation", map));
-                se.create(name, am, null);
+                ObjectType type = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Standard", "Sound");
+                se.create(name, am, type, null);
                 se.setSoundFile(soundFile);
                 se.setLocalTranslation(loc);
                 se.setPositional(positional);
@@ -447,27 +456,16 @@ public class SceneLoader implements AssetLoader {
                 String name = getAttrContent("name", map);
                 Vector3f loc = parseFloat3(getAttrContent("translation", map));
                 Quaternion rotation = parseQuaternion(getAttrContent("rotation", map));
-                pse.create(name, am, null);
+                ObjectType type = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Standard", "PlayerStart");
+                pse.create(name, am, type, null);
                 pse.setLocalTranslation(loc);
                 pse.setLocalRotation(rotation);
                 currentPrefab = pse;
-            } else if ("waypoint".equals(n.getNodeName())) {
-                WayPointEntity we = new WayPointEntity();
-                Vector3f loc = parseFloat3(getAttrContent("translation", map));
-                Quaternion rotation = parseQuaternion(getAttrContent("rotation", map));
-                String waypointid = getAttrContent("waypointid", map);
-                we.setWaypointId(waypointid);
-                we.create("waypoint_" + waypointid, am, null);
-                we.setLocalTranslation(loc);
-                we.setLocalRotation(rotation);
-
-                currentPrefab = we;
-            } else if ("trigger".equals(n.getNodeName())) {
+            }else if ("trigger".equals(n.getNodeName())) {
                 TriggerBox tb = new TriggerBox();
-                tb.setCategory("Standard");
-                tb.setType("Trigger");
                 tb.setId(getAttrContent("id", map));
-                tb.create(tb.getId(), am, null);
+                ObjectType type = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Standard", "Trigger");
+                tb.create(tb.getId(), am, type, null);
                 Vector3f loc = parseFloat3(getAttrContent("translation", map));
                 tb.setLocalTranslation(loc);
                 Quaternion rotation = parseQuaternion(getAttrContent("rotation", map));
@@ -483,9 +481,11 @@ public class SceneLoader implements AssetLoader {
                 String mesh = getAttrContent("npcmesh", map);
                 float yRot = Float.parseFloat(getAttrContent("yRotation", map));
 
-                npcloc.create(name, am, null);
+                ObjectType type = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Standard", "NPCLocation");
+                npcloc.create(name, am, type, null);
                 npcloc.setLocalTranslation(loc);
-                npcloc.setYRotation(yRot);
+                Quaternion q = new Quaternion();
+                npcloc.setLocalRotation(q.fromAngleAxis(yRot, Vector3f.UNIT_Y));
                 npcloc.setNpc(mesh);
                 npcloc.setAnimation(animation);
                 currentPrefab = npcloc;
@@ -537,79 +537,156 @@ public class SceneLoader implements AssetLoader {
                 float contourMaxDeviation = parseFloat("contourmaxdeviation", map);
                 mesh.setContourMaxDeviation(contourMaxDeviation);
 
-                mesh.create("navmesh", am, null);
+                ObjectType type = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Standard", "NavigationMesh");
+                mesh.create("navmesh", am, type, null);
                 currentPrefab = mesh;
             } else if ("spotlight".equals(n.getNodeName())) {
-                Vector3f translation = parseFloat3(getAttrContent("translation", map));
-                Quaternion rotation = parseQuaternion(getAttrContent("rotation", map));
                 ColorRGBA color = parseColor(getAttrContent("spotcolor", map));
                 float innerangle = parseFloat("spotinnerangle", map);
                 float outerangle = parseFloat("spotouterangle", map);
                 float spotrange = parseFloat("spotrange", map);
                 float intensity = parseFloat("spotintensity", map);
                 String name = getAttrContent("name", map);
-                SpotLightPrefab prefab = new SpotLightPrefab(translation, rotation, innerangle, outerangle, spotrange, color, intensity);
-                prefab.create(name, am, null);
+                ObjectType type = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Light", "SpotLight");
+                SpotLightPrefab prefab = new SpotLightPrefab(innerangle, outerangle, spotrange, color, intensity);
+                prefab.create(name, am, type, null);
                 currentPrefab = prefab;
             } else if ("pointlight".equals(n.getNodeName())) {
-                Vector3f translation = parseFloat3(getAttrContent("translation", map));
-                Quaternion rotation = parseQuaternion(getAttrContent("rotation", map));
                 ColorRGBA color = parseColor(getAttrContent("color", map));
                 float intensity = parseFloat("intensity", map);
                 String name = getAttrContent("name", map);
                 PointLightPrefab prefab = new PointLightPrefab();
-                prefab.setLocalPrefabTranslation(translation);
-                prefab.setLocalPrefabRotation(rotation);
                 prefab.setPointLightColor(color);
                 prefab.setPointLightIntensity(intensity);
-                prefab.create(name, am, null);
+                ObjectType type = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Light", "PointLight");
+                prefab.create(name, am, type, null);
                 currentPrefab = prefab;
             } else if ("directionallight".equals(n.getNodeName())) {
-                Vector3f translation = parseFloat3(getAttrContent("translation", map));
-                Quaternion rotation = parseQuaternion(getAttrContent("rotation", map));
                 ColorRGBA color = parseColor(getAttrContent("color", map));
                 float intensity = parseFloat("intensity", map);
                 String name = getAttrContent("name", map);
                 boolean castshadow = parseBoolean("castshadow", map);
                 DirectionalLightPrefab prefab = new DirectionalLightPrefab();
-                prefab.create(name, am, null);
-                prefab.setLocalPrefabTranslation(translation);
-                prefab.setLocalPrefabRotation(rotation);
+                ObjectType type = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Light", "DirectionalLight");
+                prefab.create(name, am, type, null);
                 prefab.setDirectionalLightColor(color);
                 prefab.setDirectionalLightIntensity(intensity);
                 prefab.setCastShadow(castshadow);
                 currentPrefab = prefab;
             } else if ("ambientlight".equals(n.getNodeName())) {
-                Vector3f translation = parseFloat3(getAttrContent("translation", map));
-                Quaternion rotation = parseQuaternion(getAttrContent("rotation", map));
                 ColorRGBA color = parseColor(getAttrContent("color", map));
                 float intensity = parseFloat("intensity", map);
                 String name = getAttrContent("name", map);
                 AmbientLightPrefab prefab = new AmbientLightPrefab();
-                prefab.create(name, am, null);
-                prefab.setLocalPrefabTranslation(translation);
-                prefab.setLocalPrefabRotation(rotation);
+                ObjectType type = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Light", "AmbientLight");
+                prefab.create(name, am, type, null);
                 prefab.setAmbientLightColor(color);
                 prefab.setAmbientLightIntensity(intensity);
-
                 currentPrefab = prefab;
             } else if ("pivot".equals(n.getNodeName())) {
-                Vector3f translation = parseFloat3(getAttrContent("translation", map));
-                Quaternion rotation = parseQuaternion(getAttrContent("rotation", map));
                 String name = getAttrContent("name", map);
                 PivotGizmo prefab = new PivotGizmo();
-                prefab.create(name, am, null);
-                prefab.setLocalPrefabTranslation(translation);
-                prefab.setLocalPrefabRotation(rotation);
+                ObjectType type = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("MetaData", "Pivot");
+                prefab.create(name, am, type, null);
                 currentPrefab = prefab;
+            } else if ("terrain".equals(n.getNodeName())) {
+                currentPrefab = readTerrain(n, am);
+            }else if ("characterpath".equals(n.getNodeName())){
+                currentPrefab = readCharacterPath(n,am);
+            } else if ("waypoint".equals(n.getNodeName())){
+                currentPrefab = readWaypoint(n,am);
+            } else if ("component".equals(n.getNodeName())) {
+                if (parentNode != null && parentNode instanceof Prefab) {
+                    String id = XMLUtils.getAttribute("id", n.getAttributes());
+
+                    ComponentType ct = GlobalObjects.getInstance().getObjectsTypeCategory().getComponent(id);
+                    if (ct != null) {
+                        PrefabComponent pc = ct.create();
+                        readComponentParameters(pc, ct, n.getChildNodes());
+                        ((Prefab) parentNode).addPrefabComponent(pc, false);
+
+                    }
+                }
             }
             if (currentPrefab != null) {
                 parentNode.attachChild(currentPrefab);
-                if (currentPrefab.canHaveChildren() && n.hasChildNodes()) {
+                if (n.hasChildNodes()) {
                     readNodeChildren(n.getChildNodes(), am, objectsToCreate, currentPrefab);
+                }
+                currentPrefab.installAllComponents();
+            }
+        }
+    }
+
+    /**
+     * Reads the parameters of the components.
+     *
+     * @param pc
+     * @param childNodes
+     */
+    private static void readComponentParameters(PrefabComponent pc, ComponentType type, NodeList childNodes) {
+        PropertyReflector pr = ReflectionManager.getInstance().getPropertyReflector(pc.getClass());
+        if (pr != null) {
+            for (int i = 0; i < childNodes.getLength(); ++i) {
+                org.w3c.dom.Node p = childNodes.item(i);
+                if (p.getNodeName().equals("parameter")) {
+                    String id = XMLUtils.getAttribute("id", p.getAttributes());
+                    String value = null;
+                    if (p.getAttributes().getNamedItem("value") == null) {
+                        value = readCData(p);
+                    } else {
+                        value = XMLUtils.getAttribute("value", p.getAttributes());
+                    }
+                    importer.parseAndSetParameter(pc, type, id, value);
                 }
             }
         }
+    }
+
+    public static String readCData(org.w3c.dom.Node node) {
+        NodeList nl = node.getChildNodes();
+        for (int i = 0; i < nl.getLength(); ++i) {
+            org.w3c.dom.Node child = nl.item(i);
+            if (child.getNodeType() == org.w3c.dom.Node.CDATA_SECTION_NODE) {
+                return child.getNodeValue();
+            }
+        }
+        return null;
+    }
+
+    private static Prefab readTerrain(org.w3c.dom.Node n, AssetManager am) {
+        Terrain terrain = new Terrain();
+        NamedNodeMap attrs = n.getAttributes();
+        String name = XMLUtils.getAttribute("name", attrs);
+        terrain.setTexture1(XMLUtils.getAttribute("texture1", attrs));
+        terrain.setTex1Scale(XMLUtils.parseFloat("tex1scale", attrs));
+        terrain.setTexture2(XMLUtils.getAttribute("texture2", attrs));
+        terrain.setTex2Scale(XMLUtils.parseFloat("tex2scale", attrs));
+        terrain.setTexture3(XMLUtils.getAttribute("texture3", attrs));
+        terrain.setTex3Scale(XMLUtils.parseFloat("tex3scale", attrs));
+        terrain.setAlphaMap(XMLUtils.getAttribute("alphamap", attrs));
+        terrain.setHeightMap(XMLUtils.getAttribute("heightmap", attrs));
+        ObjectType type = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Standard", "Terrain");
+        terrain.create(name, am, type, null);
+        return terrain;
+    }
+
+    private static Prefab readCharacterPath(org.w3c.dom.Node n, AssetManager am) {
+        CharacterPath cp = new CharacterPath();
+        NamedNodeMap attrs = n.getAttributes();
+        String name = XMLUtils.getAttribute("name", attrs);
+        ObjectType type = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Animation", "CharacterPath");
+        cp.create(name, am, type,null);
+        return cp;
+    }
+    
+    private static Prefab readWaypoint(org.w3c.dom.Node n, AssetManager am) {
+        Waypoint wp = new Waypoint();
+        NamedNodeMap attrs = n.getAttributes();
+        String name = XMLUtils.getAttribute("name", attrs);
+        ObjectType type = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Animation", "Waypoint");
+        wp.create(name, am, type,null);
+        return wp;
     }
 
     public Object load(AssetInfo assetInfo) throws IOException {
@@ -624,7 +701,7 @@ public class SceneLoader implements AssetLoader {
         for (Spatial s : klatch.getChildren()) {
             s.setUserData("klatchpart", Boolean.TRUE);
         }
-        
+
         klatch.setCategory("Standard");
         klatch.setType("Klatch");
         return klatch;
