@@ -1,10 +1,7 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.prefabs.ui;
 
 import dae.prefabs.Prefab;
+import dae.prefabs.ReflectionManager;
 import dae.prefabs.parameters.FloatParameter;
 import dae.prefabs.parameters.Parameter;
 import dae.prefabs.standard.UpdateObject;
@@ -46,19 +43,12 @@ public class FloatParameterUI extends javax.swing.JPanel implements ParameterUI 
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        lblLabel = new javax.swing.JLabel();
         spnFloatValue = new javax.swing.JSpinner();
 
         setLayout(new java.awt.GridBagLayout());
 
-        lblLabel.setText("Label : ");
-        lblLabel.setPreferredSize(new java.awt.Dimension(100, 16));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        add(lblLabel, gridBagConstraints);
-
         spnFloatValue.setModel(new javax.swing.SpinnerNumberModel(Float.valueOf(0.0f), null, null, Float.valueOf(1.0f)));
-        spnFloatValue.setMinimumSize(new java.awt.Dimension(200, 22));
+        spnFloatValue.setMinimumSize(null);
         spnFloatValue.setPreferredSize(null);
         spnFloatValue.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
@@ -78,13 +68,12 @@ public class FloatParameterUI extends javax.swing.JPanel implements ParameterUI 
         if (disregardEvent) {
             return;
         }
-        String property = parameter.getId();
+        
         if (currentNode != null) {
-            currentNode.addUpdateObject(new UpdateObject(property, (Float) spnFloatValue.getValue(), true));
+            currentNode.addUpdateObject(new UpdateObject(parameter, (Float) spnFloatValue.getValue(), true));
         }
     }//GEN-LAST:event_spnFloatValueStateChanged
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel lblLabel;
     private javax.swing.JSpinner spnFloatValue;
     // End of variables declaration//GEN-END:variables
 
@@ -92,18 +81,26 @@ public class FloatParameterUI extends javax.swing.JPanel implements ParameterUI 
     public void setParameter(Parameter p) {
         parameter = (FloatParameter) p;
     }
+    
+    public Parameter getParameter(){
+        return parameter;
+    }
 
     @Override
-    public void setNode(Prefab currentSelectedNode) {
-        currentNode = currentSelectedNode;
-        Object value = currentSelectedNode.getParameter(parameter.getId());
+    public void setNode(Prefab prefab) {
+        currentNode = prefab;
+        Object value = ReflectionManager.getInstance().invokeGetMethod(prefab,parameter); 
         if ( value != null ){
             spnFloatValue.setValue(value);
         }
         
     }
-
-    public void setLabel(String id) {
-        lblLabel.setText(id);
+    
+    /**
+     * Checks if a label should be created for the UI.
+     * @return true if a label should be created, false othwerise.
+     */
+    public boolean needsLabel(){
+        return true;
     }
 }

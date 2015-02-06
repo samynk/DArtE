@@ -1,15 +1,12 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.prefabs.ui;
 
 import dae.prefabs.Prefab;
+import dae.prefabs.ReflectionManager;
 import dae.prefabs.parameters.Parameter;
 
 /**
  *
- * @author samyn_000
+ * @author Koen Samyn
  */
 public class BooleanParameterUI extends javax.swing.JPanel implements ParameterUI {
 
@@ -39,6 +36,8 @@ public class BooleanParameterUI extends javax.swing.JPanel implements ParameterU
         setLayout(new java.awt.GridBagLayout());
 
         cbxBooleanParameter.setText("Label");
+        cbxBooleanParameter.setMinimumSize(null);
+        cbxBooleanParameter.setPreferredSize(null);
         cbxBooleanParameter.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 cbxBooleanParameterItemStateChanged(evt);
@@ -55,7 +54,7 @@ public class BooleanParameterUI extends javax.swing.JPanel implements ParameterU
     private void cbxBooleanParameterItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cbxBooleanParameterItemStateChanged
         // TODO add your handling code here:
         if ( prefab != null && !internalEvent){
-            prefab.setParameter(parameter.getId(), cbxBooleanParameter.isSelected(), true);
+            prefab.setParameter(parameter, cbxBooleanParameter.isSelected(), true);
         }
     }//GEN-LAST:event_cbxBooleanParameterItemStateChanged
 
@@ -67,15 +66,26 @@ public class BooleanParameterUI extends javax.swing.JPanel implements ParameterU
         cbxBooleanParameter.setText(p.getLabel());
         this.parameter = p;
     }
+    
+    public Parameter getParameter(){
+        return parameter;
+    }
 
     public void setNode(Prefab prefab) {
-        String property = parameter.getId();
-        Object value = prefab.getParameter(property);
+        Object value = ReflectionManager.getInstance().invokeGetMethod(prefab,parameter); 
         if (value != null && value instanceof Boolean) {
             internalEvent = true;
             cbxBooleanParameter.setSelected((Boolean) value);
             internalEvent = false;
         }
         this.prefab = prefab;
+    }
+    
+    /**
+     * Checks if a label should be created for the UI.
+     * @return true if a label should be created, false othwerise.
+     */
+    public boolean needsLabel(){
+        return false;
     }
 }

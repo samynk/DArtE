@@ -1,13 +1,9 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.prefabs.ui;
 
 import dae.animation.rig.Rig;
 import dae.animation.rig.gui.RigConnectorDialog;
-import dae.gui.EditFuzzySystemDialog;
 import dae.prefabs.Prefab;
+import dae.prefabs.ReflectionManager;
 import dae.prefabs.parameters.Parameter;
 import java.awt.Frame;
 import mlproject.fuzzy.FuzzySystem;
@@ -46,7 +42,7 @@ public class ConnectorParameterUI extends javax.swing.JPanel implements Paramete
         setLayout(new java.awt.GridBagLayout());
 
         lblLabel.setText("Property");
-        lblLabel.setPreferredSize(new java.awt.Dimension(100, 14));
+        lblLabel.setPreferredSize(new java.awt.Dimension(50, 14));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -97,13 +93,25 @@ public class ConnectorParameterUI extends javax.swing.JPanel implements Paramete
         lblLabel.setText(p.getLabel());
 
     }
+    
+    public Parameter getParameter(){
+        return p;
+    }
 
     public void setNode(Prefab currentSelectedNode) {
         currentPrefab = currentSelectedNode;
-        Object value = currentPrefab.getParameter(p.getId());
+        Object value = ReflectionManager.getInstance().invokeGetMethod(currentSelectedNode,p); 
         if (value instanceof FuzzySystem) {
             FuzzySystem fs = (FuzzySystem) value;
             txtFuzzySystemName.setText(fs.getName());
         }
+    }
+    
+    /**
+     * Checks if a label should be created for the UI.
+     * @return true if a label should be created, false othwerise.
+     */
+    public boolean needsLabel(){
+        return true;
     }
 }

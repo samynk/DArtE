@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.prefabs.ui;
 
 import dae.prefabs.Prefab;
@@ -9,7 +5,7 @@ import dae.prefabs.parameters.Parameter;
 
 /**
  *
- * @author samyn_000
+ * @author Koen Samyn
  */
 public class MethodParameterUI extends javax.swing.JPanel implements ParameterUI{
     private Parameter p;
@@ -30,37 +26,32 @@ public class MethodParameterUI extends javax.swing.JPanel implements ParameterUI
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
         btnMethod = new javax.swing.JButton();
 
+        setLayout(new java.awt.GridBagLayout());
+
         btnMethod.setText("Method to call");
+        btnMethod.setMaximumSize(null);
+        btnMethod.setMinimumSize(null);
+        btnMethod.setPreferredSize(null);
         btnMethod.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnMethodActionPerformed(evt);
             }
         });
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(291, Short.MAX_VALUE)
-                .addComponent(btnMethod)
-                .addContainerGap())
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(btnMethod)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.weightx = 1.0;
+        add(btnMethod, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnMethodActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMethodActionPerformed
         // TODO add your handling code here:
-        prefab.call(p.getId());
+        prefab.call(p);
     }//GEN-LAST:event_btnMethodActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -71,8 +62,20 @@ public class MethodParameterUI extends javax.swing.JPanel implements ParameterUI
         this.p = p;
         this.btnMethod.setText(p.getLabel());
     }
+    
+    public Parameter getParameter(){
+        return p;
+    }
 
     public void setNode(Prefab currentSelectedNode) {
         this.prefab = currentSelectedNode;
+    }
+    
+    /**
+     * Checks if a label should be created for the UI.
+     * @return true if a label should be created, false othwerise.
+     */
+    public boolean needsLabel(){
+        return false;
     }
 }

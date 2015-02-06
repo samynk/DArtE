@@ -1,16 +1,15 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.prefabs.ui;
 
 import com.google.common.eventbus.Subscribe;
 import dae.GlobalObjects;
 import dae.prefabs.Prefab;
+import dae.prefabs.ReflectionManager;
 import dae.prefabs.parameters.Parameter;
 import dae.prefabs.ui.events.GizmoEvent;
 import dae.prefabs.ui.events.GizmoType;
 import dae.prefabs.ui.events.PickEvent;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 
 /**
@@ -21,11 +20,11 @@ import javax.swing.SwingUtilities;
  */
 public class ObjectParameterUI extends javax.swing.JPanel implements ParameterUI {
 
-    private String objectName;
     private String classFilter;
     private Prefab currentNode;
     private Prefab pickedObject;
     private Parameter parameter;
+    private Class toCheck;
 
     /**
      * Creates new form ObjectParameterUI
@@ -45,21 +44,14 @@ public class ObjectParameterUI extends javax.swing.JPanel implements ParameterUI
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        lblLabel = new javax.swing.JLabel();
         txtObjectName = new javax.swing.JTextField();
         btnPick = new javax.swing.JButton();
 
         setLayout(new java.awt.GridBagLayout());
 
-        lblLabel.setText("Label :");
-        lblLabel.setPreferredSize(new java.awt.Dimension(100, 14));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        add(lblLabel, gridBagConstraints);
-
         txtObjectName.setEditable(false);
-        txtObjectName.setPreferredSize(null);
+        txtObjectName.setColumns(10);
+        txtObjectName.setMinimumSize(null);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -90,18 +82,20 @@ public class ObjectParameterUI extends javax.swing.JPanel implements ParameterUI
     }//GEN-LAST:event_btnPickActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnPick;
-    private javax.swing.JLabel lblLabel;
     private javax.swing.JTextField txtObjectName;
     // End of variables declaration//GEN-END:variables
 
     public void setParameter(Parameter p) {
         this.parameter = p;
-        lblLabel.setText(parameter.getLabel());
+    }
+
+    public Parameter getParameter() {
+        return parameter;
     }
 
     public void setNode(Prefab currentSelectedNode) {
         this.currentNode = currentSelectedNode;
-        Object pValue = currentNode.getParameter(this.parameter.getId());
+        Object pValue = ReflectionManager.getInstance().invokeGetMethod(currentSelectedNode, parameter);
         if (pValue instanceof Prefab) {
             pickedObject = (Prefab) pValue;
             if (pickedObject != null) {
@@ -109,9 +103,9 @@ public class ObjectParameterUI extends javax.swing.JPanel implements ParameterUI
             } else {
                 txtObjectName.setText("");
             }
-        }else{
+        } else {
             pickedObject = null;
-            txtObjectName.setText(pValue!=null?pValue.toString():"");
+            txtObjectName.setText(pValue != null ? pValue.toString() : "");
         }
     }
 
@@ -127,6 +121,11 @@ public class ObjectParameterUI extends javax.swing.JPanel implements ParameterUI
      */
     public void setClassFilter(String classFilter) {
         this.classFilter = classFilter;
+        try {
+            this.toCheck = Class.forName(classFilter);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(ObjectParameterUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @Subscribe
@@ -137,13 +136,27 @@ public class ObjectParameterUI extends javax.swing.JPanel implements ParameterUI
             return;
         }
         pickedObject = pe.getSelectedNode();
+
+        if (toCheck != null && !toCheck.isInstance(pickedObject)) {
+            return;
+        }
+
         if (currentNode != null) {
-            currentNode.setParameter(this.parameter.getId(), pickedObject, false);
+            currentNode.setParameter(parameter, pickedObject, false);
         }
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 txtObjectName.setText(pickedObject.getName());
             }
         });
+    }
+
+    /**
+     * Checks if a label should be created for the UI.
+     *
+     * @return true if a label should be created, false othwerise.
+     */
+    public boolean needsLabel() {
+        return true;
     }
 }

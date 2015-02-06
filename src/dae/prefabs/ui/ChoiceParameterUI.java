@@ -1,21 +1,23 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.prefabs.ui;
 
 import javax.swing.DefaultComboBoxModel;
 import dae.prefabs.parameters.ChoiceParameter;
 import dae.prefabs.parameters.Parameter;
 import dae.prefabs.Prefab;
+import dae.prefabs.ReflectionManager;
+import java.awt.event.ItemEvent;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 /**
  *
  * @author Koen
  */
-public class ChoiceParameterUI extends javax.swing.JPanel implements ParameterUI {
+public class ChoiceParameterUI extends javax.swing.JPanel implements ParameterUI, ChangeListener {
 
     private ChoiceParameter parameter;
+    private Parameter choiceProvider;
+    private Prefab prefab;
 
     /**
      * Creates new form ChoiceParameterUI
@@ -27,14 +29,6 @@ public class ChoiceParameterUI extends javax.swing.JPanel implements ParameterUI
     public ChoiceParameterUI(Parameter p) {
         initComponents();
         setParameter(p);
-    }
-
-    public void setLabel(String label) {
-        lblLabel.setText(label);
-    }
-
-    public String getLabel() {
-        return lblLabel.getText();
     }
 
     public void setChoices(String[] choice) {
@@ -55,44 +49,88 @@ public class ChoiceParameterUI extends javax.swing.JPanel implements ParameterUI
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        lblLabel = new javax.swing.JLabel();
         cboChoice = new javax.swing.JComboBox();
 
         setLayout(new java.awt.GridBagLayout());
 
-        lblLabel.setText("Label : ");
-        lblLabel.setMinimumSize(new java.awt.Dimension(100, 14));
-        lblLabel.setPreferredSize(new java.awt.Dimension(100, 14));
-        add(lblLabel, new java.awt.GridBagConstraints());
-
         cboChoice.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cboChoice.setMaximumSize(new java.awt.Dimension(100, 20));
+        cboChoice.setMinimumSize(null);
+        cboChoice.setPreferredSize(null);
+        cboChoice.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                cboChoiceItemStateChanged(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 0);
         add(cboChoice, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void cboChoiceItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cboChoiceItemStateChanged
+        // TODO add your handling code here:
+        if (evt.getStateChange() == ItemEvent.SELECTED) {
+            Object newValue = evt.getItem();
+            parameter.invokeSet(prefab, newValue, true);
+        }
+    }//GEN-LAST:event_cboChoiceItemStateChanged
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox cboChoice;
-    private javax.swing.JLabel lblLabel;
     // End of variables declaration//GEN-END:variables
 
     @Override
-    public void setParameter(Parameter p) {
+    public final void setParameter(Parameter p) {
         if (p instanceof ChoiceParameter) {
             ChoiceParameter cp = (ChoiceParameter) p;
-            cboChoice.setModel(new DefaultComboBoxModel(cp.getChoices().toArray()));
-            setLabel(cp.getLabel());
             this.parameter = cp;
+            if (cp.isBoundToProperty()) {
+                String parameterNameForValues = cp.getListenTo();
+                choiceProvider = p.getComponentType().findParameter(parameterNameForValues);
+                cboChoice.setModel(new DefaultComboBoxModel());
+                choiceProvider.addChangeListener(this);
+            } else {
+                cboChoice.setModel(new DefaultComboBoxModel(cp.getChoices().toArray()));
+            }
         }
+    }
+
+    public Parameter getParameter() {
+        return parameter;
     }
 
     @Override
     public void setNode(Prefab prefab) {
-        String property = parameter.getId();
-        Object value = prefab.getParameter(property);
+        this.prefab = prefab;
+        if (parameter.isBoundToProperty()) {
+            String property = parameter.getValuesProvider();
+            Object[] values = (Object[]) ReflectionManager.getInstance().invokeGetMethod(prefab, parameter.getComponentType(), property);
+            if ( values != null){
+                cboChoice.setModel(new DefaultComboBoxModel(values));
+            }else{
+                cboChoice.setModel(new DefaultComboBoxModel()); 
+            }
+        }
+
+        Object value = ReflectionManager.getInstance().invokeGetMethod(prefab, parameter);
         if (value != null) {
             cboChoice.setSelectedItem(value);
         }
+    }
+
+    /**
+     * Checks if a label should be created for the UI.
+     *
+     * @return true if a label should be created, false othwerise.
+     */
+    public boolean needsLabel() {
+        return true;
+    }
+
+    public void stateChanged(ChangeEvent e) {
+        String property = parameter.getValuesProvider();
+        Object[] values = (Object[]) ReflectionManager.getInstance().invokeGetMethod(prefab, parameter.getComponentType(), property);
+        cboChoice.setModel(new DefaultComboBoxModel(values));
     }
 }

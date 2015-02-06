@@ -7,6 +7,7 @@ package dae.prefabs.ui;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import dae.prefabs.Prefab;
+import dae.prefabs.ReflectionManager;
 import dae.prefabs.parameters.ColorParameter;
 import dae.prefabs.parameters.Parameter;
 import java.awt.Color;
@@ -53,21 +54,10 @@ public class ColorParameterUI extends javax.swing.JPanel implements ParameterUI 
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        lblLabel = new javax.swing.JLabel();
         lblColor = new javax.swing.JLabel();
         btnChangeColor = new javax.swing.JButton();
 
         setLayout(new java.awt.GridBagLayout());
-
-        lblLabel.setText(" Color :");
-        lblLabel.setPreferredSize(new java.awt.Dimension(100, 14));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.weightx = 1.0;
-        add(lblLabel, gridBagConstraints);
 
         lblColor.setBackground(new java.awt.Color(0, 0, 0));
         lblColor.setMaximumSize(new java.awt.Dimension(50, 16));
@@ -102,7 +92,7 @@ public class ColorParameterUI extends javax.swing.JPanel implements ParameterUI 
             lblColor.setBackground(new Color(color.r, color.g, color.b));
             if (currentNode != null) {
                 //System.out.println("Setting " + property + " to " + value);
-                currentNode.addUpdateObject(new UpdateObject(parameter.getId(), color, true));
+                currentNode.addUpdateObject(new UpdateObject(parameter, color, true));
             }
         }
     }//GEN-LAST:event_btnChangeColorActionPerformed
@@ -111,6 +101,10 @@ public class ColorParameterUI extends javax.swing.JPanel implements ParameterUI 
     public void setParameter(Parameter p) {
         parameter = (ColorParameter) p;
     }
+    
+    public Parameter getParameter(){
+        return parameter;
+    }
 
     @Override
     public void setNode(Prefab currentSelectedNode) {
@@ -118,8 +112,7 @@ public class ColorParameterUI extends javax.swing.JPanel implements ParameterUI 
         if (currentNode == null) {
             return;
         }
-        String property = parameter.getId();
-        Object value = currentSelectedNode.getParameter(property);
+        Object value = ReflectionManager.getInstance().invokeGetMethod(currentSelectedNode,parameter); 
         if (value != null && value instanceof ColorRGBA) {
             this.setColor((ColorRGBA) value);
         }
@@ -127,10 +120,14 @@ public class ColorParameterUI extends javax.swing.JPanel implements ParameterUI 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnChangeColor;
     private javax.swing.JLabel lblColor;
-    private javax.swing.JLabel lblLabel;
     // End of variables declaration//GEN-END:variables
 
-    public void setLabel(String id) {
-        lblLabel.setText(id);
+    
+    /**
+     * Checks if a label should be created for the UI.
+     * @return true if a label should be created, false othwerise.
+     */
+    public boolean needsLabel(){
+        return true;
     }
 }

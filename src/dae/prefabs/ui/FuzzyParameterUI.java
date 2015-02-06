@@ -1,11 +1,8 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.prefabs.ui;
 
 import dae.gui.EditFuzzySystemDialog;
 import dae.prefabs.Prefab;
+import dae.prefabs.ReflectionManager;
 import dae.prefabs.parameters.Parameter;
 import java.awt.Frame;
 import mlproject.fuzzy.FuzzySystem;
@@ -37,18 +34,10 @@ public class FuzzyParameterUI extends javax.swing.JPanel implements ParameterUI 
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        lblLabel = new javax.swing.JLabel();
         txtFuzzySystemName = new javax.swing.JTextField();
         btnEditFuzzySystem = new javax.swing.JButton();
 
         setLayout(new java.awt.GridBagLayout());
-
-        lblLabel.setText("Property");
-        lblLabel.setPreferredSize(new java.awt.Dimension(100, 16));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        add(lblLabel, gridBagConstraints);
 
         txtFuzzySystemName.setEditable(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -74,7 +63,7 @@ public class FuzzyParameterUI extends javax.swing.JPanel implements ParameterUI 
 
     private void btnEditFuzzySystemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditFuzzySystemActionPerformed
         // TODO add your handling code here:
-        Object value = currentPrefab.getParameter(p.getId());
+        Object value = ReflectionManager.getInstance().invokeGetMethod(currentPrefab,this.p); 
         if (value instanceof FuzzySystem) {
             FuzzySystem fs = (FuzzySystem) value;
             if (fuzzyDialog == null) {
@@ -86,22 +75,31 @@ public class FuzzyParameterUI extends javax.swing.JPanel implements ParameterUI 
     }//GEN-LAST:event_btnEditFuzzySystemActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnEditFuzzySystem;
-    private javax.swing.JLabel lblLabel;
     private javax.swing.JTextField txtFuzzySystemName;
     // End of variables declaration//GEN-END:variables
 
     public void setParameter(Parameter p) {
         this.p = p;
-        lblLabel.setText(p.getLabel());
-
+    }
+    
+    public Parameter getParameter(){
+        return p;
     }
 
     public void setNode(Prefab currentSelectedNode) {
         currentPrefab = currentSelectedNode;
-        Object value = currentPrefab.getParameter(p.getId());
+        Object value = ReflectionManager.getInstance().invokeGetMethod(currentSelectedNode,p); 
         if (value instanceof FuzzySystem) {
             FuzzySystem fs = (FuzzySystem) value;
             txtFuzzySystemName.setText(fs.getName());
         }
+    }
+    
+    /**
+     * Checks if a label should be created for the UI.
+     * @return true if a label should be created, false othwerise.
+     */
+    public boolean needsLabel(){
+        return true;
     }
 }

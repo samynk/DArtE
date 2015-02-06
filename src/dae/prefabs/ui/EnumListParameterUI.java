@@ -1,13 +1,9 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.prefabs.ui;
 
 import javax.swing.DefaultComboBoxModel;
-import dae.prefabs.parameters.ChoiceParameter;
 import dae.prefabs.parameters.Parameter;
 import dae.prefabs.Prefab;
+import dae.prefabs.ReflectionManager;
 import dae.prefabs.parameters.EnumListParameter;
 import dae.prefabs.standard.UpdateObject;
 import java.awt.event.ItemEvent;
@@ -33,14 +29,6 @@ public class EnumListParameterUI extends javax.swing.JPanel implements Parameter
         setParameter(p);
     }
 
-    public void setLabel(String label) {
-        lblLabel.setText(label);
-    }
-
-    public String getLabel() {
-        return lblLabel.getText();
-    }
-
     public void setChoices(String[] choice) {
         cboChoice.setModel(new DefaultComboBoxModel(choice));
     }
@@ -59,16 +47,13 @@ public class EnumListParameterUI extends javax.swing.JPanel implements Parameter
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        lblLabel = new javax.swing.JLabel();
         cboChoice = new javax.swing.JComboBox();
 
         setLayout(new java.awt.GridBagLayout());
 
-        lblLabel.setText("Label : ");
-        lblLabel.setPreferredSize(new java.awt.Dimension(100, 14));
-        add(lblLabel, new java.awt.GridBagConstraints());
-
         cboChoice.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cboChoice.setMinimumSize(new java.awt.Dimension(30, 20));
+        cboChoice.setPreferredSize(null);
         cboChoice.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 cboChoiceItemStateChanged(evt);
@@ -86,13 +71,12 @@ public class EnumListParameterUI extends javax.swing.JPanel implements Parameter
         if ( evt.getStateChange() == ItemEvent.SELECTED)
         {
             Object value = evt.getItem();
-            prefab.addUpdateObject(new UpdateObject(parameter.getId(),value,true));
+            prefab.addUpdateObject(new UpdateObject(parameter,value,true));
         }
     }//GEN-LAST:event_cboChoiceItemStateChanged
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox cboChoice;
-    private javax.swing.JLabel lblLabel;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -101,17 +85,27 @@ public class EnumListParameterUI extends javax.swing.JPanel implements Parameter
             EnumListParameter cp = (EnumListParameter) p;
             cboChoice.setModel(new DefaultComboBoxModel(cp.getChoices()));
             this.parameter = cp;
-            lblLabel.setText(cp.getId());
         }
+    }
+    
+    public Parameter getParameter(){
+        return parameter;
     }
 
     @Override
     public void setNode(Prefab prefab) {
         this.prefab = prefab;
-        String property = parameter.getId();
-        Object value = prefab.getParameter(property);
+        Object value = ReflectionManager.getInstance().invokeGetMethod(prefab,parameter); 
         if (value != null) {
             cboChoice.setSelectedItem(value);
         }
+    }
+    
+    /**
+     * Checks if a label should be created for the UI.
+     * @return true if a label should be created, false othwerise.
+     */
+    public boolean needsLabel(){
+        return true;
     }
 }

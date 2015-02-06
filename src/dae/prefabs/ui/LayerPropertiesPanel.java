@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.prefabs.ui;
 
 import com.google.common.eventbus.Subscribe;
@@ -13,7 +9,7 @@ import java.awt.event.ItemEvent;
 
 /**
  *
- * @author samyn_000
+ * @author Koen Samyn
  */
 public class LayerPropertiesPanel extends javax.swing.JPanel {
     private Layer model;

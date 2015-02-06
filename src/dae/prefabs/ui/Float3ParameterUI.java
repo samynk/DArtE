@@ -1,30 +1,24 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.prefabs.ui;
 
-import com.google.common.eventbus.Subscribe;
-import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
-import dae.GlobalObjects;
+import dae.components.ComponentType;
+import dae.components.PrefabComponent;
 import dae.prefabs.Prefab;
+import dae.prefabs.ReflectionManager;
 import dae.prefabs.parameters.Parameter;
 import dae.prefabs.parameters.converter.PropertyConverter;
 
 import dae.prefabs.standard.UpdateObject;
-import dae.prefabs.ui.events.PrefabChangedEvent;
 import dae.prefabs.ui.events.PrefabChangedEventType;
-import static dae.prefabs.ui.events.PrefabChangedEventType.TRANSLATION;
-import java.awt.Component;
-import javax.swing.JComponent;
-import javax.swing.SwingUtilities;
+import java.beans.PropertyChangeEvent;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 /**
  *
  * @author Koen
  */
-public class Float3ParameterUI extends javax.swing.JPanel implements ParameterUI {
+public class Float3ParameterUI extends javax.swing.JPanel implements ParameterUI,ChangeListener {
 
     private Parameter parameter;
     private Prefab currentNode;
@@ -37,20 +31,7 @@ public class Float3ParameterUI extends javax.swing.JPanel implements ParameterUI
      */
     public Float3ParameterUI() {
         initComponents();
-        for (Component c : this.getComponents()) {
-            if (c instanceof JComponent && c != lblLabel) {
-                ((JComponent) c).putClientProperty("JComponent.sizeVariant", "small");
-            }
-        }
-        SwingUtilities.updateComponentTreeUI(this);
-    }
 
-    public void setLabel(String label) {
-        lblLabel.setText(label);
-    }
-
-    public String getLabel() {
-        return lblLabel.getText();
     }
 
     public void setFloat3(Vector3f value) {
@@ -86,7 +67,6 @@ public class Float3ParameterUI extends javax.swing.JPanel implements ParameterUI
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        lblLabel = new javax.swing.JLabel();
         lblBracket = new javax.swing.JLabel();
         xSpinner = new javax.swing.JSpinner();
         ySpinner = new javax.swing.JSpinner();
@@ -97,15 +77,6 @@ public class Float3ParameterUI extends javax.swing.JPanel implements ParameterUI
 
         setLayout(new java.awt.GridBagLayout());
 
-        lblLabel.setText("float3 : ");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 6;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        add(lblLabel, gridBagConstraints);
-
         lblBracket.setText("[");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -115,8 +86,8 @@ public class Float3ParameterUI extends javax.swing.JPanel implements ParameterUI
         add(lblBracket, gridBagConstraints);
 
         xSpinner.setModel(new javax.swing.SpinnerNumberModel(Float.valueOf(0.0f), null, null, Float.valueOf(0.5f)));
-        xSpinner.setMinimumSize(new java.awt.Dimension(100, 22));
-        xSpinner.setPreferredSize(null);
+        xSpinner.setMinimumSize(new java.awt.Dimension(20, 20));
+        xSpinner.setPreferredSize(new java.awt.Dimension(20, 20));
         xSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 xSpinnerStateChanged(evt);
@@ -132,8 +103,8 @@ public class Float3ParameterUI extends javax.swing.JPanel implements ParameterUI
         add(xSpinner, gridBagConstraints);
 
         ySpinner.setModel(new javax.swing.SpinnerNumberModel(Float.valueOf(0.0f), null, null, Float.valueOf(0.5f)));
-        ySpinner.setMinimumSize(new java.awt.Dimension(100, 22));
-        ySpinner.setPreferredSize(null);
+        ySpinner.setMinimumSize(new java.awt.Dimension(20, 20));
+        ySpinner.setPreferredSize(new java.awt.Dimension(20, 20));
         ySpinner.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 ySpinnerStateChanged(evt);
@@ -166,8 +137,8 @@ public class Float3ParameterUI extends javax.swing.JPanel implements ParameterUI
 
         zSpinner.setModel(new javax.swing.SpinnerNumberModel(Float.valueOf(0.0f), null, null, Float.valueOf(0.5f)));
         zSpinner.setAlignmentX(0.0F);
-        zSpinner.setMinimumSize(new java.awt.Dimension(100, 22));
-        zSpinner.setPreferredSize(null);
+        zSpinner.setMinimumSize(null);
+        zSpinner.setPreferredSize(new java.awt.Dimension(20, 20));
         zSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 zSpinnerStateChanged(evt);
@@ -203,31 +174,32 @@ public class Float3ParameterUI extends javax.swing.JPanel implements ParameterUI
         updateNode();
     }//GEN-LAST:event_zSpinnerStateChanged
 
+    /**
+     * Sets the parameter this float3 ui is bound to.
+     *
+     * @param p the bound parameter.
+     */
     @Override
     public void setParameter(Parameter p) {
         parameter = p;
         converter = p.getConverter();
-        if (p.getId().equals("localTranslation") || p.getId().equals("localPrefabTranslation")) {
-            eventType = PrefabChangedEventType.TRANSLATION;
-        } else if (p.getId().equals("localRotation") || p.getId().equals("localPrefabRotation")) {
-            eventType = PrefabChangedEventType.ROTATION;
-        } else if (p.getId().equals("localScale")) {
-            eventType = PrefabChangedEventType.SCALE;
-        }
-        if (eventType != null) {
-            GlobalObjects.getInstance().registerListener(this);
-        }
+        parameter.addChangeListener(this);
+    }
+
+    public Parameter getParameter() {
+        return parameter;
     }
 
     @Override
     public void setNode(Prefab currentSelectedNode) {
+        
         currentNode = currentSelectedNode;
         if (currentNode == null) {
             return;
         }
-        String property = parameter.getId();
-        Object value = currentSelectedNode.getParameter(property);
-        if ( converter != null ){
+
+        Object value = ReflectionManager.getInstance().invokeGetMethod(currentSelectedNode, parameter);
+        if (converter != null) {
             value = converter.convertFromObjectToUI(value);
         }
         if (value != null && value instanceof Vector3f) {
@@ -235,41 +207,29 @@ public class Float3ParameterUI extends javax.swing.JPanel implements ParameterUI
         }
     }
 
-    @Subscribe
-    public void prefabChanged(final PrefabChangedEvent event) {
-        if (event.getType() == this.eventType && event.getChangedNode() == this.currentNode) {
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    switch (event.getType()) {
-                        case TRANSLATION:
-                            setFloat3(currentNode.getLocalPrefabTranslation());
-                            break;
-                        case ROTATION:
-                            float angles[] = new float[3];
-                            currentNode.getLocalPrefabRotation().toAngles(angles);
-                            setFloat3(angles[0]*FastMath.RAD_TO_DEG, angles[1]*FastMath.RAD_TO_DEG, angles[2]*FastMath.RAD_TO_DEG);
-                            break;
-                        case SCALE:
-                            setFloat3(currentNode.getLocalScale());
-                            break;
-                    }
-                }
-            });
-        }
+    /**
+     * Checks if a label should be created for the UI.
+     *
+     * @return true if a label should be created, false othwerise.
+     */
+    public boolean needsLabel() {
+        return true;
     }
 
+    /**
+     * Sends the correct event to set the new value for the object.
+     */
     private void updateNode() {
         if (disregardEvent) {
             return;
         }
         Object value = getFloat3();
-        if ( converter != null){
+        if (converter != null) {
             value = converter.convertFromUIToObject(value);
         }
-        String property = parameter.getId();
         if (currentNode != null) {
             //System.out.println("Setting " + property + " to " + value);
-            currentNode.addUpdateObject(new UpdateObject(property, value, true));
+            currentNode.addUpdateObject(new UpdateObject(parameter, value, true));
         }
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -277,9 +237,27 @@ public class Float3ParameterUI extends javax.swing.JPanel implements ParameterUI
     private javax.swing.JLabel lblCloseBracket;
     private javax.swing.JLabel lblComma1;
     private javax.swing.JLabel lblComma2;
-    private javax.swing.JLabel lblLabel;
     private javax.swing.JSpinner xSpinner;
     private javax.swing.JSpinner ySpinner;
     private javax.swing.JSpinner zSpinner;
     // End of variables declaration//GEN-END:variables
+
+
+    /**
+     * Called when a property of the component is changed.
+     * @param evt the property change event.
+     */
+    public void stateChanged(ChangeEvent e) {
+         if (currentNode != null) {
+            disregardEvent = true;
+            Object value = ReflectionManager.getInstance().invokeGetMethod(currentNode, parameter);
+            if (converter != null) {
+                value = converter.convertFromObjectToUI(value);
+            }
+            if (value != null && value instanceof Vector3f) {
+                this.setFloat3((Vector3f) value);
+            }
+            disregardEvent = false;
+        }
+    }
 }
