@@ -1,46 +1,65 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.prefabs.standard;
 
+import dae.prefabs.Prefab;
+import dae.prefabs.parameters.Parameter;
+
 /**
+ * An object that encapsulates the change of a property to an object.
  *
  * @author Koen
  */
 public class UpdateObject {
 
-    private String property;
+    /**
+     * The value to set.
+     */
     private Object value;
+    /**
+     * The parameter to set.
+     */
+    private Parameter parameter;
+    /**
+     * Is this edit undoable ?
+     */
     private boolean undoableEdit;
-    private boolean hasParameter;
 
-    public UpdateObject(String property, Object value, boolean undoableEdit) {
-        this.property = property;
+    /**
+     * Creates a new update object.
+     *
+     * @param value the value for the object.
+     * @param p
+     * @param undoableEdit
+     */
+    public UpdateObject(Parameter p, Object value, boolean undoableEdit) {
         this.value = value;
+        this.parameter = p;
         this.undoableEdit = undoableEdit;
-        this.hasParameter = true;
     }
 
-    public UpdateObject(String methodName, boolean b) {
-        this.property = methodName;
-        this.undoableEdit = b;
-        this.hasParameter = false;
-    }
-
-    public String getProperty() {
-        return property;
-    }
-
+    /**
+     * Returns the value to set.
+     *
+     * @return the value to set.
+     */
     public Object getValue() {
         return value;
     }
-    
-    public boolean isUndoableEdit(){
+
+    /**
+     * Returns true if the update of the object can be undone.
+     *
+     * @return true if the update of the object can be undone, false otherwise.
+     */
+    public boolean isUndoableEdit() {
         return undoableEdit;
     }
-    
-    public boolean hasParameter(){
-        return hasParameter;
+
+    /**
+     * Executes the update object.
+     * @param prefab the prefab to execute the update on.
+     * @param undoable is this an undoable edit or not.
+     */
+    public void execute(Prefab prefab, boolean undoable) {
+        parameter.invokeSet(prefab, value, undoable);
     }
 }
