@@ -58,6 +58,7 @@ public class CharacterPath extends Prefab {
      */
     public CharacterPath() {
         setLayerName("waypoints");
+        super.canHaveChildren = true;
     }
 
     @Override
@@ -78,7 +79,7 @@ public class CharacterPath extends Prefab {
     }
 
     public int getNrOfWaypoints() {
-        return waypoints.size();
+        return waypointList.size()+1;
     }
 
     /**
@@ -98,19 +99,10 @@ public class CharacterPath extends Prefab {
 
     public PathSegment getCRCurrentSegment(Animatable toMove) {
         if (currentSegment < waypoints.size()) {
-            Vector3f p1 = toMove.getWorldTranslation();
-            Vector3f p0;
-            if (currentSegment == 0) {
-                Vector3f direction = toMove.getForwardDirection();
-                Vector3f dir = direction.normalize();
-                dir.multLocal(-0.2f);
-                p0 = p1.add(dir);
-            } else {
-                p0 = waypoints.get(currentSegment - 1);
-            }
+            Vector3f p1 = new Vector3f();
+            worldToLocal(toMove.getWorldTranslation(), p1);
 
             Vector3f p2 = waypoints.get(currentSegment);
-
             Vector3f p3;
             if (currentSegment < waypoints.size() - 1) {
                 p3 = waypoints.get(currentSegment + 1);
@@ -126,7 +118,7 @@ public class CharacterPath extends Prefab {
             }
             //Vector3f dir1 = p1.subtract(p0);
             Vector3f dir2 = p3.subtract(p2);
-            return new NaturalCharacterPathSegmentXZ(p1, toMove.getForwardDirection(), p2, dir2);
+            return new NaturalCharacterPathSegmentXZ(p1, convertVectorToLocal(toMove.getForwardDirection()), p2, dir2);
             //return new CRCharacterPathSegment(p0, p1, p2, p3, 0.2f);
         } else if (finalDestination != null) {
             return createCRFinalDestination(toMove);
@@ -135,14 +127,18 @@ public class CharacterPath extends Prefab {
         }
     }
 
+    private Vector3f convertVectorToLocal(Vector3f direction) {
+        return this.getWorldRotation().inverse().mult(direction);
+    }
+
     public PathSegment getCurrentSegment(Animatable toMove) {
         return getCRCurrentSegment(toMove);
     }
 
     public PathSegment getBezierCurrentSegment(Animatable toMove) {
         if (currentSegment < waypoints.size()) {
-            Vector3f start = toMove.getWorldTranslation();
-            Vector3f direction = toMove.getForwardDirection();
+            Vector3f start = toMove.getWorldTranslation().clone();
+            Vector3f direction = convertVectorToLocal(toMove.getForwardDirection());
             Vector3f cp1dir = direction.normalize();
             cp1dir.multLocal(0.1f);
 
@@ -186,7 +182,7 @@ public class CharacterPath extends Prefab {
         finalDestination.forceRefresh(true, true, true);
         System.out.println(finalDestination.getName());
         Vector3f start = toMove.getWorldTranslation();
-        Vector3f direction = toMove.getForwardDirection();
+        Vector3f direction = convertVectorToLocal(toMove.getForwardDirection());
         Vector3f cp1dir = direction.normalize();
         cp1dir.multLocal(0.1f);
 
@@ -206,7 +202,7 @@ public class CharacterPath extends Prefab {
         if (waypoints.size() >= 2) {
             p0 = waypoints.get(currentSegment - 2);
         } else {
-            Vector3f direction = toMove.getForwardDirection();
+            Vector3f direction = convertVectorToLocal(toMove.getForwardDirection());
             Vector3f cp1dir = direction.normalize();
             cp1dir.negateLocal();
             p0 = p1.add(cp1dir);
@@ -219,7 +215,7 @@ public class CharacterPath extends Prefab {
         Vector3f diff = p3.subtract(p2);
         diff.negateLocal();
 
-        return new NaturalCharacterPathSegmentXZ(toMove.getWorldTranslation(), toMove.getForwardDirection(), p2, diff);
+        return new NaturalCharacterPathSegmentXZ(toMove.getWorldTranslation(), convertVectorToLocal(toMove.getForwardDirection()), p2, diff);
 
     }
 
@@ -259,7 +255,7 @@ public class CharacterPath extends Prefab {
     }
 
     public void createPathMesh() {
-        if (waypointList.size() == 0) {
+        if (waypointList.isEmpty()) {
             return;
         }
         waypoints.clear();
@@ -304,7 +300,7 @@ public class CharacterPath extends Prefab {
         for (int i = 0; i < locations.size(); ++i) {
             Vector3f loc = locations.get(i);
             buffer.put(loc.x);
-            buffer.put(loc.y);
+            buffer.put(loc.y+0.4f);
             buffer.put(loc.z);
 
         }
@@ -318,6 +314,7 @@ public class CharacterPath extends Prefab {
         if (pathMesh != null) {
             pathMesh.removeFromParent();
         }
+        lines.setCullHint(CullHint.Never);
         this.attachChild(lines);
         pathMesh = lines;
 
@@ -373,7 +370,7 @@ public class CharacterPath extends Prefab {
 
                     this.getWorldRotation().mult(tangent, tangent);
                     Vector3f bodyRot = body.getWorldRotation().inverse().mult(tangent);
-                    float yAngle = FastMath.atan2(bodyRot.x, bodyRot.z)-FastMath.HALF_PI;
+                    float yAngle = FastMath.atan2(bodyRot.x, bodyRot.z) - FastMath.HALF_PI;
                     Quaternion q = new Quaternion();
                     q.fromAngleAxis(yAngle, Vector3f.UNIT_Y);
                     footStep.setLocalRotation(q);
@@ -426,42 +423,6 @@ public class CharacterPath extends Prefab {
     }
 
     @Override
-    public void setXRotation(float xRot) {
-        super.setXRotation(xRot);
-        createPathMesh();
-    }
-
-    @Override
-    public void setYRotation(float yRot) {
-        super.setYRotation(yRot);
-        createPathMesh();
-    }
-
-    @Override
-    public void setZRotation(float zRot) {
-        super.setZRotation(zRot);
-        createPathMesh();
-    }
-
-    @Override
-    public void setXTranslation(float x) {
-        super.setXTranslation(x);
-        createPathMesh();
-    }
-
-    @Override
-    public void setYTranslation(float y) {
-        super.setYTranslation(y);
-        createPathMesh();
-    }
-
-    @Override
-    public void setZTranslation(float z) {
-        super.setZTranslation(z);
-        createPathMesh();
-    }
-
-    @Override
     public void setLocalTranslation(Vector3f localTranslation) {
         super.setLocalTranslation(localTranslation); //To change body of generated methods, choose Tools | Templates.
         createPathMesh();
@@ -485,4 +446,38 @@ public class CharacterPath extends Prefab {
         super.setLocalRotation(quaternion); //To change body of generated methods, choose Tools | Templates.
         createPathMesh();
     }
+
+    /**
+     * Resets the path.
+     */
+    public void reset() {
+        this.currentSegment = 0;
+    }
+
+    public void insertWaypointAfter(Waypoint first, Waypoint second) {
+
+        int index = this.getChildIndex(first);
+        if (index > -1) {
+            this.attachChildAt(second, index + 1);
+        }
+        int wpindex = waypointList.indexOf(first);
+        if ( wpindex > -1)
+        {
+            waypointList.add(wpindex + 1, second);
+        }
+    }
+
+    /**
+     * Returns the waypoint location in world space.
+     * @param waypointId the waypoint location in world space.
+     * @return the waypoint location in world space.
+     */
+    public Vector3f getWaypointLocation(int waypointId) {
+        if ( waypointId == 0 ){
+            return this.getWorldTranslation();
+        }else{
+            return waypointList.get(waypointId-1).getWorldTranslation();
+        }
+    }
 }
+
