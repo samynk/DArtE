@@ -1,33 +1,32 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.prefabs.ui;
 
 import com.google.common.eventbus.Subscribe;
 import dae.GlobalObjects;
+import dae.components.ComponentType;
+import dae.components.PrefabComponent;
 import dae.prefabs.Prefab;
+import dae.prefabs.events.ComponentListener;
 import dae.prefabs.parameters.ParameterSection;
 import dae.prefabs.types.ObjectType;
 import dae.prefabs.types.ObjectTypeCategory;
 import dae.prefabs.ui.events.SelectionEvent;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+import java.awt.Rectangle;
 import javax.swing.JLabel;
+import javax.swing.Scrollable;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
-/**
- *
- * @author samyn_000
- */
-public class PrefabParameterPanel extends javax.swing.JPanel {
+public class PrefabParameterPanel extends javax.swing.JPanel implements Scrollable, ComponentListener {
 
     private Prefab selected;
     private ObjectTypeCategory otCategories;
     private ObjectType currentObjectType;
+    private JLabel filler = new JLabel();
 
-    private JLabel filler =new JLabel();
     /**
      * Creates new form PrefabParameterPanel
      */
@@ -46,17 +45,15 @@ public class PrefabParameterPanel extends javax.swing.JPanel {
             otCategories = GlobalObjects.getInstance().getObjectsTypeCategory();
         }
 
-        ObjectType ot = otCategories.getObjectType(selected.getCategory(), selected.getType());
+        ObjectType ot = selected.getObjectType();
 
         //System.out.println("Found description : " + ot.getLabel());
-        if (ot == null || ot != currentObjectType) {
-            // remove parameter panels.
-            for (Component c : this.getComponents()) {
-                this.remove(c);
-            }
-            currentObjectType = ot;
-            this.invalidate();
+
+        for (Component c : this.getComponents()) {
+            this.remove(c);
         }
+        currentObjectType = ot;
+        this.invalidate();
 
         //System.out.println("Adding parameter sections");
         GridBagConstraints gbc = new GridBagConstraints();
@@ -65,7 +62,7 @@ public class PrefabParameterPanel extends javax.swing.JPanel {
         gbc.weightx = 1.0;
         gbc.weighty = 0.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(3, 7, 6, 7);
+        gbc.insets = new Insets(3,0,3,0);
 
         if (currentObjectType != null) {
             for (ParameterSection ps : currentObjectType.getParameterSections()) {
@@ -77,24 +74,61 @@ public class PrefabParameterPanel extends javax.swing.JPanel {
                 gbc.gridy++;
                 pp.revalidate();
             }
+
+
+            for (PrefabComponent c : selected.getComponents()) {
+                ComponentType ct = GlobalObjects.getInstance().getObjectsTypeCategory().getComponent(c.getId());
+                for (ParameterSection ps : ct.getParameterSections()) {
+                    ParameterPanel pp = ps.createParameterPanel();
+
+                    pp.setParameterSection(ps);
+                    pp.setNode(selected);
+                    this.add(pp, gbc);
+                    gbc.gridy++;
+                    pp.revalidate();
+                }
+            }
         }
         gbc.weighty = 1.0;
-        this.add(filler,gbc);
-        synchronized (this.getTreeLock()) {
-            this.validateTree();
-        }
+        this.add(filler, gbc);
         this.repaint();
     }
 
     @Subscribe
     public void prefabSelected(SelectionEvent selectionEvent) {
         //System.out.println("Prefab selected: " + selectionEvent.getSelectedNode().getName());
-        this.selected = selectionEvent.getSelectedNode();
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                createSelectedNodeUI();
+        if (this.selected != selectionEvent.getSelectedNode()) {
+            if (this.selected != null) {
+                selected.removeComponentListener(this);
             }
-        });
+            this.selected = selectionEvent.getSelectedNode();
+            selected.addComponentListener(this);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    createSelectedNodeUI();
+                }
+            });
+        }
+    }
+
+    public Dimension getPreferredScrollableViewportSize() {
+        return getMinimumSize();
+    }
+
+    public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
+        return 10;
+    }
+
+    public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
+        return ((orientation == SwingConstants.VERTICAL) ? visibleRect.height : visibleRect.width) - 10;
+    }
+
+    public boolean getScrollableTracksViewportWidth() {
+        return true;
+    }
+
+    public boolean getScrollableTracksViewportHeight() {
+        return false;
     }
 
     /**
@@ -108,10 +142,27 @@ public class PrefabParameterPanel extends javax.swing.JPanel {
 
         jLabel1 = new javax.swing.JLabel();
 
+        setPreferredSize(null);
         setLayout(new java.awt.GridBagLayout());
         add(jLabel1, new java.awt.GridBagConstraints());
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
     // End of variables declaration//GEN-END:variables
+
+    public void componentAdded(Prefab prefab, PrefabComponent added) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                createSelectedNodeUI();
+            }
+        });
+    }
+
+    public void componentRemoved(Prefab prefab, PrefabComponent removed) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                createSelectedNodeUI();
+            }
+        });
+    }
 }
