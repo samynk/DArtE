@@ -95,6 +95,7 @@ public class ProjectPanel extends javax.swing.JPanel implements TreeSelectionLis
             }
         });
         createLayerDialog = new CreateLayerDialog((Frame) this.getTopLevelAncestor(), true);
+        createLayerDialog.setTitle("New level");
         createKlatchDialog = new CreateKlatchDialog((Frame) this.getTopLevelAncestor(), true);
     }
 
