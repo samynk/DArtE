@@ -18,12 +18,14 @@ import com.jme3.math.Transform;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import dae.GlobalObjects;
 import dae.animation.custom.CharacterPath;
 import dae.animation.trajectory.CurveChannel;
 import dae.animation.trajectory.CurveTarget;
 import dae.animation.trajectory.FootStep;
 import dae.animation.trajectory.TargetCurve;
 import dae.prefabs.Prefab;
+import dae.prefabs.types.ObjectType;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -1413,54 +1415,6 @@ public class Body extends Prefab implements BodyElement {
     }
 
     @Override
-    public void setXTranslation(float x) {
-        super.setXTranslation(x); //To change body of generated methods, choose Tools | Templates.
-        if (characterPath != null) {
-            characterPath.createPathMesh();
-        }
-    }
-
-    @Override
-    public void setYTranslation(float y) {
-        super.setYTranslation(y); //To change body of generated methods, choose Tools | Templates.
-        if (characterPath != null) {
-            characterPath.createPathMesh();
-        }
-    }
-
-    @Override
-    public void setZTranslation(float z) {
-        super.setZTranslation(z); //To change body of generated methods, choose Tools | Templates.
-        if (characterPath != null) {
-            characterPath.createPathMesh();
-        }
-    }
-
-    @Override
-    public void setXRotation(float xRot) {
-        super.setXRotation(xRot); //To change body of generated methods, choose Tools | Templates.
-        if (characterPath != null) {
-            characterPath.createPathMesh();
-        }
-    }
-
-    @Override
-    public void setYRotation(float yRot) {
-        super.setYRotation(yRot); //To change body of generated methods, choose Tools | Templates.
-        if (characterPath != null) {
-            characterPath.createPathMesh();
-        }
-    }
-
-    @Override
-    public void setZRotation(float zRot) {
-        super.setZRotation(zRot); //To change body of generated methods, choose Tools | Templates.
-        if (characterPath != null) {
-            characterPath.createPathMesh();
-        }
-    }
-
-    @Override
     public void setLocalTranslation(Vector3f localTranslation) {
         super.setLocalTranslation(localTranslation); //To change body of generated methods, choose Tools | Templates.
         if (characterPath != null) {
@@ -1502,12 +1456,14 @@ public class Body extends Prefab implements BodyElement {
         if (footSteps.getChildren().size() > 1) {
             if (rightLegTarget == null) {
                 this.rightLegTarget = new Handle();
-                rightLegTarget.create("rightLegTarget", assetManager, null);
+                ObjectType type = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Animation", "TwoAxisHandle");
+                rightLegTarget.create("rightLegTarget", assetManager,  type, null);
                 attachChild(rightLegTarget);
             }
             if (leftLegTarget == null) {
                 this.leftLegTarget = new Handle();
-                leftLegTarget.create("leftLegTarget", assetManager, null);
+                ObjectType type = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Animation", "TwoAxisHandle");
+                leftLegTarget.create("leftLegTarget", assetManager, type,  null);
                 attachChild(leftLegTarget);
             }
 
