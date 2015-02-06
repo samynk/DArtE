@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.prefabs.lights;
 
 import com.jme3.asset.AssetManager;
@@ -85,6 +81,7 @@ public class DirectionalLightPrefab extends Prefab implements ShadowCastSupport 
         return super.removeFromParent();
     }
 
+    
     @Override
     public void rotationChanged() {
         Vector3f dir = this.getWorldRotation().mult(Vector3f.UNIT_X);
