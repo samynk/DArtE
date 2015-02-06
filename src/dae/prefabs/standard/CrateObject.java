@@ -67,7 +67,7 @@ public class CrateObject extends Prefab {
         CrateObject co = new CrateObject(bottom,top);
         co.physicsSpace = physicsSpace;
         co.setPivot(getPivot());
-        co.create( name, manager, null) ;
+        co.create( name, manager, getObjectType(), null) ;
         co.setType( this.getType() );
         co.setCategory( this.getCategory() );
         return co;
