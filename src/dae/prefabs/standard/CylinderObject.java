@@ -50,7 +50,7 @@ public class CylinderObject extends Prefab {
     public Prefab duplicate(AssetManager manager) {
         CylinderObject co = new CylinderObject( this.radius, height, axialSegments, radialSegments);
         co.physicsSpace = physicsSpace;
-        co.create( name, manager, null) ;
+        co.create( name, manager, getObjectType(), null) ;
         co.setType( this.getType() );
         co.setCategory( this.getCategory() );
         return co;
