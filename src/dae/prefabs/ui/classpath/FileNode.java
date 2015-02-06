@@ -15,7 +15,6 @@ import java.util.Iterator;
  */
 public class FileNode implements Transferable {
 
-    
     private String name;
     private String label;
     private String extension = "";
@@ -34,8 +33,8 @@ public class FileNode implements Transferable {
             }
         }
     }
-    
-    public void setLabel(String label){
+
+    public void setLabel(String label) {
         this.label = label;
     }
 
@@ -106,8 +105,11 @@ public class FileNode implements Transferable {
             children = new ArrayList<FileNode>();
             isLeaf = false;
         }
-        children.add(node);
-        node.parentNode = this;
+        if (!children.contains(node)) {
+            children.add(node);
+            node.parentNode = this;
+        }
+
     }
 
     public void removeChild(FileNode node) {
@@ -240,31 +242,30 @@ public class FileNode implements Transferable {
     public int getDepth() {
         FileNode parent = this.getParentNode();
         int count = 1;
-        while(parent != null){
+        while (parent != null) {
             ++count;
             parent = parent.getParentNode();
         }
         return count;
     }
-    
+
     /**
      * Creates a FileNode starting from a path.
+     *
      * @param rigLocation the location of the file.
      * @return a new filenode.
      */
     public static FileNode createFromPath(String rigLocation) {
         Path p = Paths.get(rigLocation);
         FileNode current = null;
-        for ( int i = 0; i < p.getNameCount();++i)
-        {
+        for (int i = 0; i < p.getNameCount(); ++i) {
             Path currentPath = p.getName(i);
-            FileNode newNode = new FileNode(currentPath.toString(),false);
-            if ( current != null){
+            FileNode newNode = new FileNode(currentPath.toString(), false);
+            if (current != null) {
                 current.addChild(newNode);
             }
             current = newNode;
         }
-        return current; 
+        return current;
     }
-
 }
