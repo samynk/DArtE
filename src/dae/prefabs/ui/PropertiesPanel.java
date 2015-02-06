@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.prefabs.ui;
 
 import com.google.common.eventbus.Subscribe;
@@ -18,7 +14,7 @@ import javax.swing.SwingUtilities;
 
 /**
  *
- * @author samyn_000
+ * @author Koen Samyn
  */
 public class PropertiesPanel extends javax.swing.JPanel {
 
@@ -87,19 +83,19 @@ public class PropertiesPanel extends javax.swing.JPanel {
     private void initComponents() {
 
         prefabParameterPanel1 = new dae.prefabs.ui.PrefabParameterPanel();
-        levelParameterPanel2 = new dae.prefabs.ui.LevelParameterPanel();
         layerPropertiesPanel1 = new dae.prefabs.ui.LayerPropertiesPanel();
         projectParameterPanel1 = new dae.prefabs.ui.ProjectParameterPanel();
+        levelParameterPanel1 = new dae.gui.level.LevelParameterPanel();
 
         setLayout(new java.awt.CardLayout());
         add(prefabParameterPanel1, "Prefab");
-        add(levelParameterPanel2, "Level");
         add(layerPropertiesPanel1, "Layer");
         add(projectParameterPanel1, "Project");
+        add(levelParameterPanel1, "Level");
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private dae.prefabs.ui.LayerPropertiesPanel layerPropertiesPanel1;
-    private dae.prefabs.ui.LevelParameterPanel levelParameterPanel2;
+    private dae.gui.level.LevelParameterPanel levelParameterPanel1;
     private dae.prefabs.ui.PrefabParameterPanel prefabParameterPanel1;
     private dae.prefabs.ui.ProjectParameterPanel projectParameterPanel1;
     // End of variables declaration//GEN-END:variables

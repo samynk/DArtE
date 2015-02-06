@@ -23,13 +23,6 @@
         </Constraint>
       </Constraints>
     </Component>
-    <Component class="dae.prefabs.ui.LevelParameterPanel" name="levelParameterPanel2">
-      <Constraints>
-        <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignCardLayout" value="org.netbeans.modules.form.compat2.layouts.DesignCardLayout$CardConstraintsDescription">
-          <CardConstraints cardName="Level"/>
-        </Constraint>
-      </Constraints>
-    </Component>
     <Component class="dae.prefabs.ui.LayerPropertiesPanel" name="layerPropertiesPanel1">
       <Constraints>
         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignCardLayout" value="org.netbeans.modules.form.compat2.layouts.DesignCardLayout$CardConstraintsDescription">
@@ -41,6 +34,13 @@
       <Constraints>
         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignCardLayout" value="org.netbeans.modules.form.compat2.layouts.DesignCardLayout$CardConstraintsDescription">
           <CardConstraints cardName="Project"/>
+        </Constraint>
+      </Constraints>
+    </Component>
+    <Component class="dae.gui.level.LevelParameterPanel" name="levelParameterPanel1">
+      <Constraints>
+        <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignCardLayout" value="org.netbeans.modules.form.compat2.layouts.DesignCardLayout$CardConstraintsDescription">
+          <CardConstraints cardName="Level"/>
         </Constraint>
       </Constraints>
     </Component>
