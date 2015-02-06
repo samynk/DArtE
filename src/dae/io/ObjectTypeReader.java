@@ -10,6 +10,7 @@ import com.jme3.asset.AssetLoader;
 import com.jme3.math.FastMath;
 import com.jme3.math.Matrix3f;
 import com.jme3.math.Vector3f;
+import dae.components.ComponentType;
 import dae.prefabs.magnets.FillerParameter;
 import dae.prefabs.magnets.GridMagnet;
 import dae.prefabs.magnets.Magnet;
@@ -23,6 +24,7 @@ import dae.prefabs.parameters.ColorParameter;
 import dae.prefabs.parameters.ConnectorParameter;
 import dae.prefabs.parameters.DefaultSection;
 import dae.prefabs.parameters.DictionaryParameter;
+import dae.prefabs.parameters.FileParameter;
 import dae.prefabs.parameters.Float3Parameter;
 import dae.prefabs.parameters.FloatParameter;
 import dae.prefabs.parameters.FuzzyParameter;
@@ -37,6 +39,7 @@ import dae.prefabs.standard.RotationRange;
 import dae.prefabs.types.ObjectType;
 import dae.prefabs.types.ObjectTypeCategory;
 import dae.prefabs.types.ObjectTypeCollection;
+import dae.prefabs.types.ParameterSupport;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.MissingResourceException;
@@ -84,7 +87,9 @@ public class ObjectTypeReader implements AssetLoader {
                     ObjectTypeCollection newCollection =
                             new ObjectTypeCollection(getAttrContent("name", map));
                     result.addObjectTypeCollection(newCollection);
-                    readObjects(current, newCollection);
+                    readObjects(current, result, newCollection);
+                } else if ("components".equals(current.getNodeName())) {
+                    readComponents(result, current);
                 }
             }
 
@@ -101,7 +106,7 @@ public class ObjectTypeReader implements AssetLoader {
         }
     }
 
-    private void readObjects(Node parentNode, ObjectTypeCollection parent) {
+    private void readObjects(Node parentNode, ObjectTypeCategory main, ObjectTypeCollection parent) {
         NodeList objects = parentNode.getChildNodes();
         for (int i = 0; i < objects.getLength(); ++i) {
             Node current = objects.item(i);
@@ -114,12 +119,13 @@ public class ObjectTypeReader implements AssetLoader {
                 ObjectType ot = new ObjectType(parent.getName(), label, className, extraInfo, defaultLoader);
                 parent.addObjectType(ot);
 
+                readComponents(main, current, ot);
                 readParameterSections(current, ot);
             }
         }
     }
 
-    private void readParameterSections(Node parentNode, ObjectType parent) {
+    private void readParameterSections(Node parentNode, ParameterSupport parent) {
         NodeList sections = parentNode.getChildNodes();
         for (int i = 0; i < sections.getLength(); ++i) {
             Node current = sections.item(i);
@@ -130,17 +136,27 @@ public class ObjectTypeReader implements AssetLoader {
                 ParameterSection ps = new ParameterSection(section);
                 parent.addParameterSection(ps);
 
-                readParameters(current, ps);
+                if ( parent instanceof ComponentType)
+                {
+                    readParameters(current, ps, (ComponentType)parent);
+                }else{
+                    readParameters(current, ps, ComponentType.PREFAB);
+                }
             } else if ("defaults".equals(current.getNodeName())) {
                 DefaultSection ds = new DefaultSection();
                 parent.setDefaultSection(ds);
 
-                readDefaults(current, ds);
+                if ( parent instanceof ComponentType)
+                {
+                    readDefaults(current, ds, (ComponentType)parent);
+                }else{
+                    readDefaults(current, ds, ComponentType.PREFAB);
+                }
             }
         }
     }
 
-    private void readParameters(Node parentNode, ParameterSection parent) {
+    private void readParameters(Node parentNode, ParameterSection parent, ComponentType cType) {
         NodeList parameters = parentNode.getChildNodes();
         for (int i = 0; i < parameters.getLength(); ++i) {
             Node current = parameters.item(i);
@@ -148,10 +164,10 @@ public class ObjectTypeReader implements AssetLoader {
                 NamedNodeMap map = current.getAttributes();
                 String type = getAttrContent("type", map);
                 String id = getAttrContent("id", map);
-                String collectionType = getAttrContent("collectiontype",map);
-                
+                String collectionType = getAttrContent("collectiontype", map);
+
                 String label;
-                String converter = getAttrContent("converter",map);
+                String converter = getAttrContent("converter", map);
                 try {
                     label = translations.getString(id);
                 } catch (MissingResourceException ex) {
@@ -159,32 +175,37 @@ public class ObjectTypeReader implements AssetLoader {
                 }
                 Parameter p = null;
                 if ("float3".equals(type)) {
-                    p = new Float3Parameter(type, id);
+                    p = new Float3Parameter(cType, type, id);
                 } else if ("string".equals(type)) {
-                    p = new TextParameter(type, id);
+                    p = new TextParameter(cType, type, id);
                 } else if ("choice".equals(type)) {
-                    ChoiceParameter cp = new ChoiceParameter(type, id);
+                    ChoiceParameter cp = new ChoiceParameter(cType, type, id);
+                    // if the values are supplied by a property in the object.
+                    String listento = getAttrContent("listento",map);
+                    String provider = getAttrContent("values",map);
+                    cp.setListenTo(listento);
+                    cp.setValuesProvider(provider);
                     readChoices(current, cp);
                     p = cp;
                 } else if ("color".equals(type)) {
-                    ColorParameter cp = new ColorParameter(type, id);
+                    ColorParameter cp = new ColorParameter(cType, type, id);
                     p = cp;
                 } else if ("float".equals(type)) {
-                    FloatParameter fp = new FloatParameter(type, id);
+                    FloatParameter fp = new FloatParameter(cType, type, id);
                     p = fp;
                 } else if ("integer".equals(type)) {
-                    IntParameter ip = new IntParameter(type, id);
+                    IntParameter ip = new IntParameter(cType, type, id);
                     p = ip;
                 } else if ("magnets".equals(type)) {
-                    MagnetParameter mp = new MagnetParameter(type, id);
+                    MagnetParameter mp = new MagnetParameter(cType, type, id);
                     readMagnets(current, mp);
                     p = mp;
                 } else if ("filler".equals(type)) {
-                    FillerParameter fp = new FillerParameter(type, id);
+                    FillerParameter fp = new FillerParameter(cType, type, id);
                     readFiller(current, fp);
                     p = fp;
                 } else if ("range".equals(type)) {
-                    RangeParameter rp = new RangeParameter(type, id);
+                    RangeParameter rp = new RangeParameter(cType, type, id);
                     float min = parseFloat("min", map);
                     float max = parseFloat("max", map);
                     float step = parseFloat("step", map);
@@ -193,44 +214,49 @@ public class ObjectTypeReader implements AssetLoader {
                     rp.setStep(step);
                     p = rp;
                 } else if ("object".equals(type)) {
-                    ObjectParameter op = new ObjectParameter(type, id);
+                    ObjectParameter op = new ObjectParameter(cType, type, id);
                     p = op;
                 } else if ("sound".equals(type)) {
-                    ObjectParameter op = new ObjectParameter(type, id);
+                    ObjectParameter op = new ObjectParameter(cType, type, id);
                     p = op;
                 } else if ("gmf_object".equals(type)) {
-                    ObjectParameter op = new ObjectParameter(type, id);
+                    ObjectParameter op = new ObjectParameter(cType, type, id);
                     p = op;
                 } else if ("action".equals(type)) {
-                    ActionParameter ap = new ActionParameter(type, id);
+                    ActionParameter ap = new ActionParameter(cType, type, id);
                     String method = this.getAttrContent("method", map);
                     ap.setMethodName(method);
                     p = ap;
                 } else if ("boolean".equals(type)) {
-                    BooleanParameter bp = new BooleanParameter(type, id);
+                    BooleanParameter bp = new BooleanParameter(cType, type, id);
                     p = bp;
                 } else if ("enumlist".equals(type)) {
-                    EnumListParameter elp = new EnumListParameter(type, id);
+                    EnumListParameter elp = new EnumListParameter(cType, type, id);
                     String enumClass = this.getAttrContent("enumclass", map);
                     elp.setEnumClass(enumClass);
                     p = elp;
-                }else if ("fuzzy".equals(type)){
-                    FuzzyParameter frp = new FuzzyParameter(type,id);
+                } else if ("fuzzy".equals(type)) {
+                    FuzzyParameter frp = new FuzzyParameter(cType, type, id);
                     p = frp;
-                    
-                }else if ("connector".equals(type)){
-                    ConnectorParameter frp = new ConnectorParameter(type,id);
+
+                } else if ("connector".equals(type)) {
+                    ConnectorParameter frp = new ConnectorParameter(cType, type, id);
                     p = frp;
-                    
+
+                } else if ("file".equals(type)){
+                    String extension = this.getAttrContent("extension",map);
+                    FileParameter fp = new FileParameter(cType,type,id);
+                    fp.setExtension(extension);
+                    p = fp;
                 }
                 if (p != null) {
-                    if ( "list".equals(collectionType)){
-                        ListParameter lp = new ListParameter(type,p);
+                    if ("list".equals(collectionType)) {
+                        ListParameter lp = new ListParameter(cType, type, id, p);
                         parent.addParameter(lp);
-                    }else if ( "dictionary".equals(collectionType)){
-                        DictionaryParameter dp = new DictionaryParameter(collectionType,id, p);
+                    } else if ("dictionary".equals(collectionType)) {
+                        DictionaryParameter dp = new DictionaryParameter(cType, collectionType, id, p);
                         parent.addParameter(dp);
-                    }else{
+                    } else {
                         parent.addParameter(p);
                     }
                     p.setLabel(label);
@@ -240,7 +266,7 @@ public class ObjectTypeReader implements AssetLoader {
         }
     }
 
-    private void readDefaults(Node parentNode, DefaultSection parent) {
+    private void readDefaults(Node parentNode, DefaultSection parent, ComponentType cType) {
         NodeList parameters = parentNode.getChildNodes();
         for (int i = 0; i < parameters.getLength(); ++i) {
             Node current = parameters.item(i);
@@ -251,21 +277,21 @@ public class ObjectTypeReader implements AssetLoader {
                 String value = getAttrContent("value", map);
                 if ("float3".equals(type)) {
                     Vector3f v = parseFloat3(value);
-                    parent.addParameter(new Float3Parameter(type, id, v));
+                    parent.addParameter(new Float3Parameter(cType,type, id, v));
                 } else if ("string".equals(type)) {
-                    parent.addParameter(new TextParameter(type, id));
+                    parent.addParameter(new TextParameter(cType,type, id));
                 } else if ("choice".equals(type)) {
-                    ChoiceParameter cp = new ChoiceParameter(type, id);
+                    ChoiceParameter cp = new ChoiceParameter(cType,type, id);
                     readChoices(current, cp);
                     parent.addParameter(cp);
                 } else if ("color".equals(type)) {
-                    ColorParameter cp = new ColorParameter(type, id);
+                    ColorParameter cp = new ColorParameter(cType,type, id);
                     parent.addParameter(cp);
                 } else if ("float".equals(type)) {
-                    FloatParameter fp = new FloatParameter(type, id);
+                    FloatParameter fp = new FloatParameter(cType,type, id);
                     parent.addParameter(fp);
                 } else if ("boolean".equals(type)) {
-                    BooleanParameter bp = new BooleanParameter(type, id);
+                    BooleanParameter bp = new BooleanParameter(cType,type, id);
                     parent.addParameter(bp);
                 }
             }
@@ -480,6 +506,56 @@ public class ObjectTypeReader implements AssetLoader {
             }
         } else {
             return new Vector3f(0, 0, 0);
+        }
+    }
+
+    /**
+     * Reads the components that were declared.
+     *
+     * @param current the current components node.
+     */
+    private void readComponents(ObjectTypeCategory result, Node current) {
+        NodeList nl = current.getChildNodes();
+        for (int i = 0; i < nl.getLength(); ++i) {
+            Node child = nl.item(i);
+            if (child.getNodeName().equals("component")) {
+                NamedNodeMap attrs = child.getAttributes();
+                String id = getAttrContent("id", attrs);
+                int order = XMLUtils.parseInt("order", attrs);
+                if ( order == 0 ){
+                    order = Integer.MAX_VALUE;
+                }
+                String className = getAttrContent("className", attrs);
+
+                ComponentType ct = new ComponentType();
+                ct.setId(id);
+                ct.setClassName(className);
+                ct.setOrder(order);
+                result.addComponent(ct);
+
+                this.readParameterSections(child, ct);
+
+                // loop through all the parameters and set
+                // the component type as parent.
+
+                for (Parameter p : ct.getAllParameters()) {
+                    p.setComponentType(ct);
+                }
+            }
+        }
+    }
+
+    private void readComponents(ObjectTypeCategory parent, Node current, ObjectType ot) {
+        NodeList nl = current.getChildNodes();
+        for (int i = 0; i < nl.getLength(); ++i) {
+            Node child = nl.item(i);
+            if (child.getNodeName().equals("component")) {
+                String id = getAttrContent("id", child.getAttributes());
+                ComponentType ct = parent.getComponent(id);
+                if (ct != null) {
+                    ot.addComponentType(ct);
+                }
+            }
         }
     }
 }
