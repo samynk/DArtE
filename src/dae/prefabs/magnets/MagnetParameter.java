@@ -1,9 +1,6 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.prefabs.magnets;
 
+import dae.components.ComponentType;
 import dae.prefabs.parameters.Parameter;
 import java.util.ArrayList;
 
@@ -16,8 +13,14 @@ public class MagnetParameter extends Parameter {
     private ArrayList<Magnet> magnets = new ArrayList<Magnet>();
     private Magnet pivotMagnet;
 
-    public MagnetParameter(String label, String id) {
-        super(label, id);
+      /**
+     * Creates a new manger parameter.
+     * @param componentType the component type of the action parameter.
+     * @param type the type of the parameter (string, int, float, color, ...)
+     * @param id the id of the property of the prefab or component.
+     */
+    public MagnetParameter(ComponentType componentType,String type, String id) {
+        super(componentType, type, id);
     }
 
     public void addMagnet(Magnet magnet) {
