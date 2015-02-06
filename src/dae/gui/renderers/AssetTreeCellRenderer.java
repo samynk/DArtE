@@ -23,6 +23,7 @@ public class AssetTreeCellRenderer extends DefaultTreeCellRenderer {
     private Icon imgKlatch;
     private Icon imgRig;
     private Icon imgSound;
+    private Icon imgAnimationSet;
     
 
 
@@ -33,6 +34,7 @@ public class AssetTreeCellRenderer extends DefaultTreeCellRenderer {
         imgKlatch = new ImageIcon(loader.getImage("/dae/icons/klatch.png"));
         imgRig = new ImageIcon(loader.getImage("/dae/icons/body.png"));
         imgSound = new ImageIcon(loader.getImage("/dae/icons/sound.png"));
+        imgAnimationSet = new ImageIcon(loader.getImage("/dae/icons/animationset.png"));
     }
 
     @Override
@@ -49,6 +51,8 @@ public class AssetTreeCellRenderer extends DefaultTreeCellRenderer {
                     label.setIcon(imgRig);
                 }else if (node.getExtension().equals("ogg") || node.getExtension().equals("wav")){
                     label.setIcon(imgSound);
+                }else if (node.getExtension().equals("animset")){
+                    label.setIcon(imgAnimationSet);
                 }
             }
         }
