@@ -4,6 +4,7 @@
  */
 package dae.prefabs.types;
 
+import dae.components.ComponentType;
 import java.util.HashMap;
 
 /**
@@ -13,6 +14,7 @@ import java.util.HashMap;
 public class ObjectTypeCategory {
 
     private HashMap<String, ObjectTypeCollection> categories = new HashMap<String, ObjectTypeCollection>();
+    private HashMap<String, ComponentType> components = new HashMap<String, ComponentType>();
 
     public ObjectTypeCategory() {
     }
@@ -42,5 +44,22 @@ public class ObjectTypeCategory {
             }
         }
         return null;
+    }
+
+    /**
+     * Adds a component to the list of components.
+     * @param comp the component to add.
+     */
+    public void addComponent(ComponentType comp) {
+        components.put(comp.getId(),comp);
+    }
+    
+    /**
+     * Gets the component with the specified id.
+     * @param id the id of the component.
+     * @return the base component object.
+     */
+    public ComponentType getComponent(String id){
+        return components.get(id);
     }
 }
