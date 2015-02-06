@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.animation.event;
 
 import dae.prefabs.Prefab;
@@ -9,7 +5,7 @@ import dae.prefabs.Prefab;
 /**
  * Interface that enables an object to listen to transformation
  * changes in a Prefab object.
- * @author samyn_000
+ * @author Koen Samyn
  */
 public interface TransformListener {
     /**
