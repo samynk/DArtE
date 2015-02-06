@@ -1,10 +1,7 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.prefabs.ui;
 
 import dae.prefabs.Prefab;
+import dae.prefabs.ReflectionManager;
 import dae.prefabs.parameters.Parameter;
 import dae.prefabs.parameters.RangeParameter;
 import javax.swing.SpinnerNumberModel;
@@ -13,7 +10,7 @@ import javax.swing.event.ChangeListener;
 
 /**
  *
- * @author samyn_000
+ * @author Koen Samyn
  */
 public class RangeParameterUI extends javax.swing.JPanel implements ParameterUI, ChangeListener {
 
@@ -38,55 +35,54 @@ public class RangeParameterUI extends javax.swing.JPanel implements ParameterUI,
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        lblPropertyName = new javax.swing.JLabel();
         spnValue = new javax.swing.JSpinner();
 
         setLayout(new java.awt.GridBagLayout());
 
-        lblPropertyName.setText("Label :");
-        lblPropertyName.setPreferredSize(new java.awt.Dimension(100, 14));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        add(lblPropertyName, gridBagConstraints);
-
         spnValue.setModel(new javax.swing.SpinnerNumberModel(Double.valueOf(0.0d), null, null, Double.valueOf(1.0d)));
+        spnValue.setMinimumSize(null);
+        spnValue.setPreferredSize(null);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 0);
         add(spnValue, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel lblPropertyName;
     private javax.swing.JSpinner spnValue;
     // End of variables declaration//GEN-END:variables
 
     public void setParameter(Parameter p) {
         this.p = p;
-        lblPropertyName.setText(p.getId());
         RangeParameter rp = (RangeParameter) p;
         SpinnerNumberModel model1 = new SpinnerNumberModel(rp.getDefaultValue(), rp.getMin(), rp.getMax(), rp.getStep()); 
         
         spnValue.setModel(model1);
     }
     
-    public void setLabel(String label) {
-        lblPropertyName.setText(label);
+    public Parameter getParameter(){
+        return p;
     }
     
     public void setNode(Prefab currentSelectedNode) {
         spnValue.removeChangeListener(this);
         this.currentPrefab = currentSelectedNode;
-        Object value = currentSelectedNode.getParameter(p.getId());
+        Object value = ReflectionManager.getInstance().invokeGetMethod(currentSelectedNode,p); 
         this.spnValue.setValue(value);
         spnValue.addChangeListener(this);
     }
     
     public void stateChanged(ChangeEvent e) {
         Double d = (Double)spnValue.getValue();        
-        currentPrefab.setParameter(p.getId(), d.floatValue(), true);
+        currentPrefab.setParameter(p, d.floatValue(), true);
+    }
+    
+    /**
+     * Checks if a label should be created for the UI.
+     * @return true if a label should be created, false othwerise.
+     */
+    public boolean needsLabel(){
+        return true;
     }
 }

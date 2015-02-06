@@ -2,6 +2,7 @@ package dae.prefabs.ui;
 
 import dae.GlobalObjects;
 import dae.prefabs.Prefab;
+import dae.prefabs.ReflectionManager;
 import dae.prefabs.parameters.Parameter;
 import dae.prefabs.standard.SoundEntity;
 import dae.prefabs.ui.classpath.FileNode;
@@ -36,18 +37,10 @@ public class SoundParameterUI extends javax.swing.JPanel implements ParameterUI 
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        lblLabel = new javax.swing.JLabel();
         txtObjectName = new javax.swing.JTextField();
         btnPickSound = new javax.swing.JButton();
 
         setLayout(new java.awt.GridBagLayout());
-
-        lblLabel.setText("Label :");
-        lblLabel.setPreferredSize(new java.awt.Dimension(100, 14));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        add(lblLabel, gridBagConstraints);
 
         txtObjectName.setEditable(false);
         txtObjectName.setPreferredSize(null);
@@ -88,7 +81,7 @@ public class SoundParameterUI extends javax.swing.JPanel implements ParameterUI 
             // todo replace with query in application extension registry.
             FileNode fn = GlobalObjects.getInstance().selectAsset(rootComponent, this, currentProject, "Select sound", "oog|wav");
             if (currentNode instanceof SoundEntity && fn != null) {
-                currentNode.setParameter(parameter.getId(),fn.getFullName(),true);
+                currentNode.setParameter(parameter,fn.getFullName(),true);
                 txtObjectName.setText(fn.getFullName());
             }
         }
@@ -96,17 +89,29 @@ public class SoundParameterUI extends javax.swing.JPanel implements ParameterUI 
 
     public void setParameter(Parameter p) {
         this.parameter = p;
-        lblLabel.setText(parameter.getLabel());
+        
+    }
+    
+    public Parameter getParameter(){
+        return parameter;
     }
 
     public void setNode(Prefab currentSelectedNode) {
         this.currentNode = currentSelectedNode;
-        txtObjectName.setText(currentSelectedNode.getParameter(parameter.getId()).toString());
+        Object value = ReflectionManager.getInstance().invokeGetMethod(currentSelectedNode,parameter); 
+        txtObjectName.setText(value.toString());
+    }
+    
+    /**
+     * Checks if a label should be created for the UI.
+     * @return true if a label should be created, false othwerise.
+     */
+    public boolean needsLabel(){
+        return true;
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnPickSound;
-    private javax.swing.JLabel lblLabel;
     private javax.swing.JTextField txtObjectName;
     // End of variables declaration//GEN-END:variables
 }

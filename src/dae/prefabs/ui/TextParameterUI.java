@@ -1,12 +1,8 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.prefabs.ui;
 
 import dae.prefabs.Prefab;
+import dae.prefabs.ReflectionManager;
 import dae.prefabs.parameters.Parameter;
-import dae.prefabs.standard.UpdateObject;
 
 /**
  *
@@ -29,6 +25,12 @@ public class TextParameterUI extends javax.swing.JPanel implements ParameterUI {
     public void setParameter(Parameter p) {
         this.parameter = p;
     }
+    
+    public Parameter getParameter(){
+        return parameter;
+    }
+    
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -41,59 +43,40 @@ public class TextParameterUI extends javax.swing.JPanel implements ParameterUI {
         java.awt.GridBagConstraints gridBagConstraints;
 
         jLabel1 = new javax.swing.JLabel();
-        lblLabel = new javax.swing.JLabel();
         txtMessage = new javax.swing.JTextField();
 
         jLabel1.setText("jLabel1");
 
-        setMinimumSize(null);
         setLayout(new java.awt.GridBagLayout());
-
-        lblLabel.setText("Label : ");
-        lblLabel.setPreferredSize(new java.awt.Dimension(100, 14));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        add(lblLabel, gridBagConstraints);
-
-        txtMessage.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyTyped(java.awt.event.KeyEvent evt) {
-                txtMessageKeyTyped(evt);
-            }
-        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 0);
         add(txtMessage, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void txtMessageKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtMessageKeyTyped
-        // TODO add your handling code here:
-        if ( !disregardEvent )
-        {
-            currentNode.setParameter(parameter.getId(), txtMessage.getText(), true);
-        }
-    }//GEN-LAST:event_txtMessageKeyTyped
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel lblLabel;
     private javax.swing.JTextField txtMessage;
     // End of variables declaration//GEN-END:variables
 
-    public void setLabel(String id) {
-        lblLabel.setText(id);
-    }
+    
 
     @Override
     public void setNode(Prefab currentSelectedNode) {
         currentNode = currentSelectedNode;
-        String property = parameter.getId();
-        Object value = currentSelectedNode.getParameter(property);
+        Object value = ReflectionManager.getInstance().invokeGetMethod(currentSelectedNode, parameter);
         if (value != null) {
             disregardEvent = true;
-            txtMessage.setText(currentSelectedNode.getParameter(property).toString());
+            txtMessage.setText(value.toString());
             disregardEvent = false;
         }
+    }
+    
+    /**
+     * Checks if a label should be created for the UI.
+     * @return true if a label should be created, false othwerise.
+     */
+    public boolean needsLabel(){
+        return true;
     }
 }
