@@ -799,8 +799,9 @@ public class GlobalObjects {
         }
         dialog.setLocationRelativeTo(relative);
         dialog.setTitle(title);
-        dialog.setExtensions(extensions);
         dialog.setProject(currentProject);
+        dialog.setExtensions(extensions);
+        
         
         dialog.setVisible(true);
         if ( dialog.getReturnStatus() == dialog.RET_OK)
