@@ -4,28 +4,35 @@
  */
 package dae.prefabs.types;
 
-import dae.prefabs.parameters.DefaultSection;
-import dae.prefabs.parameters.ParameterSection;
+import com.google.common.io.Files;
+import com.jme3.asset.AssetManager;
+import com.jme3.asset.AssetNotFoundException;
+import com.jme3.asset.ModelKey;
+import dae.components.ComponentList;
+import dae.components.ComponentType;
+import dae.components.PrefabComponent;
+import dae.prefabs.Prefab;
+import dae.prefabs.magnets.FillerParameter;
+import dae.prefabs.magnets.MagnetParameter;
 import dae.prefabs.parameters.Parameter;
-import dae.prefabs.parameters.Float3Parameter;
-import com.jme3.math.Vector3f;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author Koen
  */
-public class ObjectType {
+public class ObjectType extends ParameterSupport {
 
     private String label;
     private String category;
     private String objectClass;
     private String extraInfo;
-    private ArrayList<ParameterSection> parameterSections =
-            new ArrayList<ParameterSection>();
-    private DefaultSection defaults = new DefaultSection();
-    
     private boolean loadFromExtraInfo = false;
+    private ArrayList<ComponentType> componentTypes = new ArrayList<ComponentType>();
+    private HashMap<String,ComponentType> componentMap = new HashMap<String,ComponentType>();
 
     /*
      * Creates a new objectype.
@@ -42,7 +49,7 @@ public class ObjectType {
         this.extraInfo = extraInfo;
         this.loadFromExtraInfo = loadFromExtraInfo;
     }
-    
+
     /**
      * @return the objectToCreate
      */
@@ -83,43 +90,128 @@ public class ObjectType {
         this.objectClass = objectToCreate;
     }
 
-    public void addParameterSection(ParameterSection section) {
-        parameterSections.add(section);
-    }
-
-    public void removeParameterSection(ParameterSection section) {
-        parameterSections.remove(section);
-    }
-
-    public Iterable<ParameterSection> getParameterSections() {
-        return parameterSections;
-    }
-
-    public void setDefaultSection(DefaultSection section) {
-        this.defaults = section;
-    }
-
-    public Vector3f getDefaultVec3Parameter(String property) {
-        Parameter p = defaults.getParameter(property);
-        if (p instanceof Float3Parameter) {
-            return ((Float3Parameter) p).getDefaultValue();
-        } else {
-            return new Vector3f();
-        }
-
-    }
-
-    public Parameter findParameter(String property) {
-        for (ParameterSection ps : this.parameterSections) {
-            Parameter p = ps.getParameter(property);
-            if (p != null) {
-                return p;
-            }
-        }
-        return null;
-    }
-
     public boolean usesDefaultLoader() {
         return this.loadFromExtraInfo;
+    }
+
+    /**
+     * Adds a component type to the object type definition.
+     *
+     * @param ct the component type to add.
+     */
+    public void addComponentType(ComponentType ct) {
+        this.componentTypes.add(ct);
+        componentMap.put(ct.getId(), ct);
+    }
+
+    /**
+     * Returns the list of component types.
+     *
+     * @return the list of component types.
+     */
+    public Iterable<ComponentType> getComponentTypes() {
+        return componentTypes;
+    }
+
+    /**
+     * Creates a Prefab with the info in this object type.
+     *
+     * @param AssetManager manager the AssetManager to use to create the object.
+     * @param name the name of the new object.
+     */
+    public Prefab create(AssetManager manager, String name) {
+        Prefab p = null;
+        if (usesDefaultLoader()) {
+            ModelKey mk = new ModelKey(getExtraInfo());
+            p = (Prefab) manager.loadAsset(mk);
+            loadComponents(manager, p, mk);
+            p.setName(name);
+        } else {
+            try {
+                p = (Prefab) Class.forName(getObjectToCreate()).newInstance();
+                p.create(name, manager, this, getExtraInfo());
+
+                p.setType(getLabel());
+                p.setCategory(getCategory());
+                p.notifyLoaded();
+
+
+                MagnetParameter mp = (MagnetParameter) findParameter("magnets");
+                p.setMagnets(mp);
+
+                FillerParameter fp = (FillerParameter) findParameter("filler");
+                p.setFillers(fp);
+            } catch (InstantiationException ex) {
+                Logger.getLogger(ObjectType.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IllegalAccessException ex) {
+                Logger.getLogger(ObjectType.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(ObjectType.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
+        if ( p != null ){
+            for (ComponentType c: this.componentTypes)
+            {
+                PrefabComponent pc = c.create();
+                if ( pc != null )
+                {
+                    p.addPrefabComponent(pc);
+                }
+            }
+        }
+        
+        return p;
+
+    }
+
+    /**
+     * Loads the components if a components file with the same name exists.
+     *
+     * @param manager the manager object.
+     * @param p the prefab to load the component file from.
+     * @param mk the modelkey of the original object.
+     */
+    private void loadComponents(AssetManager manager, Prefab p, ModelKey mk) {
+        String folder = mk.getFolder();
+        String name = mk.getName();
+        String baseName = Files.getNameWithoutExtension(name);
+        String components = folder + baseName + ".components";
+
+        try {
+            Object result = manager.loadAsset(components);
+            if (result instanceof ComponentList) {
+                ComponentList cl = (ComponentList) result;
+                p.addComponents(cl);
+            }
+        } catch (AssetNotFoundException ex) {
+            // not an error, it is possible that there is no components file.
+        }
+    }
+
+    /**
+     * Returns the component type with the given id.
+     * @param id the id for the component type.
+     * @return the ComponentType or null if no ComponentType with the given id
+     * is found.
+     */
+    public ComponentType getComponentType(String id) {
+        return this.componentMap.get(id);
+    }
+    
+    /**
+     * Finds the parameter that is bound to the given component for the
+     * given property.
+     * @param transformComponent
+     * @param property
+     * @return the Parameter object or null if the parameter is not found.
+     */
+    public Parameter findParameter(String componentId, String property) {
+        ComponentType ct = componentMap.get(componentId);
+        if ( ct != null ){
+            return ct.findParameter(property);
+        }else{
+            return null;
+        }
     }
 }
