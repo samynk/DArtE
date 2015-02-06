@@ -11,6 +11,7 @@ import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.util.HashMap;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.border.TitledBorder;
 
 /**
@@ -40,17 +41,17 @@ public class ParameterPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        setBorder(javax.swing.BorderFactory.createTitledBorder("Parameter Section"));
+        setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 1, 0, new java.awt.Color(0, 0, 0)), javax.swing.BorderFactory.createEmptyBorder(2, 0, 4, 0)));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 388, Short.MAX_VALUE)
+            .addGap(0, 400, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 275, Short.MAX_VALUE)
+            .addGap(0, 291, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -58,13 +59,26 @@ public class ParameterPanel extends javax.swing.JPanel {
 
     public void setParameterSection(ParameterSection ps) {
         this.parameterSection = ps;
-        ((TitledBorder) this.getBorder()).setTitle(parameterSection.getName());
     }
 
     public void addParameterUI(String id, ParameterUI pUI, GridBagConstraints gbc) {
         parameterUI.put(id, pUI);
         add((JComponent) pUI, gbc);
-        revalidate();
+
+        setSmallSize((JComponent) pUI);
+
+        if (pUI.needsLabel()) {
+            gbc.gridx = 0;
+            gbc.weightx = 0;
+            gbc.insets.left = 10;
+            JLabel label = new JLabel(pUI.getParameter().getLabel());
+            label.putClientProperty("JComponent.sizeVariant", "small");
+            add(label, gbc);
+            gbc.insets.left = 0;
+            gbc.weightx = 1;
+            gbc.gridx = 1;
+        }
+        gbc.gridy++;
     }
 
     public void setNode(Prefab currentSelectedNode) {
@@ -72,6 +86,14 @@ public class ParameterPanel extends javax.swing.JPanel {
             if (c instanceof ParameterUI) {
                 ParameterUI pui = (ParameterUI) c;
                 pui.setNode(currentSelectedNode);
+            }
+        }
+    }
+
+    private void setSmallSize(JComponent panel) {
+        for (Component c : panel.getComponents()) {
+            if (c instanceof JComponent) {
+                ((JComponent) c).putClientProperty("JComponent.sizeVariant", "small");
             }
         }
     }
