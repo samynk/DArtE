@@ -11,6 +11,8 @@ import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
+import dae.GlobalObjects;
+import dae.prefabs.types.ObjectType;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Level;
@@ -407,7 +409,8 @@ public class BodyLoader implements AssetLoader {
         Vector3f rotation = parseVector3f(srotation);
 
         Handle result = new Handle();
-        result.create(sname, this.assetManager, null);
+        ObjectType type = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Animation", "TwoAxisHandle");
+        result.create(sname, this.assetManager, type, null);
         result.setTransformation(location, rotation);
         return result;
     }
