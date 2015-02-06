@@ -27,8 +27,11 @@ public class DAEFlyByCamera extends FlyByCamera {
      * @param cam
      */
     public DAEFlyByCamera(Camera cam){
-        super(cam);
-   
+        super(cam); 
+    }
+    
+    public Camera getCamera(){
+        return cam;
     }
 
     /**
