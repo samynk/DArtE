@@ -2,20 +2,24 @@ package dae.project;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.bullet.collision.shapes.BoxCollisionShape;
+import com.jme3.bullet.collision.shapes.PlaneCollisionShape;
 import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Matrix3f;
+import com.jme3.math.Plane;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.shape.Box;
 import com.jme3.texture.Texture;
 import dae.GlobalObjects;
+import dae.components.ComponentType;
 import dae.prefabs.AxisEnum;
 import dae.prefabs.Prefab;
 import dae.prefabs.magnets.GridMagnet;
 import dae.prefabs.magnets.MagnetParameter;
+import dae.prefabs.types.ObjectType;
 
 /**
  *
@@ -33,8 +37,7 @@ public class Grid extends Prefab {
 
     public Grid() {
         this.setName("Ground");
-        this.setCategory("Standard");
-        this.setType("Ground");
+        objectType = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Standard", "Ground");
     }
 
     /**
@@ -45,8 +48,8 @@ public class Grid extends Prefab {
      */
     public Grid(float width, float length, Material groundMaterial) {
         this.setName("Ground");
-        this.setCategory("Standard");
-        this.setType("Ground");
+        objectType = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Standard", "Ground");
+        
         this.width = width;
         this.length = length;
 
@@ -54,15 +57,13 @@ public class Grid extends Prefab {
     }
 
     @Override
-    public void create(String name, AssetManager manager, String extraInfo) {
+    public void create(String name, AssetManager manager, ObjectType type, String extraInfo) {
         this.setName(name);
         this.setCategory("Standard");
         this.setType("Ground");
 
         Material mat = createStandardMaterial(manager, "Textures/refPattern.png", Texture.WrapMode.Repeat, ColorRGBA.White);
         initialize(mat);
-        
-        
     }
 
     public float getWidth() {
@@ -121,23 +122,23 @@ public class Grid extends Prefab {
 
         // set the cube's material
         magnet = new GridMagnet();
-        BoxCollisionShape shape;
+        PlaneCollisionShape shape;
         if (currentUpAxis == AxisEnum.Z) {
             attachChild(zGeometry);
             magnet.setRotationAxis(Vector3f.UNIT_Z);
             currentGeometry = zGeometry;
-            shape = new BoxCollisionShape(new Vector3f(width,length,0.01f));
+            shape = new PlaneCollisionShape(new Plane(Vector3f.UNIT_Z,0));
         } else {
             attachChild(yGeometry);
             magnet.setRotationAxis(Vector3f.UNIT_Y);
             currentGeometry = yGeometry;
-            shape = new BoxCollisionShape(new Vector3f(width,0.01f,length));
+            shape = new PlaneCollisionShape(new Plane(Vector3f.UNIT_Y,0));
         }
 
-
+        
         magnet.setLocalFrame(Matrix3f.IDENTITY);
         magnet.setRotationRange(GlobalObjects.getInstance().getDefaultRotationRange());
-        MagnetParameter mp = new MagnetParameter("grid", "grid");
+        MagnetParameter mp = new MagnetParameter(ComponentType.PREFAB,"grid", "grid");
         mp.addMagnet(magnet);
         this.setMagnets(mp);
         
