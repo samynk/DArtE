@@ -11,7 +11,6 @@ import com.jme3.bounding.BoundingVolume;
 import com.jme3.bounding.BoundingVolume.Type;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.bullet.PhysicsSpace;
-import com.jme3.bullet.control.PhysicsControl;
 import com.jme3.collision.CollisionResult;
 import com.jme3.collision.CollisionResults;
 import com.jme3.cursors.plugins.JmeCursor;
@@ -511,21 +510,6 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
         return this.objectsToCreate;
     }
 
-    private Material createAlphaMaterial(ColorRGBA color) {
-        Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        mat.setColor("Color", color);
-        mat.setTransparent(true);
-        mat.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
-
-        return mat;
-    }
-
-    private Material createColorMaterial(ColorRGBA color) {
-        Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        mat.setColor("Color", color);
-        return mat;
-    }
-
     /**
      *
      */
@@ -786,11 +770,8 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
 
                 this.level.levelShown(this.assetManager, bas);
                 editorState = EditorState.IDLE;
-
+                level.updateGeometricState();
                 bas.getPhysicsSpace().addAll(level);
-
-                // for nodes that need the physics space to create physics controls.
-
 
                 CameraFrame cf = level.getLastCamera();
                 if (cf != null) {
@@ -905,11 +886,11 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
                 Quaternion moLocalRot = g.getWorldRotation();
 
                 currentInsertion.setLocalRotation(moLocalRot);
-                currentInsertion.setLocalTranslation(magnetLocWorld);
+                setLocationOnPrefab((Prefab) currentInsertion, magnetLoc, false);
             }
         } else if (prefab == null) {
             if (currentInsertion instanceof Prefab) {
-                ((Prefab) currentInsertion).setLocalPrefabTranslation(point);
+                setLocationOnPrefab((Prefab) currentInsertion, point, false);
                 ((Prefab) currentInsertion).setLocalPrefabRotation(rotation);
             } else {
                 currentInsertion.setLocalTranslation(point);
@@ -961,7 +942,7 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
                     if (currentInsertion instanceof Prefab) {
 
                         Prefab p = (Prefab) currentInsertion;
-                        p.setLocalPrefabTranslation(point.subtract(p.getPivot()));
+                        setLocationOnPrefab((Prefab)currentInsertion, point.subtract(p.getPivot()), false);
                         if (closestMagnet.hasLocalFrame()) {
                             p.setLocalPrefabRotation(insertRotation);
                         } else {
@@ -981,7 +962,7 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
             } else {
                 if (currentInsertion instanceof Prefab) {
                     Prefab p = (Prefab) currentInsertion;
-                    p.setLocalPrefabTranslation(point.subtract(p.getPivot()));
+                    setLocationOnPrefab(p, point.subtract(p.getPivot()), false);
                     p.setLocalPrefabRotation(rotation);
                 } else {
                     currentInsertion.setLocalTranslation(point);
@@ -1541,6 +1522,9 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
     private void removeNode(dae.project.Level level, Node n) {
         if (n instanceof Prefab) {
             Prefab p = (Prefab) n;
+            // remove the physics
+            BulletAppState bas = this.stateManager.getState(BulletAppState.class);
+            bas.getPhysicsSpace().removeAll(p);
             ProjectTreeNode parent = p.getProjectParent();
             if (parent != null) {
                 int childIndex = parent.getIndexOfChild(p);
@@ -1731,5 +1715,15 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
 
     public void setFlyByCamera(FlyByCamera flyCam) {
         this.flyCam = flyCam;
+    }
+
+    private void setLocationOnPrefab(Prefab prefab, Vector3f translation, boolean undoable) {
+        ObjectType oType = prefab.getObjectType();
+        if (oType != null) {
+            Parameter ptrans = oType.findParameter("TransformComponent", "translation");
+            if (ptrans != null) {
+                ptrans.invokeSet(prefab, translation, undoable);
+            }
+        }
     }
 }
