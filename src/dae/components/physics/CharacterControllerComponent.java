@@ -27,8 +27,6 @@ public class CharacterControllerComponent extends PrefabComponent {
         parent.addControl(characterControl);
         if (PhysicsSpace.getPhysicsSpace() != null) {
             PhysicsSpace.getPhysicsSpace().add(characterControl);
-        }else{
-            characterControl.setEnabled(false);
         }
     }
 
