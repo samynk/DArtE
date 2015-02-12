@@ -5,6 +5,7 @@
 package dae.prefab.standard;
 
 import dae.animation.rig.Rig;
+import dae.components.ComponentType;
 import dae.prefabs.Prefab;
 import dae.prefabs.parameters.DictionaryParameter;
 import dae.prefabs.parameters.ObjectParameter;
@@ -39,7 +40,7 @@ public class DictionaryParameterTest {
     @Before
     public void setUp() {
         rig = new Rig();
-        parameter = new DictionaryParameter("dictionary", "target", new ObjectParameter("object", "target"));
+        parameter = new DictionaryParameter(ComponentType.PREFAB,"dictionary", "target", new ObjectParameter( ComponentType.PREFAB,"object", "target"));
 
         assertEquals("Number of keys at start should be zero", rig.getNrOfTargetKeys(), 0);
         assertEquals("Property should be equal to target", parameter.getProperty(), "Target");
