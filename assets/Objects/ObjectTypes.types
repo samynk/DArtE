@@ -5,31 +5,105 @@ and open the template in the editor.
 -->
 
 
-<objects>
-    <collection name="Standard" >
-        <object label="Crate" class="dae.prefabs.standard.CrateObject">
+<prefabs>
+    <components>
+        <component id="AnimationComponent" className="dae.components.AnimationComponent">
+            <parameters section="Animation">
+                <parameter type="file" id="animationSet" extension="animset"/>
+                <parameter type="choice" id="animation" listento="animationSet" values="animations" />
+            </parameters>
+        </component>
+         <component id="PathComponent" className="dae.components.animation.PathComponent">
+            <parameters section="Path">
+                <parameter type="object" id="path" classFilter="dae.animation.custom.CharacterPath"/>
+                <parameter type="float" id="speed" />
+                <parameter type="action" id="walk" method="walk"/>
+            </parameters>
+        </component>
+        <component id="PersonalityComponent" className="dae.components.PersonalityComponent">
+            <parameters section="Personality">
+                <parameter type="range" id="bully" min="0" max="10" step="0.1"/>
+                <parameter type="range" id="friendly" min="0" max="10" step="0.1"/>
+            </parameters>
+        </component>
+        <component id="PhysicsBoxComponent" className="dae.components.physics.PhysicsBoxComponent">
+            <parameters section="Physics">
+                <parameter type="range" id="mass" min="0" max="100" step="0.1"/>
+                <parameter type="float" id="friction"/>
+                <parameter type="float" id="restitution" />
+                <parameter type="float" id="linearDamping"/>
+                <parameter type="float3" id="dimension" />
+                <parameter type="integer" id="collisionGroup" constraint="positive"/>
+                <parameter type="action" id="drop" method="drop"/>
+            </parameters>
+        </component>
+        <component id="CharacterControllerComponent" className="dae.components.physics.CharacterControllerComponent">
+            <parameters section="Physics">
+                <parameter type="range" id="mass" min="0" max="100" step="0.1"/>
+                <parameter type="float" id="radius"/>
+                <parameter type="float" id="height" />
+                <parameter type="integer" id="collisionGroup" constraint="positive"/>
+            </parameters>
+        </component>
+        <component id="PhysicsConvexComponent" className="dae.components.physics.PhysicsConvexComponent">
+            <parameters section="Physics">
+                <parameter type="range" id="mass" min="0" max="100" step="0.1"/>
+                <parameter type="float" id="friction"/>
+                <parameter type="float" id="restitution" />
+                <parameter type="float" id="linearDamping"/>
+                <parameter type="integer" id="collisionGroup" constraint="positive"/>
+                <parameter type="action" id="drop" method="drop"/>
+            </parameters>
+        </component>
+        <component id="PhysicsConcaveComponent" className="dae.components.physics.PhysicsConcaveComponent">
+            <parameters section="Physics">
+                <parameter type="float" id="friction"/>
+                <parameter type="integer" id="collisionGroup" constraint="positive"/>
+            </parameters>
+        </component>
+        <component id="PhysicsTerrainComponent" className="dae.components.physics.PhysicsTerrainComponent">
+            <parameters section="Physics">
+                <parameter type="float" id="friction"/>
+                <parameter type="integer" id="collisionGroup" constraint="positive"/>
+            </parameters>
+        </component>
+        <component id="TransformComponent" className="dae.components.TransformComponent" order="1">
             <parameters section="Transform">
+                <parameter type="float3" id="translation"/>
+                <parameter type="float3" id="rotation" converter="dae.prefabs.parameters.converter.QuaternionConverter"/>
+                <parameter type="float3" id="scale"/>
+            </parameters>
+        </component>
+    </components>
+    <collection name="Standard" >
+        <object label="Ground" class="dae.projects.Grid">
+            <parameters section="Transform">
+                <parameter type="float3" id="localTranslation"/>
+                <parameter type="float" id="width"/>
+                <parameter type="float" id="length"/>
+            </parameters>
+        </object>
+
+        <object label="Crate" class="dae.prefabs.standard.CrateObject">
+            <component id="TransformComponent"/>
+            <parameters section="Object">
                 <parameter type="string" id="name"/>
-                <parameter type="float3" id="localPrefabTranslation"/>
-                <parameter type="float3" id="localPrefabRotation" converter="dae.prefabs.parameters.converter.QuaternionConverter"/>
                 <parameter type="float3" id="dimension"/>
                 <parameter type="action" id="drop" method="drop"/>
             </parameters>
         </object>
         <object label="Sphere" class="dae.prefabs.standard.SphereObject">
-            <parameters section="Transform">
+            <component id="TransformComponent"/>
+            <parameters section="Object">
                 <parameter type="string" id="name"/>
-                <parameter type="float3" id="localPrefabTranslation"/>
-                <parameter type="float3" id="localPrefabRotation" converter="dae.prefabs.parameters.converter.QuaternionConverter"/>
                 <parameter type="float" id="radius"/>
                 <parameter type="action" id="drop" method="drop"/>
             </parameters>
         </object>
         <object label="Cylinder" class="dae.prefabs.standard.CylinderObject">
-            <parameters section="Transform">
+            <component id="TransformComponent"/>
+            <parameters section="Object">
                 <parameter type="string" id="name"/>
-                <parameter type="float3" id="localPrefabTranslation"/>
-                <parameter type="float3" id="localPrefabRotation" converter="dae.prefabs.parameters.converter.QuaternionConverter"/>
             </parameters>
             <parameters section="Physics">
                 <parameter type="float" id="mass"/>
@@ -43,11 +117,7 @@ and open the template in the editor.
             </parameters>
         </object>
         <object label="HingeJoint" class="dae.prefabs.physics.JointPrefab">
-            <parameters section="Transform">
-                <parameter type="string" id="name"/>
-                <parameter type="float3" id="localPrefabTranslation"/>
-                <parameter type="float3" id="localPrefabRotation" converter="dae.prefabs.parameters.converter.QuaternionConverter"/>
-            </parameters>
+            <component id="TransformComponent"/>
             <parameters section="Physics">
                 <parameter type="float" id="lowerLimit"/>
                 <parameter type="float" id="upperLimit"/>
@@ -61,126 +131,69 @@ and open the template in the editor.
                 <parameter type="action" id="stop" method="stop"/>
             </parameters>
         </object>
-        <object label="Ground" class="motum.Ground">
-            <parameters section="Transform">
-                <parameter type="float3" id="localTranslation"/>
-                <parameter type="float" id="width"/>
-                <parameter type="float" id="length"/>
-            </parameters>
-        </object>
         <object label="Trigger" class="dae.prefabs.standard.TriggerBox">
-            <parameters section="Transform">
+            <component id="TransformComponent"/>
+            <parameters section="Object">
                 <parameter type="string" id="id"/>
-                <parameter type="float3" id="localTranslation"/>
-                <parameter type="float3" id="localPrefabRotation" converter="dae.prefabs.parameters.converter.QuaternionConverter"/>
                 <parameter type="float" id="width"/>
                 <parameter type="float" id="height"/>
                 <parameter type="float" id="length"/>
             </parameters>
-        </object>
-
-        <object label="MessageBoard" class="motum.objects.prefab.MessageBoardObject">
-            <defaults>
-                <parameter type="float3" id="offset" value="[0,0,1]"/>
-            </defaults>
-            <parameters section="Transform">
-                <parameter type="float3" id="localTranslation"/>
-                <parameter type="float" id="zRotation"/>
-                <parameter type="string" id="text"/>
-            </parameters>
-            <parameters section="Appearance">
-                <parameter type="color" id="fontColor"/>
-            </parameters>
-        </object>
-        
+        </object>  
         <object label="Klatch" class="dae.prefabs.Klatch" defaultloader="true">
-            <parameters section="Transform">
-                <parameter type="string" id="name"/>
-                <parameter type="float3" id="localPrefabTranslation"/>
-                <parameter type="float3" id="localPrefabRotation" converter="dae.prefabs.parameters.converter.QuaternionConverter"/>
-                <parameter type="float3" id="localScale"/>
-                <parameter type="string" id="layer"/>
-                <parameter type="enumlist" id="shadowMode" enumclass="com.jme3.renderer.queue.RenderQueue$ShadowMode"/>
-            </parameters>
+            <component id="TransformComponent"/>
             <parameters section="Appearance">
+                <parameter type="string" id="name"/>
                 <parameter type="boolean" id="wireframe"/>
                 <parameter type="boolean" id="locked"/>
+                <parameter type="enumlist" id="shadowMode" enumclass="com.jme3.renderer.queue.RenderQueue$ShadowMode"/>
             </parameters>
         </object>
         <object label="Mesh" class="dae.prefabs.standard.MeshObject">
-            <parameters section="Transform">
+            <component id="TransformComponent"/>
+            <parameters section="Object">
                 <parameter type="string" id="name"/>
-                <parameter type="float3" id="localPrefabTranslation"/>
-                <parameter type="float3" id="localPrefabRotation" converter="dae.prefabs.parameters.converter.QuaternionConverter"/>
-                <parameter type="float3" id="localScale"/>
-                <parameter type="object" id="physicsMesh"/>
-                <parameter type="magnets" id="magnets">
-                    <gridmagnet type="construction"/>
-                    <magnet translation="[0,0,0]" radius="0.02" type="construction,pivot" activePivot="true"/>
-                </parameter>
-                <parameter type="string" id="layer"/>
-                <parameter type="enumlist" id="shadowMode" enumclass="com.jme3.renderer.queue.RenderQueue$ShadowMode"/>
-            </parameters>
-            <parameters section="Appearance">
                 <parameter type="boolean" id="wireframe"/>
                 <parameter type="boolean" id="locked"/>
+                <parameter type="enumlist" id="shadowMode" enumclass="com.jme3.renderer.queue.RenderQueue$ShadowMode"/>
             </parameters>
         </object>
-        <object label="NPC" class="motum.objects.prefab.NPC">
-            <parameters section="Transform">
+        <object label="Terrain" class="dae.prefabs.standard.Terrain">
+            <component id="TransformComponent"/>
+            <parameters section="Terrain">
                 <parameter type="string" id="name"/>
-                <parameter type="string" id="animation"/>
+                <parameter type="file"  id="texture1" extension="dds|png|jpg"/>
+                <parameter type="float" id="tex1Scale" />
+                <parameter type="file"  id="texture2" extension="dds|png|jpg"/>
+                <parameter type="float" id="tex2Scale" />
+                <parameter type="file"  id="texture3" extension="dds|png|jpg"/>
+                <parameter type="float" id="tex3Scale" />
+                <parameter type="file"  id="alphaMap" extension="dds|png|jpg"/>
+                <parameter type="file"  id="heightMap" extension="dds|png|jpg"/>
+            </parameters>
+        </object>
+        <object label="J3ONPC" class="dae.prefabs.standard.J3ONPC">
+            <component id="TransformComponent"/>
+            <component id="PersonalityComponent"/>
+            <parameters section="Appearance">
+                <parameter type="string" id="name"/>
                 <parameter type="string" id="actorName"/>
                 <parameter type="string" id="actorId"/>
-                <parameter type="float" id="xTranslation"/>
-                <parameter type="float" id="yTranslation"/>
-                <parameter type="float" id="zTranslation"/>
-                <parameter type="range" id="xRotation" min="0" max="360" step="1"/>
-                <parameter type="range" id="yRotation" min="0" max="360" step="1"/>
-                <parameter type="range" id="zRotation" min="0" max="360" step="1"/>
-                <parameter type="string" id="waypointTest"/>
-                <parameter type="action" id="doWaypointTest" method="doWaypointTest"/>
-            </parameters>
-        </object>
-        <object label="J3ONPC" class="motum.objects.prefab.J3ONPC">
-            <parameters section="Transform">
-                <parameter type="string" id="name"/>
-                <parameter type="string" id="animation"/>
-                <parameter type="string" id="actorName"/>
-                <parameter type="string" id="actorId"/>
-                <parameter type="float" id="xTranslation"/>
-                <parameter type="float" id="yTranslation"/>
-                <parameter type="float" id="zTranslation"/>
-                <parameter type="range" id="xRotation" min="0" max="360" step="1"/>
-                <parameter type="range" id="yRotation" min="0" max="360" step="1"/>
-                <parameter type="range" id="zRotation" min="0" max="360" step="1"/>
-                <parameter type="string" id="waypointTest"/>
-                <parameter type="action" id="doWaypointTest" method="doWaypointTest"/>
-            </parameters>
-        </object>
-        <object label="Situation" class="motum.objects.prefab.SituationEntity">
-            <parameters section="Transform">
-                <parameter type="string" id="name"/>
-                <parameter type="string" id="eventId"/>
-                <parameter type="float" id="xTranslation"/>
-                <parameter type="float" id="yTranslation"/>
-                <parameter type="float" id="zTranslation"/>
             </parameters>
         </object>
         <object label="Camera" class="dae.prefabs.standard.CameraEntity">
-            <parameters section="Transform">
+            <component id="TransformComponent"/>
+            <parameters section="Appearance">
                 <parameter type="string" id="name"/>
                 <parameter type="string" id="cameraId"/>
-                <parameter type="float3" id="localPrefabTranslation"/>
-                <parameter type="float3" id="localPrefabRotation"/>
                 <parameter type="boolean" id="startCam"/>
                 <parameter type="offscreenrender"/>
             </parameters>
         </object>
         <object label="Sound" class="dae.prefabs.standard.SoundEntity">
+            <component id="TransformComponent"/>
             <parameters section="Transform">
                 <parameter type="string" id="name"/>
-                <parameter type="float3" id="localTranslation"/>
                 <parameter type="sound" id="soundFile"/>
                 <parameter type="range" id="volume" min="0" max="10" step="0.1"/>
                 <parameter type="boolean" id="looping"/>
@@ -191,42 +204,27 @@ and open the template in the editor.
             </parameters>
         </object>
         <object label="PlayerStart" class="dae.prefabs.standard.PlayerStartEntity">
-            <parameters section="Transform">
+            <component id="TransformComponent"/>
+            <parameters section="Object">
                 <parameter type="string" id="name"/>
-                <parameter type="float" id="xTranslation"/>
-                <parameter type="float" id="yTranslation"/>
-                <parameter type="float" id="zTranslation"/>
-                <parameter type="range" id="xRotation" min="0" max="360" step="1"/>
-                <parameter type="range" id="yRotation" min="0" max="360" step="1"/>
-                <parameter type="range" id="zRotation" min="0" max="360" step="1"/>
             </parameters>
         </object>
         <object label="NPCLocation" class="dae.prefabs.standard.NPCLocationEntity">
-            <parameters section="Transform">
+            <component id="TransformComponent"/>
+            <parameters section="Object">
                 <parameter type="string" id="name"/>
-                <parameter type="float" id="xTranslation"/>
-                <parameter type="float" id="yTranslation"/>
-                <parameter type="float" id="zTranslation"/>
-                <parameter type="range" id="yRotation" min="0" max="360" step="1"/>
                 <parameter type="gmf_object" id="npc"/>
                 <parameter type="string" id="animation"/>
             </parameters>
         </object>
         <object label="Waypoint" class="dae.prefabs.standard.WayPointEntity">
+            <component id="TransformComponent"/>
             <parameters section="Transform">
                 <parameter type="string" id="name"/>
-                <parameter type="string" id="waypointId"/>
-                <parameter type="float" id="xTranslation"/>
-                <parameter type="float" id="yTranslation"/>
-                <parameter type="float" id="zTranslation"/>
-                <parameter type="range" id="xRotation" min="0" max="360" step="1"/>
-                <parameter type="range" id="yRotation" min="0" max="360" step="1"/>
-                <parameter type="range" id="zRotation" min="0" max="360" step="1"/>
-                
             </parameters>
         </object>
         <object label="NavigationMesh" class="dae.prefabs.standard.NavigationMesh">
-            <parameters section="Transform">
+            <parameters section="Object">
                 <parameter type="string" id="name"/>
                 <parameter type="object" id="sourceMesh"/>
                 <parameter type="float" id="cellSize" default="0.5" constraint="positive"/>
@@ -251,19 +249,17 @@ and open the template in the editor.
     </collection>
     <collection name="Metadata">
         <object label="Pivot" class="dae.prefabs.gizmos.PivotGizmo">
-            <parameters section="Transform">
+            <component id="TransformComponent"/>
+            <parameters section="Object">
                 <parameter type="string" id="name"/>
-                <parameter type="float3" id="localPrefabTranslation"/>
-                <parameter type="float3" id="localPrefabRotation" converter="dae.prefabs.parameters.converter.QuaternionConverter"/>
             </parameters>
         </object>
     </collection>
     <collection name="Animation">
         <object label="Rig" class="dae.animation.rig.Rig" defaultloader="true">
-            <parameters section="Transform">
+            <component id="TransformComponent"/>
+            <parameters section="Object">
                 <parameter type="string" id="name"/>
-                <parameter type="float3" id="localTranslation"/>
-                <parameter type="float3" id="localPrefabRotation" converter="dae.prefabs.parameters.converter.QuaternionConverter"/>
             </parameters>
             <parameters section="Animation">
                 <parameter type="fuzzy" id="fuzzySystem"/>
@@ -286,20 +282,18 @@ and open the template in the editor.
             </parameters>
         </object>
         <object label="RevoluteJoint" class="dae.animation.skeleton.RevoluteJoint">
-            <parameters section="Transform">
+            <component id="TransformComponent"/>
+            <parameters section="Object">
                 <parameter type="string" id="name"/>
-                <parameter type="float3" id="localPrefabTranslation"/>
-                <parameter type="float3" id="localPrefabRotation" converter="dae.prefabs.parameters.converter.QuaternionConverter"/>
                 <parameter type="float" id="currentAngle"/>
                 <parameter type="float" id="minAngle"/>
                 <parameter type="float" id="maxAngle"/>
             </parameters>
         </object>
         <object label="AttachmentPoint" class="dae.animation.skeleton.AttachmentPoint">
+            <component id="TransformComponent"/>
             <parameters section="Transform">
                 <parameter type="string" id="name"/>
-                <parameter type="float3" id="localPrefabTranslation"/>
-                <parameter type="float3" id="localPrefabRotation" converter="dae.prefabs.parameters.converter.QuaternionConverter"/>
             </parameters>
         </object>
         <object label="RevoluteJointTwoAxis" class="dae.animation.skeleton.RevoluteJointTwoAxis">
@@ -310,20 +304,18 @@ and open the template in the editor.
             </parameters>
         </object>
         <object label="Handle" class="dae.prefabs.standard.MeshObject" mesh="Skeleton/Helpers/Handle.j3o">
-            <parameters section="Transform">
+            <component id="TransformComponent"/>
+            <parameters section="Object">
                 <parameter type="string" id="name"/>
-                <parameter type="float3" id="localTranslation"/>
-                <parameter type="float3" id="localRotation"/>
             </parameters>
             <parameters section="Appearance">
                 <parameter type="color" id="diffuseColor"/>
             </parameters>
         </object>
         <object label="TwoAxisHandle" class="dae.animation.skeleton.Handle">
+            <component id="TransformComponent"/>
             <parameters section="Transform">
                 <parameter type="string" id="name"/>
-                <parameter type="float3" id="localTranslation"/>
-                <parameter type="float3" id="localRotation"/>
             </parameters>
         </object>
         <object label="Handshake" class="dae.animation.skeleton.Handshake">
@@ -334,23 +326,21 @@ and open the template in the editor.
             </parameters>
         </object>
         <object label="CharacterPath" class="dae.animation.custom.CharacterPath">
-            <parameters section="Transform">
+            <component id="TransformComponent"/>
+            <parameters section="Object">
                 <parameter type="string" id="name"/>
-                <parameter type="float3" id="localTranslation"/>
-                <parameter type="float" id="yRotation"/>
             </parameters>
         </object>
         <object label="Waypoint" class="dae.animation.custom.Waypoint">
-            <parameters section="Transform">
+            <component id="TransformComponent"/>
+            <parameters section="Object">
                 <parameter type="string" id="name"/>
-                <parameter type="float3" id="localTranslation"/>
-                <parameter type="float" id="yRotation"/>
             </parameters>
         </object>
         <object label="Footcurve" class="dae.animation.trajectory.FootstepTargetCurve">
+            <component id="TransformComponent"/>
             <parameters section="Transform">
                 <parameter type="string" id="name"/>
-                <parameter type="float3" id="localTranslation"/>
             </parameters>
             <parameters section="Trajectory">
                 <parameter type="float" id="tolerance"/>
@@ -358,9 +348,9 @@ and open the template in the editor.
             </parameters>
         </object>
         <object label="Handcurve" class="dae.animation.trajectory.HandTargetCurve">
+            <component id="TransformComponent"/>
             <parameters section="Transform">
                 <parameter type="string" id="name"/>
-                <parameter type="float3" id="localTranslation"/>
             </parameters>
             <parameters section="Trajectory">
                 <parameter type="float" id="tolerance"/>
@@ -369,10 +359,9 @@ and open the template in the editor.
     </collection>
     <collection name="Light">
         <object label="SpotLight" class="dae.prefabs.lights.SpotLightPrefab">
-            <parameters section="Transform">
+            <component id="TransformComponent"/>
+            <parameters section="Object">
                 <parameter type="string" id="name"/>
-                <parameter type="float3" id="localPrefabTranslation"/>
-                <parameter type="float3" id="localPrefabRotation" converter="dae.prefabs.parameters.converter.QuaternionConverter"/>
             </parameters>
             <parameters section="Light">
                 <parameter type="float" id="spotInnerAngle"/>
@@ -384,22 +373,20 @@ and open the template in the editor.
             </parameters>
         </object>
         <object label="PointLight" class="dae.prefabs.lights.PointLightPrefab">
+            <component id="TransformComponent"/>
             <parameters section="Transform">
                 <parameter type="string" id="name"/>
-                <parameter type="float3" id="localPrefabTranslation"/>
             </parameters>
             <parameters section="Light">
                 <parameter type="float" id="radius"/>
                 <parameter type="color" id="pointLightColor"/>
-                <parameter type="float" id="pointLightIntensity" default="1" min="0" max="10" step=".1"/>
-               
+                <parameter type="float" id="pointLightIntensity" default="1" min="0" max="10" step=".1"/>     
             </parameters>
         </object>
         <object label="DirectionalLight" class="dae.prefabs.lights.DirectionalLightPrefab">
+            <component id="TransformComponent"/>
             <parameters section="Transform">
                 <parameter type="string" id="name"/>
-                <parameter type="float3" id="localPrefabTranslation"/>
-                <parameter type="float3" id="localPrefabRotation" converter="dae.prefabs.parameters.converter.QuaternionConverter"/>
             </parameters>
             <parameters section="Light">
                 <parameter type="color" id="directionalLightColor"/>
@@ -408,10 +395,9 @@ and open the template in the editor.
             </parameters>
         </object>
         <object label="AmbientLight" class="dae.prefabs.lights.AmbientLightPrefab">
+            <component id="TransformComponent"/>
             <parameters section="Transform">
                 <parameter type="string" id="name"/>
-                <parameter type="float3" id="localPrefabTranslation"/>
-                <parameter type="float3" id="localPrefabRotation" converter="dae.prefabs.parameters.converter.QuaternionConverter"/>
             </parameters>
             <parameters section="Light">
                 <parameter type="color" id="ambientLightColor"/>
@@ -579,4 +565,4 @@ and open the template in the editor.
             </parameters>
         </object>
     </collection>
-</objects>
+</prefabs>
