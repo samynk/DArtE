@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.animation.skeleton;
 
 import com.jme3.asset.AssetInfo;
@@ -408,9 +404,9 @@ public class BodyLoader implements AssetLoader {
         Vector3f location = parseVector3f(slocation);
         Vector3f rotation = parseVector3f(srotation);
 
-        Handle result = new Handle();
+        
         ObjectType type = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Animation", "TwoAxisHandle");
-        result.create(sname, this.assetManager, type, null);
+        Handle result = (Handle)type.create( this.assetManager ,sname);
         result.setTransformation(location, rotation);
         return result;
     }
