@@ -100,11 +100,10 @@ public class AssetLevel extends Level {
             super.setLocation(file);
             super.levelShown(manager, state);
             if (!levelShown) {
-                MeshObject mo = new MeshObject();
-                mo.setType("Mesh");
-                mo.setCategory("Standard");
                 ObjectType type = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Mesh", "Standard");
-                mo.create(asset.getFileName().toString(), manager, type, assetLocation);
+                MeshObject mo = (MeshObject)type.create(manager, name);
+                //TODO pass asset location to asset level.
+                //mo.initialize( manager, type, assetLocation);
                 this.attachChild(mo);
                 levelShown = true;
             }
