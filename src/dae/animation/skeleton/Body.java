@@ -29,6 +29,7 @@ import dae.prefabs.types.ObjectType;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
+import mlproject.control.Variable;
 import mlproject.fuzzy.FuzzyRuleBlock;
 import mlproject.fuzzy.FuzzySystem;
 import mlproject.fuzzy.FuzzyVariable;
@@ -165,13 +166,10 @@ public class Body extends Prefab implements BodyElement {
     }
 
     @Override
-    public void create(String name, AssetManager manager, String extraInfo) {
+    public void create(AssetManager manager, String extraInfo) {
         this.assetManager = manager;
         Node n = (Node) assetManager.loadModel(extraInfo);
         attachChild(n);
-
-
-
     }
 
     /**
@@ -211,7 +209,7 @@ public class Body extends Prefab implements BodyElement {
         if (checkVector.dot(worldAxis) < 0) {
             angle = -angle;
         }
-        bodyAngleLH.setCurrentValue(angle);
+        bodyAngleLH.setInputValue(angle);
         //System.out.println("Current angle : " + angle);
     }
 
@@ -228,7 +226,7 @@ public class Body extends Prefab implements BodyElement {
         if (checkVector.dot(worldAxis) < 0) {
             angle = -angle;
         }
-        bodyAngleRH.setCurrentValue(angle);
+        bodyAngleRH.setInputValue(angle);
         //System.out.println("Current angle : " + angle);
     }
 
@@ -288,7 +286,7 @@ public class Body extends Prefab implements BodyElement {
         float halfStartArcDist = startArcDistance / 2;
         float arcDist = calculateArcDistance(current);
         float value = (arcDist - halfStartArcDist) * (-1 / halfStartArcDist);
-        arcDistance.setCurrentValue(value);
+        arcDistance.setInputValue(value);
     }
 
     /**
@@ -477,12 +475,12 @@ public class Body extends Prefab implements BodyElement {
         }
         //System.out.println(rj.getName()  +" angle:" + angle);
         if (inputAngle != null) {
-            inputAngle.setCurrentValue(angle);
+            inputAngle.setInputValue(angle);
         }
         if (inputDistance != null) {
             Vector3f directionVector = targetLocation.subtract(worldLocation);
             float targetDistance = directionVector.length();
-            inputDistance.setCurrentValue(targetDistance - limbDistance);
+            inputDistance.setInputValue(targetDistance - limbDistance);
         }
     }
 
@@ -527,10 +525,10 @@ public class Body extends Prefab implements BodyElement {
         }
 
         if (inputAngle != null) {
-            inputAngle.setCurrentValue(angle);
+            inputAngle.setInputValue(angle);
         }
         if (inputDistance != null) {
-            inputDistance.setCurrentValue(targetDistance - limbDistance);
+            inputDistance.setInputValue(targetDistance - limbDistance);
         }
     }
     private Vector3f worldAxisOrigin = new Vector3f();
@@ -972,7 +970,7 @@ public class Body extends Prefab implements BodyElement {
                     if (currentBlock == null) {
                         continue;
                     }
-                    for (FuzzyVariable input : currentBlock.getInputs()) {
+                    for (Variable input : currentBlock.getInputs()) {
                         String inputName = input.getName();
                         if (inputName.startsWith("angle_target") || inputName.startsWith("angle_alignment")) {
                             calculateAndSetAngle(input, target, controller.getName());
@@ -983,7 +981,7 @@ public class Body extends Prefab implements BodyElement {
                         }
                     }
                     currentBlock.evaluate();
-                    for (FuzzyVariable output : currentBlock.getOutputs()) {
+                    for (Variable output : currentBlock.getOutputs()) {
                         String outputName = output.getName();
                         if (outputName.startsWith("dangle")) {
                             float outputVal = output.getOutputValue() * tpf;
@@ -1027,7 +1025,7 @@ public class Body extends Prefab implements BodyElement {
         }
     }
 
-    public void calculateAndSetAngle(FuzzyVariable input, Spatial rightHandTarget, String apName) {
+    public void calculateAndSetAngle(Variable input, Spatial rightHandTarget, String apName) {
         String inputName = input.getName();
         String jointName = inputName.substring(inputName.lastIndexOf("_") + 1);
         if (jointName.contains("@")) {
@@ -1051,7 +1049,7 @@ public class Body extends Prefab implements BodyElement {
         }
     }
 
-    private void setCurrentAngle(FuzzyVariable input, Spatial target, String name) {
+    private void setCurrentAngle(Variable input, Spatial target, String name) {
         String inputName = input.getName();
         String jointName = inputName.substring(inputName.lastIndexOf("_") + 1);
         if (jointName.contains("@")) {
@@ -1064,10 +1062,10 @@ public class Body extends Prefab implements BodyElement {
                 System.out.println("could not find : " + jointName);
             } else {
                 if (index == 1) {
-                    input.setCurrentValue(rj2.getCurrentAngle1());
+                    input.setInputValue(rj2.getCurrentAngle1());
                     rj2.setCurrentMaxAngle1Change(1000.0f);
                 } else if (index == 2) {
-                    input.setCurrentValue(rj2.getCurrentAngle2());
+                    input.setInputValue(rj2.getCurrentAngle2());
                     rj2.setCurrentMaxAngle2Change(1000.0f);
                 }
             }
@@ -1076,13 +1074,13 @@ public class Body extends Prefab implements BodyElement {
             if (rj == null) {
                 System.out.println("Could not find : " + jointName);
             } else {
-                input.setCurrentValue(rj.getCurrentAngle());
+                input.setInputValue(rj.getCurrentAngle());
                 rj.setCurrentMaxAngleChange(1000.0f);
             }
         }
     }
 
-    private void CalculateAndSetAngleRevoluteJointTwoAxis(RevoluteJointTwoAxis rj2, int index, String inputName, Spatial rightHandTarget, FuzzyVariable input, String apName) {
+    private void CalculateAndSetAngleRevoluteJointTwoAxis(RevoluteJointTwoAxis rj2, int index, String inputName, Spatial rightHandTarget, Variable input, String apName) {
         if (inputName.contains("target")) {
             //String groupName = rj2.getGroup();
             AttachmentPoint ap = this.attachmentPoints.get(apName);
@@ -1119,7 +1117,7 @@ public class Body extends Prefab implements BodyElement {
                     rj2.setCurrentMaxAngle2Change(angle);
                 }
                 //System.out.println("Angle is : " + angle);
-                input.setCurrentValue(angle);
+                input.setInputValue(angle);
             }
         } else if (inputName.contains("alignment")) {
             //String groupName = rj2.getGroup();
@@ -1158,7 +1156,7 @@ public class Body extends Prefab implements BodyElement {
                 if (vector1.cross(vector2).dot(axis) > 0) {
                     angle = -angle;
                 }
-                input.setCurrentValue(angle);
+                input.setInputValue(angle);
 
                 if (index == 1) {
                     rj2.setCurrentMaxAngle1Change(angle);
@@ -1169,7 +1167,7 @@ public class Body extends Prefab implements BodyElement {
         }
     }
 
-    private void CalculateAndSetAngleRevoluteJoint(RevoluteJoint rj, String inputName, Spatial rightHandTarget, FuzzyVariable input, String apName) {
+    private void CalculateAndSetAngleRevoluteJoint(RevoluteJoint rj, String inputName, Spatial rightHandTarget, Variable input, String apName) {
 
         if (inputName.contains("target")) {
             //String groupName = rj.getGroup();
@@ -1195,7 +1193,7 @@ public class Body extends Prefab implements BodyElement {
                     angle = -angle;
                 }
                 //System.out.println("Angle is : " + angle);
-                input.setCurrentValue(angle);
+                input.setInputValue(angle);
                 rj.setCurrentMaxAngleChange(angle);
             }
         } else if (inputName.contains("alignment")) {
@@ -1241,13 +1239,13 @@ public class Body extends Prefab implements BodyElement {
                     angle = -angle;
                 }
 //                System.out.println("Alignment Angle is : " + angle);
-                input.setCurrentValue(angle);
+                input.setInputValue(angle);
                 rj.setCurrentMaxAngleChange(angle);
             }
         }
     }
 
-    public void calculateAndSetDistance(FuzzyVariable input, Spatial rightHandTarget, String apName) {
+    public void calculateAndSetDistance(Variable input, Spatial rightHandTarget, String apName) {
         String inputName = input.getName();
         String jointName = inputName.substring(inputName.lastIndexOf("_") + 1);
 
@@ -1275,7 +1273,7 @@ public class Body extends Prefab implements BodyElement {
             //this.project(vector2, axis);
             float diff = vector1.length() - vector2.length();
             //System.out.println("Difference is : " + diff);
-            input.setCurrentValue(diff);
+            input.setInputValue(diff);
         }
     }
     static int skelCount = 0;
@@ -1455,15 +1453,13 @@ public class Body extends Prefab implements BodyElement {
 
         if (footSteps.getChildren().size() > 1) {
             if (rightLegTarget == null) {
-                this.rightLegTarget = new Handle();
                 ObjectType type = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Animation", "TwoAxisHandle");
-                rightLegTarget.create("rightLegTarget", assetManager,  type, null);
+                rightLegTarget = (Handle)type.create( assetManager, "rightLegTarget");
                 attachChild(rightLegTarget);
             }
             if (leftLegTarget == null) {
-                this.leftLegTarget = new Handle();
                 ObjectType type = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Animation", "TwoAxisHandle");
-                leftLegTarget.create("leftLegTarget", assetManager, type,  null);
+                leftLegTarget = (Handle)type.create( assetManager, "leftLegTarget");
                 attachChild(leftLegTarget);
             }
 
