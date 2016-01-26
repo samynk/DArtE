@@ -1,21 +1,23 @@
 package dae.components;
 
+import dae.prefabs.Prefab;
+import dae.prefabs.PropertyReflector;
+import dae.prefabs.parameters.Parameter;
 import dae.prefabs.types.ParameterSupport;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * The component type describes how to create a component and
- * how to set and get parameters from the component.
+ * The component type describes how to create a component and how to set and get
+ * parameters from the component.
  *
  * @author Koen Samyn
  */
-public class ComponentType extends ParameterSupport{
+public class ComponentType extends ParameterSupport {
 
     private String id;
     private String className;
     private int order;
-    
     public static ComponentType PREFAB = new ComponentType("__PREFAB");
 
     /**
@@ -23,12 +25,13 @@ public class ComponentType extends ParameterSupport{
      */
     public ComponentType() {
     }
-    
+
     /**
      * Creates a new component with a given id.
+     *
      * @param id the id of the component type.
      */
-    public ComponentType(String id){
+    public ComponentType(String id) {
         this.id = id;
     }
 
@@ -77,7 +80,7 @@ public class ComponentType extends ParameterSupport{
             Class c = Class.forName(className);
             Object component = c.newInstance();
             if (component instanceof PrefabComponent) {
-                result = (PrefabComponent)component;
+                result = (PrefabComponent) component;
                 result.setId(this.id);
                 result.setOrder(this.order);
             }
@@ -87,16 +90,33 @@ public class ComponentType extends ParameterSupport{
             Logger.getLogger(ComponentType.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
             Logger.getLogger(ComponentType.class.getName()).log(Level.SEVERE, null, ex);
-        }finally{
+        } finally {
             return result;
         }
-    }  
+    }
 
     public void setOrder(int order) {
         this.order = order;
     }
-    
-    public int getOrder(){
+
+    public int getOrder() {
         return order;
+    }
+
+    /**
+     * Copies the information of this prefabcomponent into the target component.
+     *
+     * @param source the source to copy.
+     * @param target the target for the copy operation.
+     */
+    public void copy(Prefab source, Prefab target) {
+        for (Parameter p : this.getAllParameters()) {
+            Object value = p.invokeGet(source);
+            
+            if (value != null) {
+                Object cloned = PropertyReflector.clone(value);
+                p.invokeSet(target, cloned, false);
+            }
+        }
     }
 }
