@@ -32,7 +32,7 @@ public class PivotGizmo extends Prefab implements Gizmo{
     }
     
     @Override
-    public void create(String name, AssetManager manager, String extraInfo) {     
+    public void create(AssetManager manager, String extraInfo) {     
         Material xMaterial = manager.loadMaterial("Materials/XPivotMaterial.j3m");
         Material yMaterial = manager.loadMaterial("Materials/YPivotMaterial.j3m");
         Material zMaterial = manager.loadMaterial("Materials/ZPivotMaterial.j3m");
