@@ -8,7 +8,7 @@ import dae.prefabs.standard.SoundEntity;
 import dae.prefabs.ui.classpath.FileNode;
 import dae.project.Project;
 import dae.project.ProjectTreeNode;
-import java.awt.Frame;
+import java.awt.Window;
 
 /**
  *
@@ -67,7 +67,7 @@ public class SoundParameterUI extends javax.swing.JPanel implements ParameterUI 
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnPickSoundActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPickSoundActionPerformed
-        Frame rootComponent = (Frame) this.getTopLevelAncestor();
+        Window rootComponent = (Window) this.getTopLevelAncestor();
         Project currentProject = null;
         ProjectTreeNode p = currentNode;
         while (p.getProjectParent() != null) {
@@ -98,8 +98,11 @@ public class SoundParameterUI extends javax.swing.JPanel implements ParameterUI 
 
     public void setNode(Prefab currentSelectedNode) {
         this.currentNode = currentSelectedNode;
-        Object value = ReflectionManager.getInstance().invokeGetMethod(currentSelectedNode,parameter); 
-        txtObjectName.setText(value.toString());
+        Object value = ReflectionManager.getInstance().invokeGetMethod(currentSelectedNode,parameter);
+        if ( value != null )
+        {
+            txtObjectName.setText(value.toString());
+        }
     }
     
     /**
