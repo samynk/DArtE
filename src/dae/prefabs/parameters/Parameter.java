@@ -28,6 +28,8 @@ public class Parameter {
     private String property;
     private String id;
     private String label;
+    // The parsed default value.
+    private Object defaultValue;
     private PropertyConverter converter;
     /**
      * The Component type that this Parameter belongs to. set to null if the
@@ -178,6 +180,11 @@ public class Parameter {
         if (this.componentType != ComponentType.PREFAB) {
             base = prefab.getComponent(componentType.getId());
         }
+        if (base == null) {
+            System.out.println("base is null for : " + componentType.getId() + "," + prefab.getClass().getName());
+            System.out.println("Object type : " + prefab.getObjectType().getCategory() + prefab.getObjectType().getLabel());
+            return null;
+        }
         PropertyReflector pr = ReflectionManager.getInstance().getPropertyReflector(base.getClass());
         return pr.invokeGetMethod(base, property);
     }
@@ -197,7 +204,7 @@ public class Parameter {
         PropertyReflector pr = ReflectionManager.getInstance().getPropertyReflector(base.getClass());
 
         Object oldValue = invokeGet(prefab);
-        oldValue = pr.clone(oldValue);
+        oldValue = PropertyReflector.clone(oldValue);
         boolean changed = true;
         if (oldValue != null) {
             changed = !oldValue.equals(value);
@@ -213,6 +220,21 @@ public class Parameter {
                 }
             }
         }
+    }
+
+    /**
+     * Invokes the set of the property of this object. The ComponentType will be
+     * taken into account to invoke the set method on the correct component.
+     * 
+     * This method can be used with any object. The restriction is that no attempt
+     * will be made to make this into an undoable edit.
+     *
+     * @param component the component to invoke the set method on.
+     * @param value the value to set.
+     */
+    public void invokeSet(Object component, Object value) {
+        PropertyReflector pr = ReflectionManager.getInstance().getPropertyReflector(component.getClass());
+        pr.invokeSetMethod(component, property, value);
     }
 
     /**
@@ -247,17 +269,44 @@ public class Parameter {
     }
 
     /**
-     * Converts a value from the user interface representation to the
-     * object representation. If no converter exists the value itself
-     * will be returned.
+     * Converts a value from the user interface representation to the object
+     * representation. If no converter exists the value itself will be returned.
+     *
      * @param oValue the value to converted.
      * @return the converted value or oValue if no converter is configured.
      */
     public Object convertToObject(Object oValue) {
-        if ( converter != null){
+        if (converter != null) {
             return converter.convertFromUIToObject(oValue);
-        }else{
+        } else {
             return oValue;
         }
+    }
+
+    /**
+     * Sets the parsed default value.
+     *
+     * @param defaultValue the default value to set.
+     */
+    public void setDefault(Object defaultValue) {
+        this.defaultValue = defaultValue;
+    }
+
+    /**
+     * Returns the parsed default value.
+     *
+     * @return the default value.
+     */
+    public Object getDefault() {
+        return defaultValue;
+    }
+
+    /**
+     * Checks if the parameter has a default value.
+     *
+     * @return true if the parameter has a default value, false otherwise.
+     */
+    public boolean hasDefaultValue() {
+        return defaultValue != null;
     }
 }
