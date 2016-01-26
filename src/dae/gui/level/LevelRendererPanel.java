@@ -13,6 +13,7 @@ import dae.prefabs.ui.events.ProjectEventType;
 import dae.project.Level;
 import dae.project.Project;
 import java.awt.Frame;
+import java.awt.Window;
 import java.io.File;
 
 /**
@@ -83,7 +84,7 @@ public class LevelRendererPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnChooseSkyboxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChooseSkyboxActionPerformed
-        FileNode skyboxTexture = GlobalObjects.getInstance().selectAsset((Frame) this.getTopLevelAncestor(), this, currentProject, "Choose skybox texture", "dds");
+        FileNode skyboxTexture = GlobalObjects.getInstance().selectAsset((Window) this.getTopLevelAncestor(), this, currentProject, "Choose skybox texture", "dds");
         if (skyboxTexture != null) {
             txtSkyBox.setText(skyboxTexture.getFullName());
             currentLevel.setSkyBoxTexture(skyboxTexture.getFullName());
