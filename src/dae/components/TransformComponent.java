@@ -2,6 +2,7 @@ package dae.components;
 
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
+import com.jme3.scene.Spatial;
 import dae.prefabs.Prefab;
 
 /**
@@ -29,6 +30,7 @@ public class TransformComponent extends PrefabComponent{
     public void setTranslation(Vector3f translation) {
         this.translation = translation;
         if ( parent != null ){
+            System.out.println("TransformComponent setTranslation on " +parent.getName() + " translation");
             parent.setLocalPrefabTranslation(translation);
         }
     }
@@ -63,6 +65,7 @@ public class TransformComponent extends PrefabComponent{
     public void setRotation(Quaternion rotation) {
         this.rotation = rotation;
         if ( parent != null ){
+            System.out.println("TransformComponent setRotation on " +parent.getName() + " translation");
             parent.setLocalPrefabRotation(rotation);
         }
     }
@@ -73,7 +76,23 @@ public class TransformComponent extends PrefabComponent{
         parent.setLocalPrefabRotation(rotation);
         parent.setLocalPrefabTranslation(translation);
         parent.setLocalScale(scale);
-        parent.updateGeometricState();
+        //parent.updateGeometricState();
     }
     
+    @Override
+    public void deinstall(){
+        // unnecessary to change the prefab parent.
+    }
+    
+    /**
+     * Sets the properties of this component on a game object.
+     * @param parent the parent to install the component in.
+     */
+    @Override
+    public void installGameComponent(Spatial parent){
+        parent.setLocalTranslation(this.translation);
+        parent.setLocalRotation(this.rotation);
+        Vector3f localScale = parent.getLocalScale();
+        parent.setLocalScale(this.scale.mult(localScale));
+    }
 }
