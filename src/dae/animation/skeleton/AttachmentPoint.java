@@ -8,7 +8,6 @@ import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
-import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import dae.io.XMLUtils;
 import dae.prefabs.Prefab;
@@ -54,8 +53,7 @@ public class AttachmentPoint extends Prefab implements BodyElement {
     }
 
     @Override
-    public void create(String name, AssetManager manager, String extraInfo) {
-        setName(name);
+    public void create(AssetManager manager, String extraInfo) {
         createArrows(manager);
     }
     
