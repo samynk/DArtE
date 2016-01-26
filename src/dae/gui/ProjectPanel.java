@@ -353,7 +353,9 @@ public class ProjectPanel extends javax.swing.JPanel implements TreeSelectionLis
         if (le.eventType == LayerEventType.CREATED) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    treeModel.layerAdded(le);
+                    if (treeModel != null) {
+                        treeModel.layerAdded(le);
+                    }
                 }
             });
         }
