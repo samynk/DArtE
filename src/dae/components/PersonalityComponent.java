@@ -5,7 +5,9 @@
 
 package dae.components;
 
+import com.jme3.scene.Spatial;
 import dae.prefabs.Prefab;
+import org.dae.game.controls.PersonalityControl;
 
 /**
  * Creates a new Personality component.
@@ -52,6 +54,18 @@ public class PersonalityComponent extends PrefabComponent{
 
     @Override
     public void install(Prefab parent) {
-        // to do 
+        
     }
+    
+    @Override
+    public void deinstall(){
+        
+    }
+
+    @Override
+    public void installGameComponent(Spatial parent) {
+        parent.addControl(new PersonalityControl(bully,friendly));
+    }
+    
+    
 }
