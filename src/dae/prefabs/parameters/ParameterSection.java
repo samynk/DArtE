@@ -10,6 +10,7 @@ import dae.prefabs.ui.ColorParameterUI;
 import dae.prefabs.ui.ConnectorParameterUI;
 import dae.prefabs.ui.EnumListParameterUI;
 import dae.prefabs.ui.FileParameterUI;
+import dae.prefabs.ui.Float2ParameterUI;
 import dae.prefabs.ui.Float3ParameterUI;
 import dae.prefabs.ui.FloatParameterUI;
 import dae.prefabs.ui.FuzzyParameterUI;
@@ -22,6 +23,7 @@ import dae.prefabs.ui.RangeParameterUI;
 import dae.prefabs.ui.SoundParameterUI;
 import dae.prefabs.ui.TextParameterUI;
 import dae.prefabs.ui.collection.DictionaryParameterUI;
+import dae.prefabs.ui.collection.ListParameterUI;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.ArrayList;
@@ -45,6 +47,10 @@ public class ParameterSection {
 
     public ParameterSection(String name) {
         this.name = name;
+    }
+    
+    public int getNrOfParameters(){
+        return parameters.size();
     }
 
     public String getName() {
@@ -94,25 +100,25 @@ public class ParameterSection {
                     float3ui.setParameter(p);
                     System.out.println("minimum size float3 : " + float3ui.getMinimumSize());
                     parameterPanel.addParameterUI(p.getId(), float3ui, gbc);
+                }else if ("float2".equals(type)){
+                    Float2ParameterUI float2ui = new Float2ParameterUI();
+                    float2ui.setParameter(p);
+                    parameterPanel.addParameterUI(p.getId(), float2ui, gbc);
                 } else if ("string".equals(type)) {
                     TextParameterUI textui = new TextParameterUI();
                     textui.setParameter(p);
-                    System.out.println("minimum size string : " + textui.getMinimumSize());
                     parameterPanel.addParameterUI(p.getId(), textui, gbc);
                 } else if ("choice".equals(type)) {
                     ChoiceParameterUI cui = new ChoiceParameterUI();
                     cui.setParameter(p);
-                    System.out.println("minimum size choice : " + cui.getMinimumSize());
                     parameterPanel.addParameterUI(p.getId(), cui, gbc);
                 } else if ("color".equals(type)) {
                     ColorParameterUI cpui = new ColorParameterUI();
                     cpui.setParameter(p);
-                    System.out.println("minimum size color : " + cpui.getMinimumSize());
                     parameterPanel.addParameterUI(p.getId(), cpui, gbc);
                 } else if ("float".equals(type)) {
                     FloatParameterUI fpui = new FloatParameterUI();
                     fpui.setParameter(p);
-                    System.out.println("minimum size float : " + fpui.getMinimumSize());
                     parameterPanel.addParameterUI(p.getId(), fpui, gbc);
                 } else if ("integer".equals(type)) {
                     IntParameterUI ipui = new IntParameterUI();
@@ -163,6 +169,10 @@ public class ParameterSection {
                     FileParameterUI fui = new FileParameterUI();
                     fui.setParameter(p);
                     parameterPanel.addParameterUI(p.getId(), fui, gbc);
+                }else if ("list".equals(type)){
+                    ListParameterUI lui = new ListParameterUI();
+                    lui.setParameter(p);
+                    parameterPanel.addParameterUI(p.getId(),lui,gbc);
                 }
 
             }
