@@ -2,7 +2,6 @@ package dae.gui;
 
 import com.google.common.eventbus.Subscribe;
 import com.jme3.app.SimpleApplication;
-import com.jme3.asset.AssetManager;
 import com.jme3.asset.DesktopAssetManager;
 import com.jme3.asset.ModelKey;
 import com.jme3.asset.plugins.FileLocator;
@@ -14,7 +13,6 @@ import com.jme3.bullet.PhysicsSpace;
 import com.jme3.collision.CollisionResult;
 import com.jme3.collision.CollisionResults;
 import com.jme3.cursors.plugins.JmeCursor;
-import com.jme3.font.BitmapText;
 import com.jme3.input.FlyByCamera;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
@@ -32,51 +30,51 @@ import com.jme3.input.event.MouseMotionEvent;
 import com.jme3.input.event.TouchEvent;
 import com.jme3.light.AmbientLight;
 import com.jme3.material.Material;
-import com.jme3.material.RenderState.BlendMode;
 import com.jme3.math.ColorRGBA;
-import com.jme3.math.FastMath;
-import com.jme3.math.Matrix3f;
-import com.jme3.math.Matrix4f;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Ray;
 import com.jme3.math.Transform;
-import com.jme3.math.Triangle;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.debug.WireBox;
-import com.jme3.scene.debug.WireSphere;
 import com.jme3.shadow.AbstractShadowRenderer;
 import dae.DAECamAppState;
 import dae.GlobalObjects;
 import dae.animation.rig.io.RigLoader;
 import dae.animation.skeleton.BodyLoader;
 import dae.components.ComponentType;
+import dae.components.MeshComponent;
 import dae.components.PrefabComponent;
 import dae.controller.ControllerLoader;
+import dae.gui.tools.BrushTool;
+import dae.gui.tools.IdleTool;
+import dae.gui.tools.InsertionTool;
+import dae.gui.tools.LinkTool;
+import dae.gui.tools.PickTool;
+import dae.gui.tools.RotateTool;
+import dae.gui.tools.TranslateTool;
+import dae.gui.tools.ViewportTool;
 import dae.io.AnimationReader;
 import dae.io.ComponentReader;
 
 import dae.io.ObjectTypeReader;
 import dae.io.SceneLoader;
+import dae.io.game.GameBuilder;
+import dae.io.game.GameWriter;
 import dae.io.readers.OVMReader;
-import dae.math.RayIntersect;
 import dae.prefabs.AxisEnum;
 import dae.prefabs.Klatch;
 import dae.prefabs.Prefab;
 import dae.prefabs.gizmos.Axis;
 import dae.prefabs.gizmos.RotateGizmo;
 import dae.prefabs.gizmos.events.AutoGridEvent;
-import dae.prefabs.magnets.Magnet;
 import dae.prefabs.parameters.Parameter;
 import dae.prefabs.prefab.undo.AddPrefabEdit;
 import dae.prefabs.prefab.undo.DeletePrefabEdit;
-import dae.prefabs.shapes.LineShape;
-import dae.prefabs.shapes.QuadShape;
 import dae.prefabs.standard.CameraFrame;
-import dae.prefabs.standard.MagnetObject;
 import dae.prefabs.standard.MeshObject;
 import dae.prefabs.types.ObjectType;
 import dae.prefabs.types.ObjectTypeCategory;
@@ -92,17 +90,17 @@ import static dae.prefabs.ui.events.GizmoType.TRANSLATE;
 import dae.prefabs.ui.events.InsertObjectEvent;
 import dae.prefabs.ui.events.LevelEvent;
 import dae.prefabs.ui.events.LevelEvent.EventType;
-import dae.prefabs.ui.events.PickEvent;
+import dae.prefabs.ui.events.PlayEvent;
 import dae.prefabs.ui.events.ProjectEvent;
 import dae.prefabs.ui.events.SelectionEvent;
 import dae.prefabs.ui.events.ShadowEvent;
 import dae.prefabs.ui.events.ViewportReshapeEvent;
 import dae.prefabs.ui.events.ZoomEvent;
 import dae.project.Grid;
-import dae.project.Layer;
 import dae.project.Project;
 import dae.project.ProjectTreeNode;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -126,45 +124,26 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
      */
     private Node sceneElements = new Node("scene");
     /**
-     * The selection material for the sandbox
-     */
-    private Material selectionMaterial = new Material();
-    /**
-     * The translation axis.
-     */
-    private Axis a;
-    /**
-     * The rotate gizmo
-     */
-    private RotateGizmo r;
-    /**
      * The elements to insert.
      */
     private Node insertionElements = new Node("insertion");
+    private Prefab insertionElement;
     /**
      * The current gizmo type
      */
-    private GizmoType gizmoType = GizmoType.TRANSLATE;
-    private GizmoType newGizmoType = GizmoType.TRANSLATE;
-    /**
-     * The currently picked element.
-     */
-    private Prefab currentPickElement;
+    private GizmoType gizmoType = GizmoType.NONE;
+    private GizmoType newGizmoType = GizmoType.NONE;
     /**
      * The current pick property.
      */
     private String pickProperty;
-    /**
-     * The current child element for linking.
-     */
-    private Prefab currentChildElement;
 
     /**
      * The editor state.
      */
     private enum EditorState {
 
-        IDLE, INSERTIONEVENT, INSERTION, ADDTOSCENE, LEVELCHANGED, SELECTION, TRANSLATEX, TRANSLATEY, TRANSLATEZ, ROTATEX, ROTATEY, ROTATEZ, MOUSEMOVE, LINK, LINKPARENT, PICK, TRANSLATETWOAXIS
+        IDLE, INSERTIONEVENT, ADDTOSCENE, LEVELCHANGED, SELECTION
     };
     /**
      * The current editor state.
@@ -174,20 +153,8 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
      * Shift key is used for copying of items
      */
     private boolean shiftIsDown = false;
-    /**
-     * helper objects for translation
-     */
-    private Vector3f pickOffset = new Vector3f();
-    private Vector3f pickAxis1 = new Vector3f();
-    private Vector3f pickAxis2 = new Vector3f();
-    /**
-     * helper objects for rotation
-     */
-    private Vector3f rotationDir = new Vector3f();
     private ArrayList<Node> currentSelection = new ArrayList<Node>();
-    private Node currentInsertion;
-    private ObjectType objectTypeToCreate;
-    private int objectId = 0;
+    private CreateObjectEvent objectCreationEvent;
     /**
      * The current level.
      */
@@ -201,7 +168,7 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
      */
     private final ArrayList<Runnable> viewportTasks = new ArrayList<Runnable>();
     /**
-     * Selection from other thread (such as user interface.
+     * Selection from other thread (such as user interfac)e.
      */
     private ArrayList<Node> selectionFromOutside = new ArrayList<Node>();
     /**
@@ -211,19 +178,6 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
     private Geometry wireBoxGeometry;
     private Material wireBoxMaterial;
     /**
-     * Used for linking objects.
-     */
-    private Geometry linkGeometry;
-    private LineShape linkShape;
-    private BitmapText linkText;
-    private QuadShape textBackground;
-    private Geometry textBackgroundGeometry;
-    /**
-     * Used to highlight the parent
-     */
-    private WireBox wireBoxLinkParent = new WireBox();
-    private Geometry wireBoxGeometryLinkParent;
-    /**
      * Cursor
      */
     private JmeCursor cursorConnect1;
@@ -232,6 +186,17 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
     private JmeCursor cursorMove;
     private JmeCursor cursorRotate;
     private JmeCursor cursorScale;
+    /**
+     * Tool support
+     */
+    private IdleTool idleTool;
+    private ViewportTool currentTool;
+    private TranslateTool translateTool;
+    private RotateTool rotateTool;
+    private BrushTool brushTool;
+    private PickTool pickTool;
+    private LinkTool linkTool;
+    private InsertionTool insertionTool;
     /**
      * Autogrid functionality
      */
@@ -259,20 +224,29 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
         objectsToCreate = (ObjectTypeCategory) assetManager.loadAsset("Objects/ObjectTypes.types");
         GlobalObjects.getInstance().setObjectTypeCategory(objectsToCreate);
         GlobalObjects.getInstance().registerListener(this);
-        selectionMaterial = assetManager.loadMaterial("Materials/SelectionMaterial.j3m");
         setPauseOnLostFocus(false);
 
         Material gridMaterial = assetManager.loadMaterial("Materials/GridMaterial.j3m");
-        Grid grid = new Grid(10, 10, gridMaterial);
-        //grid.setUpAxis(AxisEnum.Y);
-        a = new Axis(assetManager, 3, 0.15f);
-        r = new RotateGizmo(assetManager, 3, 0.15f);
 
-        sceneElements.attachChild(grid);
+        translateTool = new TranslateTool();
+        translateTool.initialize(assetManager, inputManager);
+        rotateTool = new RotateTool();
+        rotateTool.initialize(assetManager, inputManager);
+        brushTool = new BrushTool();
+        brushTool.initialize(assetManager, inputManager);
+        pickTool = new PickTool();
+        pickTool.initialize(assetManager, inputManager);
+        linkTool = new LinkTool();
+        linkTool.initialize(assetManager, inputManager);
+        idleTool = new IdleTool();
+        idleTool.initialize(assetManager, inputManager);
+        insertionTool = new InsertionTool();
+        insertionTool.initialize(assetManager, inputManager);
+
+        currentTool = idleTool;
+
         rootNode.attachChild(sceneElements);
         rootNode.attachChild(insertionElements);
-
-        rootNode.attachChild(a);
 
 
         AmbientLight al = new AmbientLight();
@@ -283,19 +257,11 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
         insertionLight.setColor(ColorRGBA.White.mult(5.0f));
         insertionElements.addLight(insertionLight);
 
-
-
-
-
         cam.setFrustumPerspective(45f, (float) cam.getWidth() / cam.getHeight(), 0.01f, 1000f);
         cam.setLocation(new Vector3f(5, 2, 0));
         cam.lookAt(new Vector3f(0, 0, 0), new Vector3f(0, 1, 0));
 
         initKeys();
-
-//        this.helperSphere1 = createDebugSphere(this.assetManager, 0.02f, ColorRGBA.White);
-//        this.helperSphere2 = createDebugSphere(this.assetManager, 0.02f, ColorRGBA.Red);
-//        this.helperSphere3 = createDebugSphere(this.assetManager, 0.02f, ColorRGBA.Green);
 
 //        cursorConnect1 = (JmeCursor) assetManager.loadAsset("Interface/connect1.ico");
 //        cursorConnect2 = (JmeCursor) assetManager.loadAsset("Interface/connect2.ico");
@@ -310,8 +276,6 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
         bulletAppState.setBroadphaseType(PhysicsSpace.BroadphaseType.AXIS_SWEEP_3_32);
         PhysicsSpace.getPhysicsSpace().setGravity(new Vector3f(0, -9.81f, 0));
 
-
-
         GlobalObjects.getInstance().setAssetManager(assetManager);
         GlobalObjects.getInstance().setInputManager(this.inputManager);
 
@@ -321,40 +285,65 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
         wireBoxGeometry.setMaterial(wireBoxMaterial);
 
         rootNode.attachChild(wireBoxGeometry);
+    }
 
-        // helper objects for linking
-        linkShape = new LineShape(Vector3f.ZERO, Vector3f.ZERO);
-        linkShape.setLineWidth(5.0f);
+    /**
+     * Attaches a guid element to the viewport.
+     *
+     * @param s the spatial to attach to the viewport.
+     */
+    public void attachGuiElement(Spatial s) {
+        guiNode.attachChild(s);
+    }
 
-        linkGeometry = new Geometry("link", linkShape);
+    public Node getSceneElements() {
+        return this.sceneElements;
+    }
 
-        linkGeometry.setMaterial(assetManager.loadMaterial("Materials/LinkMaterial.j3m"));
-        wireBoxGeometryLinkParent = new Geometry("linked parent", wireBoxLinkParent);
-        wireBoxGeometryLinkParent.setMaterial(assetManager.loadMaterial("Materials/LinkParentMaterial.j3m"));
+    public dae.project.Level getLevel() {
+        return this.level;
+    }
 
-        //guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
-        linkText = new BitmapText(guiFont, false);
-        linkText.setSize(guiFont.getCharSet().getRenderedSize());
-        linkText.setText("");
+    public Iterable<Node> getSelection() {
+        return this.currentSelection;
+    }
 
-        this.textBackground = new QuadShape(1, 1);
-        this.textBackgroundGeometry = new Geometry("linktext", textBackground);
-        textBackgroundGeometry.setMaterial(assetManager.loadMaterial("Materials/LinkTextBackgroundMaterial.j3m"));
+    public boolean isAutoGridEnabled() {
+        return autoGridEnabled;
+    }
+
+    public AxisEnum getAutoGridAxis() {
+        return this.autoGridAxis;
+    }
+
+    public void disableFlyCam() {
+        flyCam.setEnabled(false);
+    }
+
+    public void enableFlyCam() {
+        flyCam.setEnabled(true);
     }
 
     public void adaptSelectionBox() {
         Node parent = null;
-        switch (this.gizmoType) {
-            case TRANSLATE:
-                parent = a.getParent();
-                a.removeFromParent();
-                break;
-            case ROTATE:
-                parent = r.getParent();
-                r.removeFromParent();
-        }
+        // TODO : remove commented code when everything works again.
+        // gizmo should be removed when tool is inactive
+        // should not be needed anymore.
+        /*
+         switch (this.gizmoType) {
+         case TRANSLATE:
+         parent = a.getParent();
+         a.removeFromParent();
+         break;
+         case ROTATE:
+         parent = r.getParent();
+         r.removeFromParent();
+         }
+         */
         BoundingVolume bv = null;
         for (Node n : this.currentSelection) {
+            if ( n == null)
+                continue;
             if (bv == null) {
                 bv = n.getWorldBound();
             } else {
@@ -372,27 +361,18 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
         } else {
             wireBoxGeometry.removeFromParent();
         }
-        if (parent != null) {
-            switch (this.gizmoType) {
-                case TRANSLATE:
-                    parent.attachChild(a);
-                    break;
-                case ROTATE:
-                    parent.attachChild(r);
-                    break;
-            }
-        }
-    }
-
-    private Geometry createDebugSphere(AssetManager assetManager, float size, ColorRGBA color) {
-        Geometry g = new Geometry("wireframe sphere", new WireSphere(size));
-        Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        mat.getAdditionalRenderState().setWireframe(true);
-        mat.setColor("Color", color);
-        g.setMaterial(mat);
-        //g.setLocalTranslation(pos);
-        rootNode.attachChild(g);
-        return g;
+        /*
+         if (parent != null) {
+         switch (this.gizmoType) {
+         case TRANSLATE:
+         parent.attachChild(a);
+         break;
+         case ROTATE:
+         parent.attachChild(r);
+         break;
+         }
+         }
+         */
     }
 
     @Override
@@ -414,7 +394,7 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
         inputManager.addMapping("CHANGE_PIVOT", new KeyTrigger(KeyInput.KEY_C));
         inputManager.addMapping("COPY_LASTOBJECT", new KeyTrigger(KeyInput.KEY_F1));
 
-
+        inputManager.addMapping("DOBRUSH", new KeyTrigger(KeyInput.KEY_LSHIFT), new KeyTrigger(KeyInput.KEY_RSHIFT));
 
         inputManager.addMapping("UNDO", new KeyTrigger(KeyInput.KEY_U));
         inputManager.addMapping("REDO", new KeyTrigger(KeyInput.KEY_R));
@@ -425,6 +405,7 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
         inputManager.addListener(analogListener, new String[]{"ACCEPT_INSERTION", "SELECT_OBJECT", "REJECT_INSERTION", "DELETE_SELECTION", "ROTATION_UP", "ROTATION_DOWN"});
         inputManager.addListener(actionListener, new String[]{"CHANGE_PIVOT", "COPY_LASTOBJECT"});
         inputManager.addListener(undoRedoListener, new String[]{"UNDO", "REDO"});
+
         inputManager.addRawInputListener(this);
     }
     private ActionListener undoRedoListener = new ActionListener() {
@@ -458,7 +439,7 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
                 }
 
             } else if (name.equals("COPY_LASTOBJECT") && !keyPressed) {
-                if (objectTypeToCreate != null) {
+                if (objectCreationEvent != null) {
                     insertionElements.detachAllChildren();
                     editorState = EditorState.INSERTIONEVENT;
 
@@ -471,26 +452,7 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
         public void onAnalog(String name, float value, float tpf) {
             //System.out.println("EditorState is : " + editorState);
             //System.out.println("onAnalog : " + name);
-            if (editorState == EditorState.INSERTION) {
-                if ("ACCEPT_INSERTION".equals(name)) {
-                    clearSelection();
-                    addToScene();
-                } else if ("REJECT_INSERTION".equals(name)) {
-                    clearSelection();
-                    linkGeometry.removeFromParent();
-                    wireBoxGeometryLinkParent.removeFromParent();
-                    insertionElements.detachAllChildren();
-                    editorState = EditorState.IDLE;
-                } else if ("ROTATION_UP".equals(name)) {
-                    if (currentPickElement != null) {
-                        currentPickElement.nextRotationValue();
-                    }
-                } else if ("ROTATION_DOWN".equals(name)) {
-                    if (currentPickElement != null) {
-                        currentPickElement.previousRotationValue();
-                    }
-                }
-            } else if (editorState == EditorState.IDLE) {
+            if (editorState == EditorState.IDLE) {
                 if ("DELETE_SELECTION".equals(name)) {
                     for (Node n : currentSelection) {
                         removeNode(level, n);
@@ -531,143 +493,30 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
 
     @Override
     public void onMouseMotionEvent(MouseMotionEvent evt) {
-        if (editorState == EditorState.TRANSLATEX
-                || editorState == EditorState.TRANSLATEY
-                || editorState == EditorState.TRANSLATEZ
-                || editorState == EditorState.TRANSLATETWOAXIS) {
-            Vector2f screenCoords = new Vector2f(evt.getX(), evt.getY());
-            Vector3f p1 = cam.getWorldCoordinates(screenCoords, 0.01f);
-            Vector3f p2 = cam.getWorldCoordinates(screenCoords, 0.95f);
-
-
-            for (Node n : currentSelection) {
-                Vector3f oldValue = n.getLocalTranslation().clone();
-
-                Vector3f pa = new Vector3f();
-                Vector3f pb = new Vector3f();
-                Vector2f t = new Vector2f();
-
-                Vector3f diff1 = Vector3f.ZERO;
-
-
-                pb.set(0, 0, 0);
-                if (editorState == EditorState.TRANSLATETWOAXIS) {
-                    Vector3f normal = pickAxis1.cross(pickAxis2);
-                    float u = normal.dot(pickOffset.subtract(p1)) / normal.dot(p2.subtract(p1));
-
-                    Vector3f loc = p1.add(p2.subtract(p1).mult(u));
-                    Vector3f b1 = n.getParent().worldToLocal(pickOffset, null);
-                    Vector3f b2 = n.getParent().worldToLocal(loc, null);
-                    diff1 = b2.subtract(b1);
-                } else {
-                    if (RayIntersect.rayIntersect(p1, p2, pickOffset, pickOffset.add(pickAxis1), pa, pb, t)) {
-                        Vector3f b1 = n.getParent().worldToLocal(pickOffset, null);
-                        Vector3f b2 = n.getParent().worldToLocal(pb, null);
-                        diff1 = b2.subtract(b1);
-                        //helperSphere2.setLocalTranslation(pb);
-                    }
-                }
-
-                Vector3f baseTranslation = n.getUserData("BaseTranslation");
-                Vector3f translation = baseTranslation.add(diff1);
-
-                if (n instanceof Prefab) {
-                    Prefab p = (Prefab) n;
-                    ObjectType oType = p.getObjectType();
-                    if (oType != null) {
-                        Parameter ptrans = oType.findParameter("TransformComponent", "translation");
-                        if (ptrans != null) {
-                            ptrans.invokeSet(p, translation, true);
-                        }
-                    } else {
-                        Logger.getLogger("DArtE").log(Level.INFO, "Could not find object type for :" + p.getClass().getName());
-                    }
-                }
-            }
-        } else if (editorState == EditorState.ROTATEX || editorState == EditorState.ROTATEY || editorState == EditorState.ROTATEZ) {
-            Vector2f screenCoords = new Vector2f(evt.getX(), evt.getY());
-            Vector3f p1 = cam.getWorldCoordinates(screenCoords, 0.01f);
-            Vector3f p2 = cam.getWorldCoordinates(screenCoords, 0.95f);
-            Vector3f pa = new Vector3f();
-            Vector3f pb = new Vector3f();
-            Vector2f t = new Vector2f();
-            if (RayIntersect.rayIntersect(p1, p2, pickOffset, pickOffset.add(rotationDir), pa, pb, t)) {
-
-                float projectedLength = pb.distance(pickOffset) * 100.0f;
-                if (pb.subtract(pickOffset).dot(rotationDir) > 0) {
-                    projectedLength = -projectedLength;
-                }
-
-                Vector3f axis = null;
-                switch (editorState) {
-                    case ROTATEX:
-                        axis = Vector3f.UNIT_X;
-                        break;
-                    case ROTATEY:
-                        axis = Vector3f.UNIT_Y;
-                        break;
-                    case ROTATEZ:
-                        axis = Vector3f.UNIT_Z;
-                        break;
-                }
-                Quaternion q = new Quaternion();
-                q.fromAngleAxis(projectedLength * FastMath.DEG_TO_RAD, axis);
-
-                for (Node n : currentSelection) {
-                    Quaternion base = n.getUserData("BaseRotation");
-                    Quaternion newValue = base.mult(q);
-
-                    if (n instanceof Prefab) {
-                        Prefab p = (Prefab) n;
-                        ObjectType oType = p.getObjectType();
-                        if (oType != null) {
-                            Parameter rotation = oType.findParameter("TransformComponent", "rotation");
-                            if (rotation != null) {
-                                rotation.invokeSet(p, newValue, true);
-                            }
-                        } else {
-                            Logger.getLogger("DArtE").log(Level.INFO, "Could not find object type for :{0}", p.getClass().getName());
-                        }
-                    }
-                }
-            }
-        }
+        currentTool.onMouseMotionEvent(evt, this);
     }
 
     @Override
     public void onMouseButtonEvent(MouseButtonEvent evt) {
         if (evt.isReleased()) {
-            handleMouseReleased();
+            currentTool.onMouseButtonReleased(this);
         } else if (evt.isPressed()) {
-            if (editorState == EditorState.IDLE) {
-                //System.out.println("picking");
-                pick();
-                pickGizmo();
-            } else if (editorState == EditorState.LINK || editorState == EditorState.LINKPARENT) {
-                pick();
-            } else if (editorState == EditorState.PICK) {
-                pick();
-            }
+            currentTool.onMouseButtonPressed(this);
+            /*
+             if (editorState == EditorState.IDLE) {
+             //System.out.println("picking");
+             pick();
+             pickGizmo();
+             } else if (editorState == EditorState.LINK || editorState == EditorState.LINKPARENT) {
+             pick();
+             } else if (editorState == EditorState.PICK) {
+             pick();
+             }
+             */
         }
     }
 
-    private void handleMouseReleased() {
-        if (editorState == EditorState.TRANSLATEX
-                || editorState == EditorState.TRANSLATEY
-                || editorState == EditorState.TRANSLATEZ
-                || editorState == EditorState.TRANSLATETWOAXIS
-                || editorState == EditorState.ROTATEX || editorState == EditorState.ROTATEY || editorState == EditorState.ROTATEZ) {
-
-            // re-enable physics
-            for (Node n : this.currentSelection) {
-                ((Prefab) n).enablePhysics();
-            }
-            editorState = EditorState.IDLE;
-            flyCam.setEnabled(true);
-        }
-    }
-
-    private void addToScene() {
+    public void addToScene() {
         clearSelection();
 
         for (Spatial p : insertionElements.getChildren()) {
@@ -732,25 +581,33 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
             }
             selectionFromOutside.clear();
             editorState = EditorState.IDLE;
+            activateIdleState();
         }
 
         if (editorState == EditorState.INSERTIONEVENT) {
+            ObjectType objectTypeToCreate = objectCreationEvent.getObjectType();
             String name = createName(this.sceneElements, objectTypeToCreate.getLabel());
+
             Prefab p = objectTypeToCreate.create(assetManager, name);
+            if (objectCreationEvent.hasComponents()) {
+                for (PrefabComponent pc : objectCreationEvent.getComponents()) {
+                    p.removeComponents(pc.getId());
+                    p.addPrefabComponent(pc);
+                }
+            }
             if (p != null) {
                 BulletAppState state = stateManager.getState(BulletAppState.class);
                 state.getPhysicsSpace().addAll(p);
-                insertionElements.attachChild((Node) p);
-                currentInsertion = (Node) p;
+                insertionElement = p;
+                this.insertionElements.attachChild(insertionElement);
                 this.clearSelection();
                 this.addToSelection(p);
-                editorState = EditorState.INSERTION;
+                activateInsertionTool();
             }
+
+            editorState = EditorState.IDLE;
         }
-        if (editorState == EditorState.INSERTION) {
-            //ystem.out.println("Doing insertion");
-            doInsertion();
-        }
+
 
         if (editorState == EditorState.ADDTOSCENE) {
             addToScene();
@@ -782,37 +639,15 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
             }
         }
 
-        if (editorState == EditorState.LINKPARENT) {
-            Vector3f from = this.currentChildElement.getWorldTranslation();
-            Vector3f to = this.doLink();
-            linkShape.setLine(from, to);
-        }
 
-        if (editorState == EditorState.PICK) {
-            doPickText();
-        }
+        currentTool.simpleUpdate(tpf, this);
+
 
         // Gizmo part
         if (newGizmoType != gizmoType) {
             switchGizmo();
         }
 
-        // Adjust gizmo scale
-        float d = cam.getLocation().distance(a.getWorldTranslation());
-        float rd = (d - cam.getFrustumNear()) / (cam.getFrustumFar() - cam.getFrustumNear());
-
-        switch (gizmoType) {
-            case TRANSLATE:
-                Vector3f ws = a.getParent() != null ? a.getParent().getWorldScale() : Vector3f.UNIT_XYZ;
-                float factor = 1.5f * (0.1f + rd * 10);
-                a.setLocalScale(factor / ws.x, factor / ws.y, factor / ws.z);
-                break;
-            case ROTATE:
-                Vector3f rws = r.getParent() != null ? r.getParent().getWorldScale() : Vector3f.UNIT_XYZ;
-                float factorr = 0.9f * (0.1f + rd * 10);
-                r.setLocalScale(factorr / rws.x, factorr / rws.y, factorr / rws.z);
-                break;
-        }
 
         synchronized (viewportTasks) {
             for (Runnable tasks : viewportTasks) {
@@ -834,273 +669,8 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
         } while (spatial != null);
         return prefix + i;
     }
-    private Triangle contactTriangle = new Triangle();
 
-    private void doInsertion() {
-        // Reset results list.
-        CollisionResults results = new CollisionResults();
-        // Convert screen click to 3d position
-        Vector2f click2d = inputManager.getCursorPosition();
-        Vector3f click3d = cam.getWorldCoordinates(new Vector2f(click2d.x, click2d.y), 0f).clone();
-        Vector3f dir = cam.getWorldCoordinates(new Vector2f(click2d.x, click2d.y), 1f).subtractLocal(click3d);
-        // Aim the ray from the clicked spot forwards.
-        dir.normalizeLocal();
-        Ray ray = new Ray(click3d, dir);
-        // Collect intersections between ray and all nodes in results list.
-
-        sceneElements.collideWith(ray, results);
-
-        int index = 0;
-        for (; index < results.size(); ++index) {
-            Geometry g = results.getCollision(index).getGeometry();
-            Boolean pickable = g.getUserData("Pickable");
-            if (pickable == null || pickable == true) {
-                break;
-            }
-        }
-        if (index == results.size()) {
-            return;
-        }
-
-        CollisionResult result = results.getCollision(index);
-        Geometry g = result.getGeometry();
-        Prefab prefab = findPrefabParent(g);
-        this.currentPickElement = prefab;
-
-        Vector3f point = result.getContactPoint().clone();
-        result.getTriangle(contactTriangle);
-
-        Quaternion rotation = Quaternion.IDENTITY;
-        if (autoGridEnabled) {
-            rotation = this.createRotationFromNormal(result.getContactNormal(), this.autoGridAxis);
-        }
-
-        if (g.getParent() instanceof MagnetObject) {
-            MagnetObject mo = (MagnetObject) g.getParent();
-            Magnet m = mo.getMagnet();
-            Vector3f magnetLoc = m.getLocation();
-            // there should be a prefab parent.
-            Vector3f magnetLocWorld = new Vector3f();
-            if (prefab != null) {
-                mo.localToWorld(magnetLoc, magnetLocWorld);
-                Quaternion moLocalRot = g.getWorldRotation();
-
-                currentInsertion.setLocalRotation(moLocalRot);
-                setLocationOnPrefab((Prefab) currentInsertion, magnetLoc, false);
-            }
-        } else if (prefab == null) {
-            if (currentInsertion instanceof Prefab) {
-                setLocationOnPrefab((Prefab) currentInsertion, point, false);
-                ((Prefab) currentInsertion).setLocalPrefabRotation(rotation);
-            } else {
-                currentInsertion.setLocalTranslation(point);
-                currentInsertion.setLocalRotation(rotation);
-            }
-
-        } else {
-            if (prefab.hasMagnets()) {
-                float distance = Float.MAX_VALUE;
-                Magnet closestMagnet = null;
-                Vector3f worldLoc = new Vector3f();
-                for (Magnet m : prefab.getMagnets()) {
-                    if (m.hasMagnetArea()) {
-                        Vector3f local = new Vector3f();
-                        prefab.worldToLocal(point, local);
-                        local.addLocal(prefab.getOffset());
-                        //System.out.println("Local point : " + local);
-                        if (m.isInside(local)) {
-                            closestMagnet = m;
-                            break;
-                        }
-                    } else {
-                        float magnetDistance = m.calcDistance(point, prefab);
-                        if (magnetDistance < distance) {
-                            closestMagnet = m;
-                            distance = magnetDistance;
-                        }
-                    }
-                }
-                if (closestMagnet != null) {
-                    if (closestMagnet.hasSelectPivot()) {
-                        if (currentInsertion instanceof Prefab) {
-                            Prefab p = (Prefab) currentInsertion;
-                            p.selectPivot(closestMagnet.getSelectPivot());
-                        }
-
-                    }
-                    prefab.setAttachMagnet(closestMagnet);
-
-                    Matrix3f rot = closestMagnet.getLocalFrame();
-                    Quaternion world = prefab.getWorldRotation();
-                    Quaternion local = new Quaternion();
-                    local.fromRotationMatrix(rot);
-                    Quaternion insertRotation = local.mult(world);
-
-                    Vector3f magnetLoc = closestMagnet.getLocation();
-                    Vector3f offsetLoc = magnetLoc.subtract(prefab.getOffset());
-                    prefab.localToWorld(offsetLoc, worldLoc);
-                    if (currentInsertion instanceof Prefab) {
-
-                        Prefab p = (Prefab) currentInsertion;
-                        setLocationOnPrefab((Prefab)currentInsertion, point.subtract(p.getPivot()), false);
-                        if (closestMagnet.hasLocalFrame()) {
-                            p.setLocalPrefabRotation(insertRotation);
-                        } else {
-                            p.setLocalPrefabRotation(rotation);
-                        }
-
-                    } else {
-                        currentInsertion.setLocalTranslation(point);
-                        if (closestMagnet.hasLocalFrame()) {
-                            currentInsertion.setLocalRotation(insertRotation);
-                        } else {
-                            currentInsertion.setLocalRotation(rotation);
-                        }
-                    }
-                }
-
-            } else {
-                if (currentInsertion instanceof Prefab) {
-                    Prefab p = (Prefab) currentInsertion;
-                    setLocationOnPrefab(p, point.subtract(p.getPivot()), false);
-                    p.setLocalPrefabRotation(rotation);
-                } else {
-                    currentInsertion.setLocalTranslation(point);
-                    currentInsertion.setLocalRotation(rotation);
-                }
-
-            }
-
-        }
-    }
-
-    private Quaternion createRotationFromNormal(Vector3f normal, AxisEnum mainAxis) {
-        Vector3f x, y;
-        Quaternion result = new Quaternion();
-        if (normal.x > normal.y && normal.x > normal.z) {
-            x = normal.cross(Vector3f.UNIT_Y);
-            x.normalizeLocal();
-            y = normal.cross(x);
-            y.normalizeLocal();
-
-        } else if (normal.y > normal.x && normal.y > normal.z) {
-            x = normal.cross(Vector3f.UNIT_Z);
-            x.normalizeLocal();
-            y = normal.cross(x);
-            y.normalizeLocal();
-        } else {
-            x = normal.cross(Vector3f.UNIT_X);
-            x.normalizeLocal();
-            y = normal.cross(x);
-            y.normalizeLocal();
-        }
-
-        switch (mainAxis) {
-            case X:
-                result.fromAxes(normal, x, y);
-                break;
-            case Y:
-                result.fromAxes(y, normal, x);
-                break;
-            case Z:
-                result.fromAxes(x, y, normal);
-                break;
-        }
-        return result;
-    }
-
-    private Vector3f doLink() {
-        CollisionResults results = new CollisionResults();
-        // Convert screen click to 3d position
-        Vector2f click2d = inputManager.getCursorPosition();
-        Vector3f click3d = cam.getWorldCoordinates(new Vector2f(click2d.x, click2d.y), 0f).clone();
-        Vector3f dir = cam.getWorldCoordinates(new Vector2f(click2d.x, click2d.y), 1f).subtractLocal(click3d);
-        // Aim the ray from the clicked spot forwards.
-        Ray ray = new Ray(click3d, dir);
-        // Collect intersections between ray and all nodes in results list.
-
-        sceneElements.collideWith(ray, results);
-
-        CollisionResult result = results.getClosestCollision();
-        if (result == null) {
-            return cam.getWorldCoordinates(new Vector2f(click2d.x, click2d.y), 0.5f).clone();
-        }
-
-        Geometry g = result.getGeometry();
-        Prefab prefab = findPrefabParent(g);
-
-        if (prefab != null) {
-            prefab.updateModelBound();
-            BoundingVolume bv = prefab.getWorldBound();
-            if (bv.getType() == Type.AABB) {
-                BoundingBox bb = (BoundingBox) bv;
-                wireBoxLinkParent.fromBoundingBox(bb);
-                wireBoxGeometryLinkParent.setLocalTranslation(bb.getCenter().clone());
-                if (wireBoxGeometryLinkParent.getParent() == null) {
-                    rootNode.attachChild(wireBoxGeometryLinkParent);
-                }
-            }
-            linkText.setText(currentChildElement.getName() + "->" + prefab.getName());
-            linkText.setLocalTranslation(click2d.x, click2d.y, 0.01f);
-            textBackground.setDimension(linkText.getLineWidth() + 2, linkText.getLineHeight() + 4);
-            textBackgroundGeometry.updateModelBound();
-            textBackgroundGeometry.setLocalTranslation(click2d.x - 1, click2d.y - linkText.getLineHeight() - 2, 0f);
-            return result.getContactPoint();
-        } else {
-            wireBoxGeometryLinkParent.removeFromParent();
-            return result.getContactPoint();
-        }
-    }
-
-    private void doPickText() {
-        CollisionResults results = new CollisionResults();
-        // Convert screen click to 3d position
-        Vector2f click2d = inputManager.getCursorPosition();
-        Vector3f click3d = cam.getWorldCoordinates(new Vector2f(click2d.x, click2d.y), 0f).clone();
-        Vector3f dir = cam.getWorldCoordinates(new Vector2f(click2d.x, click2d.y), 1f).subtractLocal(click3d);
-        // Aim the ray from the clicked spot forwards.
-        Ray ray = new Ray(click3d, dir);
-        // Collect intersections between ray and all nodes in results list.
-
-        sceneElements.collideWith(ray, results);
-
-        CollisionResult result = results.getClosestCollision();
-        if (result == null) {
-            linkText.setText("");
-            textBackground.setDimension(0, 0);
-            textBackgroundGeometry.updateModelBound();
-            return;
-        }
-
-        Geometry g = result.getGeometry();
-        Prefab prefab = findPrefabParent(g);
-
-        if (prefab != null) {
-            prefab.updateModelBound();
-            BoundingVolume bv = prefab.getWorldBound();
-            if (bv.getType() == Type.AABB) {
-                BoundingBox bb = (BoundingBox) bv;
-                wireBoxLinkParent.fromBoundingBox(bb);
-                wireBoxGeometryLinkParent.setLocalTranslation(bb.getCenter().clone());
-                if (wireBoxGeometryLinkParent.getParent() == null) {
-                    rootNode.attachChild(wireBoxGeometryLinkParent);
-                }
-            }
-            linkText.setText(prefab.getName());
-            linkText.setLocalTranslation(click2d.x, click2d.y, 0.01f);
-            textBackground.setDimension(linkText.getLineWidth() + 2, linkText.getLineHeight() + 4);
-            textBackgroundGeometry.updateModelBound();
-            textBackgroundGeometry.setLocalTranslation(click2d.x - 1, click2d.y - linkText.getLineHeight() - 2, 0f);
-
-        } else {
-            linkText.setText("");
-            textBackground.setDimension(0, 0);
-            textBackgroundGeometry.updateModelBound();
-            wireBoxGeometryLinkParent.removeFromParent();
-        }
-    }
-
-    private Prefab findPrefabParent(Geometry g) {
+    public Prefab findPrefabParent(Geometry g) {
         Node parent = g.getParent();
         while (!(parent instanceof Prefab) && parent != this.sceneElements && parent != null) {
             parent = parent.getParent();
@@ -1112,7 +682,7 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
         }
     }
 
-    private void pick() {
+    public Prefab pick() {
         CollisionResults results = new CollisionResults();
         // Convert screen click to 3d position
         Vector2f click2d = inputManager.getCursorPosition();
@@ -1124,7 +694,7 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
         sceneElements.collideWith(ray, results);
 
         if (results.size() == 0) {
-            return;
+            return null;
         }
 
         // check if the axis is in there.
@@ -1132,132 +702,135 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
             CollisionResult cr = it.next();
             Geometry g = cr.getGeometry();
             if (hasGizmoParent(g)) {
-                return;
+                return null;
             }
         }
 
-        if (editorState == EditorState.IDLE || editorState == EditorState.LINK || editorState == EditorState.LINKPARENT || editorState == EditorState.PICK) {
-            int index = 0;
-            for (; index < results.size(); ++index) {
-                Geometry g = results.getCollision(index).getGeometry();
-                Boolean pickable = (Boolean) g.getUserData("Pickable");
-                if (pickable == null || pickable == true) {
-                    break;
-                }
-            }
-            if (index == results.size()) {
-                return;
-            }
-
+        // if (editorState == EditorState.IDLE || editorState == EditorState.LINK || editorState == EditorState.LINKPARENT || editorState == EditorState.PICK) {
+        int index = 0;
+        for (; index < results.size(); ++index) {
             Geometry g = results.getCollision(index).getGeometry();
-            Node parent = g.getParent();
-            boolean hasKlatchParent = false;
-            boolean hasPrefabParent = false;
-
-            Node check = parent;
-            while (check != this.sceneElements) {
-                if (check instanceof Prefab) {
-                    hasPrefabParent = true;
-                }
-                if (check instanceof Klatch) {
-                    hasKlatchParent = true;
-                }
-                check = check.getParent();
-            }
-
-            if (hasKlatchParent) {
-                while (!(parent instanceof Klatch) && parent != this.sceneElements) {
-                    parent = parent.getParent();
-                }
-            } else if (hasPrefabParent) {
-                while (!(parent instanceof Prefab) && parent != this.sceneElements) {
-                    parent = parent.getParent();
-                }
-            } else {
-                return;
-            }
-
-            if (parent != this.sceneElements) {
-                if (editorState == EditorState.IDLE) {
-                    clearSelection();
-                    this.addToSelection(parent);
-                } else if (editorState == EditorState.PICK) {
-                    PickEvent pe = new PickEvent((Prefab) parent, this, pickProperty);
-                    GlobalObjects.getInstance().postEvent(pe);
-                    clearSelection();
-                    this.newGizmoType = GizmoType.TRANSLATE;
-                    editorState = EditorState.IDLE;
-                    linkText.setText("");
-                    textBackground.setDimension(0, 0);
-                    textBackgroundGeometry.updateModelBound();
-                    linkGeometry.removeFromParent();
-                    wireBoxGeometryLinkParent.removeFromParent();
-                    currentChildElement = null;
-                    guiNode.detachChild(linkText);
-                    guiNode.detachChild(textBackgroundGeometry);
-                } else if (editorState == EditorState.LINK) {
-                    this.currentChildElement = (Prefab) parent;
-                    addToSelection(currentChildElement);
-                    rootNode.attachChild(linkGeometry);
-                    editorState = EditorState.LINKPARENT;
-                } else if (editorState == EditorState.LINKPARENT) {
-                    Prefab p = (Prefab) parent;
-                    if (p == currentChildElement) {
-                        return;
-                    }
-
-                    Vector3f wtrans = currentChildElement.getWorldTranslation().clone();
-                    Quaternion wrot = currentChildElement.getWorldRotation().clone();
-                    Vector3f wscale = currentChildElement.getWorldScale().clone();
-
-                    // child element is moved from one place to another.
-                    ProjectTreeNode previousParent = currentChildElement.getProjectParent();
-                    int previousIndex = previousParent.getIndexOfChild(currentChildElement);
-                    p.attachChild(currentChildElement);
-                    // it is possible that the attachment process attaches the child somewhere else.
-                    // express the world transformation of the child as a local transformation in the parent space.
-                    Node pn = currentChildElement.getParent();
-                    if (pn != null) {
-                        Matrix4f parentMatrix = new Matrix4f();
-                        parentMatrix.setTranslation(pn.getWorldTranslation());
-                        parentMatrix.setRotationQuaternion(pn.getWorldRotation());
-                        parentMatrix.setScale(pn.getWorldScale());
-                        parentMatrix.invertLocal();
-
-                        Matrix4f childMatrix = new Matrix4f();
-                        childMatrix.setTranslation(wtrans);
-                        childMatrix.setRotationQuaternion(wrot);
-                        childMatrix.setScale(wscale);
-
-                        Matrix4f local = parentMatrix.mult(childMatrix);
-
-                        currentChildElement.setLocalTranslation(local.toTranslationVector());
-                        currentChildElement.setLocalRotation(local.toRotationQuat());
-                        currentChildElement.setLocalScale(local.toScaleVector());
-                    }
-
-                    // remove child from its layer
-                    if (previousParent instanceof Layer) {
-                        Layer l = (Layer) previousParent;
-                        l.removeNode(currentChildElement);
-                    }
-
-                    LevelEvent le = new LevelEvent(level, EventType.NODEMOVED, currentChildElement, previousParent, previousIndex, pn);
-                    GlobalObjects.getInstance().postEvent(le);
-
-                    editorState = EditorState.IDLE;
-                    newGizmoType = GizmoType.TRANSLATE;
-                    linkText.setText("");
-                    textBackground.setDimension(0, 0);
-                    textBackgroundGeometry.updateModelBound();
-                    linkGeometry.removeFromParent();
-                    wireBoxGeometryLinkParent.removeFromParent();
-                    currentChildElement = null;
-                    guiNode.detachChild(linkText);
-                    guiNode.detachChild(textBackgroundGeometry);
-                }
+            Boolean pickable = (Boolean) g.getUserData("Pickable");
+            if (pickable == null || pickable == true) {
+                break;
             }
         }
+        if (index == results.size()) {
+            return null;
+        }
+
+        Geometry g = results.getCollision(index).getGeometry();
+        Node parent = g.getParent();
+        boolean hasKlatchParent = false;
+        boolean hasPrefabParent = false;
+
+        Node check = parent;
+        while (check != this.sceneElements) {
+            if (check instanceof Prefab) {
+                hasPrefabParent = true;
+            }
+            if (check instanceof Klatch) {
+                hasKlatchParent = true;
+            }
+            check = check.getParent();
+        }
+
+        if (hasKlatchParent) {
+            while (!(parent instanceof Klatch) && parent != this.sceneElements) {
+                parent = parent.getParent();
+            }
+        } else if (hasPrefabParent) {
+            while (!(parent instanceof Prefab) && parent != this.sceneElements) {
+                parent = parent.getParent();
+            }
+        } else {
+            return null;
+        }
+
+        return (Prefab) parent;
+        /*
+         if (parent != this.sceneElements) {
+         if (editorState == EditorState.IDLE) {
+         clearSelection();
+         this.addToSelection(parent);
+         } else if (editorState == EditorState.PICK) {
+         PickEvent pe = new PickEvent((Prefab) parent, this, pickProperty);
+         GlobalObjects.getInstance().postEvent(pe);
+         clearSelection();
+         this.newGizmoType = GizmoType.TRANSLATE;
+         editorState = EditorState.IDLE;
+         linkText.setText("");
+         textBackground.setDimension(0, 0);
+         textBackgroundGeometry.updateModelBound();
+         linkGeometry.removeFromParent();
+         wireBoxGeometryLinkParent.removeFromParent();
+         currentChildElement = null;
+         guiNode.detachChild(linkText);
+         guiNode.detachChild(textBackgroundGeometry);
+         } else if (editorState == EditorState.LINK) {
+         this.currentChildElement = (Prefab) parent;
+         addToSelection(currentChildElement);
+         rootNode.attachChild(linkGeometry);
+         editorState = EditorState.LINKPARENT;
+         } else if (editorState == EditorState.LINKPARENT) {
+         Prefab p = (Prefab) parent;
+         if (p == currentChildElement) {
+         return;
+         }
+
+         Vector3f wtrans = currentChildElement.getWorldTranslation().clone();
+         Quaternion wrot = currentChildElement.getWorldRotation().clone();
+         Vector3f wscale = currentChildElement.getWorldScale().clone();
+
+         // child element is moved from one place to another.
+         ProjectTreeNode previousParent = currentChildElement.getProjectParent();
+         int previousIndex = previousParent.getIndexOfChild(currentChildElement);
+         p.attachChild(currentChildElement);
+         // it is possible that the attachment process attaches the child somewhere else.
+         // express the world transformation of the child as a local transformation in the parent space.
+         Node pn = currentChildElement.getParent();
+         if (pn != null) {
+         Matrix4f parentMatrix = new Matrix4f();
+         parentMatrix.setTranslation(pn.getWorldTranslation());
+         parentMatrix.setRotationQuaternion(pn.getWorldRotation());
+         parentMatrix.setScale(pn.getWorldScale());
+         parentMatrix.invertLocal();
+
+         Matrix4f childMatrix = new Matrix4f();
+         childMatrix.setTranslation(wtrans);
+         childMatrix.setRotationQuaternion(wrot);
+         childMatrix.setScale(wscale);
+
+         Matrix4f local = parentMatrix.mult(childMatrix);
+
+         currentChildElement.setLocalTranslation(local.toTranslationVector());
+         currentChildElement.setLocalRotation(local.toRotationQuat());
+         currentChildElement.setLocalScale(local.toScaleVector());
+         }
+
+         // remove child from its layer
+         if (previousParent instanceof Layer) {
+         Layer l = (Layer) previousParent;
+         l.removeNode(currentChildElement);
+         }
+
+         LevelEvent le = new LevelEvent(level, EventType.NODEMOVED, currentChildElement, previousParent, previousIndex, pn);
+         GlobalObjects.getInstance().postEvent(le);
+
+         editorState = EditorState.IDLE;
+         newGizmoType = GizmoType.TRANSLATE;
+         linkText.setText("");
+         textBackground.setDimension(0, 0);
+         textBackgroundGeometry.updateModelBound();
+         linkGeometry.removeFromParent();
+         wireBoxGeometryLinkParent.removeFromParent();
+         currentChildElement = null;
+         guiNode.detachChild(linkText);
+         guiNode.detachChild(textBackgroundGeometry);
+         }
+         }
+         }
+         */
     }
 
     private boolean hasGizmoParent(Geometry g) {
@@ -1272,6 +845,8 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
     }
 
     public void addToSelection(Node node) {
+        if ( node == null)
+            return;
         currentSelection.add(node);
 
         if (node instanceof Prefab) {
@@ -1280,12 +855,7 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
 
             GlobalObjects.getInstance().postEvent(new SelectionEvent((Prefab) node, this));
         }
-        if (gizmoType == GizmoType.TRANSLATE) {
-            node.attachChild(a);
-        } else if (gizmoType == GizmoType.ROTATE) {
-            node.attachChild(r);
-        }
-
+        currentTool.selectionChanged(this, node);
         adaptSelectionBox();
     }
 
@@ -1294,39 +864,29 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
             ((Prefab) n).setSelected(false);
         }
         currentSelection.clear();
-        a.removeFromParent();
-        r.removeFromParent();
+        currentTool.removeGizmo();
 
         adaptSelectionBox();
     }
 
-    private void pickGizmo() {
-        if (editorState == EditorState.IDLE) {
-            CollisionResults results = new CollisionResults();
-            // Convert screen click to 3d position
-            Vector2f click2d = inputManager.getCursorPosition();
-            Vector3f click3d = cam.getWorldCoordinates(new Vector2f(click2d.x, click2d.y), 0f).clone();
-            Vector3f dir = cam.getWorldCoordinates(new Vector2f(click2d.x, click2d.y), 0.5f).subtractLocal(click3d);
-            // Aim the ray from the clicked spot forwards.
-            Ray ray = new Ray(click3d, dir);
-            // Collect intersections between ray and all nodes in results list.
-            switch (gizmoType) {
-                case TRANSLATE:
-                    this.a.collideWith(ray, results);
-                    break;
-                case ROTATE:
-                    r.collideWith(ray, results);
-                    break;
-            }
+    public void pickGizmo() {
 
+        CollisionResults results = new CollisionResults();
+        // Convert screen click to 3d position
+        Vector2f click2d = inputManager.getCursorPosition();
+        Vector3f click3d = cam.getWorldCoordinates(new Vector2f(click2d.x, click2d.y), 0f).clone();
+        Vector3f dir = cam.getWorldCoordinates(new Vector2f(click2d.x, click2d.y), 0.5f).subtractLocal(click3d);
+        // Aim the ray from the clicked spot forwards.
+        Ray ray = new Ray(click3d, dir);
+        // Collect intersections between ray and all nodes in results list.
+        currentTool.pickGizmo(ray, results);
 
-            if (results.size() > 1) {
-                Geometry g = results.getCollision(0).getGeometry();
-                Vector3f contactPoint = results.getClosestCollision().getContactPoint();
+        if (results.size() > 0) {
+            Geometry g = results.getCollision(0).getGeometry();
+            Vector3f contactPoint = results.getClosestCollision().getContactPoint();
 
-                if (g.getUserData("Transform") != null) {
-                    setupTransform(g, contactPoint);
-                }
+            if (g.getUserData("Transform") != null) {
+                currentTool.gizmoPicked(this, g, contactPoint);
             }
         }
     }
@@ -1344,35 +904,38 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
     }
 
     private void setupTranslateTransform(Geometry g, Vector3f contactPoint) {
-        String transform = g.getUserData("Transform");
-        if ("translate_X".equals(transform)) {
-            editorState = EditorState.TRANSLATEX;
-            a.getWorldRotation().mult(new Vector3f(1, 0, 0), pickAxis1);
-        } else if ("translate_Y".equals(transform)) {
-            editorState = EditorState.TRANSLATEY;
-            a.getWorldRotation().mult(new Vector3f(0, 1, 0), pickAxis1);
-        } else if ("translate_Z".equals(transform)) {
-            editorState = EditorState.TRANSLATEZ;
-            a.getWorldRotation().mult(new Vector3f(0, 0, 1), pickAxis1);
-        } else if ("translate_XY".equals(transform)) {
-            a.getWorldRotation().mult(new Vector3f(1, 0, 0), pickAxis1);
-            a.getWorldRotation().mult(new Vector3f(0, 1, 0), pickAxis2);
-            editorState = EditorState.TRANSLATETWOAXIS;
-        } else if ("translate_YZ".equals(transform)) {
-            a.getWorldRotation().mult(new Vector3f(0, 1, 0), pickAxis1);
-            a.getWorldRotation().mult(new Vector3f(0, 0, 1), pickAxis2);
-            editorState = EditorState.TRANSLATETWOAXIS;
-        } else if ("translate_XZ".equals(transform)) {
-            a.getWorldRotation().mult(new Vector3f(1, 0, 0), pickAxis1);
-            a.getWorldRotation().mult(new Vector3f(0, 0, 1), pickAxis2);
-            editorState = EditorState.TRANSLATETWOAXIS;
-        }
-        pickOffset = contactPoint.clone();
+        /*
+         String transform = g.getUserData("Transform");
+         if ("translate_X".equals(transform)) {
+         editorState = EditorState.TRANSLATEX;
+         a.getWorldRotation().mult(new Vector3f(1, 0, 0), pickAxis1);
+         } else if ("translate_Y".equals(transform)) {
+         editorState = EditorState.TRANSLATEY;
+         a.getWorldRotation().mult(new Vector3f(0, 1, 0), pickAxis1);
+         } else if ("translate_Z".equals(transform)) {
+         editorState = EditorState.TRANSLATEZ;
+         a.getWorldRotation().mult(new Vector3f(0, 0, 1), pickAxis1);
+         } else if ("translate_XY".equals(transform)) {
+         a.getWorldRotation().mult(new Vector3f(1, 0, 0), pickAxis1);
+         a.getWorldRotation().mult(new Vector3f(0, 1, 0), pickAxis2);
+         editorState = EditorState.TRANSLATETWOAXIS;
+         } else if ("translate_YZ".equals(transform)) {
+         a.getWorldRotation().mult(new Vector3f(0, 1, 0), pickAxis1);
+         a.getWorldRotation().mult(new Vector3f(0, 0, 1), pickAxis2);
+         editorState = EditorState.TRANSLATETWOAXIS;
+         } else if ("translate_XZ".equals(transform)) {
+         a.getWorldRotation().mult(new Vector3f(1, 0, 0), pickAxis1);
+         a.getWorldRotation().mult(new Vector3f(0, 0, 1), pickAxis2);
+         editorState = EditorState.TRANSLATETWOAXIS;
+         }
+         pickOffset = contactPoint.clone();
+         */
 
         for (Node n : currentSelection) {
             n.setUserData("BaseTranslation", n.getLocalTranslation().clone());
         }
 
+        // TODO : copy to TranslateTool class.
         if (shiftIsDown) {
             // create a copy
             ArrayList<Prefab> duplicates = new ArrayList<Prefab>();
@@ -1418,29 +981,31 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
     }
 
     private void setupRotateTransform(Geometry g, Vector3f contactPoint) {
-        String transform = g.getName();
-        Vector3f cp = g.worldToLocal(contactPoint, null);
-        if ("X".equals(transform)) {
-            editorState = EditorState.ROTATEX;
-            Vector3f axis = g.getLocalRotation().mult(Vector3f.UNIT_X);
-            rotationDir = cp.cross(axis);
-        } else if ("Y".equals(transform)) {
-            editorState = EditorState.ROTATEY;
-            Vector3f axis = g.getLocalRotation().mult(Vector3f.UNIT_Y);
-            rotationDir = cp.cross(axis);
-        } else if ("Z".equals(transform)) {
-            editorState = EditorState.ROTATEZ;
-            Vector3f axis = g.getLocalRotation().mult(Vector3f.UNIT_Z);
-            rotationDir = cp.cross(axis);
-        }
-        g.getWorldRotation().mult(rotationDir, rotationDir);
-        rotationDir.normalizeLocal();
+        /*
+         String transform = g.getName();
+         Vector3f cp = g.worldToLocal(contactPoint, null);
+         if ("X".equals(transform)) {
+         editorState = EditorState.ROTATEX;
+         Vector3f axis = g.getLocalRotation().mult(Vector3f.UNIT_X);
+         rotationDir = cp.cross(axis);
+         } else if ("Y".equals(transform)) {
+         editorState = EditorState.ROTATEY;
+         Vector3f axis = g.getLocalRotation().mult(Vector3f.UNIT_Y);
+         rotationDir = cp.cross(axis);
+         } else if ("Z".equals(transform)) {
+         editorState = EditorState.ROTATEZ;
+         Vector3f axis = g.getLocalRotation().mult(Vector3f.UNIT_Z);
+         rotationDir = cp.cross(axis);
+         }
+         g.getWorldRotation().mult(rotationDir, rotationDir);
+         rotationDir.normalizeLocal();
 
-        pickOffset = contactPoint.clone();
+         pickOffset = contactPoint.clone();
 
-        for (Node n : currentSelection) {
-            n.setUserData("BaseRotation", n.getLocalRotation().clone());
-        }
+         for (Node n : currentSelection) {
+         n.setUserData("BaseRotation", n.getLocalRotation().clone());
+         }
+         */
     }
 
     /**
@@ -1452,11 +1017,8 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
     public void onObjectCreation(CreateObjectEvent coe) {
 
         synchronized (this) {
-
-            insertionElements.detachAllChildren();
             editorState = EditorState.INSERTIONEVENT;
-            this.objectTypeToCreate = coe.getObjectType();
-
+            this.objectCreationEvent = coe;
             //creationTime = System.currentTimeMillis();
         }
     }
@@ -1510,7 +1072,6 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
             submitViewportTask(new Runnable() {
                 public void run() {
                     for (Node n : le.getNodes()) {
-
                         removeNode(le.getLevel(), n);
                     }
                     clearSelection();
@@ -1550,6 +1111,9 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
     }
 
     private void reloadAsset(FileNode asset) {
+        if (asset == null) {
+            return;
+        }
         if (assetManager instanceof DesktopAssetManager) {
             ModelKey mk = new ModelKey(asset.getFullName());
             DesktopAssetManager dt = (DesktopAssetManager) assetManager;
@@ -1561,7 +1125,8 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
                 if (asset.getExtension().equals("j3o")) {
                     List<MeshObject> meshesToChange = l.descendantMatches(MeshObject.class);
                     for (MeshObject mo : meshesToChange) {
-                        if (mo.getMeshFile().equals(fullName)) {
+                        MeshComponent mc = (MeshComponent) mo.getComponent("MeshComponent");
+                        if (mc.getMeshFile().equals(fullName)) {
                             mo.reloadMesh();
                         }
                     }
@@ -1594,48 +1159,44 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
         if (ge.getSource() != this) {
             this.newGizmoType = ge.getType();
             if (ge.getType() == GizmoType.PICK) {
-                this.pickProperty = ge.getPickProperty();
+                this.pickTool.setPickProperty(ge.getPickProperty());
             }
         }
     }
 
-    private void switchGizmo() {
+    public Node getFirstSelectedNode() {
+        return currentSelection.size() > 0 ? currentSelection.get(0) : null;
+    }
 
+    private void switchGizmo() {
         gizmoType = newGizmoType;
         Node n = null;
+
+        if (currentTool != null) {
+            currentTool.deactivate(this);
+        }
+
         if (currentSelection.size() > 0) {
-            a.removeFromParent();
-            r.removeFromParent();
             n = this.currentSelection.get(0);
         }
         switch (gizmoType) {
             case TRANSLATE:
-//                    inputManager.setMouseCursor(cursorMove);
-                editorState = EditorState.IDLE;
-                if (n != null) {
-                    n.attachChild(a);
-                }
+                currentTool = translateTool;
                 break;
             case ROTATE:
-//                    inputManager.setMouseCursor(cursorRotate);
-                editorState = EditorState.IDLE;
-                if (n != null) {
-                    n.attachChild(r);
-                }
+                currentTool = rotateTool;
                 break;
             case LINK:
-                clearSelection();
-//                    inputManager.setMouseCursor(cursorConnect1);
-                editorState = EditorState.LINK;
-                guiNode.attachChild(linkText);
-                guiNode.attachChild(textBackgroundGeometry);
+                currentTool = linkTool;
                 break;
             case PICK:
-                guiNode.attachChild(linkText);
-                guiNode.attachChild(textBackgroundGeometry);
-                editorState = EditorState.PICK;
+                currentTool = pickTool;
+                break;
+            case BRUSH:
+                currentTool = brushTool;
                 break;
         }
+        currentTool.activate(this);
 
         GizmoEvent gce = new GizmoEvent(this, gizmoType);
         GlobalObjects.getInstance().postEvent(gce);
@@ -1645,7 +1206,6 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
     public void doZoomEvent(ZoomEvent ze) {
         switch (ze.getEventType()) {
             case EXTENTS_SELECTED:
-
                 break;
             case LEVEL:
                 break;
@@ -1717,7 +1277,7 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
         this.flyCam = flyCam;
     }
 
-    private void setLocationOnPrefab(Prefab prefab, Vector3f translation, boolean undoable) {
+    public void setLocationOnPrefab(Prefab prefab, Vector3f translation, boolean undoable) {
         ObjectType oType = prefab.getObjectType();
         if (oType != null) {
             Parameter ptrans = oType.findParameter("TransformComponent", "translation");
@@ -1725,5 +1285,53 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
                 ptrans.invokeSet(prefab, translation, undoable);
             }
         }
+    }
+
+    @Subscribe
+    public void playOrPauseLevel(PlayEvent event) {
+        switch (event.getType()) {
+            case PLAY:
+                try {
+                    // get the asset directories, export the current level to one 
+                    // of the asset directories and start the application.
+                    this.submitViewportTask(new Runnable() {
+                        public void run() {
+                            GameBuilder gb = new GameBuilder();
+                            gb.startGame(project, level);
+                        }
+                    });
+                    GameWriter.writeGame(project, level);
+
+
+                } catch (IOException ex) {
+                    Logger.getLogger(SandboxViewport.class.getName()).log(Level.SEVERE, null, ex);
+                }
+        }
+    }
+
+    public void activateIdleState() {
+        if (currentTool != null) {
+            currentTool.deactivate(this);
+        }
+        currentTool = idleTool;
+        idleTool.activate(this);
+        GizmoEvent ge = new GizmoEvent(this,GizmoType.NONE);
+        GlobalObjects.getInstance().postEvent(ge);
+    }
+
+    private void activateInsertionTool() {
+        if (currentTool != null) {
+            currentTool.deactivate(this);
+        }
+        currentTool = insertionTool;
+        insertionTool.activate(this);
+    }
+
+    public void clearInsertionElements() {
+        insertionElements.detachAllChildren();
+    }
+
+    public Prefab getInsertionElement() {
+        return insertionElement;
     }
 }
