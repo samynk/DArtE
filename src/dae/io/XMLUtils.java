@@ -6,11 +6,14 @@ package dae.io;
 
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Quaternion;
+import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.Writer;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  *
@@ -19,7 +22,7 @@ import org.w3c.dom.Node;
 public class XMLUtils {
 
     public static void writeAttribute(Writer w, String key, String value) throws IOException {
-        if ( value == null){
+        if (value == null) {
             return;
         }
         w.write(key);
@@ -53,8 +56,20 @@ public class XMLUtils {
         w.write("' ");
     }
 
+    public static void writeAttribute(Writer w, String key, Vector2f value) throws IOException {
+        if (value == null) {
+            return;
+        }
+        w.write(key);
+        w.write("='[");
+        w.write(Float.toString(value.x));
+        w.write(",");
+        w.write(Float.toString(value.y));
+        w.write("]' ");
+    }
+
     public static void writeAttribute(Writer w, String key, Vector3f value) throws IOException {
-        if ( value == null){
+        if (value == null) {
             return;
         }
         w.write(key);
@@ -66,7 +81,7 @@ public class XMLUtils {
         w.write(Float.toString(value.z));
         w.write("]' ");
     }
-    
+
     public static void writeAttribute(Writer w, String key, Quaternion value) throws IOException {
         if (value == null) {
             return;
@@ -83,26 +98,65 @@ public class XMLUtils {
         w.write("]' ");
     }
     
+    public static void writeAttribute(Writer bw, String key, ColorRGBA value) throws IOException {
+        if (value == null) {
+            return;
+        }
+        bw.write(key);
+        bw.write("='[");
+        bw.write(Float.toString(value.getRed()));
+        bw.write(',');
+        bw.write(Float.toString(value.getGreen()));
+        bw.write(',');
+        bw.write(Float.toString(value.getBlue()));
+        bw.write(',');
+        bw.write(Float.toString(value.getAlpha()));
+        bw.write("]' ");
+    }
+
     /**
      * Writes the specified number of tabs to the writer.
+     *
      * @param w the output writer.
-     * @param nrOfTabs the number of tabs. 
+     * @param nrOfTabs the number of tabs.
      */
-    public static void writeTabs(Writer w, int nrOfTabs) throws IOException{
-        for(int i = 0 ; i < nrOfTabs; ++i){
+    public static void writeTabs(Writer w, int nrOfTabs) throws IOException {
+        for (int i = 0; i < nrOfTabs; ++i) {
             w.write("\t");
         }
     }
-    
+
     /**
      * Gets the attribute as a string.
+     *
      * @param key the name of the attribute.
      * @param map the named node map with the attribute key/value pairs.
      * @return the attribute value or an empty string if it does not exist.
      */
-     public static String getAttribute(String key, NamedNodeMap map) {
+    public static String getAttribute(String key, NamedNodeMap map) {
         Node attr = map.getNamedItem(key);
         return attr != null ? attr.getTextContent() : "";
+    }
+
+    public static Vector2f parseFloat2(String float2) {
+        if (float2.length() > 0) {
+            String withoutBrackets = float2.substring(1, float2.length() - 1);
+            String[] cs = withoutBrackets.split(",");
+            if (cs.length == 2) {
+                try {
+                    float x = Float.parseFloat(cs[0]);
+                    float y = Float.parseFloat(cs[1]);
+                    return new Vector2f(x, y);
+                } catch (NumberFormatException ex) {
+
+                    return new Vector2f(0, 0);
+                }
+            } else {
+                return new Vector2f(0, 0);
+            }
+        } else {
+            return Vector2f.ZERO;
+        }
     }
 
     /**
@@ -140,17 +194,21 @@ public class XMLUtils {
      * @return a new Quaternion object.
      */
     public static Quaternion parseQuaternion(String quat) {
-        String withoutBrackets = quat.substring(1, quat.length() - 1);
-        String[] cs = withoutBrackets.split(",");
-        if (cs.length == 4) {
-            try {
-                float x = Float.parseFloat(cs[0]);
-                float y = Float.parseFloat(cs[1]);
-                float z = Float.parseFloat(cs[2]);
-                float w = Float.parseFloat(cs[3]);
-                return new Quaternion(x, y, z, w);
-            } catch (NumberFormatException ex) {
+        if (quat.length() > 1) {
+            String withoutBrackets = quat.substring(1, quat.length() - 1);
+            String[] cs = withoutBrackets.split(",");
+            if (cs.length == 4) {
+                try {
+                    float x = Float.parseFloat(cs[0]);
+                    float y = Float.parseFloat(cs[1]);
+                    float z = Float.parseFloat(cs[2]);
+                    float w = Float.parseFloat(cs[3]);
+                    return new Quaternion(x, y, z, w);
+                } catch (NumberFormatException ex) {
 
+                    return Quaternion.IDENTITY;
+                }
+            } else {
                 return Quaternion.IDENTITY;
             }
         } else {
@@ -183,9 +241,10 @@ public class XMLUtils {
             return ColorRGBA.Magenta;
         }
     }
-    
+
     /**
      * Parses the value of the given attribute as a float.
+     *
      * @param attributeName the name of the attribute.
      * @param map the map that contains all the attributes.
      * @return the float value.
@@ -199,8 +258,9 @@ public class XMLUtils {
         }
     }
 
-     /**
+    /**
      * Parses the value of the given attribute as an float.
+     *
      * @param attributeName the name of the attribute.
      * @param map the map that contains all the attributes.
      * @return the float value.
@@ -216,6 +276,7 @@ public class XMLUtils {
 
     /**
      * Parses the value of the given attribute as an boolean.
+     *
      * @param attributeName the name of the attribute.
      * @param map the map that contains all the attributes.
      * @return the float value.
@@ -225,5 +286,19 @@ public class XMLUtils {
         return attr != null ? Boolean.parseBoolean(attr.getTextContent()) : false;
     }
 
-
+    /**
+     * Reads a cdata section that is the child of the given node.
+     * @param node the parent node that 
+     * @return 
+     */
+    public static String readCDATA(Node node) {
+        NodeList nl = node.getChildNodes();
+        for (int i = 0; i < nl.getLength(); ++i) {
+            org.w3c.dom.Node child = nl.item(i);
+            if (child.getNodeType() == org.w3c.dom.Node.CDATA_SECTION_NODE) {
+                return child.getNodeValue();
+            }
+        }
+        return null;
+    }
 }
