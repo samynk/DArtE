@@ -4,6 +4,7 @@ import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import dae.components.ComponentType;
 import dae.components.PrefabComponent;
+import dae.prefabs.Prefab;
 import dae.prefabs.parameters.Float3Parameter;
 import dae.prefabs.parameters.FloatParameter;
 import dae.prefabs.parameters.IntParameter;
@@ -95,6 +96,14 @@ public interface PrefabTextExporter {
      * purposes).
      */
     public void writeString(Writer w, TextParameter parameter, String value, int depth) throws IOException;
+    
+    /**
+     * Writes the parameters of the prefab to the writer.
+     * @param w the writer to write to.
+     * @param p the prefab to read from.
+     * @param depth the formatting tab depth.
+     */
+    public void writePrefabParameters(Writer w, Prefab p, int depth) throws IOException;
     
     /**
      * Writes a component to the writer.
