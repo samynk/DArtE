@@ -329,4 +329,13 @@ public class Layer implements ProjectTreeNode{
     public boolean hasNode(Node node) {
        return this.nodes.contains(node);
     }
+
+    public Node getNodeChild(String nodeName) {
+        for( Node n : this.nodes){
+            if ( n.getName().equals(nodeName)){
+                return n;
+            }
+        }
+        return null;
+    }
 }
