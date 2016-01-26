@@ -6,7 +6,6 @@ package dae.animation.custom;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.math.Matrix4f;
-import com.jme3.math.Transform;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
 import dae.prefabs.Prefab;
@@ -21,12 +20,10 @@ import dae.prefabs.Prefab;
 public class Waypoint extends Prefab {
 
     public Waypoint() {
-        setLayerName("waypoints");
     }
 
     @Override
-    public final void create(String name, AssetManager manager, String extraInfo) {
-        this.setName(name);
+    public final void create(AssetManager manager, String extraInfo) {
         this.attachChild(manager.loadModel("Skeleton/Helpers/waypoint.j3o"));
     }
 
