@@ -57,14 +57,12 @@ public class CharacterPath extends Prefab {
      * Creates a new CharacterPath object.
      */
     public CharacterPath() {
-        setLayerName("waypoints");
         super.canHaveChildren = true;
     }
 
     @Override
-    public void create(String name, AssetManager manager, String extraInfo) {
+    public void create(AssetManager manager, String extraInfo) {
         // show the start of the characterpath.
-        this.setName(name);
         attachChild(manager.loadModel("Skeleton/Helpers/pathstart.j3o"));
         this.manager = manager;
     }
