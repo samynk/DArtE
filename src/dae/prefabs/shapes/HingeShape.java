@@ -46,9 +46,8 @@ public class HingeShape extends Node {
      * @param manager the AssetManager for the creation of materials.
      */
     public void create(AssetManager manager) {
-        ColorRGBA limitColor = new ColorRGBA(128 / 255f, 128 / 255f, 192 / 255f, 1f);
-        limitMaterial = new Material(manager, "Common/MatDefs/Misc/Unshaded.j3md");
-        limitMaterial.setColor("Color", limitColor);
+        
+        limitMaterial = manager.loadMaterial("Materials/Physics/LimitMaterial.j3m");
         // hinge geometyr
         createHingeGeometry(manager, 12, new ColorRGBA(153 / 255f, 217 / 255f, 234 / 255f, 1f));
         createLimits( 12, 12, height, radius);
@@ -151,8 +150,7 @@ public class HingeShape extends Node {
 
 
         hingeGeometry = new Geometry("Axis", axisMesh);
-        Material mat = new Material(manager, "Common/MatDefs/Misc/Unshaded.j3md");
-        mat.setColor("Color", color);
+        Material mat = manager.loadMaterial("Materials/Physics/RotationAxisMaterial.j3m");
         hingeGeometry.setMaterial(mat);
         attachChild(hingeGeometry);
     }
