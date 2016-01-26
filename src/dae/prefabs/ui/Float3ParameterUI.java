@@ -1,16 +1,13 @@
 package dae.prefabs.ui;
 
 import com.jme3.math.Vector3f;
-import dae.components.ComponentType;
-import dae.components.PrefabComponent;
 import dae.prefabs.Prefab;
 import dae.prefabs.ReflectionManager;
 import dae.prefabs.parameters.Parameter;
 import dae.prefabs.parameters.converter.PropertyConverter;
 
 import dae.prefabs.standard.UpdateObject;
-import dae.prefabs.ui.events.PrefabChangedEventType;
-import java.beans.PropertyChangeEvent;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -18,12 +15,11 @@ import javax.swing.event.ChangeListener;
  *
  * @author Koen
  */
-public class Float3ParameterUI extends javax.swing.JPanel implements ParameterUI,ChangeListener {
+public class Float3ParameterUI extends javax.swing.JPanel implements ParameterUI, ChangeListener {
 
     private Parameter parameter;
     private Prefab currentNode;
     private boolean disregardEvent = false;
-    private PrefabChangedEventType eventType;
     private PropertyConverter converter;
 
     /**
@@ -163,14 +159,17 @@ public class Float3ParameterUI extends javax.swing.JPanel implements ParameterUI
     }// </editor-fold>//GEN-END:initComponents
 
     private void xSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_xSpinnerStateChanged
+        System.out.println("xspinner state changed:" + parameter.getId());
         updateNode();
     }//GEN-LAST:event_xSpinnerStateChanged
 
     private void ySpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_ySpinnerStateChanged
+        System.out.println("yspinner state changed"+ parameter.getId());
         updateNode();
     }//GEN-LAST:event_ySpinnerStateChanged
 
     private void zSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_zSpinnerStateChanged
+        System.out.println("xspinner state changed"+ parameter.getId());
         updateNode();
     }//GEN-LAST:event_zSpinnerStateChanged
 
@@ -192,7 +191,7 @@ public class Float3ParameterUI extends javax.swing.JPanel implements ParameterUI
 
     @Override
     public void setNode(Prefab currentSelectedNode) {
-        
+
         currentNode = currentSelectedNode;
         if (currentNode == null) {
             return;
@@ -223,6 +222,7 @@ public class Float3ParameterUI extends javax.swing.JPanel implements ParameterUI
         if (disregardEvent) {
             return;
         }
+        //System.out.println("updating node:"+ parameter.getId());
         Object value = getFloat3();
         if (converter != null) {
             value = converter.convertFromUIToObject(value);
@@ -242,18 +242,36 @@ public class Float3ParameterUI extends javax.swing.JPanel implements ParameterUI
     private javax.swing.JSpinner zSpinner;
     // End of variables declaration//GEN-END:variables
 
-
     /**
      * Called when a property of the component is changed.
+     *
      * @param evt the property change event.
      */
-    public void stateChanged(ChangeEvent e) {
-         if (currentNode != null) {
+    public void stateChanged(final ChangeEvent e) {
+        if (e.getSource() != currentNode){
+            return;
+        }
+        if (!SwingUtilities.isEventDispatchThread()) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    //System.out.println("state changed from outside event thread:" + parameter.getId() + e.getSource().toString());
+                    stateChanged();
+                }
+            });
+        }else{
+            //System.out.println("state changed from withing event thread:"+ parameter.getId());
+            stateChanged();
+        }
+    }
+
+    private void stateChanged() {
+        if (currentNode != null) {
             disregardEvent = true;
             Object value = ReflectionManager.getInstance().invokeGetMethod(currentNode, parameter);
             if (converter != null) {
                 value = converter.convertFromObjectToUI(value);
             }
+            //System.out.println("New value for " + currentNode.getName() + ":"+ parameter.getId());
             if (value != null && value instanceof Vector3f) {
                 this.setFloat3((Vector3f) value);
             }
