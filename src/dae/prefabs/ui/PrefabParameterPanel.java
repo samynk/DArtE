@@ -32,6 +32,9 @@ public class PrefabParameterPanel extends javax.swing.JPanel implements Scrollab
      */
     public PrefabParameterPanel() {
         initComponents();
+    }
+
+    public void subscribeToPrefabSelectionEvent() {
         GlobalObjects.getInstance().registerListener(this);
     }
 
@@ -62,7 +65,7 @@ public class PrefabParameterPanel extends javax.swing.JPanel implements Scrollab
         gbc.weightx = 1.0;
         gbc.weighty = 0.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(3,0,3,0);
+        gbc.insets = new Insets(3, 0, 3, 0);
 
         if (currentObjectType != null) {
             for (ParameterSection ps : currentObjectType.getParameterSections()) {
@@ -77,7 +80,8 @@ public class PrefabParameterPanel extends javax.swing.JPanel implements Scrollab
 
 
             for (PrefabComponent c : selected.getComponents()) {
-                ComponentType ct = GlobalObjects.getInstance().getObjectsTypeCategory().getComponent(c.getId());
+                ComponentType ct = otCategories.getComponent(c.getId());
+              
                 for (ParameterSection ps : ct.getParameterSections()) {
                     ParameterPanel pp = ps.createParameterPanel();
 
@@ -92,6 +96,16 @@ public class PrefabParameterPanel extends javax.swing.JPanel implements Scrollab
         gbc.weighty = 1.0;
         this.add(filler, gbc);
         this.repaint();
+    }
+
+    public void setSelectedPrefab(Prefab prefab) {
+        if (this.selected != prefab) {
+            if (this.selected != null) {
+                selected.removeComponentListener(this);
+            }
+            this.selected = prefab;
+            selected.addComponentListener(this);
+        }
     }
 
     @Subscribe
