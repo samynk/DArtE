@@ -17,7 +17,7 @@ public class PlayerStartEntity extends Prefab {
     }
 
     @Override
-    public void create(String name, AssetManager manager, String extraInfo) {
+    public void create( AssetManager manager, String extraInfo) {
         this.attachChild(manager.loadModel("Entities/M_Playerstart.j3o"));
         this.setCategory("Standard");
         this.setType("PlayerStart");

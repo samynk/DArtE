@@ -39,15 +39,15 @@ public class SphereObject extends Prefab {
     public Prefab duplicate(AssetManager manager) {
         SphereObject so = new SphereObject(this.radius);
         so.space = this.space;
-        so.create(name, manager, null);
+        so.create( manager, null);
+        so.setName(name);
         so.setType(this.getType());
         so.setCategory(this.getCategory());
         return so;
     }
     
     @Override
-    public final void create(String name, AssetManager manager, String extraInfo) {
-        this.setName(name);
+    public final void create(AssetManager manager, String extraInfo) {
         this.manager = manager;
         recreate();
     }

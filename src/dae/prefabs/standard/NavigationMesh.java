@@ -13,7 +13,6 @@ import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.VertexBuffer.Type;
-import com.jme3.scene.mesh.IndexBuffer;
 import com.jme3.terrain.Terrain;
 import dae.navmesh.NavMesh;
 import dae.navmesh.util.NavMeshGenerator;
@@ -21,7 +20,6 @@ import dae.prefabs.Prefab;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.FloatBuffer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jme3tools.optimize.GeometryBatchFactory;
@@ -58,13 +56,12 @@ public class NavigationMesh extends Prefab {
     }
 
     @Override
-    public void create(String name, AssetManager manager, String extraInfo) {
+    public void create( AssetManager manager, String extraInfo) {
         this.manager = manager;
         System.out.println("Creating a navigation mesh");
         this.attachChild(manager.loadModel("Entities/M_NavigationMesh.j3o"));
         this.setCategory("Standard");
         this.setType("NavigationMesh");
-        this.setName(name);
 
         if (compiledMesh != null && compiledMesh.length() > 0) {
             this.attachChild(manager.loadModel(compiledMesh));

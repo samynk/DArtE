@@ -22,8 +22,7 @@ public class NPCLocationEntity extends Prefab {
     }
 
     @Override
-    protected void create(String name, AssetManager manager, String extraInfo) {
-        this.setName(name);
+    protected void create( AssetManager manager, String extraInfo) {
         npcLoc = manager.loadModel("Entities/M_Playerstart.j3o");
         this.attachChild(npcLoc);
         assetManager = manager;
@@ -33,7 +32,8 @@ public class NPCLocationEntity extends Prefab {
         if (npc != null) {
             this.npcMeshLocation = npc;
             npcMesh = new NPC();
-            npcMesh.create(name + "_npcmesh", assetManager, npc);
+            npcMesh.create(assetManager, npc);
+            npcMesh.setName(name+ "_npcmesh");
             for (Spatial s : this.getChildren()) {
                 s.removeFromParent();
             }

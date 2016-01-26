@@ -19,7 +19,7 @@ public class SituationEntity extends Prefab {
     }
 
     @Override
-    public void create(String name, AssetManager manager, String extraInfo) {
+    public void create(AssetManager manager, String extraInfo) {
         this.attachChild(manager.loadModel("Entities/Entity_Situation.gmf"));
         this.setCategory("Standard");
         this.setType("Sound");

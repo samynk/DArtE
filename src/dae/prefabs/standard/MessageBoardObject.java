@@ -31,8 +31,7 @@ public class MessageBoardObject extends Prefab {
     }
 
     @Override
-    public void create(String name, AssetManager manager, String extraInfo) {
-        setName(name);
+    public void create( AssetManager manager, String extraInfo) {
         // Load font and create the Text
         font = manager.loadFont("Font/billboard.fnt");
         bmText = new BitmapText(font, true);

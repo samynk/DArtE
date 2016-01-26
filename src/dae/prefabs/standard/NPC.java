@@ -67,10 +67,9 @@ public class NPC extends Prefab implements Animatable {
     }
 
     @Override
-    public void create(String name, AssetManager manager, String extraInfo) {
+    public void create(AssetManager manager, String extraInfo) {
         if (extraInfo != null && extraInfo.length() > 0) {
             Spatial model = manager.loadModel(extraInfo);
-            super.setName(name);
             this.meshName = name;
             this.meshFile = extraInfo;
 

@@ -20,7 +20,7 @@ public class WayPointEntity extends Prefab {
     }
 
     @Override
-    public void create(String name, AssetManager manager, String extraInfo) {
+    public void create(AssetManager manager, String extraInfo) {
         this.attachChild(manager.loadModel("Entities/M_Waypoint.j3o"));
         this.setCategory("Standard");
         this.setType("Waypoint");

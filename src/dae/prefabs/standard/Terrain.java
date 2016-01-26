@@ -46,8 +46,7 @@ public class Terrain extends Prefab {
     }
 
     @Override
-    public void create(String name, AssetManager manager, ObjectType objectType, String extraInfo) {
-        super.setName(name);
+    public void initialize(AssetManager manager, ObjectType objectType, String extraInfo) {
         this.objectType = objectType;
         terrainMaterial = new Material(manager,
                 "Common/MatDefs/Terrain/Terrain.j3md");

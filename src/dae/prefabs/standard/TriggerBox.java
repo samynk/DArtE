@@ -37,8 +37,7 @@ public class TriggerBox extends Prefab {
     }
 
     @Override
-    public final void create(String name, AssetManager manager, String extraInfo) {
-        this.setName(name);
+    public final void create(AssetManager manager, String extraInfo) {       
 
         Box b = new Box(dimension.mult(-0.5f), dimension.mult(0.5f)); // create cube shape at the origin
         Geometry geom = new Geometry("Box", b);  // create cube geometry from the shape
@@ -61,7 +60,8 @@ public class TriggerBox extends Prefab {
     public Prefab duplicate(AssetManager manager) {
         TriggerBox to = new TriggerBox();
         to.dimension = dimension;
-        to.create( name, manager, null) ;
+        to.create( manager, null) ;
+        to.setName(name);
         to.addPhysics(physicsSpace);
         to.setType( this.getType() );
         to.setCategory( this.getCategory() );

@@ -22,7 +22,7 @@ public class RackObject extends Prefab {
     }
 
     @Override
-    public void create(String name, AssetManager manager, String extraInfo) {
-        setName(name);
+    public void create( AssetManager manager, String extraInfo) {
+        
     }
 }

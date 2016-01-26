@@ -34,11 +34,10 @@ public class SoundEntity extends Prefab {
     }
 
     @Override
-    public void create(String name, AssetManager manager, String extraInfo) {
+    public void create(AssetManager manager, String extraInfo) {
         this.attachChild(manager.loadModel("Entities/M_Sound.j3o"));
         this.setCategory("Standard");
         this.setType("Sound");
-        this.setName(name);
 
         soundFile = extraInfo;
         assetManager = manager;
