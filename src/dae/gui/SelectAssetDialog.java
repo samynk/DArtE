@@ -34,8 +34,8 @@ public class SelectAssetDialog extends javax.swing.JDialog implements TreeSelect
     /**
      * Creates new form SelectAssetDialog
      */
-    public SelectAssetDialog(java.awt.Frame parent, boolean modal) {
-        super(parent, modal);
+    public SelectAssetDialog(java.awt.Window parent, boolean modal) {
+        super(parent,modal? ModalityType.TOOLKIT_MODAL:ModalityType.MODELESS);
         initComponents();
 
         // Close the dialog when Esc is pressed
