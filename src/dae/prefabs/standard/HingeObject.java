@@ -28,8 +28,7 @@ public class HingeObject extends Prefab {
     }
 
     @Override
-    public final void create(String name, AssetManager manager, String extraInfo) {
-        this.setName(name);
+    public final void create(AssetManager manager, String extraInfo) {
         this.assetManager = manager;
 
         attachChild(assetManager.loadModel("Entities/M_Joint.j3o"));
