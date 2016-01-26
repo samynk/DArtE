@@ -1,20 +1,21 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.prefabs.types;
 
 import com.google.common.io.Files;
 import com.jme3.asset.AssetManager;
 import com.jme3.asset.AssetNotFoundException;
 import com.jme3.asset.ModelKey;
+import com.jme3.scene.Node;
 import dae.components.ComponentList;
 import dae.components.ComponentType;
 import dae.components.PrefabComponent;
 import dae.prefabs.Prefab;
 import dae.prefabs.magnets.FillerParameter;
 import dae.prefabs.magnets.MagnetParameter;
+import dae.prefabs.parameters.InstanceCreator;
 import dae.prefabs.parameters.Parameter;
+import dae.prefabs.parameters.ParameterSection;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -32,7 +33,8 @@ public class ObjectType extends ParameterSupport {
     private String extraInfo;
     private boolean loadFromExtraInfo = false;
     private ArrayList<ComponentType> componentTypes = new ArrayList<ComponentType>();
-    private HashMap<String,ComponentType> componentMap = new HashMap<String,ComponentType>();
+    private HashMap<String, ComponentType> componentMap = new HashMap<String, ComponentType>();
+    private HashMap<String, HashMap<String, Object>> defaultMap = new HashMap<String, HashMap<String, Object>>();
 
     /*
      * Creates a new objectype.
@@ -116,7 +118,8 @@ public class ObjectType extends ParameterSupport {
     /**
      * Creates a Prefab with the info in this object type.
      *
-     * @param AssetManager manager the AssetManager to use to create the object.
+     * @param parent the parent node of the current object.
+     * @param manager the AssetManager to use to create the object.
      * @param name the name of the new object.
      */
     public Prefab create(AssetManager manager, String name) {
@@ -125,14 +128,12 @@ public class ObjectType extends ParameterSupport {
             ModelKey mk = new ModelKey(getExtraInfo());
             p = (Prefab) manager.loadAsset(mk);
             loadComponents(manager, p, mk);
-            p.setName(name);
+
         } else {
             try {
-                p = (Prefab) Class.forName(getObjectToCreate()).newInstance();
-                p.create(name, manager, this, getExtraInfo());
 
-                p.setType(getLabel());
-                p.setCategory(getCategory());
+                p = (Prefab) Class.forName(getObjectToCreate()).newInstance();
+                p.initialize(manager, this, getExtraInfo());
                 p.notifyLoaded();
 
 
@@ -149,20 +150,55 @@ public class ObjectType extends ParameterSupport {
                 Logger.getLogger(ObjectType.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        
-        if ( p != null ){
-            for (ComponentType c: this.componentTypes)
-            {
+
+        if (p != null) {
+            for (ComponentType c : this.componentTypes) {
                 PrefabComponent pc = c.create();
-                if ( pc != null )
-                {
+                if (pc != null) {
                     p.addPrefabComponent(pc);
                 }
             }
-        }
-        
-        return p;
+            p.setName(name);
 
+            // set the defaults.
+            for (ComponentType c : this.componentTypes) {
+                for (Parameter param : c.getAllParameters()) {
+                    Object def = this.getDefaultValue(c.getId(), param.getId());
+
+                    if (def instanceof InstanceCreator) {
+                        InstanceCreator ic = (InstanceCreator) def;
+                        def = ic.createInstance();
+                        if (def instanceof Prefab) {
+                            p.attachChild((Prefab) def);
+                        }
+                    } else if (def instanceof Cloneable) {
+                        def = cloneDefault(def);
+                    }
+                    if (def != null) {
+                        param.invokeSet(p, def, false);
+                    }
+                }
+            }
+
+            for (ParameterSection section : this.getParameterSections()) {
+                for (Parameter param : section.getAllParameters()) {
+                    if (param.hasDefaultValue()) {
+                        Object def = param.getDefault();
+                        if (def instanceof InstanceCreator) {
+                            InstanceCreator ic = (InstanceCreator) def;
+                            def = ic.createInstance();
+                            if (def instanceof Prefab) {
+                                p.attachChild((Prefab) def);
+                            }
+                        } else if (def instanceof Cloneable) {
+                            def = cloneDefault(def);
+                        }
+                        param.invokeSet(p, def, false);
+                    }
+                }
+            }
+        }
+        return p;
     }
 
     /**
@@ -191,6 +227,7 @@ public class ObjectType extends ParameterSupport {
 
     /**
      * Returns the component type with the given id.
+     *
      * @param id the id for the component type.
      * @return the ComponentType or null if no ComponentType with the given id
      * is found.
@@ -198,20 +235,86 @@ public class ObjectType extends ParameterSupport {
     public ComponentType getComponentType(String id) {
         return this.componentMap.get(id);
     }
-    
+
     /**
-     * Finds the parameter that is bound to the given component for the
-     * given property.
+     * Finds the parameter that is bound to the given component for the given
+     * property.
+     *
      * @param transformComponent
      * @param property
      * @return the Parameter object or null if the parameter is not found.
      */
     public Parameter findParameter(String componentId, String property) {
         ComponentType ct = componentMap.get(componentId);
-        if ( ct != null ){
+        if (ct != null) {
             return ct.findParameter(property);
-        }else{
+        } else {
             return null;
         }
+    }
+
+    /**
+     * Checks if this object type has prefab parameters
+     *
+     * @return
+     */
+    public boolean hasParameters() {
+        int numParams = 0;
+        for (ParameterSection ps : this.getParameterSections()) {
+            numParams += ps.getNrOfParameters();
+
+        }
+        return numParams > 0;
+    }
+
+    /**
+     * Sets a default value that can be used when constructing this object.
+     *
+     * @param componentId the component id of the default value.
+     * @param propertyId the property id of the default value.
+     * @param parsed the parsed default value.
+     */
+    public void setDefaultValue(String componentId, String propertyId, Object parsed) {
+        HashMap<String, Object> categoryMap = this.defaultMap.get(componentId);
+        if (categoryMap == null) {
+            categoryMap = new HashMap<String, Object>();
+            defaultMap.put(componentId, categoryMap);
+        }
+        categoryMap.put(propertyId, parsed);
+    }
+
+    /**
+     * Returns the default value for a given component and property combination.
+     *
+     * @param componentId the id of the component.
+     * @param propertyId the id of the property.
+     * @return Returns the default value if it exists, false otherwise.
+     */
+    public Object getDefaultValue(String componentId, String propertyId) {
+        HashMap<String, Object> categoryMap = this.defaultMap.get(componentId);
+        if (categoryMap == null) {
+            return null;
+        } else {
+            return categoryMap.get(propertyId);
+        }
+    }
+
+    private Object cloneDefault(Object def) {
+        try {
+            Cloneable c = (Cloneable) def;
+            Method m = def.getClass().getMethod("clone");
+            def = m.invoke(def);
+        } catch (NoSuchMethodException ex) {
+            Logger.getLogger(ObjectType.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SecurityException ex) {
+            Logger.getLogger(ObjectType.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            Logger.getLogger(ObjectType.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalArgumentException ex) {
+            Logger.getLogger(ObjectType.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvocationTargetException ex) {
+            Logger.getLogger(ObjectType.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return def;
     }
 }
