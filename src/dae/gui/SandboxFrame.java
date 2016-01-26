@@ -3,17 +3,21 @@ package dae.gui;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.io.Files;
 import com.jme3.asset.AssetManager;
+import com.jme3.scene.Node;
 import com.jme3.system.AppSettings;
 import com.jme3.system.JmeCanvasContext;
 import dae.GlobalObjects;
 import dae.animation.rig.Rig;
 import dae.animation.rig.io.RigWriter;
+import dae.components.MeshComponent;
 import dae.gui.events.ApplicationStoppedEvent;
 import dae.gui.renderers.TransformSpaceRenderer;
 import dae.io.ProjectLoader;
 import dae.io.ProjectSaver;
 import dae.io.SceneLoader;
 import dae.prefabs.AxisEnum;
+import dae.prefabs.Prefab;
+import dae.prefabs.brush.Brush;
 import dae.prefabs.gizmos.RotateGizmoSpace;
 import dae.prefabs.gizmos.TranslateGizmoSpace;
 import dae.prefabs.gizmos.events.AutoGridEvent;
@@ -24,12 +28,19 @@ import dae.prefabs.types.ObjectTypeCategory;
 import dae.prefabs.ui.classpath.FileNode;
 import dae.prefabs.ui.events.AssetEvent;
 import dae.prefabs.ui.events.AssetEventType;
+import dae.prefabs.ui.events.BrushEvent;
+import dae.prefabs.ui.events.BrushEventType;
 import dae.prefabs.ui.events.ComponentEvent;
 import dae.prefabs.ui.events.CreateObjectEvent;
 import dae.prefabs.ui.events.GizmoEvent;
 import dae.prefabs.ui.events.GizmoType;
+import dae.prefabs.ui.events.LevelEvent;
+import dae.prefabs.ui.events.LevelEvent.EventType;
+import dae.prefabs.ui.events.PlayEvent;
+import dae.prefabs.ui.events.PlayEventType;
 import dae.prefabs.ui.events.ProjectEvent;
 import dae.prefabs.ui.events.ProjectEventType;
+import dae.prefabs.ui.events.SelectionEvent;
 import dae.prefabs.ui.events.ViewportReshapeEvent;
 import dae.prefabs.ui.events.ZoomEvent;
 import dae.prefabs.ui.events.ZoomEventType;
@@ -49,6 +60,7 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -70,12 +82,17 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
     private SandboxViewport viewport;
     private CreateProjectDialog createProjectDialog;
     private CreateKlatchDialog createObjectDialog;
+    private RemoveComponentDialog removeComponentDialog;
     private FileNameExtensionFilter sandboxFilter = new FileNameExtensionFilter("Sandbox Files", "zbk");
     private FileNameExtensionFilter sceneFilter = new FileNameExtensionFilter("Scene files", "scene");
     /**
      * The current project.
      */
     private Project currentProject;
+    /**
+     * The currently selected prefab.
+     */
+    private Prefab selectedPrefab;
     /**
      * This boolean is true when the viewport has been loaded.
      */
@@ -92,10 +109,10 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
 
         cboTranslateSpace.setSelectedItem(TranslateGizmoSpace.LOCAL);
         cboRotateSpace.setSelectedItem(RotateGizmoSpace.LOCAL);
-        
+
         cboTranslateSpace.setRenderer(new TransformSpaceRenderer());
         cboRotateSpace.setRenderer(new TransformSpaceRenderer());
-        
+
         SwingUtilities.updateComponentTreeUI(this);
         GlobalObjects.getInstance().registerListener(this);
 
@@ -137,6 +154,7 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
 
         sceneChooser = new javax.swing.JFileChooser();
         gizmoButtonGroup = new javax.swing.ButtonGroup();
+        jToggleButton1 = new javax.swing.JToggleButton();
         pnlMainSplitPane = new javax.swing.JSplitPane();
         pnlProjectSplit = new javax.swing.JSplitPane();
         projectPanel1 = new dae.gui.ProjectPanel();
@@ -161,6 +179,11 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
         snapToolbar = new javax.swing.JToolBar();
         toggleSnap = new javax.swing.JToggleButton();
         toggleAutogrid = new javax.swing.JToggleButton();
+        brushToolbar = new javax.swing.JToolBar();
+        btnToggleBrush = new javax.swing.JToggleButton();
+        cboBrushes = new javax.swing.JComboBox();
+        playToolbar = new javax.swing.JToolBar();
+        btnPlay = new javax.swing.JToggleButton();
         mnuSandboxMenu = new javax.swing.JMenuBar();
         mnuFile = new javax.swing.JMenu();
         mnuNewProject = new javax.swing.JMenuItem();
@@ -184,8 +207,11 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
         mnuAddPath = new javax.swing.JMenuItem();
         jSeparator6 = new javax.swing.JPopupMenu.Separator();
         mnuAddPersonalityComponent = new javax.swing.JMenuItem();
+        jSeparator7 = new javax.swing.JPopupMenu.Separator();
+        mnuRemoveComponent = new javax.swing.JMenuItem();
         mnuStandardObjects = new javax.swing.JMenu();
         mnuTerrain = new javax.swing.JMenuItem();
+        mnuCreateTerrainBrush = new javax.swing.JMenuItem();
         mnuEntities = new javax.swing.JMenu();
         mnuAddCamera = new javax.swing.JMenuItem();
         mnuAddSound = new javax.swing.JMenuItem();
@@ -225,6 +251,8 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
 
         sceneChooser.setAcceptAllFileFilterUsed(false);
         sceneChooser.setFileFilter(new FileNameExtensionFilter("Sandbox files","zbk"));
+
+        jToggleButton1.setText("jToggleButton1");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("DAE Sandbox v1.0");
@@ -305,7 +333,7 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
         gizmoToolbar.add(cboTranslateSpace);
 
         gizmoButtonGroup.add(btnRotate);
-        btnRotate.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dae/icons/transform_rotate.png"))); // NOI18N
+        btnRotate.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dae/icons/flat/rotate.png"))); // NOI18N
         btnRotate.setFocusable(false);
         btnRotate.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnRotate.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -360,6 +388,46 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
         snapToolbar.add(toggleAutogrid);
 
         pnlToolbar.add(snapToolbar);
+
+        brushToolbar.setRollover(true);
+
+        gizmoButtonGroup.add(btnToggleBrush);
+        btnToggleBrush.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dae/icons/flat/brush.png"))); // NOI18N
+        btnToggleBrush.setFocusable(false);
+        btnToggleBrush.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnToggleBrush.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        btnToggleBrush.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnToggleBrush.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                btnToggleBrushItemStateChanged(evt);
+            }
+        });
+        brushToolbar.add(btnToggleBrush);
+
+        cboBrushes.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                cboBrushesItemStateChanged(evt);
+            }
+        });
+        brushToolbar.add(cboBrushes);
+
+        pnlToolbar.add(brushToolbar);
+
+        playToolbar.setRollover(true);
+
+        btnPlay.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dae/icons/flat/play.png"))); // NOI18N
+        btnPlay.setFocusable(false);
+        btnPlay.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnPlay.setPressedIcon(new javax.swing.ImageIcon(getClass().getResource("/dae/icons/flat/pause.png"))); // NOI18N
+        btnPlay.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnPlay.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                btnPlayItemStateChanged(evt);
+            }
+        });
+        playToolbar.add(btnPlay);
+
+        pnlToolbar.add(playToolbar);
 
         pnlToolbarViewport.add(pnlToolbar, java.awt.BorderLayout.NORTH);
 
@@ -514,6 +582,15 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
             }
         });
         mnuComponents.add(mnuAddPersonalityComponent);
+        mnuComponents.add(jSeparator7);
+
+        mnuRemoveComponent.setText("Remove Component ...");
+        mnuRemoveComponent.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuRemoveComponentActionPerformed(evt);
+            }
+        });
+        mnuComponents.add(mnuRemoveComponent);
 
         mnuSandboxMenu.add(mnuComponents);
 
@@ -526,6 +603,14 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
             }
         });
         mnuStandardObjects.add(mnuTerrain);
+
+        mnuCreateTerrainBrush.setText("Terrain Brush");
+        mnuCreateTerrainBrush.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuCreateTerrainBrushActionPerformed(evt);
+            }
+        });
+        mnuStandardObjects.add(mnuCreateTerrainBrush);
 
         mnuSandboxMenu.add(mnuStandardObjects);
 
@@ -776,7 +861,7 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(pnlMainSplitPane, javax.swing.GroupLayout.DEFAULT_SIZE, 884, Short.MAX_VALUE)
+            .addComponent(pnlMainSplitPane, javax.swing.GroupLayout.DEFAULT_SIZE, 1063, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1205,7 +1290,7 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
 
     private void mnuAddNPCActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAddNPCActionPerformed
         // TODO add your handling code here:
-        createObject("Standard", "J3ONPC","Characters/Male/Character1/character1.j3o");
+        createObject("Standard", "J3ONPC", "Characters/Male/Character1/character1.j3o");
     }//GEN-LAST:event_mnuAddNPCActionPerformed
 
     private void mnuAddPhysicsBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAddPhysicsBoxActionPerformed
@@ -1213,11 +1298,11 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
     }//GEN-LAST:event_mnuAddPhysicsBoxActionPerformed
 
     private void mnuAddAnimationComponentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAddAnimationComponentActionPerformed
-         GlobalObjects.getInstance().postEvent(new ComponentEvent("AnimationComponent"));
+        GlobalObjects.getInstance().postEvent(new ComponentEvent("AnimationComponent"));
     }//GEN-LAST:event_mnuAddAnimationComponentActionPerformed
 
     private void mnuTerrainActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuTerrainActionPerformed
-        createObject("Standard","Terrain");
+        createObject("Terrain", "Terrain");
     }//GEN-LAST:event_mnuTerrainActionPerformed
 
     private void mnuPhysicsTerrainActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuPhysicsTerrainActionPerformed
@@ -1244,10 +1329,47 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
         GlobalObjects.getInstance().postEvent(new ComponentEvent("PersonalityComponent"));
     }//GEN-LAST:event_mnuAddPersonalityComponentActionPerformed
 
-     private void createObject(String category, String type) {
-         createObject(category,type,null);
+    private void btnToggleBrushItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_btnToggleBrushItemStateChanged
+        if (evt.getStateChange() == ItemEvent.SELECTED) {
+            GlobalObjects.getInstance().postEvent(new GizmoEvent(this, GizmoType.BRUSH));
+        }
+    }//GEN-LAST:event_btnToggleBrushItemStateChanged
+
+    private void btnPlayItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_btnPlayItemStateChanged
+        if (evt.getStateChange() == ItemEvent.SELECTED) {
+            GlobalObjects.getInstance().postEvent(new PlayEvent(PlayEventType.PLAY));
+        } else {
+            GlobalObjects.getInstance().postEvent(new PlayEvent(PlayEventType.PAUSE));
+        }
+    }//GEN-LAST:event_btnPlayItemStateChanged
+
+    private void mnuCreateTerrainBrushActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuCreateTerrainBrushActionPerformed
+        createObject("Terrain", "Brush", null);
+
+    }//GEN-LAST:event_mnuCreateTerrainBrushActionPerformed
+
+    private void cboBrushesItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cboBrushesItemStateChanged
+        if (evt.getStateChange() == ItemEvent.SELECTED) {
+            Brush selected = (Brush) evt.getItem();
+            GlobalObjects.getInstance().postEvent(new BrushEvent(BrushEventType.SELECTED, selected));
+        }
+    }//GEN-LAST:event_cboBrushesItemStateChanged
+
+    private void mnuRemoveComponentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuRemoveComponentActionPerformed
+        // select a component and remove it.
+        if (selectedPrefab != null) {
+            if (removeComponentDialog == null) {
+                removeComponentDialog = new RemoveComponentDialog(this, true);
+            }
+            removeComponentDialog.setPrefab(selectedPrefab);
+            removeComponentDialog.setVisible(true);
+        }
+    }//GEN-LAST:event_mnuRemoveComponentActionPerformed
+
+    private void createObject(String category, String type) {
+        createObject(category, type, null);
     }
-    
+
     private void createObject(String category, String type, String extraInfo) {
         ObjectTypeCategory otc = viewport.getObjectsToCreate();
         ObjectType ot = otc.getObjectType(category, type);
@@ -1322,10 +1444,14 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private dae.gui.AssetPanel assetPanel2;
+    private javax.swing.JToolBar brushToolbar;
     private javax.swing.JToggleButton btnLink;
     private javax.swing.JToggleButton btnMove;
+    private javax.swing.JToggleButton btnPlay;
     private javax.swing.JToggleButton btnRotate;
+    private javax.swing.JToggleButton btnToggleBrush;
     private javax.swing.JButton btnZoomExtents;
+    private javax.swing.JComboBox cboBrushes;
     private javax.swing.JComboBox cboRotateSpace;
     private javax.swing.JComboBox cboTranslateSpace;
     private javax.swing.ButtonGroup gizmoButtonGroup;
@@ -1337,6 +1463,8 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
     private javax.swing.JPopupMenu.Separator jSeparator4;
     private javax.swing.JPopupMenu.Separator jSeparator5;
     private javax.swing.JPopupMenu.Separator jSeparator6;
+    private javax.swing.JPopupMenu.Separator jSeparator7;
+    private javax.swing.JToggleButton jToggleButton1;
     private javax.swing.JMenu mnuAdd;
     private javax.swing.JMenuItem mnuAdd2HandleAxis;
     private javax.swing.JMenuItem mnuAddAmbientLight;
@@ -1366,6 +1494,7 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
     private javax.swing.JMenu mnuComponents;
     private javax.swing.JMenuItem mnuConvexShape;
     private javax.swing.JMenuItem mnuCreateRig;
+    private javax.swing.JMenuItem mnuCreateTerrainBrush;
     private javax.swing.JMenu mnuEdit;
     private javax.swing.JMenu mnuEntities;
     private javax.swing.JMenuItem mnuExit;
@@ -1382,6 +1511,7 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
     private javax.swing.JMenuItem mnuPhysicsTerrain;
     private javax.swing.JMenuItem mnuPreferences;
     private javax.swing.JMenuItem mnuRedo;
+    private javax.swing.JMenuItem mnuRemoveComponent;
     private javax.swing.JMenuBar mnuSandboxMenu;
     private javax.swing.JMenuItem mnuSaveProject;
     private javax.swing.JMenuItem mnuSkeleton2;
@@ -1392,6 +1522,7 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
     private javax.swing.JMenuItem munAddFootcurve;
     private javax.swing.JPopupMenu.Separator openSeparator;
     private dae.gui.OutputPanel outputPanel1;
+    private javax.swing.JToolBar playToolbar;
     private javax.swing.JSplitPane pnlMainSplitPane;
     private javax.swing.JSplitPane pnlOutputSplit;
     private javax.swing.JSplitPane pnlProjectSplit;
@@ -1456,10 +1587,12 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
             int dotIndex = asset.lastIndexOf('.');
             if (dotIndex > 0) {
                 String extension = asset.substring(dotIndex + 1).toLowerCase();
-                if (extension.equals("j3o")  || extension.equals("ovm")) {
+                if (extension.equals("j3o") || extension.equals("ovm")) {
                     ObjectType ot = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Standard", "Mesh");
-                    ot.setExtraInfo(asset);
                     CreateObjectEvent event = new CreateObjectEvent("dae.prefabs.standard.MeshObject", asset, ot);
+                    MeshComponent mc = new MeshComponent();
+                    mc.setMeshFile(asset);
+                    event.addPrefabComponent(mc);
                     viewport.onObjectCreation(event);
                 } else if (extension.equals("klatch")) {
                     ObjectType ot = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Standard", "Klatch");
@@ -1518,7 +1651,7 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
                     break;
                 case ROTATE:
                     if (!btnRotate.isSelected()) {
-                        this.btnMove.setSelected(true);
+                        this.btnRotate.setSelected(true);
                     }
                     this.btnRotate.setSelected(true);
                     break;
@@ -1532,6 +1665,51 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
                 default:
                     this.gizmoButtonGroup.clearSelection();
             }
+        }
+    }
+
+    @Subscribe
+    public void levelSelected(LevelEvent le) {
+        dae.project.Level current = le.getLevel();
+        if (le.getEventType() == EventType.LEVELSELECTED) {
+            // get all the brushes.  
+            List<Brush> brushes = current.descendantMatches(Brush.class);
+            cboBrushes.setModel(new DefaultComboBoxModel(brushes.toArray()));
+
+            if (brushes.size() > 0) {
+                System.out.println("Setting selected brush to : " + brushes.get(0));
+                GlobalObjects.getInstance().postEvent(
+                        new BrushEvent(BrushEventType.SELECTED, brushes.get(0)));
+            }
+        }
+        if (le.getEventType() == EventType.NODEADDED || le.getEventType() == EventType.NODEREMOVED) {
+            for (Node node : le.getNodes()) {
+                if (node instanceof Brush) {
+                    List<Brush> brushes = current.descendantMatches(Brush.class);
+                    cboBrushes.setModel(new DefaultComboBoxModel(brushes.toArray()));
+
+                    Brush b = (Brush) node;
+                    cboBrushes.setSelectedItem(b);
+                    GlobalObjects.getInstance().postEvent(
+                            new BrushEvent(BrushEventType.SELECTED, b));
+                }
+            }
+        }
+    }
+
+    @Subscribe
+    public void nodeSelected(final SelectionEvent se) {
+        if (se.getSource() == this) {
+            return;
+        }
+        if (SwingUtilities.isEventDispatchThread()) {
+            selectedPrefab = se.getSelectedNode();
+        } else {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    selectedPrefab = se.getSelectedNode();
+                }
+            });
         }
     }
 
