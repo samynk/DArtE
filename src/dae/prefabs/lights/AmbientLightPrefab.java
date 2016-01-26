@@ -24,14 +24,10 @@ public class AmbientLightPrefab extends Prefab {
 
     public AmbientLightPrefab() {
         light = new AmbientLight();
-        setCategory("Light");
-        setType("AmbientLight");
-        setLayerName("lights");
     }
 
     @Override
-    public void create(String name, AssetManager manager, String extraInfo) {
-        setName(name);
+    public void create( AssetManager manager, String extraInfo) {
         ambientLightColor = light.getColor().clone();
 
         Sphere s = new Sphere(12, 12, 0.05f);

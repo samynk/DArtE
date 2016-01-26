@@ -5,7 +5,6 @@ import com.jme3.light.SpotLight;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
-import com.jme3.math.Quaternion;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
@@ -48,9 +47,6 @@ public class SpotLightPrefab extends Prefab implements ShadowCastSupport {
 
     public SpotLightPrefab() {
         spotLight = new SpotLight();
-        setCategory("Light");
-        setType("SpotLight");
-        setLayerName("lights");
 
         LightControl lc = new LightControl(spotLight);
         addControl(lc);
@@ -80,8 +76,7 @@ public class SpotLightPrefab extends Prefab implements ShadowCastSupport {
     }
 
     @Override
-    public void create(String name, AssetManager manager, String extraInfo) {
-        setName(name);
+    public void create(AssetManager manager, String extraInfo) {
         setPivot(new Vector3f(0, -0.2f, 0));
         //spotLight.setPosition(this.getLocalTranslation());
         spotLight.setSpotRange(5.0f);
@@ -117,7 +112,8 @@ public class SpotLightPrefab extends Prefab implements ShadowCastSupport {
         sl.setLocalPrefabTranslation(this.getLocalPrefabTranslation());
         sl.setLocalPrefabRotation(this.getLocalPrefabRotation());
         sl.setLocalScale(this.getLocalScale());
-        sl.create(this.getName(), assetManager, getObjectType(), null);
+        sl.initialize(assetManager, getObjectType(), null);
+        sl.setName(this.getName());
         sl.setSpotLightIntensity(this.spotLightIntensity);
         sl.setSpotLightColor(this.spotLightColor.clone());
         sl.setSpotRange(this.spotLight.getSpotRange());

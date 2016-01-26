@@ -12,6 +12,7 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.shadow.DirectionalLightShadowRenderer;
 import dae.GlobalObjects;
+import dae.components.TransformComponent;
 import dae.prefabs.Prefab;
 import dae.prefabs.shapes.ArrowShape;
 import dae.prefabs.ui.events.ShadowEvent;
@@ -45,14 +46,10 @@ public class DirectionalLightPrefab extends Prefab implements ShadowCastSupport 
         light = new DirectionalLight();
         setCategory("Light");
         setType("DirectionalLight");
-        setLayerName("lights");
     }
 
     @Override
-    public void create(String name, AssetManager manager, String extraInfo) {
-        setName(name);
-
-
+    public void create(AssetManager manager, String extraInfo) {
         Vector3f dir = this.getWorldRotation().mult(Vector3f.UNIT_X);
         light.setDirection(dir);
         directionalLightColor = light.getColor().clone();
@@ -99,8 +96,9 @@ public class DirectionalLightPrefab extends Prefab implements ShadowCastSupport 
         rotationMatrix.fromStartEndVectors(Vector3f.UNIT_X, dir);
         Quaternion q = new Quaternion();
         q.fromRotationMatrix(rotationMatrix);
-        this.setLocalPrefabRotation(q);
         
+        TransformComponent tc = (TransformComponent)this.getComponent("TransformComponent");
+        tc.setRotation(q);        
         light.setDirection(dir);
     }
 

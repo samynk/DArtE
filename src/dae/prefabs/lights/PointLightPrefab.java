@@ -25,18 +25,13 @@ public class PointLightPrefab extends Prefab {
 
     public PointLightPrefab() {
         pointLight = new PointLight();
-        pointLight.setRadius(1.0f);
-        setCategory("Light");
-        setType("PointLight");
-        setLayerName("lights");
 
         LightControl lightControl = new LightControl(pointLight);
         this.addControl(lightControl);
     }
 
     @Override
-    public void create(String name, AssetManager manager, String extraInfo) {
-        setName(name);
+    public void create(AssetManager manager, String extraInfo) {
         pointLight.setPosition(this.getLocalTranslation());
         pointLightColor = pointLight.getColor().clone();
         lightMaterial = manager.loadMaterial("/Materials/LightMaterial.j3m");
