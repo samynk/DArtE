@@ -163,7 +163,7 @@ public class PropertyReflector {
      * @return a clone of the value or the object itself if the value is not
      * cloneable.
      */
-    public Object clone(Object toClone) {
+    public static Object clone(Object toClone) {
         if (toClone instanceof Cloneable) {
             try {
                 Method clone = toClone.getClass().getMethod("clone");
@@ -203,6 +203,75 @@ public class PropertyReflector {
             Logger.getLogger(Prefab.class.getName()).log(Level.SEVERE, null, ex);
         } catch (InvocationTargetException ex) {
             Logger.getLogger(Prefab.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    /**
+     * Invokes the list size method for the given property. The list size method
+     * should be of the form : get<Property>ListSize without arguments and should
+     * return an integer.
+     * This method will return 0 if the list is empty or if the proper method was not implemented.
+     * @param prefab the prefab to get the list size for.
+     * @param property the list property.
+     * @return the current size of the list.
+     */
+    public int invokeListSizeMethod(Prefab prefab, String property) {
+        String p = Character.toUpperCase(property.charAt(0)) + property.substring(1);
+        try {
+            Method m = clazz.getMethod("get" + p + "ListSize");
+            Object result = m.invoke(prefab);
+            if ( result instanceof Integer){
+                return (Integer)result;
+            }
+        } catch (NoSuchMethodException ex) {
+            Logger.getLogger(PropertyReflector.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SecurityException ex) {
+            Logger.getLogger(PropertyReflector.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            Logger.getLogger(PropertyReflector.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalArgumentException ex) {
+            Logger.getLogger(PropertyReflector.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvocationTargetException ex) {
+            Logger.getLogger(PropertyReflector.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return 0;
+    }
+
+    public Object invokeListElementAt(Prefab prefab, String property, int index) {
+        String p = Character.toUpperCase(property.charAt(0)) + property.substring(1);
+        try {
+            Method m = clazz.getMethod("get" + p + "At",getPrimitiveType(Integer.class));
+            Object result = m.invoke(prefab,index);
+            return result;
+        } catch (NoSuchMethodException ex) {
+            Logger.getLogger(PropertyReflector.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SecurityException ex) {
+            Logger.getLogger(PropertyReflector.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            Logger.getLogger(PropertyReflector.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalArgumentException ex) {
+            Logger.getLogger(PropertyReflector.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvocationTargetException ex) {
+            Logger.getLogger(PropertyReflector.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return 0;
+    }
+
+    public void invokeListAddItem(Prefab prefab, String property, Object object) {
+        String p = Character.toUpperCase(property.charAt(0)) + property.substring(1);
+        try {
+            Method m = clazz.getMethod("add" + p ,object.getClass());
+            m.invoke(prefab,object);
+        } catch (NoSuchMethodException ex) {
+            Logger.getLogger(PropertyReflector.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SecurityException ex) {
+            Logger.getLogger(PropertyReflector.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            Logger.getLogger(PropertyReflector.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalArgumentException ex) {
+            Logger.getLogger(PropertyReflector.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvocationTargetException ex) {
+            Logger.getLogger(PropertyReflector.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }
