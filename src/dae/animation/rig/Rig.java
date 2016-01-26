@@ -70,8 +70,7 @@ public class Rig extends Prefab implements BodyElement {
     }
 
     @Override
-    public void create(String name, AssetManager manager, String extraInfo) {
-        this.setName(name);
+    public void create(AssetManager manager, String extraInfo) {
         Material rigMaterial = manager.loadMaterial("Materials/RigMaterial.j3m");
         DiamondShape ds = new DiamondShape(0.1f, true);
         Geometry g = new Geometry("rigshape", ds);
