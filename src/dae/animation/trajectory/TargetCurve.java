@@ -63,16 +63,14 @@ public class TargetCurve extends Prefab implements TransformListener{
     }
 
     @Override
-    public void create(String name, AssetManager manager, String extraInfo) {
+    public void create( AssetManager manager, String extraInfo) {
         // create two handles to manipulate.
-
-        start = new Handle();
         ObjectType type = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Animation", "TwoAxisHandle");
-        start.create("start", manager, type, null);
+        start = (Handle)type.create(manager,"start");
+        start.setName("start");
         this.attachChild(start);
 
-        end = new Handle();
-        end.create("end", manager, type, null);
+        end =  (Handle)type.create(manager,"end");
         end.setLocalTranslation(2,0,0);
         this.attachChild(end);
         
@@ -163,9 +161,9 @@ public class TargetCurve extends Prefab implements TransformListener{
     
     protected void createHandle(String name, Vector3f location, Quaternion rotation)
     {
-        Handle h = new Handle();
         ObjectType type = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Animation", "TwoAxisHandle");
-        h.create(name, manager, type, null);
+        Handle h = (Handle)type.create(manager,name);
+        h.setName(name);
         h.setLocalTranslation(location);
         h.setLocalRotation(rotation);
         debugNode.attachChild(h);
