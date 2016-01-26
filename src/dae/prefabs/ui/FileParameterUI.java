@@ -13,7 +13,9 @@ import dae.prefabs.parameters.Parameter;
 import dae.prefabs.ui.classpath.FileNode;
 import dae.project.Project;
 import dae.project.ProjectTreeNode;
+import java.awt.Container;
 import java.awt.Frame;
+import java.awt.Window;
 
 /**
  *
@@ -64,7 +66,9 @@ public class FileParameterUI extends javax.swing.JPanel implements ParameterUI{
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnSelectFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectFileActionPerformed
-        Frame rootComponent = (Frame) this.getTopLevelAncestor();
+        Container root = this.getTopLevelAncestor();
+        
+        
         Project currentProject = null;
         ProjectTreeNode p = currentNode;
         while (p.getProjectParent() != null) {
@@ -76,7 +80,7 @@ public class FileParameterUI extends javax.swing.JPanel implements ParameterUI{
         }
         if (currentProject != null) {
             // todo replace with query in application extension registry.
-            FileNode fn = GlobalObjects.getInstance().selectAsset(rootComponent, this, currentProject, "Select animation set", parameter.getExtension());
+            FileNode fn = GlobalObjects.getInstance().selectAsset((Window)root, this, currentProject, "Select animation set", parameter.getExtension());
             if (fn != null) {
                 currentNode.setParameter(parameter,fn.getFullName(),true);
                 txtFileName.setText(fn.getFullName());
