@@ -103,6 +103,14 @@ public class Level extends Node implements ProjectTreeNode {
         defaultLights.add(light1);
         defaultLights.add(light2);
         defaultLights.add(backlight);
+        
+        if (ground == null) {
+            ObjectType gridtype = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Standard", "Ground");
+            ground = (Grid)gridtype.create(manager, name);
+            this.attachChild(ground);
+            LevelEvent le = new LevelEvent(this, EventType.NODEADDED, ground);
+            GlobalObjects.getInstance().postEvent(le);
+        }
     }
 
     protected Iterable<Prefab> getDefaultLights() {
@@ -246,14 +254,7 @@ public class Level extends Node implements ProjectTreeNode {
      */
     public void levelShown(AssetManager manager, BulletAppState state) {
         this.manager = manager;
-        if (ground == null) {
-            Material gridMaterial = manager.loadMaterial("Materials/GridMaterial.j3m");
-            ground = new Grid(10, 10, gridMaterial);
-            this.attachChild(ground);
-            LevelEvent le = new LevelEvent(this, EventType.NODEADDED, ground);
-            GlobalObjects.getInstance().postEvent(le);
-
-        }
+        
         if (this.createDefaultLights) {
             this.createLights(manager);
             createDefaultLights = false;
