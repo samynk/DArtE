@@ -258,6 +258,9 @@ public class ProjectTreeModel implements TreeModel {
 
     public void layerAdded(LayerEvent le) {
         Layer added = le.getLayer();
+        TreeModelEvent layerAdd = createInsertTreeModelEvent(added);
+        /*
+        Layer added = le.getLayer();
         Object path[] = new Object[added.getNumParentLayers() + 2]; //  project and the level.
         path[0] = this.project;
         path[1] = added.getParentLevel();
@@ -272,9 +275,9 @@ public class ProjectTreeModel implements TreeModel {
         Object[] objects = {added};
 
         TreeModelEvent event = new TreeModelEvent(this, path, indices, objects);
-
+        */
         for (TreeModelListener tml : listeners) {
-            tml.treeNodesInserted(event);
+            tml.treeNodesInserted(layerAdd);
         }
     }
 
