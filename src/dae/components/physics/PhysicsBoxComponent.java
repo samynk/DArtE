@@ -25,7 +25,6 @@ public class PhysicsBoxComponent extends PrefabComponent {
     private float linearDamping = 0.0f;
     private Vector3f dimension;
     private int collisionGroup;
-    
     private RigidBodyControl rigidBodyControl;
 
     /**
@@ -40,20 +39,6 @@ public class PhysicsBoxComponent extends PrefabComponent {
      */
     public void setMass(float mass) {
         this.mass = mass;
-    }
-
-    /**
-     * @return the dimension
-     */
-    public Vector3f getDimension() {
-        return dimension;
-    }
-
-    /**
-     * @param dimension the dimension to set
-     */
-    public void setDimension(Vector3f dimension) {
-        this.dimension = dimension;
     }
 
     /**
@@ -95,14 +80,50 @@ public class PhysicsBoxComponent extends PrefabComponent {
         rigidBodyControl.setRestitution(restitution);
         rigidBodyControl.setFriction(getFriction());
         parent.addControl(rigidBodyControl);
-        if ( PhysicsSpace.getPhysicsSpace() != null)
-        {
+        if (PhysicsSpace.getPhysicsSpace() != null) {
             PhysicsSpace.getPhysicsSpace().add(rigidBodyControl);
         }
         rigidBodyControl.setEnabled(true);
         rigidBodyControl.setPhysicsLocation(backupTrans);
         rigidBodyControl.setPhysicsRotation(backupRotation);
 
+    }
+    
+    @Override
+     public void deinstall(){
+        if ( parentComponent != null){
+            parentComponent.removeControl(rigidBodyControl);
+        }
+    }
+
+    @Override
+    public void installGameComponent(Spatial parent) {
+        Vector3f backupTrans = parent.getLocalTranslation().clone();
+        Quaternion backupRotation = parent.getLocalRotation().clone();
+        parent.setLocalTranslation(Vector3f.ZERO);
+        parent.setLocalRotation(Quaternion.IDENTITY);
+        parent.updateModelBound();
+
+        BoundingBox bb = (BoundingBox) parent.getWorldBound();
+        Vector3f center = new Vector3f();
+        bb.getCenter(center);
+        Vector3f exts = new Vector3f();
+        bb.getExtent(exts);
+
+        BoxCollisionShape shape = new BoxCollisionShape(exts);
+        CompoundCollisionShape finalShape = new CompoundCollisionShape();
+        mass = 0;
+        finalShape.addChildShape(shape, Vector3f.ZERO);
+        mass += bb.getVolume();
+
+        rigidBodyControl = new RigidBodyControl(finalShape, mass);
+        rigidBodyControl.setRestitution(restitution);
+        rigidBodyControl.setFriction(getFriction());
+
+        rigidBodyControl.setPhysicsLocation(backupTrans);
+        rigidBodyControl.setPhysicsRotation(backupRotation);
+        
+        parent.addControl(rigidBodyControl);
     }
 
     /**
@@ -131,7 +152,7 @@ public class PhysicsBoxComponent extends PrefabComponent {
      */
     public void setRestitution(float restitution) {
         this.restitution = restitution;
-        if ( rigidBodyControl != null){
+        if (rigidBodyControl != null) {
             rigidBodyControl.setRestitution(restitution);
             System.out.println("Setting restitution");
         }
@@ -149,7 +170,7 @@ public class PhysicsBoxComponent extends PrefabComponent {
      */
     public void setFriction(float friction) {
         this.friction = friction;
-         if ( rigidBodyControl != null){
+        if (rigidBodyControl != null) {
             rigidBodyControl.setFriction(friction);
             System.out.println("Setting restitution");
         }

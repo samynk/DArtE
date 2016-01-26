@@ -2,11 +2,15 @@ package dae.components.physics;
 
 import com.jme3.bullet.PhysicsSpace;
 import com.jme3.bullet.collision.shapes.CollisionShape;
+import com.jme3.bullet.collision.shapes.CompoundCollisionShape;
 import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.bullet.util.CollisionShapeFactory;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
+import com.jme3.scene.Node;
+import com.jme3.scene.Spatial;
 import dae.components.PrefabComponent;
+import dae.components.TransformComponent;
 import dae.prefabs.Prefab;
 
 /**
@@ -22,7 +26,6 @@ public class PhysicsConvexComponent extends PrefabComponent {
     private float linearDamping = 0.0f;
     private Vector3f dimension;
     private int collisionGroup;
-    
     private RigidBodyControl rigidBodyControl;
 
     /**
@@ -68,26 +71,63 @@ public class PhysicsConvexComponent extends PrefabComponent {
     @Override
     public void install(Prefab parent) {
         parentComponent = parent;
-        Vector3f backupTrans = parent.getLocalTranslation().clone();
-        Quaternion backupRotation = parent.getLocalRotation().clone();
-        parent.setLocalTranslation(Vector3f.ZERO);
-        parent.setLocalRotation(Quaternion.IDENTITY);
-        parent.updateModelBound();
-        
-        CollisionShape cs = CollisionShapeFactory.createDynamicMeshShape(parentComponent);
-        
+        installGameComponent(parent);
+        if (PhysicsSpace.getPhysicsSpace() != null) {
+            PhysicsSpace.getPhysicsSpace().add(rigidBodyControl);
+        }
+    }
+
+    @Override
+    public void installGameComponent(Spatial parent) {
+        CollisionShape cs;
+        if (parent instanceof Node) {
+            Node p = (Node) parent;
+            Spatial physics = p.getChild("physics");
+            if (physics != null) {
+                Vector3f scaleToApply = parent.getWorldScale().clone();
+                physics.setLocalScale(scaleToApply);
+                physics.updateGeometricState();
+                CompoundCollisionShape ccs = new CompoundCollisionShape();
+
+                ccs.addChildShape(CollisionShapeFactory.createDynamicMeshShape(physics), Vector3f.ZERO);
+                cs = ccs;
+                /*parent.setLocalScale(Vector3f.UNIT_XYZ);
+                for (Spatial s : p.getChildren()) {
+                    if (physics != s) {
+                        s.setLocalScale(scaleToApply.x, scaleToApply.y, scaleToApply.z);
+                    }
+                }*/
+            } else {
+                cs = CollisionShapeFactory.createDynamicMeshShape(parent);
+            }
+        } else {
+            cs = CollisionShapeFactory.createDynamicMeshShape(parent);
+        }
+        parent.updateGeometricState();
         rigidBodyControl = new RigidBodyControl(cs, mass);
         rigidBodyControl.setRestitution(restitution);
         rigidBodyControl.setFriction(getFriction());
+        rigidBodyControl.setDamping(0.5f, 0.25f);
         parent.addControl(rigidBodyControl);
-        if ( PhysicsSpace.getPhysicsSpace() != null)
-        {
-            PhysicsSpace.getPhysicsSpace().add(rigidBodyControl);
-        }
-        rigidBodyControl.setEnabled(true);
-        rigidBodyControl.setPhysicsLocation(backupTrans);
-        rigidBodyControl.setPhysicsRotation(backupRotation);
+    }
 
+    @Override
+    public void deinstall() {
+        if (parentComponent != null) {
+            PhysicsSpace space = rigidBodyControl.getPhysicsSpace();
+            Vector3f loc = rigidBodyControl.getPhysicsLocation();
+            Quaternion rot = rigidBodyControl.getPhysicsRotation();
+
+            parentComponent.removeControl(rigidBodyControl);
+
+            if (space != null) {
+                space.remove(rigidBodyControl);
+            }
+            
+            TransformComponent tc = (TransformComponent) parentComponent.getComponent("TransformComponent");
+            tc.setTranslation(loc);
+            tc.setRotation(rot);
+        }
     }
 
     /**
@@ -116,9 +156,8 @@ public class PhysicsConvexComponent extends PrefabComponent {
      */
     public void setRestitution(float restitution) {
         this.restitution = restitution;
-        if ( rigidBodyControl != null){
+        if (rigidBodyControl != null) {
             rigidBodyControl.setRestitution(restitution);
-            System.out.println("Setting restitution");
         }
     }
 
@@ -134,9 +173,8 @@ public class PhysicsConvexComponent extends PrefabComponent {
      */
     public void setFriction(float friction) {
         this.friction = friction;
-         if ( rigidBodyControl != null){
+        if (rigidBodyControl != null) {
             rigidBodyControl.setFriction(friction);
-            System.out.println("Setting restitution");
         }
     }
 

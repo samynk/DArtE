@@ -3,6 +3,7 @@ package dae.components.physics;
 import com.jme3.bullet.PhysicsSpace;
 import com.jme3.bullet.control.BetterCharacterControl;
 import com.jme3.math.Vector3f;
+import com.jme3.scene.Spatial;
 import dae.components.PrefabComponent;
 import dae.prefabs.Prefab;
 
@@ -23,11 +24,24 @@ public class CharacterControllerComponent extends PrefabComponent {
     public void install(Prefab parent) {
         this.parent = parent;
         characterControl = new BetterCharacterControl(radius, height, mass);
-        
+
         parent.addControl(characterControl);
         if (PhysicsSpace.getPhysicsSpace() != null) {
             PhysicsSpace.getPhysicsSpace().add(characterControl);
         }
+    }
+    
+    public void deinstall(){
+        if ( parent != null){
+            parent.removeControl(characterControl);
+        }
+    }
+    
+    @Override
+    public void installGameComponent(Spatial parent)
+    {
+        characterControl = new BetterCharacterControl(radius, height, mass);
+        parent.addControl(characterControl);
     }
 
     /**

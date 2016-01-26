@@ -2,11 +2,9 @@ package dae.components.physics;
 
 import com.jme3.bullet.PhysicsSpace;
 import com.jme3.bullet.collision.shapes.CollisionShape;
-import com.jme3.bullet.collision.shapes.CompoundCollisionShape;
 import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.bullet.util.CollisionShapeFactory;
-import com.jme3.math.Quaternion;
-import com.jme3.math.Vector3f;
+import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import dae.components.PrefabComponent;
 import dae.prefabs.Prefab;
@@ -25,17 +23,24 @@ public class PhysicsConcaveComponent extends PrefabComponent {
     @Override
     public void install(Prefab parent) {
         parentComponent = parent;
-        Vector3f backupTrans = parent.getLocalTranslation().clone();
-        Quaternion backupRotation = parent.getLocalRotation().clone();
-        parent.setLocalTranslation(Vector3f.ZERO);
-        parent.setLocalRotation(Quaternion.IDENTITY);
-        parent.updateModelBound();
-
+        installGameComponent(parent);
+        
+        if (PhysicsSpace.getPhysicsSpace() != null) {
+            PhysicsSpace.getPhysicsSpace().add(rigidBodyControl);
+        }
+    }
+    
+    @Override
+    public void installGameComponent(Spatial parent)
+    {
         CollisionShape cs;
-        CompoundCollisionShape ccs = new CompoundCollisionShape();
-        Spatial physicsChild = parentComponent.getChild("physics");
+        Spatial physicsChild = null;
+        if ( parent instanceof Node)
+        {
+            Node n = (Node)parent;
+            physicsChild = n.getChild("physics");
+        }
         if (physicsChild != null) {
-            
             cs = CollisionShapeFactory.createMeshShape(physicsChild);
         } else {
             cs = CollisionShapeFactory.createMeshShape(parentComponent);
@@ -45,12 +50,15 @@ public class PhysicsConcaveComponent extends PrefabComponent {
         rigidBodyControl = new RigidBodyControl(cs, 0);
         rigidBodyControl.setFriction(getFriction());
         parent.addControl(rigidBodyControl);
-        if (PhysicsSpace.getPhysicsSpace() != null) {
-            PhysicsSpace.getPhysicsSpace().add(rigidBodyControl);
-        }
+        
         rigidBodyControl.setEnabled(true);
-        rigidBodyControl.setPhysicsLocation(backupTrans);
-        rigidBodyControl.setPhysicsRotation(backupRotation);
+    }
+    
+    @Override
+     public void deinstall(){
+        if ( parentComponent != null){
+            parentComponent.removeControl(rigidBodyControl);
+        }
     }
 
     /**

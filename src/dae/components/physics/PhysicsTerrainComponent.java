@@ -4,6 +4,10 @@ import com.jme3.bullet.PhysicsSpace;
 import com.jme3.bullet.collision.shapes.CollisionShape;
 import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.bullet.util.CollisionShapeFactory;
+import com.jme3.math.Quaternion;
+import com.jme3.math.Vector3f;
+import com.jme3.scene.Spatial;
+import com.jme3.terrain.geomipmap.TerrainQuad;
 import dae.components.PrefabComponent;
 import dae.prefabs.Prefab;
 import dae.prefabs.standard.Terrain;
@@ -13,26 +17,43 @@ import dae.prefabs.standard.Terrain;
  * @author Koen Samyn
  */
 public class PhysicsTerrainComponent extends PrefabComponent {
-
+    private Spatial parent;
     private RigidBodyControl rbc;
     private float friction;
     private int collisionGroup = 1;
 
     @Override
     public void install(Prefab parent) {
-        if (parent instanceof Terrain) {
-            Terrain t = (Terrain) parent;
+        this.parent = parent;
+        installGameComponent(parent);
+        if (PhysicsSpace.getPhysicsSpace() != null) {
+            PhysicsSpace.getPhysicsSpace().add(parent);
+        }
+    }
 
+    @Override
+    public void installGameComponent(Spatial parent) {
+        if (parent instanceof Terrain || parent instanceof TerrainQuad) {
+            Vector3f backupTrans = parent.getLocalTranslation().clone();
+            Quaternion backupRotation = parent.getLocalRotation().clone();
+            parent.setLocalTranslation(Vector3f.ZERO);
+            parent.setLocalRotation(Quaternion.IDENTITY);
 
-            CollisionShape terrainShape = CollisionShapeFactory.createMeshShape(t);
-            rbc = new RigidBodyControl(terrainShape,  0);
+            CollisionShape terrainShape = CollisionShapeFactory.createMeshShape(parent);
+            rbc = new RigidBodyControl(terrainShape, 0);
             rbc.setFriction(friction);
             rbc.setCollisionGroup(collisionGroup);
-            t.addControl(rbc);
-            if (PhysicsSpace.getPhysicsSpace() != null) {
-                PhysicsSpace.getPhysicsSpace().add(t);
-            }
+            parent.addControl(rbc);
+            rbc.setPhysicsLocation(backupTrans);
+            rbc.setPhysicsRotation(backupRotation);
             rbc.setEnabled(true);
+        }
+    }
+    
+    @Override
+     public void deinstall(){
+        if ( parent != null){
+            parent.removeControl(rbc);
         }
     }
 
