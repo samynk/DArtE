@@ -1,18 +1,15 @@
 package dae.project;
 
 import com.jme3.asset.AssetManager;
-import com.jme3.bullet.collision.shapes.BoxCollisionShape;
 import com.jme3.bullet.collision.shapes.PlaneCollisionShape;
 import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.material.Material;
-import com.jme3.math.ColorRGBA;
 import com.jme3.math.Matrix3f;
 import com.jme3.math.Plane;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.shape.Box;
-import com.jme3.texture.Texture;
 import dae.GlobalObjects;
 import dae.components.ComponentType;
 import dae.prefabs.AxisEnum;
@@ -36,8 +33,6 @@ public class Grid extends Prefab {
     private Geometry currentGeometry;
 
     public Grid() {
-        this.setName("Ground");
-        objectType = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Standard", "Ground");
     }
 
     /**
@@ -46,9 +41,7 @@ public class Grid extends Prefab {
      * @param width the width of the ground object.
      * @param length the length of the ground object;
      */
-    public Grid(float width, float length, Material groundMaterial) {
-        this.setName("Ground");
-        objectType = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Standard", "Ground");
+    private Grid(float width, float length, Material groundMaterial) {
         
         this.width = width;
         this.length = length;
@@ -57,12 +50,9 @@ public class Grid extends Prefab {
     }
 
     @Override
-    public void create(String name, AssetManager manager, ObjectType type, String extraInfo) {
-        this.setName(name);
-        this.setCategory("Standard");
-        this.setType("Ground");
-
-        Material mat = createStandardMaterial(manager, "Textures/refPattern.png", Texture.WrapMode.Repeat, ColorRGBA.White);
+    public void initialize(AssetManager manager, ObjectType type, String extraInfo) {
+        objectType = type;
+        Material mat = manager.loadMaterial("Materials/GridMaterial.j3m");
         initialize(mat);
     }
 
