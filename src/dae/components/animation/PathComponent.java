@@ -3,6 +3,7 @@ package dae.components.animation;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
+import com.jme3.scene.Spatial;
 import dae.animation.custom.Animatable;
 import dae.animation.custom.CharacterPath;
 import dae.animation.custom.PathSegment;
@@ -69,6 +70,16 @@ public class PathComponent extends PrefabComponent implements Animatable {
     @Override
     public void install(Prefab parent) {
         this.parent = parent;
+    }
+    
+    @Override
+    public void deinstall(){
+        
+    }
+    
+    @Override
+    public void installGameComponent(Spatial parent){
+        // to do : create path control component.
     }
 
     /**
