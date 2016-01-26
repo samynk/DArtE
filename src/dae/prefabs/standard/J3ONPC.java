@@ -69,9 +69,8 @@ public class J3ONPC extends Prefab implements Animatable {
     }
 
     @Override
-    public void create(String name, AssetManager manager, String extraInfo) {
+    public void create(AssetManager manager, String extraInfo) {
         Spatial model = manager.loadModel(extraInfo);
-        super.setName(name);
         this.meshName = name;
         this.meshFile = extraInfo;
 
