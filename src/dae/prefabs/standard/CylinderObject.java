@@ -40,8 +40,7 @@ public class CylinderObject extends Prefab {
     }
 
     @Override
-    public final void create(String name, AssetManager manager, String extraInfo) {
-        this.setName(name);
+    public final void create(AssetManager manager, String extraInfo) {
         this.manager = manager;
         recreateCylinder();
     }
@@ -50,7 +49,8 @@ public class CylinderObject extends Prefab {
     public Prefab duplicate(AssetManager manager) {
         CylinderObject co = new CylinderObject( this.radius, height, axialSegments, radialSegments);
         co.physicsSpace = physicsSpace;
-        co.create( name, manager, getObjectType(), null) ;
+        co.initialize( manager, getObjectType(), null) ;
+        co.setName(name);
         co.setType( this.getType() );
         co.setCategory( this.getCategory() );
         return co;
