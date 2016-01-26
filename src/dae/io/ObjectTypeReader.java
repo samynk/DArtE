@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.io;
 
 import dae.prefabs.parameters.EnumListParameter;
@@ -11,6 +7,7 @@ import com.jme3.math.FastMath;
 import com.jme3.math.Matrix3f;
 import com.jme3.math.Vector3f;
 import dae.components.ComponentType;
+import dae.io.readers.DefaultPrefabImporter;
 import dae.prefabs.magnets.FillerParameter;
 import dae.prefabs.magnets.GridMagnet;
 import dae.prefabs.magnets.Magnet;
@@ -18,6 +15,7 @@ import dae.prefabs.magnets.MagnetArea;
 import dae.prefabs.magnets.MagnetParameter;
 import dae.prefabs.magnets.Quad;
 import dae.prefabs.parameters.ActionParameter;
+import dae.prefabs.parameters.BaseTypeParameter;
 import dae.prefabs.parameters.BooleanParameter;
 import dae.prefabs.parameters.ChoiceParameter;
 import dae.prefabs.parameters.ColorParameter;
@@ -25,6 +23,7 @@ import dae.prefabs.parameters.ConnectorParameter;
 import dae.prefabs.parameters.DefaultSection;
 import dae.prefabs.parameters.DictionaryParameter;
 import dae.prefabs.parameters.FileParameter;
+import dae.prefabs.parameters.Float2Parameter;
 import dae.prefabs.parameters.Float3Parameter;
 import dae.prefabs.parameters.FloatParameter;
 import dae.prefabs.parameters.FuzzyParameter;
@@ -39,6 +38,8 @@ import dae.prefabs.standard.RotationRange;
 import dae.prefabs.types.ObjectType;
 import dae.prefabs.types.ObjectTypeCategory;
 import dae.prefabs.types.ObjectTypeCollection;
+import dae.prefabs.types.ObjectTypeInstance;
+import dae.prefabs.types.ObjectTypeParameter;
 import dae.prefabs.types.ParameterSupport;
 import java.io.IOException;
 import java.io.InputStream;
@@ -59,9 +60,11 @@ import org.xml.sax.SAXException;
 public class ObjectTypeReader implements AssetLoader {
 
     private ResourceBundle translations;
+    private DefaultPrefabImporter importer;
 
     public ObjectTypeReader() {
         translations = ResourceBundle.getBundle("i18n/ui");
+        importer = new DefaultPrefabImporter();
     }
 
     @Override
@@ -136,21 +139,10 @@ public class ObjectTypeReader implements AssetLoader {
                 ParameterSection ps = new ParameterSection(section);
                 parent.addParameterSection(ps);
 
-                if ( parent instanceof ComponentType)
-                {
-                    readParameters(current, ps, (ComponentType)parent);
-                }else{
+                if (parent instanceof ComponentType) {
+                    readParameters(current, ps, (ComponentType) parent);
+                } else {
                     readParameters(current, ps, ComponentType.PREFAB);
-                }
-            } else if ("defaults".equals(current.getNodeName())) {
-                DefaultSection ds = new DefaultSection();
-                parent.setDefaultSection(ds);
-
-                if ( parent instanceof ComponentType)
-                {
-                    readDefaults(current, ds, (ComponentType)parent);
-                }else{
-                    readDefaults(current, ds, ComponentType.PREFAB);
                 }
             }
         }
@@ -164,6 +156,7 @@ public class ObjectTypeReader implements AssetLoader {
                 NamedNodeMap map = current.getAttributes();
                 String type = getAttrContent("type", map);
                 String id = getAttrContent("id", map);
+
                 String collectionType = getAttrContent("collectiontype", map);
 
                 String label;
@@ -181,8 +174,8 @@ public class ObjectTypeReader implements AssetLoader {
                 } else if ("choice".equals(type)) {
                     ChoiceParameter cp = new ChoiceParameter(cType, type, id);
                     // if the values are supplied by a property in the object.
-                    String listento = getAttrContent("listento",map);
-                    String provider = getAttrContent("values",map);
+                    String listento = getAttrContent("listento", map);
+                    String provider = getAttrContent("values", map);
                     cp.setListenTo(listento);
                     cp.setValuesProvider(provider);
                     readChoices(current, cp);
@@ -243,15 +236,23 @@ public class ObjectTypeReader implements AssetLoader {
                     ConnectorParameter frp = new ConnectorParameter(cType, type, id);
                     p = frp;
 
-                } else if ("file".equals(type)){
-                    String extension = this.getAttrContent("extension",map);
-                    FileParameter fp = new FileParameter(cType,type,id);
+                } else if ("file".equals(type)) {
+                    String extension = this.getAttrContent("extension", map);
+                    FileParameter fp = new FileParameter(cType, type, id);
                     fp.setExtension(extension);
                     p = fp;
+                } else if ("float2".equals(type)) {
+                    p = new Float2Parameter(cType, type, id);
+                } else if (type.startsWith("$")) {
+                    // the type is an object type that is defined in the type
+                    // parameter file.
+                    String baseType = type.substring(1);
+                    BaseTypeParameter bpt = new BaseTypeParameter(cType, baseType, id);
+                    p = bpt;
                 }
                 if (p != null) {
                     if ("list".equals(collectionType)) {
-                        ListParameter lp = new ListParameter(cType, type, id, p);
+                        ListParameter lp = new ListParameter(cType, collectionType, id, p);
                         parent.addParameter(lp);
                     } else if ("dictionary".equals(collectionType)) {
                         DictionaryParameter dp = new DictionaryParameter(cType, collectionType, id, p);
@@ -261,40 +262,22 @@ public class ObjectTypeReader implements AssetLoader {
                     }
                     p.setLabel(label);
                     p.setConverter(converter);
-                }
-            }
-        }
-    }
 
-    private void readDefaults(Node parentNode, DefaultSection parent, ComponentType cType) {
-        NodeList parameters = parentNode.getChildNodes();
-        for (int i = 0; i < parameters.getLength(); ++i) {
-            Node current = parameters.item(i);
-            if ("parameter".equals(current.getNodeName())) {
-                NamedNodeMap map = current.getAttributes();
-                String type = getAttrContent("type", map);
-                String id = getAttrContent("id", map);
-                String value = getAttrContent("value", map);
-                if ("float3".equals(type)) {
-                    Vector3f v = parseFloat3(value);
-                    parent.addParameter(new Float3Parameter(cType,type, id, v));
-                } else if ("string".equals(type)) {
-                    parent.addParameter(new TextParameter(cType,type, id));
-                } else if ("choice".equals(type)) {
-                    ChoiceParameter cp = new ChoiceParameter(cType,type, id);
-                    readChoices(current, cp);
-                    parent.addParameter(cp);
-                } else if ("color".equals(type)) {
-                    ColorParameter cp = new ColorParameter(cType,type, id);
-                    parent.addParameter(cp);
-                } else if ("float".equals(type)) {
-                    FloatParameter fp = new FloatParameter(cType,type, id);
-                    parent.addParameter(fp);
-                } else if ("boolean".equals(type)) {
-                    BooleanParameter bp = new BooleanParameter(cType,type, id);
-                    parent.addParameter(bp);
+                    String defaultValue = getAttrContent("default", map);
+                    if (defaultValue.length() > 0) {
+                        Object parsed = importer.parseParameter(p, defaultValue);
+                        p.setDefault(parsed);
+                    } else if (defaultValue.length() == 0 && current.hasChildNodes()) {
+                        Object value = readDefault(current);
+                        if (value instanceof String) {
+                            Object parsed = importer.parseParameter(p, value.toString());
+                            p.setDefault(parsed);
+                        } else {
+                            p.setDefault(value);
+                        }
+                    }
                 }
-            }
+            } 
         }
     }
 
@@ -461,17 +444,6 @@ public class ObjectTypeReader implements AssetLoader {
         return attr != null ? attr.getTextContent() : "";
     }
 
-    private float[] parseFloatArray(String values) {
-        String withoutBrackets = values.substring(1, values.length() - 1);
-        String[] cs = withoutBrackets.split(",");
-
-        float rotationValues[] = new float[cs.length];
-        for (int i = 0; i < cs.length; ++i) {
-            rotationValues[i] = Float.parseFloat(cs[i]);
-        }
-        return rotationValues;
-    }
-
     private float parseFloat(String attribute, NamedNodeMap map) {
         try {
             Node attr = map.getNamedItem(attribute);
@@ -522,7 +494,7 @@ public class ObjectTypeReader implements AssetLoader {
                 NamedNodeMap attrs = child.getAttributes();
                 String id = getAttrContent("id", attrs);
                 int order = XMLUtils.parseInt("order", attrs);
-                if ( order == 0 ){
+                if (order == 0) {
                     order = Integer.MAX_VALUE;
                 }
                 String className = getAttrContent("className", attrs);
@@ -555,7 +527,77 @@ public class ObjectTypeReader implements AssetLoader {
                 if (ct != null) {
                     ot.addComponentType(ct);
                 }
+                readDefaults(child, ot, ct);
             }
         }
+    }
+
+    private void readDefaults(Node child, ObjectType ot, ComponentType ct) {
+        NodeList defaults = child.getChildNodes();
+        for (int i = 0; i < defaults.getLength(); ++i) {
+            Node defaultNode = defaults.item(i);
+            if (defaultNode.getNodeName().equals("default")) {
+                String id = getAttrContent("id", defaultNode.getAttributes());
+                String defaultValue = getAttrContent("value", defaultNode.getAttributes());
+
+                if (defaultValue.length() == 0) {
+                    defaultValue = XMLUtils.readCDATA(defaultNode);
+                }
+                if (defaultValue != null) {
+                    Parameter p = ot.findParameter(ct.getId(), id);
+                    Object parsed = importer.parseParameter(p, defaultValue);
+                    ot.setDefaultValue(ct.getId(), id, parsed);
+                }
+            }
+        }
+    }
+
+    /**
+     *
+     * @param current
+     * @return
+     */
+    private Object readDefault(Node current) {
+        NodeList nl = current.getChildNodes();
+        for (int i = 0; i < nl.getLength(); ++i) {
+            Node n = nl.item(i);
+            if ("setdefault".equals(n.getNodeName())) {
+                return readSetDefault(n);
+            }
+        }
+        return XMLUtils.readCDATA(current);
+    }
+
+    private Object readSetDefault(Node n) {
+        ObjectTypeInstance oti = null;
+        NamedNodeMap map = n.getAttributes();
+        String type = XMLUtils.getAttribute("type", map);
+        String prefix = XMLUtils.getAttribute("prefix", map);
+        String location = XMLUtils.getAttribute("location", map);
+        if (type.startsWith("Prefab:")) {
+            int startIndex = type.indexOf(':');
+            int dotIndex = type.indexOf('.');
+            if (startIndex > -1 && dotIndex > -1) {
+                String category = type.substring(startIndex + 1, dotIndex);
+                String ptype = type.substring(dotIndex + 1);
+                oti = new ObjectTypeInstance(prefix, category, ptype);
+                oti.setLocation(location);
+
+                if (n.hasChildNodes()) {
+                    NodeList setProperties = n.getChildNodes();
+                    for (int i = 0; i < setProperties.getLength(); ++i) {
+                        Node setProperty = setProperties.item(i);
+                        if ("setproperty".equals(setProperty.getNodeName())) {
+                            NamedNodeMap propertymap = setProperty.getAttributes();
+                            String id = XMLUtils.getAttribute("id", propertymap);
+                            String value = XMLUtils.getAttribute("value", propertymap);
+                            oti.setValueConverter(this.importer);
+                            oti.addParameter(new ObjectTypeParameter(id, value));
+                        }
+                    }
+                }
+            }
+        }
+        return oti;
     }
 }
