@@ -19,13 +19,17 @@ import com.jme3.math.Vector3f;
 import dae.gui.SelectAssetDialog;
 import dae.gui.preferences.GameKeyDefinition;
 import dae.prefabs.AxisEnum;
+import dae.prefabs.Prefab;
 import dae.prefabs.prefab.undo.UndoPrefabPropertyEdit;
 import dae.prefabs.standard.RotationRange;
 import dae.prefabs.types.ObjectTypeCategory;
+import dae.prefabs.ui.PrefabParameterDialog;
+import dae.prefabs.ui.PrefabParameterPanel;
 import dae.prefabs.ui.classpath.FileNode;
 import dae.project.Project;
 import java.awt.Component;
 import java.awt.Frame;
+import java.awt.Window;
 import java.awt.event.KeyEvent;
 import java.awt.im.InputContext;
 import java.io.File;
@@ -70,6 +74,10 @@ public class GlobalObjects {
     private Preferences preferences;
     private KeyNames keyNames = new KeyNames();
     private static int MAXRECENTFILES = 10;
+    /**
+     * Customization panel for prefabs in the form of a dialog.
+     */
+    private PrefabParameterDialog parameterDialog;
 
     private GlobalObjects() {
         eventBus = new EventBus();
@@ -249,11 +257,14 @@ public class GlobalObjects {
 
     public void setAssetManager(AssetManager manager) {
         if (manager != null) {
-            wireMaterial = new Material(manager, "/Common/MatDefs/Misc/Unshaded.j3md");
-
-            wireMaterial.getAdditionalRenderState().setWireframe(true);
-
-            wireMaterial.setColor("Color", ColorRGBA.White);
+            try {
+                wireMaterial = new Material(manager, "/Common/MatDefs/Misc/Unshaded.j3md");
+                if (wireMaterial != null) {
+                    wireMaterial.getAdditionalRenderState().setWireframe(true);
+                    wireMaterial.setColor("Color", ColorRGBA.White);
+                }
+            } catch (NullPointerException ex) {
+            }
         }
         this.manager = manager;
     }
@@ -714,13 +725,14 @@ public class GlobalObjects {
         String sKeyCode = bundle.getString(key);
         return new KeyTrigger(Integer.parseInt(sKeyCode, 16));
     }
-    
+
     /**
      * Returns a key trigger based on the information in the preferences.
+     *
      * @param key the key for the trigger.
      * @return the KeyTrigger object.
      */
-    private KeyTrigger getKeyCode(String key){
+    private KeyTrigger getKeyCode(String key) {
         GlobalObjects go = GlobalObjects.getInstance();
         String keycodes = go.getStringPreference(key);
         GameKeyDefinition gkd = new GameKeyDefinition(keycodes);
@@ -776,39 +788,48 @@ public class GlobalObjects {
 
     /**
      * Returns the camera object.
+     *
      * @return the camera object.
      */
     public DAEFlyByCamera getCamera() {
         return camera;
     }
-    
     private SelectAssetDialog dialog;
-    
+
     /**
      * Select an asset with an asset panel
+     *
      * @param rootComponent the root frame component.
      * @param relative place the dialog relative to this component.
      * @param title the title for the dialog.
-     * @param extensions the extensions (separated by |) that need to be displayed.
-     * in the asset panel.
+     * @param extensions the extensions (separated by |) that need to be
+     * displayed. in the asset panel.
      */
-    public FileNode selectAsset( Frame rootComponent, Component relative, Project currentProject, String title, String extensions )
-    {
-        if ( dialog == null ){
+    public FileNode selectAsset(Window rootComponent, Component relative, Project currentProject, String title, String extensions) {
+        if (dialog == null) {
             dialog = new SelectAssetDialog(rootComponent, true);
         }
         dialog.setLocationRelativeTo(relative);
         dialog.setTitle(title);
         dialog.setProject(currentProject);
         dialog.setExtensions(extensions);
-        
-        
+
+
         dialog.setVisible(true);
-        if ( dialog.getReturnStatus() == dialog.RET_OK)
-        {
+        if (dialog.getReturnStatus() == dialog.RET_OK) {
             return dialog.getSelectedFileNode();
-        }else{
+        } else {
             return null;
         }
+    }
+
+    public void showParameterDialog(Frame rootComponent, Component relative, Prefab prefab) {
+        if (this.parameterDialog == null) {
+            parameterDialog = new PrefabParameterDialog(rootComponent, true);
+        }
+        parameterDialog.setLocationRelativeTo(relative);
+        parameterDialog.setSelectedPrefab(prefab);
+        parameterDialog.setVisible(true);
+
     }
 }
