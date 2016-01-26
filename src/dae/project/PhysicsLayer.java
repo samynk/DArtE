@@ -5,9 +5,7 @@
 
 package dae.project;
 
-import com.jme3.asset.AssetManager;
 import com.jme3.bullet.BulletAppState;
-import com.jme3.bullet.PhysicsSpace;
 
 /**
  * This is a special layer that is always locked and that enables
