@@ -10,6 +10,7 @@ import java.util.logging.Logger;
  */
 public class EnumListParameter extends Parameter{
     private Object[] choices;
+    private Class enumClass;
     /**
      * Creates a new EnumListParameter object.
      * @param componentType componentType the component type of the parameter.
@@ -26,11 +27,20 @@ public class EnumListParameter extends Parameter{
      */
     public void setEnumClass(String className){
         try {
-            Class<?> enumClass = Class.forName(className);
+            enumClass = Class.forName(className);
             choices = enumClass.getEnumConstants();
         } catch (ClassNotFoundException ex) {
             Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
         }
+    }
+    
+    /**
+     * Converts the string to the correct enum value.
+     * @param value
+     * @return 
+     */
+    public Object getEnum(String value){
+        return Enum.valueOf(enumClass, value);
     }
 
     /**
