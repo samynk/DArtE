@@ -452,8 +452,7 @@ public class RevoluteJoint extends Prefab implements BodyElement {
     }
 
     @Override
-    public void create(String name, AssetManager manager, String extraInfo) {
-        this.setName(name);
+    public void create(AssetManager manager, String extraInfo) {
         createVisualization(manager);
     }
 
