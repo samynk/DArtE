@@ -24,6 +24,7 @@ public class PropertiesPanel extends javax.swing.JPanel {
     public PropertiesPanel() {
         initComponents();
         GlobalObjects.getInstance().registerListener(this);
+        prefabParameterPanel1.subscribeToPrefabSelectionEvent();
     }
 
     @Subscribe
