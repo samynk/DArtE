@@ -42,7 +42,7 @@ public class DAECamAppState extends AbstractAppState {
                 flyCam = new DAEFlyByCamera(app.getCamera());
                 flyCam.setUpVector(Vector3f.UNIT_Y);
                 flyCam.setDragToRotate(true);
-                flyCam.setMoveSpeed(5.0f);
+                flyCam.setMoveSpeed(10.0f);
                 GlobalObjects.getInstance().setCamera(flyCam);
                 if ( app instanceof SandboxViewport)
                 {
