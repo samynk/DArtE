@@ -15,6 +15,7 @@ import dae.io.writers.DefaultPrefabExporter;
 import dae.io.writers.PrefabTextExporter;
 import dae.prefabs.Klatch;
 import dae.prefabs.Prefab;
+import dae.prefabs.brush.BrushBatch;
 import dae.prefabs.gizmos.PivotGizmo;
 import dae.prefabs.lights.AmbientLightPrefab;
 import dae.prefabs.lights.DirectionalLightPrefab;
@@ -22,7 +23,6 @@ import dae.prefabs.lights.PointLightPrefab;
 import dae.prefabs.lights.SpotLightPrefab;
 import dae.prefabs.standard.CameraEntity;
 import dae.prefabs.standard.J3ONPC;
-import dae.prefabs.standard.MeshObject;
 import dae.prefabs.standard.NPCLocationEntity;
 import dae.prefabs.standard.NavigationMesh;
 import dae.prefabs.standard.PlayerStartEntity;
@@ -31,7 +31,7 @@ import dae.prefabs.standard.SoundEntity;
 import dae.prefabs.standard.Terrain;
 import dae.prefabs.standard.TriggerBox;
 import dae.prefabs.standard.WayPointEntity;
-import dae.project.Grid;
+import dae.prefabs.types.ObjectType;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -65,54 +65,70 @@ public class SceneSaver {
      * @param node the root node of the scene.
      */
     public static void writeScene(File location, Node node) {
-        FileWriter fw;
-        BufferedWriter bw = null;
         try {
+            FileWriter fw;
+            BufferedWriter bw = null;
+
             if (!location.getParentFile().exists()) {
                 location.getParentFile().mkdirs();
             }
             fw = new FileWriter(location);
-
             bw = new BufferedWriter(fw);
-            bw.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-            bw.write("<scene>\n");
+            writeScene(bw, node);
+        } catch (IOException ex) {
+            Logger.getLogger(SceneSaver.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+    
+    public static void writeScene(BufferedWriter w, Node node) {
+        try {
+            w.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+            w.write("<scene>\n");
             if (node.getUserData("eventlocation") != null) {
                 String eventloc = node.getUserData("eventlocation");
-                bw.write("\t<event ");
-                writeAttribute(bw, "location", eventloc);
-                bw.write("/>\n");
+                w.write("\t<event ");
+                writeAttribute(w, "location", eventloc);
+                w.write("/>\n");
             }
             if (node.getUserData("radarmodel") != null) {
                 String model = node.getUserData("radarmodel");
-                bw.write("\t<radar ");
-                writeAttribute(bw, "model", model);
-                bw.write("/>\n");
+                w.write("\t<radar ");
+                writeAttribute(w, "model", model);
+                w.write("/>\n");
+            }
+            if (node instanceof dae.project.Level) {
+                dae.project.Level l = (dae.project.Level) node;
+                w.write("\t<skybox ");
+                XMLUtils.writeAttribute(w, "tex", l.getSkyBoxTexture());
+                w.write("/>\n");
             }
             for (Spatial child : node.getChildren()) {
                 if (child instanceof Prefab) {
                     Prefab p = (Prefab) child;
                     Object save = p.getUserData("Save");
                     if (save != Boolean.FALSE) {
-                        writePrefab(p, bw, 1);
+                        writePrefab(p, w, 1);
                     }
                 }
 
             }
-            bw.write("</scene>\n");
+            w.write("</scene>\n");
         } catch (IOException ex) {
             Logger.getLogger(SceneSaver.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
-                bw.close();
+                w.close();
             } catch (IOException ex) {
                 Logger.getLogger(SceneSaver.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+
     }
 
     public static String createTabString(int depth) {
         if (helper.length() > 0) {
-            helper.delete(0, helper.length() );
+            helper.delete(0, helper.length());
         }
         for (int i = 0; i < depth; ++i) {
             helper.append('\t');
@@ -121,7 +137,7 @@ public class SceneSaver {
     }
 
     public static String writeEndTag(BufferedWriter bw, String tag, Prefab p, int depth) throws IOException {
-        if (!p.hasChildren() && !p.hasComponents()) {
+        if (!p.hasChildren() && !p.hasComponents() && !p.getObjectType().hasParameters()) {
             bw.write("/>\n");
             return "";
         } else {
@@ -219,11 +235,6 @@ public class SceneSaver {
         writeAttribute(bw, "offset", p.getOffset());
 
         writeAttribute(bw, "shadowmode", p.getShadowMode().toString());
-
-        if (child instanceof MeshObject) {
-            MeshObject mo = (MeshObject) child;
-            writeAttribute(bw, "mesh", mo.getMeshFile());
-        }
         return writeEndTag(bw, "prefab", p, depth);
     }
 
@@ -282,13 +293,10 @@ public class SceneSaver {
     private static String writeCameraEntity(BufferedWriter bw, Spatial child, int depth) throws IOException {
         XMLUtils.writeTabs(bw, depth);
         bw.write("<camera ");
-        writeAttribute(bw, "class", child.getClass().getName());
         writeAttribute(bw, "name", child.getName());
         writeAttribute(bw, "category", "Standard");
         writeAttribute(bw, "type", "Camera");
         writeAttribute(bw, "cameraid", ((CameraEntity) child).getCameraId());
-        writeAttribute(bw, "translation", child.getLocalTranslation());
-        writeAttribute(bw, "rotation", child.getLocalRotation());
         writeAttribute(bw, "startcam", ((CameraEntity) child).getStartCam());
         return writeEndTag(bw, "camera", (Prefab) child, depth);
     }
@@ -376,16 +384,6 @@ public class SceneSaver {
         return writeEndTag(bw, "npclocation", npcloc, depth);
     }
 
-    private static String writeGrid(Spatial child, BufferedWriter bw, int depth) throws IOException {
-        XMLUtils.writeTabs(bw, depth);
-        Grid g = (Grid) child;
-        bw.write("<ground ");
-        writeAttribute(bw, "width", g.getWidth());
-        writeAttribute(bw, "length", g.getLength());
-        writeAttribute(bw, "translation", g.getLocalTranslation());
-        return writeEndTag(bw, "ground", g, depth);
-    }
-
     private static String writeNavigationMesh(Spatial child, BufferedWriter bw, int depth) throws IOException {
         XMLUtils.writeTabs(bw, depth);
         NavigationMesh nm = (NavigationMesh) child;
@@ -409,53 +407,6 @@ public class SceneSaver {
         writeAttribute(bw, "contoursampledistance", nm.getContourSampleDistance());
         writeAttribute(bw, "contourmaxdeviation", nm.getContourMaxDeviation());
         return writeEndTag(bw, "navmesh", nm, depth);
-    }
-
-    private static String writeSpotLight(Spatial child, BufferedWriter bw, int depth) throws IOException {
-        XMLUtils.writeTabs(bw, depth);
-        SpotLightPrefab sl = (SpotLightPrefab) child;
-        bw.write("<spotlight ");
-        writeAttribute(bw, "name", sl.getName());
-        writeAttribute(bw, "spotinnerangle", sl.getSpotInnerAngle());
-        writeAttribute(bw, "spotouterangle", sl.getSpotOuterAngle());
-        writeAttribute(bw, "spotrange", sl.getSpotRange());
-        writeAttribute(bw, "spotcolor", sl.getSpotLightColor());
-        writeAttribute(bw, "spotintensity", sl.getSpotLightIntensity());
-        return writeEndTag(bw, "spotlight", sl, depth);
-    }
-
-    private static String writePointLight(Prefab child, BufferedWriter bw, int depth) throws IOException {
-        XMLUtils.writeTabs(bw, depth);
-        PointLightPrefab sl = (PointLightPrefab) child;
-        bw.write("<pointlight ");
-        writeAttribute(bw, "name", sl.getName());
-        writeAttribute(bw, "color", sl.getPointLightColor());
-        writeAttribute(bw, "intensity", sl.getPointLightIntensity());
-        return writeEndTag(bw, "pointlight", sl, depth);
-    }
-
-    private static String writeDirectionalLight(Prefab child, BufferedWriter bw, int depth) throws IOException {
-        XMLUtils.writeTabs(bw, depth);
-        DirectionalLightPrefab sl = (DirectionalLightPrefab) child;
-        bw.write("<directionallight ");
-        writeAttribute(bw, "name", sl.getName());
-        writeAttribute(bw, "color", sl.getDirectionalLightColor());
-        writeAttribute(bw, "intensity", sl.getDirectionalLightIntensity());
-        writeAttribute(bw, "castshadow", sl.getCastShadow());
-        return writeEndTag(bw, "directionallight", sl, depth);
-    }
-
-    private static String writeAmbientLight(Prefab child, BufferedWriter bw, int depth) throws IOException {
-        XMLUtils.writeTabs(bw, depth);
-        AmbientLightPrefab sl = (AmbientLightPrefab) child;
-        bw.write("<ambientlight ");
-        writeAttribute(bw, "name", sl.getName());
-        writeAttribute(bw, "translation", sl.getLocalPrefabTranslation());
-        writeAttribute(bw, "rotation", sl.getLocalPrefabRotation());
-
-        writeAttribute(bw, "color", sl.getAmbientLightColor());
-        writeAttribute(bw, "intensity", sl.getAmbientLightIntensity());
-        return writeEndTag(bw, "ambientlight", sl, depth);
     }
 
     private static String writePivot(Spatial child, BufferedWriter bw, int depth) throws IOException {
@@ -485,18 +436,11 @@ public class SceneSaver {
 
     }
 
-    private static String writeCharacterPath(CharacterPath characterPath, BufferedWriter bw, int depth) throws IOException {
+    private static String writeBrushBatch(BrushBatch brushBatch, BufferedWriter bw, int depth) throws IOException {
         XMLUtils.writeTabs(bw, depth);
-        bw.write("<characterpath ");
-        writeAttribute(bw, "name", characterPath.getName());
-        return writeEndTag(bw, "characterpath", characterPath, depth);
-    }
-
-    private static String writeWaypoint(Waypoint waypoint, BufferedWriter bw, int depth) throws IOException {
-        XMLUtils.writeTabs(bw, depth);
-        bw.write("<waypoint ");
-        writeAttribute(bw, "name", waypoint.getName());
-        return writeEndTag(bw, "waypoint", waypoint, depth);
+        bw.write("<brushbatch ");
+        writeAttribute(bw, "creategeometrybatch", brushBatch.getCreateGeometryBatch());
+        return writeEndTag(bw, "brushbatch", brushBatch, depth);
     }
 
     private static void writePrefab(Prefab child, BufferedWriter bw, int depth) throws IOException {
@@ -520,30 +464,18 @@ public class SceneSaver {
             endtag = writeTriggerBoxEntity(bw, child, depth);
         } else if (child instanceof NPCLocationEntity) {
             endtag = writeNPCLocationEntity(child, bw, depth);
-        } else if (child instanceof Grid) {
-            endtag = writeGrid(child, bw, depth);
         } else if (child instanceof NavigationMesh) {
             endtag = writeNavigationMesh(child, bw, depth);
-        } else if (child instanceof SpotLightPrefab) {
-            endtag = writeSpotLight(child, bw, depth);
-        } else if (child instanceof PointLightPrefab) {
-            endtag = writePointLight(child, bw, depth);
-        } else if (child instanceof DirectionalLightPrefab) {
-            endtag = writeDirectionalLight(child, bw, depth);
-        } else if (child instanceof AmbientLightPrefab) {
-            endtag = writeAmbientLight(child, bw, depth);
-        } else if (child instanceof PivotGizmo) {
+        }  else if (child instanceof PivotGizmo) {
             endtag = writePivot(child, bw, depth);
         } else if (child instanceof Klatch) {
             endtag = writeKlatch((Klatch) child, bw, depth);
         } else if (child instanceof Terrain) {
             endtag = writeTerrain((Terrain) child, bw, depth);
-        } else if (child instanceof CharacterPath) {
-            endtag = writeCharacterPath((CharacterPath) child, bw, depth);
-        } else if (child instanceof Waypoint) {
-            endtag = writeWaypoint((Waypoint) child, bw, depth);
+        } else if (child instanceof BrushBatch) {
+            endtag = writeBrushBatch((BrushBatch) child, bw, depth);
         } else if (child instanceof Prefab) {
-            endtag = writeSinglePrefab(bw, child, depth);
+            endtag = defaultWritePrefab(bw, child, depth);
         }
 
         if (hasChildren) {
@@ -553,17 +485,38 @@ public class SceneSaver {
                 }
             }
         }
+        if (child.getObjectType().hasParameters()){
+            prefabExporter.writePrefabParameters(bw, child, depth);
+        }
         if (child.hasComponents()) {
             for (PrefabComponent pc : child.getComponents()) {
                 ComponentType ct = GlobalObjects.getInstance().getObjectsTypeCategory().getComponent(pc.getId());
                 if (ct != null) {
-                    prefabExporter.writeComponent(bw, pc, ct, depth+1);
+                    prefabExporter.writeComponent(bw, pc, ct, depth + 1);
                 }
             }
         }
+        
 
         if (endtag.length() > 0) {
             bw.write(endtag);
         }
+    }
+
+    /**
+     *
+     * @param bw
+     * @param child
+     * @param depth
+     * @return
+     */
+    public static String defaultWritePrefab(BufferedWriter bw, Prefab child, int depth) throws IOException {
+        ObjectType ot = child.getObjectType();
+        XMLUtils.writeTabs(bw, depth);
+        bw.write("<prefab ");
+        XMLUtils.writeAttribute(bw, "category", ot.getCategory());
+        XMLUtils.writeAttribute(bw, "label", ot.getLabel());
+        
+        return writeEndTag(bw, "prefab", child, depth);
     }
 }
