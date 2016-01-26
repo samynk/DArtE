@@ -60,6 +60,7 @@ public class ReflectionManager {
         PropertyReflector reflector = reflectionClasses.get(c);
         if ( reflector == null){
             reflector = new PropertyReflector(c);
+            reflectionClasses.put(c, reflector);
         }
         return reflector;
     }
