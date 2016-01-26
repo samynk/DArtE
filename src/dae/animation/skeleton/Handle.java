@@ -51,8 +51,7 @@ public class Handle extends Prefab implements BodyElement {
     }
 
     @Override
-    public final void create(String name, AssetManager manager, String extraInfo) {
-        this.setName(name);
+    public final void create(AssetManager manager, String extraInfo) {
         this.assetManager = manager;
         axis1Geometry = createAxis(manager, axis1, 0.15f, 0.01f, 12, color1);
         attachChild(axis1Geometry);
@@ -74,8 +73,9 @@ public class Handle extends Prefab implements BodyElement {
     @Override
     public Spatial clone() {
         Handle h = new Handle(axis1, axis2);
-        h.create(this.name, assetManager, getObjectType(), null);
+        h.initialize(assetManager, getObjectType(), null);
         h.setTransformation(translation, rotation);
+        h.setName(name);
         return h;
     }
 
