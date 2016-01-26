@@ -28,8 +28,7 @@ public class Klatch extends Prefab {
     }
 
     @Override
-    public void create(String name, AssetManager manager, String extraInfo) {
-        this.name = name;
+    public void create( AssetManager manager, String extraInfo) {
         this.klatchFile = extraInfo;
     }
     
