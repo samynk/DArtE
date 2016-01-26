@@ -22,7 +22,7 @@ public class CameraEntity extends Prefab {
     }
 
     @Override
-    public void create(String name, AssetManager manager, String extraInfo) {
+    public void create(AssetManager manager, String extraInfo) {
         Spatial node = manager.loadModel("Entities/Entity_Camera.j3o");
         this.attachChild(node);
         this.setCategory("Standard");
