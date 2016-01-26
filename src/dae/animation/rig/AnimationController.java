@@ -26,7 +26,6 @@ public class AnimationController {
     private FuzzyVariable outputOfController;
     private FuzzyVariable inputToController;
     private FuzzySystem system;
-    private Rig rig;
 
     public AnimationController(String name) {
         this.name = name;
@@ -124,7 +123,7 @@ public class AnimationController {
                 && inputToController !=null && outputOfController != null) {
             float value = input.getValue();
             //System.out.print("Calculating " + this.name + " : " + value);
-            inputToController.setCurrentValue(value);
+            inputToController.setInputValue(value);
             for(FuzzyRuleBlock block : system.getFuzzyRuleBlocks())
             {
                 block.evaluate();
@@ -148,8 +147,4 @@ public class AnimationController {
     public String toString(){
         return name;
     }
-    
-    
-
-   
 }
