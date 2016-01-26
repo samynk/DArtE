@@ -14,6 +14,7 @@ import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
 import dae.GlobalObjects;
 import dae.animation.skeleton.BodyElement;
+import dae.components.MeshComponent;
 import dae.io.XMLUtils;
 import dae.prefabs.Prefab;
 import dae.prefabs.gizmos.Gizmo;
@@ -28,7 +29,6 @@ import java.io.Writer;
 public class MeshObject extends Prefab implements BodyElement {
 
     private String meshName;
-    private String meshFile;
     private AssetManager manager;
 
     public MeshObject() {
@@ -36,22 +36,8 @@ public class MeshObject extends Prefab implements BodyElement {
     }
 
     @Override
-    public void create(String name, AssetManager manager, String extraInfo) {
-        try {
-            Spatial model = manager.loadModel(extraInfo);
-            this.attachChild(model);
-        } catch (AssetNotFoundException ex) {
-            Box b = new Box(0.25f, 0.25f, 0.25f); // create cube shape at the origin
-            Geometry box = new Geometry("Box", b);
-            Material boxmat = manager.loadMaterial("Materials/ErrorMaterial.j3m");
-            box.setMaterial(boxmat);
-            this.attachChild(box);
-            setPivot(new Vector3f(0, -0.25f, 0));
-            GlobalObjects.getInstance().postEvent(new ErrorMessage("Could not load mesh :" + extraInfo));
-        }
-        super.setName(name);
+    public void create(AssetManager manager, String extraInfo) {
         this.meshName = name;
-        this.meshFile = extraInfo;
         this.manager = manager;
 
     }
@@ -67,7 +53,6 @@ public class MeshObject extends Prefab implements BodyElement {
         mo.setName(this.getName());
         mo.setType(this.getType());
         mo.setCategory(this.getCategory());
-        mo.meshFile = this.meshFile;
         mo.setLocalScale(this.getLocalScale().clone());
         mo.setLocalPrefabRotation(this.getLocalPrefabRotation().clone());
         mo.setLocalPrefabTranslation(this.getLocalPrefabTranslation().clone());
@@ -98,10 +83,6 @@ public class MeshObject extends Prefab implements BodyElement {
         return (Prefab) clone();
     }
 
-    public String getMeshFile() {
-        return meshFile;
-    }
-
     public String getMeshName() {
         return meshName;
     }
@@ -110,13 +91,11 @@ public class MeshObject extends Prefab implements BodyElement {
      * Reloads the mesh, the children of the mesh are not affected.
      */
     public void reloadMesh() {
-        for (Spatial s : this.children) {
-            if (!(s instanceof Prefab)) {
-                s.removeFromParent();
-            }
+        MeshComponent mc = (MeshComponent) this.getComponent("MeshComponent");
+        if (mc != null) {
+            mc.deinstall();
+            mc.install(this);
         }
-        Spatial model = manager.loadModel(meshFile);
-        this.attachChild(model);
     }
 
     public void attachBodyElement(BodyElement element) {
@@ -146,7 +125,6 @@ public class MeshObject extends Prefab implements BodyElement {
             XMLUtils.writeAttribute(w, "physicsMesh", getPhysicsMesh());
         }
         XMLUtils.writeAttribute(w, "shadowmode", getShadowMode().toString());
-        XMLUtils.writeAttribute(w, "mesh", getMeshFile());
 
 
 
