@@ -12,7 +12,6 @@ import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
-import com.jme3.scene.debug.WireSphere;
 import com.jme3.scene.shape.Sphere;
 import dae.GlobalObjects;
 import dae.prefabs.Prefab;
@@ -40,21 +39,20 @@ public class Handshake extends Prefab{
     }
 
     @Override
-    public final void create(String name, AssetManager manager, String extraInfo) {
-        this.setName(name);
+    public final void create(AssetManager manager, String extraInfo) {
         this.assetManager = manager;
         
-        handle1 = new Handle();
         ObjectType type = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Animation", "TwoAxisHandle");
-        handle1.create(name+".handle1", manager, type, extraInfo);
+        handle1 = (Handle) type.create( manager,  extraInfo);
+        handle1.setName("handle1");
         handle1.setLocalTranslation(0,0,0.1f);
         Quaternion q1 = new Quaternion();
         q1.fromAngles(-90*FastMath.DEG_TO_RAD,0,0);
         handle1.setLocalRotation(q1);
         attachChild(handle1);
         
-        handle2 = new Handle();
-        handle2.create(name+".handle2",manager, type, extraInfo);
+        handle2 = (Handle) type.create( manager,  extraInfo);
+        handle1.setName("handle2");
         handle2.setLocalTranslation(0,0,-0.1f);
         Quaternion q2= new Quaternion();
         q2.fromAngles(-90*FastMath.DEG_TO_RAD,180*FastMath.DEG_TO_RAD,0);
