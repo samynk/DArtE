@@ -55,8 +55,7 @@ public class CrateObject extends Prefab {
     }
 
     @Override
-    public final void create(String name, AssetManager manager, String extraInfo) {
-        this.setName(name);
+    public final void create(AssetManager manager, String extraInfo) {
         this.manager = manager;
         recreate(manager);
     }
@@ -67,7 +66,8 @@ public class CrateObject extends Prefab {
         CrateObject co = new CrateObject(bottom,top);
         co.physicsSpace = physicsSpace;
         co.setPivot(getPivot());
-        co.create( name, manager, getObjectType(), null) ;
+        co.initialize( manager, getObjectType(), null) ;
+        co.setName(name);
         co.setType( this.getType() );
         co.setCategory( this.getCategory() );
         return co;
@@ -81,18 +81,10 @@ public class CrateObject extends Prefab {
         Box b = new Box(bottom, top); // create cube shape at the origin
         box = new Geometry("Box", b);  // create cube geometry from the shape
 
-        Material mat = new Material(manager, "Common/MatDefs/Misc/Unshaded.j3md");
-        mat.setColor("Color", ColorRGBA.Orange);
-
-        Material cube1Mat = new Material(manager,
-                "Common/MatDefs/Misc/Unshaded.j3md");
-        Texture cube1Tex = manager.loadTexture(
-                "Textures/boxPattern.png");
-        cube1Mat.setTexture("ColorMap", cube1Tex);
-        box.setMaterial(cube1Mat);
+        Material mat = manager.loadMaterial("Materials/PhysicsMaterial.j3m");
+        box.setMaterial(mat);
 
         setOriginalMaterial(mat);
-        //box.setMaterial(mat);
         attachChild(box);
         
         RigidBodyControl rbc = this.getControl(RigidBodyControl.class);
