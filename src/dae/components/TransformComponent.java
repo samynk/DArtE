@@ -30,7 +30,7 @@ public class TransformComponent extends PrefabComponent{
     public void setTranslation(Vector3f translation) {
         this.translation = translation;
         if ( parent != null ){
-            System.out.println("TransformComponent setTranslation on " +parent.getName() + " translation");
+            //System.out.println("TransformComponent setTranslation on " +parent.getName() + " translation");
             parent.setLocalPrefabTranslation(translation);
         }
     }
@@ -65,7 +65,7 @@ public class TransformComponent extends PrefabComponent{
     public void setRotation(Quaternion rotation) {
         this.rotation = rotation;
         if ( parent != null ){
-            System.out.println("TransformComponent setRotation on " +parent.getName() + " translation");
+            //System.out.println("TransformComponent setRotation on " +parent.getName() + " translation");
             parent.setLocalPrefabRotation(rotation);
         }
     }
