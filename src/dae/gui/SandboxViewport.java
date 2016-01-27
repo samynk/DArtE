@@ -96,7 +96,6 @@ import dae.prefabs.ui.events.SelectionEvent;
 import dae.prefabs.ui.events.ShadowEvent;
 import dae.prefabs.ui.events.ViewportReshapeEvent;
 import dae.prefabs.ui.events.ZoomEvent;
-import dae.project.Grid;
 import dae.project.Project;
 import dae.project.ProjectTreeNode;
 import java.io.File;
@@ -226,8 +225,6 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
         GlobalObjects.getInstance().registerListener(this);
         setPauseOnLostFocus(false);
 
-        Material gridMaterial = assetManager.loadMaterial("Materials/GridMaterial.j3m");
-
         translateTool = new TranslateTool();
         translateTool.initialize(assetManager, inputManager);
         rotateTool = new RotateTool();
@@ -342,8 +339,9 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
          */
         BoundingVolume bv = null;
         for (Node n : this.currentSelection) {
-            if ( n == null)
+            if (n == null) {
                 continue;
+            }
             if (bv == null) {
                 bv = n.getWorldBound();
             } else {
@@ -581,7 +579,7 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
             }
             selectionFromOutside.clear();
             editorState = EditorState.IDLE;
-            activateIdleState();
+            activateIdleState(this);
         }
 
         if (editorState == EditorState.INSERTIONEVENT) {
@@ -602,7 +600,7 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
                 this.insertionElements.attachChild(insertionElement);
                 this.clearSelection();
                 this.addToSelection(p);
-                activateInsertionTool();
+                activateInsertionTool(objectCreationEvent);
             }
 
             editorState = EditorState.IDLE;
@@ -845,8 +843,9 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
     }
 
     public void addToSelection(Node node) {
-        if ( node == null)
+        if (node == null) {
             return;
+        }
         currentSelection.add(node);
 
         if (node instanceof Prefab) {
@@ -855,6 +854,8 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
 
             GlobalObjects.getInstance().postEvent(new SelectionEvent((Prefab) node, this));
         }
+        System.out.println("currentTool: " + currentTool.getToolName());
+        System.out.println("Selecction changed : " + node.getName());
         currentTool.selectionChanged(this, node);
         adaptSelectionBox();
     }
@@ -1195,6 +1196,12 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
             case BRUSH:
                 currentTool = brushTool;
                 break;
+            case INSERT:
+                currentTool = insertionTool;
+                break;
+            case NONE:
+                currentTool = idleTool;
+                break;
         }
         currentTool.activate(this);
 
@@ -1309,22 +1316,16 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
         }
     }
 
-    public void activateIdleState() {
-        if (currentTool != null) {
-            currentTool.deactivate(this);
-        }
-        currentTool = idleTool;
-        idleTool.activate(this);
-        GizmoEvent ge = new GizmoEvent(this,GizmoType.NONE);
+    public void activateIdleState(Object source) {
+        GizmoEvent ge = new GizmoEvent(source, GizmoType.NONE);
         GlobalObjects.getInstance().postEvent(ge);
+        //newGizmoType = GizmoType.NONE;
     }
 
-    private void activateInsertionTool() {
-        if (currentTool != null) {
-            currentTool.deactivate(this);
-        }
-        currentTool = insertionTool;
-        insertionTool.activate(this);
+    private void activateInsertionTool(Object source) {
+        GizmoEvent ge = new GizmoEvent(source, GizmoType.INSERT);
+        GlobalObjects.getInstance().postEvent(ge);
+        //newGizmoType = GizmoType.INSERT;
     }
 
     public void clearInsertionElements() {
