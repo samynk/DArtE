@@ -119,7 +119,7 @@ public class PickTool extends ViewportTool {
             wireBoxGeometryLinkParent.removeFromParent();
             linkText.removeFromParent();
             textBackgroundGeometry.removeFromParent();
-            viewport.activateIdleState();
+            viewport.activateIdleState(this);
         }
     }
 

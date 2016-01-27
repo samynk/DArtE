@@ -63,10 +63,10 @@ public class InsertionTool extends ViewportTool {
                 if ("ACCEPT_INSERTION".equals(name)) {
                     viewport.clearSelection();
                     viewport.addToScene();
-                    viewport.activateIdleState();
+                    viewport.activateIdleState(this);
                 } else if ("REJECT_INSERTION".equals(name)) {
                     viewport.clearSelection();
-                    viewport.activateIdleState();
+                    viewport.activateIdleState(this);
                     viewport.clearInsertionElements();
                 } else if ("ROTATION_UP".equals(name)) {
                     if (currentPickElement != null) {

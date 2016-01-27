@@ -193,7 +193,7 @@ public class LinkTool extends ViewportTool {
             LevelEvent le = new LevelEvent(level, EventType.NODEMOVED, currentChildElement, previousParent, previousIndex, pn);
             GlobalObjects.getInstance().postEvent(le);
 
-            viewport.activateIdleState();
+            viewport.activateIdleState(this);
             linkText.setText("");
             textBackground.setDimension(0, 0);
             textBackgroundGeometry.updateModelBound();
@@ -204,6 +204,7 @@ public class LinkTool extends ViewportTool {
             linkText.removeFromParent();
             textBackgroundGeometry.removeFromParent();
 
+            linkState = linkState.LINK;
         }
     }
 

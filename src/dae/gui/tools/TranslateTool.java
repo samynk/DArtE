@@ -226,6 +226,7 @@ public class TranslateTool extends ViewportTool {
 
     @Override
     public void selectionChanged(SandboxViewport viewport, Node node) {
+        System.out.println("selection change:" + node.getName());
         node.attachChild(a);
     }
 
