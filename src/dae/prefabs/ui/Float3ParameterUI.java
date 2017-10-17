@@ -159,17 +159,14 @@ public class Float3ParameterUI extends javax.swing.JPanel implements ParameterUI
     }// </editor-fold>//GEN-END:initComponents
 
     private void xSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_xSpinnerStateChanged
-        System.out.println("xspinner state changed:" + parameter.getId());
         updateNode();
     }//GEN-LAST:event_xSpinnerStateChanged
 
     private void ySpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_ySpinnerStateChanged
-        System.out.println("yspinner state changed"+ parameter.getId());
         updateNode();
     }//GEN-LAST:event_ySpinnerStateChanged
 
     private void zSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_zSpinnerStateChanged
-        System.out.println("xspinner state changed"+ parameter.getId());
         updateNode();
     }//GEN-LAST:event_zSpinnerStateChanged
 
@@ -248,7 +245,7 @@ public class Float3ParameterUI extends javax.swing.JPanel implements ParameterUI
      * @param evt the property change event.
      */
     public void stateChanged(final ChangeEvent e) {
-        if (e.getSource() != currentNode){
+        if (e.getSource() != currentNode) {
             return;
         }
         if (!SwingUtilities.isEventDispatchThread()) {
@@ -258,7 +255,7 @@ public class Float3ParameterUI extends javax.swing.JPanel implements ParameterUI
                     stateChanged();
                 }
             });
-        }else{
+        } else {
             //System.out.println("state changed from withing event thread:"+ parameter.getId());
             stateChanged();
         }
