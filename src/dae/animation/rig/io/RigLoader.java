@@ -20,6 +20,7 @@ import dae.animation.rig.InputConnector;
 import dae.animation.rig.OutputConnector;
 import dae.animation.rig.PrefabPlaceHolderCallback;
 import dae.animation.rig.Rig;
+import dae.io.SceneLoader;
 import static dae.io.SceneLoader.parseFloat3;
 import static dae.io.SceneLoader.parseQuaternion;
 import dae.io.XMLUtils;
@@ -69,52 +70,43 @@ public class RigLoader implements AssetLoader {
         Rig result = null;
         try {
             InputStream is = assetInfo.openStream();
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            DocumentBuilder db = dbf.newDocumentBuilder();
-            Document doc = db.parse(is);
-            doc.getDocumentElement().normalize();
-
             assetManager = assetInfo.getManager();
-
-
-
-
             ballJointMaterial = new Material(assetInfo.getManager(),
                     "Common/MatDefs/Misc/Unshaded.j3md");
             ballJointMaterial.setColor("Color", ColorRGBA.White);
             ballJointMaterial.setTexture("ColorMap", assetInfo.getManager().loadTexture("Textures/refPattern.png"));
-
             revJointMaterial = new Material(assetInfo.getManager(),
                     "Common/MatDefs/Misc/Unshaded.j3md");
             revJointMaterial.setColor("Color", ColorRGBA.LightGray);
             revJointMaterial.setTexture("ColorMap", assetInfo.getManager().loadTexture("Textures/refPattern.png"));
-
             limbMaterial = new Material(assetInfo.getManager(),
                     "Common/MatDefs/Misc/Unshaded.j3md");
             limbMaterial.setColor("Color", ColorRGBA.DarkGray);
             limbMaterial.setTexture("ColorMap", assetInfo.getManager().loadTexture("Textures/refPattern.png"));
-
             apMaterial = new Material(assetInfo.getManager(),
                     "Common/MatDefs/Misc/Unshaded.j3md");
             apMaterial.setColor("Color", ColorRGBA.Green);
             apMaterial.setTexture("ColorMap", assetInfo.getManager().loadTexture("Textures/refPattern.png"));
-
-            Element root = doc.getDocumentElement();
-
-            ObjectType objectType = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Animation", "Rig");
-            result = (Rig) objectType.create(assetManager, "rig");
-            result.setName("rig");
-
-            NodeList nl = root.getChildNodes();
-            for (int i = 0; i < nl.getLength(); ++i) {
-                Node n = nl.item(i);
-                constructChildren(n, result, assetInfo.getManager());
-            }
-        } catch (ParserConfigurationException ex) {
-            Logger.getLogger(RigLoader.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SAXException ex) {
+            result = readRig(is, assetInfo.getManager());
+        } catch (ParserConfigurationException | SAXException | IllegalAccessException | NumberFormatException | ClassNotFoundException | InstantiationException ex) {
             Logger.getLogger(RigLoader.class.getName()).log(Level.SEVERE, null, ex);
         }
+        return result;
+    }
+
+    public static Rig readRig(InputStream is, AssetManager assetManager) throws IOException, ParserConfigurationException, ClassNotFoundException, InstantiationException, SAXException, NumberFormatException, IllegalAccessException {
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        DocumentBuilder db = dbf.newDocumentBuilder();
+        Document doc = db.parse(is);
+        doc.getDocumentElement().normalize();
+
+        Element root = doc.getDocumentElement();
+        ObjectType objectType = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Animation", "Rig");
+        Rig result = (Rig) objectType.createDefault(assetManager, "rig", true);
+        result.setName("rig");
+        NodeList nl = root.getChildNodes();
+
+        SceneLoader.readNodeChildren(nl, assetManager, GlobalObjects.getInstance().getObjectsTypeCategory(), result);
         return result;
     }
 
@@ -122,6 +114,7 @@ public class RigLoader implements AssetLoader {
         if (docNode.getNodeType() == Node.TEXT_NODE) {
             return;
         }
+        /*
         String name = docNode.getNodeName();
         if (name.equals("joint") || name.equals("limb")) {
             BodyElement current = null;
@@ -213,6 +206,7 @@ public class RigLoader implements AssetLoader {
         } else if (docNode.getNodeName().equals("controllerconnections")) {
             readControllerConnections((Rig) jmeParentNode, docNode);
         }
+        */
     }
 
     public Prefab createPrefab(NamedNodeMap map, AssetManager manager, ObjectTypeCategory objectsToCreate) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
@@ -232,7 +226,6 @@ public class RigLoader implements AssetLoader {
         String physicsMesh = getAttrContent("physicsMesh", map);
 
         String shadowMode = getAttrContent("shadowmode", map);
-
 
         ObjectType type = objectsToCreate.find(label);
         if (type != null) {
@@ -325,7 +318,6 @@ public class RigLoader implements AssetLoader {
 
         }
 
-
         String logTranslation = getAttrContent("logTranslation", map);
         boolean blogTrans = Boolean.parseBoolean(logTranslation);
 
@@ -340,7 +332,17 @@ public class RigLoader implements AssetLoader {
         float minangle = Float.parseFloat(sminangle);
         float maxangle = Float.parseFloat(smaxangle);
 
-        RevoluteJoint rj = new RevoluteJoint(revJointMaterial, sname, sgroup, location, axis, minangle, maxangle, radius, height, centered);
+        ObjectType rjType = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Animation", "RevoluteJoint");
+        //RevoluteJoint rj = new RevoluteJoint(revJointMaterial, sname, sgroup, location, axis, minangle, maxangle, radius, height, centered);
+        RevoluteJoint rj = (RevoluteJoint) rjType.createDefault(assetManager, sname, true);
+
+        rj.setGroup(sgroup);
+        rj.setMinAngle(minangle);
+        rj.setMaxAngle(maxangle);
+        rj.setAxis(axis);
+        rj.getTransformComponent().setTranslation(location);
+        rj.setRenderOptions(radius, height, centered);
+
         rj.setLogRotations(blog);
         rj.setLogOffset(fOffset);
         rj.setLogPostScale(fScale);
@@ -370,105 +372,11 @@ public class RigLoader implements AssetLoader {
         rj.setJointColor(jointColor);
         rj.createVisualization(assetManager);
 
-
-        return rj;
-    }
-
-    private BodyElement createRevoluteJoint2(Node docNode) {
-        NamedNodeMap map = docNode.getAttributes();
-
-        String saxis1 = getAttrContent("axis1", map);
-        String saxisLabel1 = getAttrContent("axislabel1", map);
-        String saxis2 = getAttrContent("axis2", map);
-        String saxisLabel2 = getAttrContent("axislabel2", map);
-        String slocation = getAttrContent("location", map);
-        String sname = getAttrContent("name", map);
-
-        String sgroup = getAttrContent("group", map);
-        String sangle1 = getAttrContent("angle1", map);
-        String sangle1min = getAttrContent("minangle1", map);
-        String sangle1max = getAttrContent("maxangle1", map);
-        String sangle2 = getAttrContent("angle2", map);
-        String sangle2min = getAttrContent("minangle2", map);
-        String sangle2max = getAttrContent("maxangle2", map);
-        String sradius = getAttrContent("radius", map);
-
-        /*
-         String log = getAttrContent("log", map);
-         boolean blog = Boolean.parseBoolean(log);
-         String logScale = getAttrContent("logScale", map);
-         float fScale = logScale.length() > 0 ? Float.parseFloat(logScale) : 1.0f;
-         String logOffset = getAttrContent("logOffset", map);
-         float fOffset = logOffset.length() > 0 ? Float.parseFloat(logOffset) : 0.0f;
-         String logSymbol = getAttrContent("logSymbol", map);
-         String logName = getAttrContent("logName", map);
-         String logTranslation = getAttrContent("logTranslation", map);
-         boolean blogTrans = Boolean.parseBoolean(logTranslation);
-         */
-
-        float radius = sradius.length() > 0 ? Float.parseFloat(sradius) : 0.1f;
-
-
-        Vector3f axis1 = parseVector3f(saxis1);
-        Vector3f axis2 = parseVector3f(saxis2);
-        Vector3f location = parseVector3f(slocation);
-
-        float angle1 = Float.parseFloat(sangle1);
-        float angle2 = Float.parseFloat(sangle2);
-
-        float minAngle1 = Float.parseFloat(sangle1min);
-        float maxAngle1 = Float.parseFloat(sangle1max);
-
-        float minAngle2 = Float.parseFloat(sangle2min);
-        float maxAngle2 = Float.parseFloat(sangle2max);
-
-        RevoluteJointTwoAxis rj = new RevoluteJointTwoAxis(
-                axis1,
-                saxisLabel1,
-                axis2,
-                saxisLabel2,
-                revJointMaterial,
-                sname,
-                sgroup,
-                location,
-                radius);
-
-        String srotation = getAttrContent("rotation", map);
-        if (srotation != null) {
-            Vector3f rotation = parseVector3f(srotation);
-            rj.setInitialLocalFrame(rotation);
-        }
-        String saxisx = getAttrContent("refaxisx", map);
-        String saxisy = getAttrContent("refaxisy", map);
-        String saxisz = getAttrContent("refaxisz", map);
-        if (saxisx.length() > 0 && saxisy.length() > 0 && saxisz.length() > 0) {
-            Vector3f xa = parseVector3f(saxisx);
-            Vector3f ya = parseVector3f(saxisy);
-            Vector3f za = parseVector3f(saxisz);
-            rj.setInitialLocalFrame(xa, ya, za);
-        }
-
-        rj.setAngleConstraints(minAngle1, maxAngle1, minAngle2, maxAngle2);
-        rj.setCurrentAngle1(angle1);
-        rj.setCurrentAngle2(angle2);
-
-        String sChainWithChild = getAttrContent("chainwithchild", map);
-        boolean chainwithchild = Boolean.parseBoolean(sChainWithChild);
-
-        String sChainWithParent = getAttrContent("chainwithparent", map);
-        boolean chainwithparent = Boolean.parseBoolean(sChainWithParent);
-
-        rj.setChaining(chainwithchild, chainwithparent);
-        String childName = getAttrContent("chainchildname", map);
-        rj.setChainChildName(childName);
-
-        rj.createVisualization(assetManager);
         return rj;
     }
 
     private BodyElement createTarget(Node targetNode) {
         NamedNodeMap map = targetNode.getAttributes();
-
 
         String slocation = getAttrContent("location", map);
         String sname = getAttrContent("name", map);
@@ -485,7 +393,6 @@ public class RigLoader implements AssetLoader {
 
     private BodyElement createFixedJoint(Node docNode) {
         NamedNodeMap map = docNode.getAttributes();
-
 
         String slocation = getAttrContent("location", map);
         String sname = getAttrContent("name", map);
