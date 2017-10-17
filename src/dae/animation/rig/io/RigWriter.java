@@ -12,11 +12,14 @@ import dae.animation.rig.Rig;
 import dae.animation.skeleton.BodyElement;
 import dae.io.SceneSaver;
 import dae.io.XMLUtils;
+import dae.io.writers.DefaultPrefabExporter;
+import dae.io.writers.PrefabTextExporter;
 import dae.prefabs.Prefab;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import mlproject.fuzzy.FuzzyRule;
@@ -35,6 +38,7 @@ import mlproject.fuzzy.TrapezoidMemberShip;
  * @author Koen Samyn
  */
 public class RigWriter {
+    private final static PrefabTextExporter prefabExporter = new DefaultPrefabExporter();
 
     /**
      * Write the scene to a file.
@@ -50,55 +54,8 @@ public class RigWriter {
                 location.getParentFile().mkdirs();
             }
             fw = new FileWriter(location);
-
             bw = new BufferedWriter(fw);
-            bw.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-            bw.write("<rig>\n");
-            int depth = 0;
-            for (Spatial child : rig.getChildren()) {
-                if (child instanceof BodyElement) {
-                    BodyElement be = (BodyElement) child;
-                    be.write(bw, depth + 1);
-                }
-            }
-            bw.write("\t<fuzzysystems>\n");
-            writeFuzzySystem(bw, rig.getFuzzySystem());
-            bw.write("\t</fuzzysystems>\n");
-            // animation targets
-            bw.write("\t<animationtargets>\n");
-            for (int i = 0; i < rig.getNrOfTargetKeys(); ++i) {
-                String key = rig.getTargetKeyAt(i);
-                Prefab value = rig.getTarget(key);
-                bw.write("\t\t<target ");
-                XMLUtils.writeAttribute(bw, "key", key);
-                if (value != null) {
-                    XMLUtils.writeAttribute(bw, "target", value.getName());
-                }
-                bw.write("/>\n");
-            }
-            bw.write("\t</animationtargets>\n");
-            // controller connections
-            AnimationListControl alc = rig.getControl(AnimationListControl.class);
-            if ( alc != null )
-            {
-                bw.write("\t<controllerconnections>\n");
-                for ( AnimationController ac: alc.getAnimationControllers()){
-                    bw.write("\t\t<controller ");
-                    XMLUtils.writeAttribute(bw, "system", ac.getSystemName());
-                    XMLUtils.writeAttribute(bw, "name", ac.getName());
-                    XMLUtils.writeAttribute(bw, "inputToSystem", ac.getControllerInputName());
-                    XMLUtils.writeAttribute(bw, "outputOfSystem", ac.getControllerOutputName());
-                    bw.write(">\n");
-                    bw.write("\t\t\t");
-                    bw.write( ac.getInput().toXML());
-                    bw.write("\t\t\t");
-                    bw.write(ac.getOutput().toXML());
-                    bw.write("\t\t</controller>\n");
-                            
-                }
-                bw.write("\t</controllerconnections>\n");
-            }
-            bw.write("</rig>\n");
+            writeRig(bw, rig);
         } catch (IOException ex) {
             Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
         } finally {
@@ -110,7 +67,59 @@ public class RigWriter {
         }
     }
 
-    private static void writeFuzzySystem(BufferedWriter bw, FuzzySystem fuzzySystem) throws IOException {
+    public static void writeRig(Writer bw, Rig rig) throws IOException {
+        bw.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+        bw.write("<rig>\n");
+        int depth = 0;
+        for (Spatial child : rig.getChildren()) {
+            if (child instanceof BodyElement) {
+                BodyElement be = (BodyElement) child;
+                be.write(bw, depth + 1);
+            }
+        }
+        bw.write("\t<fuzzysystems>\n");
+        writeFuzzySystem(bw, rig.getFuzzySystem());
+        bw.write("\t</fuzzysystems>\n");
+        // animation targets
+        bw.write("\t<animationtargets>\n");
+        for (int i = 0; i < rig.getNrOfTargetKeys(); ++i) {
+            String key = rig.getTargetKeyAt(i);
+            Prefab value = rig.getTarget(key);
+            bw.write("\t\t<target ");
+            XMLUtils.writeAttribute(bw, "key", key);
+            if (value != null) {
+                XMLUtils.writeAttribute(bw, "target", value.getName());
+            }
+            bw.write("/>\n");
+        }
+        bw.write("\t</animationtargets>\n");
+        // controller connections
+        AnimationListControl alc = rig.getControl(AnimationListControl.class);
+        if ( alc != null )
+        {
+            bw.write("\t<controllerconnections>\n");
+            for ( AnimationController ac: alc.getAnimationControllers()){
+                bw.write("\t\t<controller ");
+                XMLUtils.writeAttribute(bw, "system", ac.getSystemName());
+                XMLUtils.writeAttribute(bw, "name", ac.getName());
+                XMLUtils.writeAttribute(bw, "inputToSystem", ac.getControllerInputName());
+                XMLUtils.writeAttribute(bw, "outputOfSystem", ac.getControllerOutputName());
+                bw.write(">\n");
+                bw.write("\t\t\t");
+                bw.write( ac.getInput().toXML());
+                bw.write("\t\t\t");
+                bw.write(ac.getOutput().toXML());
+                bw.write("\t\t</controller>\n");
+                
+            }
+            bw.write("\t</controllerconnections>\n");
+        }
+        bw.write("</rig>\n");
+    }
+    
+    
+
+    private static void writeFuzzySystem(Writer bw, FuzzySystem fuzzySystem) throws IOException {
         bw.write("\t\t<fuzzysystem ");
         XMLUtils.writeAttribute(bw, "name", fuzzySystem.getName());
         bw.write(">\n");
@@ -174,7 +183,7 @@ public class RigWriter {
         bw.write("\t\t</fuzzysystem>\n");
     }
 
-    private static void writeMemberShip(BufferedWriter bw, LeftSigmoidMemberShip lms) throws IOException {
+    private static void writeMemberShip(Writer bw, LeftSigmoidMemberShip lms) throws IOException {
         bw.write("\t\t\t\t\t<membership ");
         XMLUtils.writeAttribute(bw, "type", "left");
         XMLUtils.writeAttribute(bw, "name", lms.getName());
@@ -183,7 +192,7 @@ public class RigWriter {
         bw.write("/>\n");
     }
 
-    private static void writeMemberShip(BufferedWriter bw, RightSigmoidMemberShip rms) throws IOException {
+    private static void writeMemberShip(Writer bw, RightSigmoidMemberShip rms) throws IOException {
         bw.write("\t\t\t\t\t<membership ");
         XMLUtils.writeAttribute(bw, "type", "right");
         XMLUtils.writeAttribute(bw, "name", rms.getName());
@@ -192,7 +201,7 @@ public class RigWriter {
         bw.write("/>\n");
     }
 
-    private static void writeMemberShip(BufferedWriter bw, SigmoidMemberShip sms) throws IOException {
+    private static void writeMemberShip(Writer bw, SigmoidMemberShip sms) throws IOException {
         bw.write("\t\t\t\t\t<membership ");
         XMLUtils.writeAttribute(bw, "type", "triangular");
         XMLUtils.writeAttribute(bw, "name", sms.getName());
@@ -202,7 +211,7 @@ public class RigWriter {
         bw.write("/>\n");
     }
 
-    private static void writeMemberShip(BufferedWriter bw, TrapezoidMemberShip sms) throws IOException {
+    private static void writeMemberShip(Writer bw, TrapezoidMemberShip sms) throws IOException {
         bw.write("\t\t\t\t\t<membership ");
         XMLUtils.writeAttribute(bw, "type", "trapezoid");
         XMLUtils.writeAttribute(bw, "name", sms.getName());
@@ -213,7 +222,7 @@ public class RigWriter {
         bw.write("/>\n");
     }
 
-    private static void writeMemberShip(BufferedWriter bw, SingletonMemberShip sms) throws IOException {
+    private static void writeMemberShip(Writer bw, SingletonMemberShip sms) throws IOException {
         bw.write("\t\t\t\t\t<membership ");
         XMLUtils.writeAttribute(bw, "type", "singleton");
         XMLUtils.writeAttribute(bw, "name", sms.getName());
