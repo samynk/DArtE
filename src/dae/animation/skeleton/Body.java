@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.animation.skeleton;
 
 import com.jme3.animation.Bone;
@@ -995,17 +991,18 @@ public class Body extends Prefab implements BodyElement {
                                 jointName = jointName.substring(0, atIndex);
                                 RevoluteJointTwoAxis rj2 = this.revJoints2.get(jointName);
                                 if (rj2 != null) {
-                                    if (index == 1) {
-                                        if (FastMath.abs(outputVal) > FastMath.abs(rj2.getCurrentMaxAngle1Change())) {
-                                            outputVal = rj2.getCurrentMaxAngle1Change() * .9f;
-                                        }
-                                        rj2.setCurrentAngle1(rj2.getCurrentAngle1() + outputVal);
-                                    } else {
-                                        if (FastMath.abs(outputVal) > FastMath.abs(rj2.getCurrentMaxAngle2Change())) {
-                                            outputVal = rj2.getCurrentMaxAngle2Change() * .9f;
-                                        }
-                                        rj2.setCurrentAngle2(rj2.getCurrentAngle2() + outputVal);
-                                    }
+                                    // todo : replace with constraint check
+//                                    if (index == 1) {
+//                                        if (FastMath.abs(outputVal) > FastMath.abs(rj2.getCurrentMaxAngle1Change())) {
+//                                            outputVal = rj2.getCurrentMaxAngle1Change() * .9f;
+//                                        }
+//                                        rj2.setCurrentAngle1(rj2.getCurrentAngle1() + outputVal);
+//                                    } else {
+//                                        if (FastMath.abs(outputVal) > FastMath.abs(rj2.getCurrentMaxAngle2Change())) {
+//                                            outputVal = rj2.getCurrentMaxAngle2Change() * .9f;
+//                                        }
+//                                        rj2.setCurrentAngle2(rj2.getCurrentAngle2() + outputVal);
+//                                    }
                                 } else {
                                     System.out.println("could not find:" + jointName);
                                 }
@@ -1058,17 +1055,18 @@ public class Body extends Prefab implements BodyElement {
             int index = Integer.parseInt(sindex);
             jointName = jointName.substring(0, atIndex);
             RevoluteJointTwoAxis rj2 = revJoints2.get(jointName);
-            if (rj2 == null) {
-                System.out.println("could not find : " + jointName);
-            } else {
-                if (index == 1) {
-                    input.setInputValue(rj2.getCurrentAngle1());
-                    rj2.setCurrentMaxAngle1Change(1000.0f);
-                } else if (index == 2) {
-                    input.setInputValue(rj2.getCurrentAngle2());
-                    rj2.setCurrentMaxAngle2Change(1000.0f);
-                }
-            }
+            // todo change to constraint check
+//            if (rj2 == null) {
+//                System.out.println("could not find : " + jointName);
+//            } else {
+//                if (index == 1) {
+//                    input.setInputValue(rj2.getCurrentAngle1());
+//                    rj2.setCurrentMaxAngle1Change(1000.0f);
+//                } else if (index == 2) {
+//                    input.setInputValue(rj2.getCurrentAngle2());
+//                    rj2.setCurrentMaxAngle2Change(1000.0f);
+//                }
+//            }
         } else {
             RevoluteJoint rj = revJoints.get(jointName);
             if (rj == null) {
@@ -1088,6 +1086,7 @@ public class Body extends Prefab implements BodyElement {
                 // calculate the projected angle between the center of the joint,
                 // the target and the attachment point in world space.
                 Vector3f axis = Vector3f.UNIT_X;
+                /*
                 if (index == 1) {
                     axis = rj2.getWorldAxis1();
                 } else if (index == 2) {
@@ -1118,11 +1117,13 @@ public class Body extends Prefab implements BodyElement {
                 }
                 //System.out.println("Angle is : " + angle);
                 input.setInputValue(angle);
+                */
             }
         } else if (inputName.contains("alignment")) {
             //String groupName = rj2.getGroup();
             AttachmentPoint ap = this.attachmentPoints.get(apName);
             if (ap != null) {
+                /*
                 Vector3f axis = Vector3f.UNIT_X;
                 if (index == 1) {
                     axis = rj2.getWorldAxis1();
@@ -1163,6 +1164,7 @@ public class Body extends Prefab implements BodyElement {
                 } else {
                     rj2.setCurrentMaxAngle2Change(angle);
                 }
+                */
             }
         }
     }
