@@ -20,9 +20,9 @@ import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
 import com.jme3.shader.Shader;
 import com.jme3.shader.ShaderGenerator;
-import com.jme3.shader.ShaderKey;
 import com.jme3.texture.Texture;
 import com.jme3.texture.Texture2D;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -120,10 +120,6 @@ public class MockAssetManager implements AssetManager {
         return new Material();
     }
 
-    public Shader loadShader(ShaderKey key) {
-        return new Shader();
-    }
-
     public BitmapFont loadFont(String name) {
         return new BitmapFont();
     }
@@ -142,5 +138,25 @@ public class MockAssetManager implements AssetManager {
 
     public ShaderGenerator getShaderGenerator(EnumSet<Caps> caps) {
         return null;
+    }
+
+    public <T> T loadAssetFromStream(AssetKey<T> key, InputStream inputStream) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public <T> T getFromCache(AssetKey<T> key) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public <T> void addToCache(AssetKey<T> key, T asset) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public <T> boolean deleteFromCache(AssetKey<T> key) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public void clearCache() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
