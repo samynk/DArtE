@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.animation.trajectory;
 
 import com.jme3.math.Quaternion;
@@ -64,7 +60,7 @@ public class FootstepTargetCurve extends TargetCurve {
         Vector3f endLoc = getEnd().getLocalTranslation();
 
         Vector3f middle = new Vector3f();
-        middle.interpolate(startLoc,endLoc, 0.5f);
+        middle.interpolateLocal(startLoc,endLoc, 0.5f);
         middle.y = endLoc.y + height;
         System.out.println("Middle : " + middle);
         
