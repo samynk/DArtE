@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package dae.prefabs.shapes;
 
 import com.jme3.math.Vector3f;
@@ -21,7 +16,6 @@ public class LineShape extends Mesh{
         this.from = from;
         this.to = to;
         setMode(Mesh.Mode.Lines);
-        this.setPointSize(3.0f);
         reshape();
     }
     
