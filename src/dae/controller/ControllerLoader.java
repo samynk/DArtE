@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.controller;
 
 import com.jme3.asset.AssetInfo;
@@ -20,6 +16,5 @@ public class ControllerLoader implements AssetLoader{
         ParseFCL fclParser = new ParseFCL(assetInfo.openStream());
         FuzzySystem system = fclParser.getResult();
         return system;
-    }
-    
+    }  
 }
