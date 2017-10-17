@@ -95,7 +95,10 @@ public class DefaultPrefabExporter implements PrefabTextExporter {
 
         parameterMap.put(FileParameter.class, new ParameterExporter() {
             public void writeParameter(Writer w, Parameter p, Object value, int depth) throws IOException {
-                writeFile(w, (FileParameter) p, value.toString(), depth);
+                if ( value != null)
+                {
+                    writeFile(w, (FileParameter) p, value.toString(), depth);
+                }
             }
         });
 
@@ -453,7 +456,10 @@ public class DefaultPrefabExporter implements PrefabTextExporter {
             ParameterExporter pe = this.parameterMap.get(parameter.getClass());
             if (pe != null) {
                 Object value = parameter.invokeGet(p);
-                pe.writeParameter(w, parameter, value, depth + 1);
+                if ( value != null)
+                {
+                    pe.writeParameter(w, parameter, value, depth + 1);
+                }
             }
         }
     }
