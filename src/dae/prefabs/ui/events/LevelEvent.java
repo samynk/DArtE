@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.prefabs.ui.events;
 
 import com.jme3.scene.Node;
@@ -60,10 +56,10 @@ public class LevelEvent {
         this.previousIndex = index;
     }
 
-    public LevelEvent(Level level, EventType type, Node node, Object previousParent, int previousIndex, Node currentParent) {
+    public LevelEvent(Level level, EventType type, Node node, Object previousParent, int previousIndex, Object currentParent) {
         this.level = level;
         eventType = type;
-        ArrayList<Node> alNodes = new ArrayList<Node>();
+        ArrayList<Node> alNodes = new ArrayList<>();
         alNodes.add(node);
         nodes = alNodes;
 
