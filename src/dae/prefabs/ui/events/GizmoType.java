@@ -5,5 +5,5 @@ package dae.prefabs.ui.events;
  * @author Koen Samyn
  */
 public enum GizmoType {
-    LINK,TRANSLATE,ROTATE,PICK, BRUSH,NONE;
+    LINK,TRANSLATE,ROTATE,PICK, BRUSH,INSERT,NONE;
 }
