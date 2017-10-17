@@ -41,8 +41,10 @@ public class InputConnectorPanel extends javax.swing.JPanel {
         this.rig = rig;
         List<RevoluteJoint> joints = rig.descendantMatches(RevoluteJoint.class);
         cboJointNames.setModel(new DefaultComboBoxModel(joints.toArray()));
-        cboJointNames.setSelectedIndex(0);
-        updateJoint(joints.get(0));
+        if (!joints.isEmpty()) {
+            cboJointNames.setSelectedIndex(0);
+            updateJoint(joints.get(0));
+        }
 
         setRigOnCustomizerPanel(rig);
     }
