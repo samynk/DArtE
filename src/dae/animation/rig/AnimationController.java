@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.animation.rig;
 
 import mlproject.fuzzy.FuzzyRuleBlock;
@@ -130,7 +126,7 @@ public class AnimationController {
             }
             //system.evaluate();
             float result = outputOfController.getOutputValue() * tpf;
-            //System.out.println("-> " + outputOfController.getOutputValue());
+            // System.out.println("-> " + outputOfController.getOutputValue());
             output.setValue(result);
         }
     }
