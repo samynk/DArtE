@@ -152,7 +152,7 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
      * Shift key is used for copying of items
      */
     private boolean shiftIsDown = false;
-    private ArrayList<Node> currentSelection = new ArrayList<Node>();
+    private ArrayList<Node> currentSelection = new ArrayList<>();
     private CreateObjectEvent objectCreationEvent;
     /**
      * The current level.
@@ -167,7 +167,7 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
      */
     private final ArrayList<Runnable> viewportTasks = new ArrayList<Runnable>();
     /**
-     * Selection from other thread (such as user interfac)e.
+     * Selection from other thread (such as user interface).
      */
     private ArrayList<Node> selectionFromOutside = new ArrayList<Node>();
     /**
@@ -209,7 +209,6 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
     @Override
     public void simpleInitApp() {
 
-
         assetManager.registerLoader(ObjectTypeReader.class, "types");
         assetManager.registerLoader(BodyLoader.class, "skel");
         assetManager.registerLoader(ControllerLoader.class, "fcl");
@@ -218,7 +217,6 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
         assetManager.registerLoader(AnimationReader.class, "animset");
         assetManager.registerLoader(ComponentReader.class, "components");
         assetManager.registerLoader(OVMReader.class, "ovm");
-
 
         objectsToCreate = (ObjectTypeCategory) assetManager.loadAsset("Objects/ObjectTypes.types");
         GlobalObjects.getInstance().setObjectTypeCategory(objectsToCreate);
@@ -245,7 +243,6 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
         rootNode.attachChild(sceneElements);
         rootNode.attachChild(insertionElements);
 
-
         AmbientLight al = new AmbientLight();
         al.setColor(ColorRGBA.White.mult(0.25f));
         rootNode.addLight(al);
@@ -266,7 +263,6 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
 //        cursorSelect = (JmeCursor) assetManager.loadAsset("Interface/select.ico");
 //        cursorRotate = (JmeCursor)assetManager.loadAsset("Interface/rotate.ico");
 //        cursorScale = (JmeCursor)assetManager.loadAsset("Interface/scale.ico");
-
         BulletAppState bulletAppState = new BulletAppState();
 
         stateManager.attach(bulletAppState);
@@ -275,7 +271,6 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
 
         GlobalObjects.getInstance().setAssetManager(assetManager);
         GlobalObjects.getInstance().setInputManager(this.inputManager);
-
 
         wireBoxMaterial = assetManager.loadMaterial("Materials/SelectionBoxMaterial.j3m");
         wireBoxGeometry = new Geometry("wireframe cube", wireBox);
@@ -350,13 +345,16 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
         }
         if (bv != null && bv.getType() == Type.AABB) {
             BoundingBox bb = (BoundingBox) bv;
-
-            wireBox.fromBoundingBox(bb);
+            if ( wireBoxGeometry != null ){
+                wireBoxGeometry.removeFromParent();
+            }
+            wireBoxGeometry = WireBox.makeGeometry(bb);
             wireBoxGeometry.setLocalTranslation(bb.getCenter());
+            wireBoxGeometry.setMaterial(wireBoxMaterial);
             if (wireBoxGeometry.getParent() == null) {
                 this.rootNode.attachChild(wireBoxGeometry);
             }
-        } else {
+        } else if (wireBoxGeometry != null) {
             wireBoxGeometry.removeFromParent();
         }
         /*
@@ -499,18 +497,7 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
         if (evt.isReleased()) {
             currentTool.onMouseButtonReleased(this);
         } else if (evt.isPressed()) {
-            currentTool.onMouseButtonPressed(this);
-            /*
-             if (editorState == EditorState.IDLE) {
-             //System.out.println("picking");
-             pick();
-             pickGizmo();
-             } else if (editorState == EditorState.LINK || editorState == EditorState.LINKPARENT) {
-             pick();
-             } else if (editorState == EditorState.PICK) {
-             pick();
-             }
-             */
+            currentTool.onMouseButtonPressed(this);           
         }
     }
 
@@ -606,7 +593,6 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
             editorState = EditorState.IDLE;
         }
 
-
         if (editorState == EditorState.ADDTOSCENE) {
             addToScene();
         }
@@ -637,15 +623,12 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
             }
         }
 
-
         currentTool.simpleUpdate(tpf, this);
-
 
         // Gizmo part
         if (newGizmoType != gizmoType) {
             switchGizmo();
         }
-
 
         synchronized (viewportTasks) {
             for (Runnable tasks : viewportTasks) {
@@ -1308,7 +1291,6 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
                         }
                     });
                     GameWriter.writeGame(project, level);
-
 
                 } catch (IOException ex) {
                     Logger.getLogger(SandboxViewport.class.getName()).log(Level.SEVERE, null, ex);
