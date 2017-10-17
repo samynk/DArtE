@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.animation.rig;
 
 import com.jme3.asset.AssetManager;
@@ -9,9 +5,11 @@ import com.jme3.material.Material;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import dae.GlobalObjects;
 import dae.animation.skeleton.BodyElement;
 import dae.prefabs.Prefab;
 import dae.prefabs.shapes.DiamondShape;
+import dae.prefabs.types.ObjectType;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
@@ -21,22 +19,21 @@ import mlproject.fuzzy.FuzzySystem;
 /**
  * A rig provides support for procedural animation for mechanical models. A rig
  * typically is not animated with skinning but has distinct meshes that move
- * indepently without deformations.
+ * independently without deformations.
  *
  * @author Koen Samyn
  */
 public class Rig extends Prefab implements BodyElement {
 
     private FuzzySystem fuzzySystem = new FuzzySystem("default");
-    private ArrayList<String> targetKeys = new ArrayList<String>();
-    private HashMap<String, Prefab> targets = new HashMap<String, Prefab>();
+    private final ArrayList<String> targetKeys = new ArrayList<>();
+    private final HashMap<String, Prefab> targets = new HashMap<>();
 
     /**
      * Create a new Rig.
      */
     public Rig() {
-        super.setName("rig");
-        setLayerName("default");
+//        setLayerName("default");
         setCategory("Animation");
         setType("Rig");
     }
@@ -49,6 +46,12 @@ public class Rig extends Prefab implements BodyElement {
     @Override
     public Spatial clone() {
         Rig rig = new Rig();
+        rig.objectType = objectType;
+
+        if (objectType != null) {
+            this.duplicateComponents(rig, GlobalObjects.getInstance().getObjectsTypeCategory());
+        }
+
         for (Spatial s : children) {
             if (s instanceof BodyElement) {
                 Spatial clone = s.clone();
@@ -83,6 +86,7 @@ public class Rig extends Prefab implements BodyElement {
      *
      * @param element the element to attach.
      */
+    @Override
     public void attachBodyElement(BodyElement element) {
         if (element instanceof Node) {
             this.attachChild((Node) element);
@@ -95,11 +99,14 @@ public class Rig extends Prefab implements BodyElement {
     public void reset() {
     }
 
+    @Override
     public void write(Writer w, int depth) throws IOException {
     }
 
     /**
      * Returns the fuzzy system that is used by this Rig
+     *
+     * @return the fuzzy controller that is used by this rig.
      */
     public FuzzySystem getFuzzySystem() {
         return fuzzySystem;
