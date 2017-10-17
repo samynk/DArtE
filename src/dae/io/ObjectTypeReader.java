@@ -118,8 +118,20 @@ public class ObjectTypeReader implements AssetLoader {
                 String label = getAttrContent("label", map);
                 String className = getAttrContent("class", map);
                 String extraInfo = getAttrContent("mesh", map);
+                String cid = getAttrContent("cid",map);
+                int cidi = -1;
+                if (cid.length() > 0)
+                {
+                    if ( cid.startsWith("0x") || cid.startsWith("0X"))
+                    {
+                        cidi = Integer.parseInt(cid.substring(2),16);
+                    }else{
+                        cidi = Integer.parseInt(cid);
+                    }
+                }
                 boolean defaultLoader = parseBoolean("defaultloader", map);
-                ObjectType ot = new ObjectType(parent.getName(), label, className, extraInfo, defaultLoader);
+                
+                ObjectType ot = new ObjectType(parent.getName(), label, className, extraInfo, defaultLoader,cidi);
                 parent.addObjectType(ot);
 
                 readComponents(main, current, ot);
@@ -498,11 +510,20 @@ public class ObjectTypeReader implements AssetLoader {
                     order = Integer.MAX_VALUE;
                 }
                 String className = getAttrContent("className", attrs);
+                
+                String cid = getAttrContent("cid", attrs);
+                int cidi = 0;
+                if ( cid.startsWith("0x") || cid.startsWith("0X")){
+                    cidi = Integer.parseInt(cid.substring(2),16);
+                }else if (cid.length() > 0 ){
+                    cidi = Integer.parseInt(cid);
+                }
 
                 ComponentType ct = new ComponentType();
                 ct.setId(id);
                 ct.setClassName(className);
                 ct.setOrder(order);
+                ct.setCID(cidi);
                 result.addComponent(ct);
 
                 this.readParameterSections(child, ct);
