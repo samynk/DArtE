@@ -36,6 +36,7 @@ public class BodyLoader implements AssetLoader {
     private Material apMaterial;
     private AssetManager assetManager;
 
+    @Override
     public Object load(AssetInfo assetInfo) throws IOException {
         Body body = null;
         try {
@@ -46,9 +47,6 @@ public class BodyLoader implements AssetLoader {
             doc.getDocumentElement().normalize();
 
             assetManager = assetInfo.getManager();
-
-
-
 
             ballJointMaterial = new Material(assetInfo.getManager(),
                     "Common/MatDefs/Misc/Unshaded.j3md");
@@ -88,10 +86,6 @@ public class BodyLoader implements AssetLoader {
                 body.setSkeletonFile(assetInfo.getKey().toString());
             }
 
-
-
-
-
             NodeList nl = root.getChildNodes();
             for (int i = 0; i < nl.getLength(); ++i) {
                 Node n = nl.item(i);
@@ -112,8 +106,6 @@ public class BodyLoader implements AssetLoader {
         }
         return body;
     }
-    
-    
 
     private void constructChildren(Node docNode, BodyElement jmeParentNode, AssetManager manager) {
         if (docNode.getNodeType() == Node.TEXT_NODE) {
@@ -251,7 +243,6 @@ public class BodyLoader implements AssetLoader {
 
         }
 
-
         String logTranslation = getAttrContent("logTranslation", map);
         boolean blogTrans = Boolean.parseBoolean(logTranslation);
 
@@ -297,7 +288,6 @@ public class BodyLoader implements AssetLoader {
         rj.setJointColor(jointColor);
         rj.createVisualization(assetManager);
 
-
         return rj;
     }
 
@@ -313,28 +303,12 @@ public class BodyLoader implements AssetLoader {
 
         String sgroup = getAttrContent("group", map);
         String sangle1 = getAttrContent("angle1", map);
-        String sangle1min = getAttrContent("minangle1", map);
-        String sangle1max = getAttrContent("maxangle1", map);
+       
         String sangle2 = getAttrContent("angle2", map);
-        String sangle2min = getAttrContent("minangle2", map);
-        String sangle2max = getAttrContent("maxangle2", map);
+        
         String sradius = getAttrContent("radius", map);
 
-        /*
-         String log = getAttrContent("log", map);
-         boolean blog = Boolean.parseBoolean(log);
-         String logScale = getAttrContent("logScale", map);
-         float fScale = logScale.length() > 0 ? Float.parseFloat(logScale) : 1.0f;
-         String logOffset = getAttrContent("logOffset", map);
-         float fOffset = logOffset.length() > 0 ? Float.parseFloat(logOffset) : 0.0f;
-         String logSymbol = getAttrContent("logSymbol", map);
-         String logName = getAttrContent("logName", map);
-         String logTranslation = getAttrContent("logTranslation", map);
-         boolean blogTrans = Boolean.parseBoolean(logTranslation);
-         */
-
         float radius = sradius.length() > 0 ? Float.parseFloat(sradius) : 0.1f;
-
 
         Vector3f axis1 = parseVector3f(saxis1);
         Vector3f axis2 = parseVector3f(saxis2);
@@ -343,59 +317,16 @@ public class BodyLoader implements AssetLoader {
         float angle1 = Float.parseFloat(sangle1);
         float angle2 = Float.parseFloat(sangle2);
 
-        float minAngle1 = Float.parseFloat(sangle1min);
-        float maxAngle1 = Float.parseFloat(sangle1max);
+        
 
-        float minAngle2 = Float.parseFloat(sangle2min);
-        float maxAngle2 = Float.parseFloat(sangle2max);
+        RevoluteJointTwoAxis rj = new RevoluteJointTwoAxis();
 
-        RevoluteJointTwoAxis rj = new RevoluteJointTwoAxis(
-                axis1,
-                saxisLabel1,
-                axis2,
-                saxisLabel2,
-                revJointMaterial,
-                sname,
-                sgroup,
-                location,
-                radius);
-
-        String srotation = getAttrContent("rotation", map);
-        if (srotation != null) {
-            Vector3f rotation = parseVector3f(srotation);
-            rj.setInitialLocalFrame(rotation);
-        }
-        String saxisx = getAttrContent("refaxisx", map);
-        String saxisy = getAttrContent("refaxisy", map);
-        String saxisz = getAttrContent("refaxisz", map);
-        if (saxisx.length() > 0 && saxisy.length() > 0 && saxisz.length() > 0) {
-            Vector3f xa = parseVector3f(saxisx);
-            Vector3f ya = parseVector3f(saxisy);
-            Vector3f za = parseVector3f(saxisz);
-            rj.setInitialLocalFrame(xa, ya, za);
-        }
-
-        rj.setAngleConstraints(minAngle1, maxAngle1, minAngle2, maxAngle2);
-        rj.setCurrentAngle1(angle1);
-        rj.setCurrentAngle2(angle2);
-
-        String sChainWithChild = getAttrContent("chainwithchild", map);
-        boolean chainwithchild = Boolean.parseBoolean(sChainWithChild);
-
-        String sChainWithParent = getAttrContent("chainwithparent", map);
-        boolean chainwithparent = Boolean.parseBoolean(sChainWithParent);
-
-        rj.setChaining(chainwithchild, chainwithparent);
-        String childName = getAttrContent("chainchildname", map);
-        rj.setChainChildName(childName);
-
-        rj.createVisualization(assetManager);
+        rj.notifyLoaded();
         return rj;
     }
 
     private BodyElement createTarget(Node targetNode) {
         NamedNodeMap map = targetNode.getAttributes();
-
 
         String slocation = getAttrContent("location", map);
         String sname = getAttrContent("name", map);
@@ -404,16 +335,14 @@ public class BodyLoader implements AssetLoader {
         Vector3f location = parseVector3f(slocation);
         Vector3f rotation = parseVector3f(srotation);
 
-        
         ObjectType type = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Animation", "TwoAxisHandle");
-        Handle result = (Handle)type.create( this.assetManager ,sname);
+        Handle result = (Handle) type.create(this.assetManager, sname);
         result.setTransformation(location, rotation);
         return result;
     }
 
     private BodyElement createFixedJoint(Node docNode) {
         NamedNodeMap map = docNode.getAttributes();
-
 
         String slocation = getAttrContent("location", map);
         String sname = getAttrContent("name", map);
