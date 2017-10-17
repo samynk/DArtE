@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.io;
 
 import com.jme3.asset.AssetInfo;
@@ -19,8 +15,6 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
 import dae.GlobalObjects;
-import dae.animation.custom.CharacterPath;
-import dae.animation.custom.Waypoint;
 import dae.animation.skeleton.Body;
 import dae.components.ComponentType;
 import dae.components.PrefabComponent;
@@ -32,20 +26,10 @@ import dae.prefabs.ReflectionManager;
 import dae.prefabs.UnresolvedReferencePrefab;
 import dae.prefabs.brush.BrushBatch;
 import dae.prefabs.gizmos.PivotGizmo;
-import dae.prefabs.lights.AmbientLightPrefab;
-import dae.prefabs.lights.DirectionalLightPrefab;
-import dae.prefabs.lights.PointLightPrefab;
-import dae.prefabs.lights.SpotLightPrefab;
 import dae.prefabs.magnets.MagnetParameter;
-import dae.prefabs.standard.CameraEntity;
 import dae.prefabs.standard.J3ONPC;
-import dae.prefabs.standard.NPCLocationEntity;
 import dae.prefabs.standard.NavigationMesh;
-import dae.prefabs.standard.PlayerStartEntity;
 import dae.prefabs.standard.SituationEntity;
-import dae.prefabs.standard.SoundEntity;
-import dae.prefabs.standard.Terrain;
-import dae.prefabs.standard.TriggerBox;
 import dae.prefabs.types.ObjectType;
 import dae.prefabs.types.ObjectTypeCategory;
 import dae.prefabs.ui.events.ErrorMessage;
@@ -77,12 +61,24 @@ public class SceneLoader implements AssetLoader {
      * @param am the assetmanager that helps with loading the assets (textures &
      * meshes).
      * @param scene the root node for the scene.
+     * @param objectsToCreate the object with the object and parameter definitions of prefabs.
+     * @param selectionMaterial the material that is used to indicated that a prefab is selected.
      */
     public static void loadScene(String location, AssetManager am, Node scene, ObjectTypeCategory objectsToCreate, Material selectionMaterial) {
         InputStream is = am.getClass().getClassLoader().getResourceAsStream(location);
         loadScene(is, am, scene, objectsToCreate, selectionMaterial);
     }
 
+    /**
+     * Loads a scene from the specified location into the scene element.
+     *
+     * @param location the location of the scene file.
+     * @param am the assetmanager that helps with loading the assets (textures &
+     * meshes).
+     * @param scene the root node for the scene.
+     * @param objectsToCreate the object with the object and parameter definitions of prefabs.
+     * @param selectionMaterial the material that is used to indicated that a prefab is selected.
+     */
     public static void loadScene(File location, AssetManager am, Node scene, ObjectTypeCategory objectsToCreate, Material selectionMaterial) {
         InputStream is;
         try {
@@ -96,6 +92,16 @@ public class SceneLoader implements AssetLoader {
         }
     }
 
+    /**
+     * Loads a scene from the specified location into the scene element.
+     *
+     * @param is the inputstream to load the scene from.
+     * @param am the assetmanager that helps with loading the assets (textures &
+     * meshes).
+     * @param scene the root node for the scene.
+     * @param objectsToCreate the object with the object and parameter definitions of prefabs.
+     * @param selectionMaterial the material that is used to indicated that a prefab is selected.
+     */
     public static void loadScene(InputStream is, AssetManager am, Node scene, ObjectTypeCategory objectsToCreate, Material selectionMaterial) {
         try {
             importer.setRootNode(scene);
@@ -115,17 +121,7 @@ public class SceneLoader implements AssetLoader {
             for (UnresolvedReferencePrefab prefab : references) {
                 prefab.resolveReference(scene);
             }
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
-        } catch (SAXException ex) {
-            Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
-        } catch (ParserConfigurationException ex) {
-            Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | SAXException | ParserConfigurationException | IOException ex) {
             Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
         } finally {
             try {
@@ -235,12 +231,9 @@ public class SceneLoader implements AssetLoader {
 
         String label = getAttrContent("type", map);
         String category = getAttrContent("category", map);
-        String name = getAttrContent("name", map);
-
-        Vector3f translation = parseFloat3(getAttrContent("translation", map));
-        Vector3f scale = parseFloat3(getAttrContent("scale", map));
+        
         Vector3f offset = parseFloat3(getAttrContent("offset", map));
-        Quaternion rotation = parseQuaternion(getAttrContent("rotation", map));
+        
         String physicsMesh = getAttrContent("physicsMesh", map);
         String shadowMode = getAttrContent("shadowmode", map);
 
@@ -258,7 +251,6 @@ public class SceneLoader implements AssetLoader {
             k.attachChild(box);
             GlobalObjects.getInstance().postEvent(new ErrorMessage("Could not load assembly :" + klatchFile));
         }
-        k.setName(name);
         k.setKlatchFile(klatchFile);
         k.setType(label);
         k.setCategory(category);
@@ -269,10 +261,6 @@ public class SceneLoader implements AssetLoader {
             k.setShadowMode(sm);
         } catch (IllegalArgumentException ex) {
         }
-
-        k.setLocalRotation(rotation);
-        k.setLocalTranslation(translation);
-        k.setLocalScale(scale);
 
         k.setOffset(offset);
 
@@ -367,7 +355,7 @@ public class SceneLoader implements AssetLoader {
         return attr != null ? Boolean.parseBoolean(attr.getTextContent()) : false;
     }
 
-    private static void readNodeChildren(NodeList nl, AssetManager am, ObjectTypeCategory objectsToCreate, Node parentNode) throws IllegalAccessException, NumberFormatException, ClassNotFoundException, InstantiationException {
+    public static void readNodeChildren(NodeList nl, AssetManager am, ObjectTypeCategory objectsToCreate, Node parentNode) throws IllegalAccessException, NumberFormatException, ClassNotFoundException, InstantiationException {
         for (int i = 0; i < nl.getLength(); ++i) {
             org.w3c.dom.Node n = nl.item(i);
             System.out.println("Reading node : " + n.getNodeName());
@@ -393,83 +381,6 @@ public class SceneLoader implements AssetLoader {
                 Vector3f loc = parseFloat3(getAttrContent("translation", map));
                 se.setLocalTranslation(loc);
                 currentPrefab = se;
-            } else if ("camera".equals(n.getNodeName())) {
-                ObjectType objectType = objectsToCreate.getObjectType("Standard", "Camera");
-                String name = getAttrContent("name", map);
-                CameraEntity ce = (CameraEntity) objectType.create(am, name);
-                String cameraid = getAttrContent("cameraid", map);
-                boolean startCam = parseBoolean("startcam", map);
-                ce.setName(name);
-                ce.setCameraId(cameraid);
-                ce.setStartCam(startCam);
-                currentPrefab = ce;
-            } else if ("sound".equals(n.getNodeName())) {
-                SoundEntity se = new SoundEntity();
-                String name = getAttrContent("name", map);
-                String soundFile = getAttrContent("soundfile", map);
-
-                String sPositional = getAttrContent("positional", map);
-                boolean positional = sPositional != null ? Boolean.parseBoolean(sPositional) : true;
-                String sLooping = getAttrContent("looping", map);
-                boolean looping = sLooping != null ? Boolean.parseBoolean(sLooping) : true;
-
-                String sVolume = getAttrContent("volume", map);
-                float volume = sVolume != null ? Float.parseFloat(sVolume) : 1.0f;
-
-                float refDistance = XMLUtils.parseFloat("refDistance", map);
-                float maxDistance = XMLUtils.parseFloat("maxDistance", map);
-
-                Vector3f loc = parseFloat3(getAttrContent("translation", map));
-                ObjectType type = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Standard", "Sound");
-                se = (SoundEntity) type.create(am, name);
-                se.setSoundFile(soundFile);
-                se.setLocalTranslation(loc);
-                se.setPositional(positional);
-                se.setLooping(looping);
-                se.setVolume(volume);
-                se.setRefDistance(refDistance);
-                se.setMaxDistance(maxDistance);
-                currentPrefab = se;
-            } else if ("playerstart".equals(n.getNodeName())) {
-                PlayerStartEntity pse = new PlayerStartEntity();
-                String name = getAttrContent("name", map);
-                Vector3f loc = parseFloat3(getAttrContent("translation", map));
-                Quaternion rotation = parseQuaternion(getAttrContent("rotation", map));
-                ObjectType type = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Standard", "PlayerStart");
-                pse = (PlayerStartEntity) type.create(am, name);
-                pse.setName(name);
-                pse.setLocalTranslation(loc);
-                pse.setLocalRotation(rotation);
-                currentPrefab = pse;
-            } else if ("trigger".equals(n.getNodeName())) {
-                TriggerBox tb = new TriggerBox();
-                tb.setId(getAttrContent("id", map));
-                ObjectType type = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Standard", "Trigger");
-                tb = (TriggerBox) type.create(am, tb.getId());
-                Vector3f loc = parseFloat3(getAttrContent("translation", map));
-                tb.setLocalTranslation(loc);
-                Quaternion rotation = parseQuaternion(getAttrContent("rotation", map));
-                tb.setLocalRotation(rotation);
-                Vector3f dimension = parseFloat3(getAttrContent("dimension", map));
-                tb.setDimension(dimension);
-                currentPrefab = tb;
-            } else if ("npclocation".equals(n.getNodeName())) {
-                NPCLocationEntity npcloc = new NPCLocationEntity();
-                String name = getAttrContent("name", map);
-                Vector3f loc = parseFloat3(getAttrContent("translation", map));
-                String animation = getAttrContent("animation", map);
-                String mesh = getAttrContent("npcmesh", map);
-                float yRot = Float.parseFloat(getAttrContent("yRotation", map));
-
-                ObjectType type = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Standard", "NPCLocation");
-                npcloc = (NPCLocationEntity) type.create(am, name);
-                npcloc.setName(name);
-                npcloc.setLocalTranslation(loc);
-                Quaternion q = new Quaternion();
-                npcloc.setLocalRotation(q.fromAngleAxis(yRot, Vector3f.UNIT_Y));
-                npcloc.setNpc(mesh);
-                npcloc.setAnimation(animation);
-                currentPrefab = npcloc;
             } else if ("event".equals(n.getNodeName())) {
                 String location = getAttrContent("location", map);
                 parentNode.setUserData("eventlocation", location);
@@ -532,10 +443,6 @@ public class SceneLoader implements AssetLoader {
                 ObjectType type = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("MetaData", "Pivot");
                 PivotGizmo prefab = (PivotGizmo) type.create(am, name);
                 currentPrefab = prefab;
-            } else if ("terrain".equals(n.getNodeName())) {
-                currentPrefab = readTerrain(n, am);
-            } else if ("characterpath".equals(n.getNodeName())) {
-                currentPrefab = readCharacterPath(n, am);
             } else if ("brushbatch".equals(n.getNodeName())) {
                 currentPrefab = readBrushBatch(n, am);
             } else if ("component".equals(n.getNodeName())) {
@@ -627,40 +534,6 @@ public class SceneLoader implements AssetLoader {
         }
         return null;
     }
-
-    private static Prefab readTerrain(org.w3c.dom.Node n, AssetManager am) {
-        Terrain terrain = new Terrain();
-        NamedNodeMap attrs = n.getAttributes();
-        String name = XMLUtils.getAttribute("name", attrs);
-        terrain.setTexture1(XMLUtils.getAttribute("texture1", attrs));
-        terrain.setTex1Scale(XMLUtils.parseFloat("tex1scale", attrs));
-        terrain.setTexture2(XMLUtils.getAttribute("texture2", attrs));
-        terrain.setTex2Scale(XMLUtils.parseFloat("tex2scale", attrs));
-        terrain.setTexture3(XMLUtils.getAttribute("texture3", attrs));
-        terrain.setTex3Scale(XMLUtils.parseFloat("tex3scale", attrs));
-        terrain.setAlphaMap(XMLUtils.getAttribute("alphamap", attrs));
-        terrain.setHeightMap(XMLUtils.getAttribute("heightmap", attrs));
-        ObjectType type = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Terrain", "Terrain");
-        terrain.initialize(am, type, null);
-        terrain.setName(name);
-        return terrain;
-    }
-
-    private static Prefab readCharacterPath(org.w3c.dom.Node n, AssetManager am) {
-        NamedNodeMap attrs = n.getAttributes();
-        String name = XMLUtils.getAttribute("name", attrs);
-        ObjectType type = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Animation", "CharacterPath");
-        CharacterPath cp = (CharacterPath) type.create(am, name);
-        return cp;
-    }
-    /*
-     private static Prefab readWaypoint(org.w3c.dom.Node n, AssetManager am) {
-     NamedNodeMap attrs = n.getAttributes();
-     String name = XMLUtils.getAttribute("name", attrs);
-     ObjectType type = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Animation", "Waypoint");
-     Waypoint wp = (Waypoint) type.create(am, name);
-     return wp;
-     }*/
 
     private static Prefab readBrushBatch(org.w3c.dom.Node n, AssetManager am) {
 
