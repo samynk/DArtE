@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.animation.rig;
 
 import com.jme3.export.JmeExporter;
@@ -20,10 +16,11 @@ import java.util.List;
  */
 public class AnimationListControl implements Control {
 
-    private ArrayList<AnimationController> controllers =
-            new ArrayList<AnimationController>();
+    private final ArrayList<AnimationController> controllers =
+            new ArrayList<>();
     private Rig rig;
 
+    @Override
     public Control cloneForSpatial(Spatial spatial) {
         AnimationListControl controller = new AnimationListControl();
         for (AnimationController ac : controllers) {
@@ -56,6 +53,7 @@ public class AnimationListControl implements Control {
         return controllers.get(index);
     }
 
+    @Override
     public void setSpatial(Spatial spatial) {
         if (spatial instanceof Rig) {
             this.rig = (Rig) spatial;
@@ -65,18 +63,22 @@ public class AnimationListControl implements Control {
         }
     }
 
+    @Override
     public void update(float tpf) {
         for (AnimationController ac : controllers) {
             ac.update(tpf);
         }
     }
 
+    @Override
     public void render(RenderManager rm, ViewPort vp) {
     }
 
+    @Override
     public void write(JmeExporter ex) throws IOException {
     }
 
+    @Override
     public void read(JmeImporter im) throws IOException {
     }
 

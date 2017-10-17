@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.animation.rig;
 
 import com.jme3.math.FastMath;
@@ -35,6 +31,7 @@ public class AngleTargetConnector implements InputConnector {
     public AngleTargetConnector() {
     }
     
+    @Override
     public boolean isInitialized(){
         return initialized;
     }
@@ -42,6 +39,7 @@ public class AngleTargetConnector implements InputConnector {
     /**
      * @return the jointName
      */
+    @Override
     public String getJointName() {
         return jointName;
     }
@@ -49,6 +47,7 @@ public class AngleTargetConnector implements InputConnector {
     /**
      * @param jointName the jointName to set
      */
+    @Override
     public void setJointName(String jointName) {
         this.jointName = jointName;
     }
@@ -81,6 +80,7 @@ public class AngleTargetConnector implements InputConnector {
         this.attachmentName = attachmentName;
     }
 
+    @Override
     public void initialize(Rig rig) {
         initialized = false;
         Spatial sjoint = rig.getChild(jointName);
@@ -106,6 +106,7 @@ public class AngleTargetConnector implements InputConnector {
 
     }
 
+    @Override
     public float getValue() {
         Vector3f axis = joint.getWorldRotationAxis();
         axis.normalizeLocal();
@@ -135,6 +136,7 @@ public class AngleTargetConnector implements InputConnector {
         toProject.z = toProject.z - dot * axis.z;
     }
 
+    @Override
     public InputConnector cloneConnector() {
         AngleTargetConnector ac = new AngleTargetConnector();
         ac.setAttachmentName(attachmentName);
@@ -148,6 +150,7 @@ public class AngleTargetConnector implements InputConnector {
      * Creates an xml representation of this input connector.
      * @return this object as an xml string.
      */
+    @Override
     public String toXML() {
         try {
             StringWriter sw = new StringWriter();
@@ -163,6 +166,7 @@ public class AngleTargetConnector implements InputConnector {
         return "";
     }
     
+    @Override
     public void fromXML(Node inputNode)
     {
         NamedNodeMap map = inputNode.getAttributes();
