@@ -73,20 +73,13 @@ public class JointPrefab extends Prefab implements PropertyChangeListener, Trans
     public void addPhysics(PhysicsSpace space) {
         this.space = space;
         Node scene = this.getParent();
-        Transform aTransform = getObjectA().getWorldTransform();
         scene.attachChild(getObjectA());
-        getObjectA().setLocalTransform(aTransform);
-
-        Transform bTransform = getObjectB().getWorldTransform();
         scene.attachChild(getObjectB());
-        getObjectB().setLocalTransform(bTransform);
 
         getObjectA().addPhysics(space, 0);
         getObjectB().addPhysics(space);
         RigidBodyControl rbcB = getObjectB().getControl(RigidBodyControl.class);
         rbcB.setGravity(Vector3f.ZERO);
-
-
 
         joint = new HingeJoint(getObjectA().getControl(RigidBodyControl.class), getObjectB().getControl(RigidBodyControl.class), getObjectAPivot(), getObjectBPivot(), axis, axis);
         joint.setAngularOnly(false);
@@ -241,23 +234,23 @@ public class JointPrefab extends Prefab implements PropertyChangeListener, Trans
     public void transformChanged(Prefab source, TransformType type) {
         //if (type == TransformType.TRANSLATION || type == Transform) {
         // update the location of this node.
-        Vector3f aPivot = joint.getPivotA();
-        Vector3f aPivotWorld = getObjectA().localToWorld(aPivot, null);
-        this.setLocalTranslation(aPivotWorld);
-        getObjectB().getControl(RigidBodyControl.class).activate();
-        //}
-        
-        this.setLocalRotation(getObjectA().getWorldRotation());
+//        Vector3f aPivot = joint.getPivotA();
+//        Vector3f aPivotWorld = getObjectA().localToWorld(aPivot, null);
+//        this.setLocalTranslation(aPivotWorld);
+//        getObjectB().getControl(RigidBodyControl.class).activate();
+//        //}
+//        
+//        this.setLocalRotation(getObjectA().getWorldRotation());
     }
 
-    @Override
-    public void translationChanged() {
-        if (addedToScene) {
-            Vector3f world = this.getWorldTranslation();
-            setObjectAPivot(getObjectA().worldToLocal(world, null));
-            recreateJoint();
-        }
-    }
+//    @Override
+//    public void translationChanged() {
+//        if (addedToScene) {
+//            Vector3f world = this.getWorldTranslation();
+//            setObjectAPivot(getObjectA().worldToLocal(world, null));
+//            recreateJoint();
+//        }
+//    }
 
     private void recreateJoint() {
         if ( space == null || objectA == null || objectB == null )
@@ -271,8 +264,8 @@ public class JointPrefab extends Prefab implements PropertyChangeListener, Trans
         if ( rbcA == null || rbcB == null)
             return;
         joint = new HingeJoint(
-                getObjectA().getControl(RigidBodyControl.class),
-                getObjectB().getControl(RigidBodyControl.class),
+                rbcA,
+                rbcB,
                 new Vector3f(getObjectAPivot()),
                 new Vector3f(getObjectBPivot()),
                 axis, axis);
