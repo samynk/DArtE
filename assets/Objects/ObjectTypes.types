@@ -1,19 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-To change this template, choose Tools | Templates
-and open the template in the editor.
--->
-
-
 <prefabs>
     <components>
+        <component id="ObjectComponent" className="dae.components.ObjectComponent" order="1"> 
+            <parameters section="Object">
+                <parameter type="string" id="name"/>
+                <parameter type="string" id="layer"/>
+            </parameters>
+        </component>
+        <component id="TransformComponent" className="dae.components.TransformComponent" order="2" cid="1">
+            <parameters section="Transform">
+                <parameter type="float3" id="translation"/>
+                <parameter type="float3" id="rotation" converter="dae.prefabs.parameters.converter.QuaternionConverter"/>
+                <parameter type="float3" id="scale"/>
+            </parameters>
+        </component>
+        <component id="MeshComponent" className="dae.components.MeshComponent" cid="2">
+            <parameters section="Mesh">
+                <parameter type="file" id="meshFile" extension="j3o|ovm"/>
+            </parameters>
+        </component>
         <component id="AnimationComponent" className="dae.components.AnimationComponent">
             <parameters section="Animation">
                 <parameter type="file" id="animationSet" extension="animset"/>
                 <parameter type="choice" id="animation" listento="animationSet" values="animations" />
             </parameters>
         </component>
-         <component id="PathComponent" className="dae.components.animation.PathComponent">
+        <component id="SectorConstraint" className="dae.animation.skeleton.constraints.SectorConstraint">
+            <parameters section="Constraints">
+                <parameter type="float3" id="baseAxis" />
+                <parameter type="float" id="angle" />
+            </parameters>
+        </component>
+        <component id="PathComponent" className="dae.components.animation.PathComponent">
             <parameters section="Path">
                 <parameter type="object" id="path" classFilter="dae.animation.custom.CharacterPath"/>
                 <parameter type="float" id="speed" />
@@ -32,7 +50,6 @@ and open the template in the editor.
                 <parameter type="float" id="friction"/>
                 <parameter type="float" id="restitution" />
                 <parameter type="float" id="linearDamping"/>
-                <parameter type="float3" id="dimension" />
                 <parameter type="integer" id="collisionGroup" constraint="positive"/>
                 <parameter type="action" id="drop" method="drop"/>
             </parameters>
@@ -47,7 +64,7 @@ and open the template in the editor.
         </component>
         <component id="PhysicsConvexComponent" className="dae.components.physics.PhysicsConvexComponent">
             <parameters section="Physics">
-                <parameter type="range" id="mass" min="0" max="100" step="0.1"/>
+                <parameter type="range" id="mass" min="0" max="10000" step="1"/>
                 <parameter type="float" id="friction"/>
                 <parameter type="float" id="restitution" />
                 <parameter type="float" id="linearDamping"/>
@@ -67,44 +84,39 @@ and open the template in the editor.
                 <parameter type="integer" id="collisionGroup" constraint="positive"/>
             </parameters>
         </component>
-        <component id="TransformComponent" className="dae.components.TransformComponent" order="1">
-            <parameters section="Transform">
-                <parameter type="float3" id="translation"/>
-                <parameter type="float3" id="rotation" converter="dae.prefabs.parameters.converter.QuaternionConverter"/>
-                <parameter type="float3" id="scale"/>
-            </parameters>
-        </component>
+        
     </components>
     <collection name="Standard" >
-        <object label="Ground" class="dae.projects.Grid">
-            <parameters section="Transform">
-                <parameter type="float3" id="localTranslation"/>
-                <parameter type="float" id="width"/>
-                <parameter type="float" id="length"/>
+        <object label="Ground" class="dae.project.Grid">
+            <component id="ObjectComponent">
+                <default id="layer" value="gizmo"/>
+            </component>
+            <component id="TransformComponent"/>
+            <parameters section="Settings">
+                <parameter type="float" id="width" default="50"/>
+                <parameter type="float" id="length" default="25"/>
             </parameters>
         </object>
 
         <object label="Crate" class="dae.prefabs.standard.CrateObject">
+            <component id="ObjectComponent"/>
             <component id="TransformComponent"/>
             <parameters section="Object">
-                <parameter type="string" id="name"/>
                 <parameter type="float3" id="dimension"/>
                 <parameter type="action" id="drop" method="drop"/>
             </parameters>
         </object>
         <object label="Sphere" class="dae.prefabs.standard.SphereObject">
+            <component id="ObjectComponent"/>
             <component id="TransformComponent"/>
             <parameters section="Object">
-                <parameter type="string" id="name"/>
                 <parameter type="float" id="radius"/>
                 <parameter type="action" id="drop" method="drop"/>
             </parameters>
         </object>
         <object label="Cylinder" class="dae.prefabs.standard.CylinderObject">
+            <component id="ObjectComponent"/>
             <component id="TransformComponent"/>
-            <parameters section="Object">
-                <parameter type="string" id="name"/>
-            </parameters>
             <parameters section="Physics">
                 <parameter type="float" id="mass"/>
                 <parameter type="action" id="drop" method="drop"/>
@@ -117,7 +129,24 @@ and open the template in the editor.
             </parameters>
         </object>
         <object label="HingeJoint" class="dae.prefabs.physics.JointPrefab">
+            <component id="ObjectComponent">
+                <default id="layer" value="physics"/>
+            </component>
             <component id="TransformComponent"/>
+            <parameters section="Hinge objects">
+                <parameter type="object" id="objectA">
+                    <setdefault type="Prefab:Standard.Crate" prefix="bone" location="/">
+                        <setproperty id="dimension" value="[1,1,.3]"/>
+                    </setdefault>
+                </parameter>
+                <parameter type="float3" id="objectAPivot" default="[1.2, 1,0]"/>
+                <parameter type="object" id="objectB">
+                    <setdefault type="Prefab:Standard.Crate" prefix="bone" location="/">
+                        <setproperty id="dimension" value="[1,2,.1]"/>
+                    </setdefault>
+                </parameter>
+                <parameter type="float3" id="objectBPivot" default="[-1.2, 1, 0]"/>
+            </parameters>
             <parameters section="Physics">
                 <parameter type="float" id="lowerLimit"/>
                 <parameter type="float" id="upperLimit"/>
@@ -132,6 +161,9 @@ and open the template in the editor.
             </parameters>
         </object>
         <object label="Trigger" class="dae.prefabs.standard.TriggerBox">
+            <component id="ObjectComponent">
+                <default id="layer" value="physics"/>
+            </component>
             <component id="TransformComponent"/>
             <parameters section="Object">
                 <parameter type="string" id="id"/>
@@ -141,59 +173,51 @@ and open the template in the editor.
             </parameters>
         </object>  
         <object label="Klatch" class="dae.prefabs.Klatch" defaultloader="true">
+            <component id="ObjectComponent"/>
             <component id="TransformComponent"/>
             <parameters section="Appearance">
-                <parameter type="string" id="name"/>
                 <parameter type="boolean" id="wireframe"/>
                 <parameter type="boolean" id="locked"/>
                 <parameter type="enumlist" id="shadowMode" enumclass="com.jme3.renderer.queue.RenderQueue$ShadowMode"/>
             </parameters>
         </object>
-        <object label="Mesh" class="dae.prefabs.standard.MeshObject">
+        <object label="Mesh" class="dae.prefabs.standard.MeshObject" cid="0x100">
+            <component id="ObjectComponent"/>
             <component id="TransformComponent"/>
+            <component id="MeshComponent"/>
             <parameters section="Object">
-                <parameter type="string" id="name"/>
                 <parameter type="boolean" id="wireframe"/>
                 <parameter type="boolean" id="locked"/>
                 <parameter type="enumlist" id="shadowMode" enumclass="com.jme3.renderer.queue.RenderQueue$ShadowMode"/>
             </parameters>
         </object>
-        <object label="Terrain" class="dae.prefabs.standard.Terrain">
-            <component id="TransformComponent"/>
-            <parameters section="Terrain">
-                <parameter type="string" id="name"/>
-                <parameter type="file"  id="texture1" extension="dds|png|jpg"/>
-                <parameter type="float" id="tex1Scale" />
-                <parameter type="file"  id="texture2" extension="dds|png|jpg"/>
-                <parameter type="float" id="tex2Scale" />
-                <parameter type="file"  id="texture3" extension="dds|png|jpg"/>
-                <parameter type="float" id="tex3Scale" />
-                <parameter type="file"  id="alphaMap" extension="dds|png|jpg"/>
-                <parameter type="file"  id="heightMap" extension="dds|png|jpg"/>
-            </parameters>
-        </object>
+        
         <object label="J3ONPC" class="dae.prefabs.standard.J3ONPC">
+            <component id="ObjectComponent"/>
             <component id="TransformComponent"/>
             <component id="PersonalityComponent"/>
             <parameters section="Appearance">
-                <parameter type="string" id="name"/>
                 <parameter type="string" id="actorName"/>
                 <parameter type="string" id="actorId"/>
             </parameters>
         </object>
         <object label="Camera" class="dae.prefabs.standard.CameraEntity">
+            <component id="ObjectComponent">
+                <default id="layer" value="entities"/>
+            </component>
             <component id="TransformComponent"/>
             <parameters section="Appearance">
-                <parameter type="string" id="name"/>
                 <parameter type="string" id="cameraId"/>
                 <parameter type="boolean" id="startCam"/>
                 <parameter type="offscreenrender"/>
             </parameters>
         </object>
         <object label="Sound" class="dae.prefabs.standard.SoundEntity">
+            <component id="ObjectComponent">
+                <default id="layer" value="entities"/>
+            </component>
             <component id="TransformComponent"/>
             <parameters section="Transform">
-                <parameter type="string" id="name"/>
                 <parameter type="sound" id="soundFile"/>
                 <parameter type="range" id="volume" min="0" max="10" step="0.1"/>
                 <parameter type="boolean" id="looping"/>
@@ -204,28 +228,31 @@ and open the template in the editor.
             </parameters>
         </object>
         <object label="PlayerStart" class="dae.prefabs.standard.PlayerStartEntity">
+            <component id="ObjectComponent">
+                <default id="layer" value="entities"/>
+            </component>
             <component id="TransformComponent"/>
-            <parameters section="Object">
-                <parameter type="string" id="name"/>
-            </parameters>
         </object>
         <object label="NPCLocation" class="dae.prefabs.standard.NPCLocationEntity">
+            <component id="ObjectComponent">
+                <default id="layer" value="entities"/>
+            </component>
             <component id="TransformComponent"/>
             <parameters section="Object">
-                <parameter type="string" id="name"/>
                 <parameter type="gmf_object" id="npc"/>
                 <parameter type="string" id="animation"/>
             </parameters>
         </object>
         <object label="Waypoint" class="dae.prefabs.standard.WayPointEntity">
+            <component id="ObjectComponent"/>
             <component id="TransformComponent"/>
-            <parameters section="Transform">
-                <parameter type="string" id="name"/>
-            </parameters>
         </object>
         <object label="NavigationMesh" class="dae.prefabs.standard.NavigationMesh">
+            <component id="ObjectComponent">
+                <default id="layer" value="entities"/>
+            </component>
+            <component id="TransformComponent"/>
             <parameters section="Object">
-                <parameter type="string" id="name"/>
                 <parameter type="object" id="sourceMesh"/>
                 <parameter type="float" id="cellSize" default="0.5" constraint="positive"/>
                 <parameter type="float" id="cellHeight" default="0.5" constraint="positive"/>
@@ -247,20 +274,66 @@ and open the template in the editor.
             </parameters>
         </object>
     </collection>
-    <collection name="Metadata">
-        <object label="Pivot" class="dae.prefabs.gizmos.PivotGizmo">
+    <collection name="Terrain">
+        <object label="Terrain" class="dae.prefabs.standard.Terrain">
+            <component id="ObjectComponent">
+                <default id="layer" value="terrain"/>
+            </component>
+            <component id="TransformComponent"/>
+            <parameters section="Terrain">
+                <parameter type="file"  id="texture1" extension="dds|png|jpg"/>
+                <parameter type="float" id="tex1Scale" />
+                <parameter type="file"  id="texture2" extension="dds|png|jpg"/>
+                <parameter type="float" id="tex2Scale" />
+                <parameter type="file"  id="texture3" extension="dds|png|jpg"/>
+                <parameter type="float" id="tex3Scale" />
+                <parameter type="file"  id="alphaMap" extension="dds|png|jpg"/>
+                <parameter type="file"  id="heightMap" extension="dds|png|jpg"/>
+            </parameters>
+        </object>
+        <object label="BrushBatch" class="dae.prefabs.brush.BrushBatch">
+            <component id="ObjectComponent"/>
             <component id="TransformComponent"/>
             <parameters section="Object">
-                <parameter type="string" id="name"/>
+                <parameter type="boolean" id="createGeometryBatch"/>
             </parameters>
+        </object>
+        <object label="Brush" class="dae.prefabs.brush.TerrainBrush">
+            <component id="ObjectComponent"/>
+            <component id="TransformComponent"/>
+            <parameters section="Object">
+                <parameter type="string" id="brushLayer"/>
+                <parameter type="string" id="brushNode"/>
+                <parameter type="float" id="radius" />
+                <parameter type="enumlist" id="castMethod" enumclass="dae.prefabs.brush.CastMethod"/>
+                <parameter collectiontype="list" id="stroke" type="$Terrain.Stroke"/>
+            </parameters>
+        </object>
+        <object label="Stroke" class="dae.prefabs.brush.Stroke">
+            <component id="ObjectComponent"/>
+            <component id="TransformComponent"/>
+            <parameters section="Object">
+                <parameter type="file" id="mesh" extension="j3o|ovm"/>
+                <parameter type="float" id="weight"/>
+                <parameter type="boolean" id="useContactNormal"/>
+                <parameter type="boolean" id="randomizeXRot"/>
+                <parameter type="boolean" id="randomizeYRot"/>
+                <parameter type="boolean" id="randomizeZRot"/>
+                <parameter type="float2"  id="scaleValues" default="[1,1]"/>
+                <parameter type="boolean" id="useForRaycast" default="false"/>
+            </parameters>
+        </object>
+    </collection>
+    <collection name="Metadata">
+        <object label="Pivot" class="dae.prefabs.gizmos.PivotGizmo">
+            <component id="ObjectComponent"/>
+            <component id="TransformComponent"/>
         </object>
     </collection>
     <collection name="Animation">
         <object label="Rig" class="dae.animation.rig.Rig" defaultloader="true">
+            <component id="ObjectComponent"/>
             <component id="TransformComponent"/>
-            <parameters section="Object">
-                <parameter type="string" id="name"/>
-            </parameters>
             <parameters section="Animation">
                 <parameter type="fuzzy" id="fuzzySystem"/>
                 <parameter type="object" collectiontype="dictionary" id="target"/>
@@ -268,8 +341,8 @@ and open the template in the editor.
             </parameters>
         </object>
         <object label="Skeleton" class="dae.animation.skeleton.Body" defaultloader="true">
+            <component id="ObjectComponent"/>
             <parameters section="Transform">
-                <parameter type="string" id="name"/>
                 <parameter type="float3" id="localTranslation"/>
                 <parameter type="float" id="yRotation"/>
                 <parameter type="boolean" id="showCharacter"/>
@@ -282,28 +355,41 @@ and open the template in the editor.
             </parameters>
         </object>
         <object label="RevoluteJoint" class="dae.animation.skeleton.RevoluteJoint">
+            <component id="ObjectComponent"/>
             <component id="TransformComponent"/>
+            <parameters section="Kinematic Chain">
+                <parameter type="boolean" id="chainWithParent"/>
+                <parameter type="boolean" id="chainWithChild"/>
+                <parameter type="string" id="chainChildName"/>
+            </parameters>
             <parameters section="Object">
-                <parameter type="string" id="name"/>
+                <parameter type="string" id="group"/>
                 <parameter type="float" id="currentAngle"/>
                 <parameter type="float" id="minAngle"/>
                 <parameter type="float" id="maxAngle"/>
             </parameters>
-        </object>
-        <object label="AttachmentPoint" class="dae.animation.skeleton.AttachmentPoint">
-            <component id="TransformComponent"/>
-            <parameters section="Transform">
-                <parameter type="string" id="name"/>
+            <parameters section="Appearance">
+                <parameter type="color" id="jointColor"/>
+                <parameter type="float" id="radius" />
+                <parameter type="float" id="height" />
+                <parameter type="boolean" id="centered" />
             </parameters>
         </object>
+        <object label="AttachmentPoint" class="dae.animation.skeleton.AttachmentPoint">
+            <component id="ObjectComponent"/>
+            <component id="TransformComponent"/>
+        </object>
         <object label="RevoluteJointTwoAxis" class="dae.animation.skeleton.RevoluteJointTwoAxis">
+            <component id="ObjectComponent"/>
+            <component id="TransformComponent"/>
+            <component id="SectorConstraint"/>
             <parameters section="Transform">
-                <parameter type="string" id="name"/>
-                <parameter type="float" id="currentAngle1"/>
-                <parameter type="float" id="currentAngle2"/>
+                <parameter type="float" id="thetaAngle"/>
+                <parameter type="float" id="phiAngle"/>
             </parameters>
         </object>
         <object label="Handle" class="dae.prefabs.standard.MeshObject" mesh="Skeleton/Helpers/Handle.j3o">
+            <component id="ObjectComponent"/>
             <component id="TransformComponent"/>
             <parameters section="Object">
                 <parameter type="string" id="name"/>
@@ -313,45 +399,43 @@ and open the template in the editor.
             </parameters>
         </object>
         <object label="TwoAxisHandle" class="dae.animation.skeleton.Handle">
+            <component id="ObjectComponent"/>
             <component id="TransformComponent"/>
             <parameters section="Transform">
                 <parameter type="string" id="name"/>
             </parameters>
         </object>
         <object label="Handshake" class="dae.animation.skeleton.Handshake">
+            <component id="ObjectComponent"/>
             <parameters section="Transform">
-                <parameter type="string" id="name"/>
                 <parameter type="float3" id="localTranslation"/>
                 <parameter type="float3" id="localRotation"/>
             </parameters>
         </object>
         <object label="CharacterPath" class="dae.animation.custom.CharacterPath">
+            <component id="ObjectComponent">
+                <default id="layer" value="waypoints"/>
+            </component>
             <component id="TransformComponent"/>
-            <parameters section="Object">
-                <parameter type="string" id="name"/>
-            </parameters>
         </object>
         <object label="Waypoint" class="dae.animation.custom.Waypoint">
+            <component id="ObjectComponent">
+                <default id="layer" value="waypoints"/>
+            </component>
             <component id="TransformComponent"/>
-            <parameters section="Object">
-                <parameter type="string" id="name"/>
-            </parameters>
+            <setproperty id="layer" value="waypoints"/>
         </object>
         <object label="Footcurve" class="dae.animation.trajectory.FootstepTargetCurve">
+            <component id="ObjectComponent"/>
             <component id="TransformComponent"/>
-            <parameters section="Transform">
-                <parameter type="string" id="name"/>
-            </parameters>
             <parameters section="Trajectory">
                 <parameter type="float" id="tolerance"/>
                 <parameter type="float" id="height"/>
             </parameters>
         </object>
         <object label="Handcurve" class="dae.animation.trajectory.HandTargetCurve">
+            <component id="ObjectComponent"/>
             <component id="TransformComponent"/>
-            <parameters section="Transform">
-                <parameter type="string" id="name"/>
-            </parameters>
             <parameters section="Trajectory">
                 <parameter type="float" id="tolerance"/>
             </parameters>
@@ -359,10 +443,10 @@ and open the template in the editor.
     </collection>
     <collection name="Light">
         <object label="SpotLight" class="dae.prefabs.lights.SpotLightPrefab">
+            <component id="ObjectComponent">
+                <default id="layer" value="lights"/>
+            </component>
             <component id="TransformComponent"/>
-            <parameters section="Object">
-                <parameter type="string" id="name"/>
-            </parameters>
             <parameters section="Light">
                 <parameter type="float" id="spotInnerAngle"/>
                 <parameter type="float" id="spotOuterAngle"/>
@@ -373,21 +457,21 @@ and open the template in the editor.
             </parameters>
         </object>
         <object label="PointLight" class="dae.prefabs.lights.PointLightPrefab">
+            <component id="ObjectComponent">
+                <default id="layer" value="lights"/>
+            </component>
             <component id="TransformComponent"/>
-            <parameters section="Transform">
-                <parameter type="string" id="name"/>
-            </parameters>
             <parameters section="Light">
-                <parameter type="float" id="radius"/>
+                <parameter type="float" id="radius" default="2.0"/>
                 <parameter type="color" id="pointLightColor"/>
                 <parameter type="float" id="pointLightIntensity" default="1" min="0" max="10" step=".1"/>     
             </parameters>
         </object>
         <object label="DirectionalLight" class="dae.prefabs.lights.DirectionalLightPrefab">
+            <component id="ObjectComponent">
+                <default id="layer" value="lights"/>
+            </component>
             <component id="TransformComponent"/>
-            <parameters section="Transform">
-                <parameter type="string" id="name"/>
-            </parameters>
             <parameters section="Light">
                 <parameter type="color" id="directionalLightColor"/>
                 <parameter type="float" id="directionalLightIntensity" default="1" min="0" max="10" step=".1"/>
@@ -395,10 +479,10 @@ and open the template in the editor.
             </parameters>
         </object>
         <object label="AmbientLight" class="dae.prefabs.lights.AmbientLightPrefab">
+            <component id="ObjectComponent">
+                <default id="layer" value="lights"/>
+            </component>
             <component id="TransformComponent"/>
-            <parameters section="Transform">
-                <parameter type="string" id="name"/>
-            </parameters>
             <parameters section="Light">
                 <parameter type="color" id="ambientLightColor"/>
                 <parameter type="float" id="ambientLightIntensity" default="1" min="0" max="10" step=".1"/>
