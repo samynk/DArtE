@@ -109,4 +109,6 @@ public abstract class PrefabComponent implements Comparable<PrefabComponent> {
         int diff = o.order - order;
         return diff < 0 ? 1 : o.order > 0 ? -1 : 0;
     }
+
+   
 }
