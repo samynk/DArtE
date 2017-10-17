@@ -4,7 +4,6 @@ import com.google.common.io.Files;
 import com.jme3.asset.AssetManager;
 import com.jme3.asset.AssetNotFoundException;
 import com.jme3.asset.ModelKey;
-import com.jme3.scene.Node;
 import dae.components.ComponentList;
 import dae.components.ComponentType;
 import dae.components.PrefabComponent;
@@ -32,6 +31,7 @@ public class ObjectType extends ParameterSupport {
     private String objectClass;
     private String extraInfo;
     private boolean loadFromExtraInfo = false;
+    private final int cid;
     private ArrayList<ComponentType> componentTypes = new ArrayList<ComponentType>();
     private HashMap<String, ComponentType> componentMap = new HashMap<String, ComponentType>();
     private HashMap<String, HashMap<String, Object>> defaultMap = new HashMap<String, HashMap<String, Object>>();
@@ -43,13 +43,15 @@ public class ObjectType extends ParameterSupport {
      * @param objectClass the Java class for this object.
      * @param extraInfo the extra info for this object.
      * @param loadFromExtraInfo use a standard loader for this object.
+     * @param cid the class id for this object. This id is unique and is used for serialization purposes.
      */
-    public ObjectType(String category, String label, String objectClass, String extraInfo, boolean loadFromExtraInfo) {
+    public ObjectType(String category, String label, String objectClass, String extraInfo, boolean loadFromExtraInfo, int cid) {
         this.category = category;
         this.label = label;
         this.objectClass = objectClass;
         this.extraInfo = extraInfo;
         this.loadFromExtraInfo = loadFromExtraInfo;
+        this.cid = cid;
     }
 
     /**
@@ -65,6 +67,15 @@ public class ObjectType extends ParameterSupport {
 
     public void setExtraInfo(String asset) {
         this.extraInfo = asset;
+    }
+
+    /**
+     * Returns the cid of this object type.
+     *
+     * @return a unique identifier for this object type.
+     */
+    public int getCID() {
+        return cid;
     }
 
     /**
@@ -118,39 +129,26 @@ public class ObjectType extends ParameterSupport {
     /**
      * Creates a Prefab with the info in this object type.
      *
-     * @param parent the parent node of the current object.
      * @param manager the AssetManager to use to create the object.
      * @param name the name of the new object.
      */
     public Prefab create(AssetManager manager, String name) {
         Prefab p = null;
-        if (usesDefaultLoader()) {
+        if (usesDefaultLoader() && getExtraInfo() != null && getExtraInfo().length() > 0) {
             ModelKey mk = new ModelKey(getExtraInfo());
             p = (Prefab) manager.loadAsset(mk);
             loadComponents(manager, p, mk);
 
         } else {
-            try {
-
-                p = (Prefab) Class.forName(getObjectToCreate()).newInstance();
-                p.initialize(manager, this, getExtraInfo());
-                p.notifyLoaded();
-
-
-                MagnetParameter mp = (MagnetParameter) findParameter("magnets");
-                p.setMagnets(mp);
-
-                FillerParameter fp = (FillerParameter) findParameter("filler");
-                p.setFillers(fp);
-            } catch (InstantiationException ex) {
-                Logger.getLogger(ObjectType.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IllegalAccessException ex) {
-                Logger.getLogger(ObjectType.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (ClassNotFoundException ex) {
-                Logger.getLogger(ObjectType.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            p = createDefault(manager, name, false);
         }
 
+        initializePrefab(p, name);
+        p.notifyLoaded();
+        return p;
+    }
+
+    private void initializePrefab(Prefab p, String name) {
         if (p != null) {
             for (ComponentType c : this.componentTypes) {
                 PrefabComponent pc = c.create();
@@ -197,6 +195,36 @@ public class ObjectType extends ParameterSupport {
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * Creates a Prefab with the info in this object type.
+     *
+     * @param manager the AssetManager to use to create the object.
+     * @param name the name of the new object.
+     * @param initializeComponents true if the components should be initialized,
+     * false otherwise.
+     * @return returns the default prefab
+     */
+    public Prefab createDefault(AssetManager manager, String name, boolean initializeComponents) {
+        Prefab p = null;
+        try {
+
+            p = (Prefab) Class.forName(getObjectToCreate()).newInstance();
+            p.initialize(manager, this, getExtraInfo());
+            MagnetParameter mp = (MagnetParameter) findParameter("magnets");
+            p.setMagnets(mp);
+
+            FillerParameter fp = (FillerParameter) findParameter("filler");
+            p.setFillers(fp);
+
+            if (initializeComponents) {
+                this.initializePrefab(p, name);
+            }
+            
+        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException ex) {
+            Logger.getLogger(ObjectType.class.getName()).log(Level.SEVERE, null, ex);
         }
         return p;
     }
