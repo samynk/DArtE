@@ -9,6 +9,7 @@ import com.jme3.font.BitmapFont;
 import com.jme3.font.BitmapText;
 import com.jme3.input.InputManager;
 import com.jme3.input.event.MouseMotionEvent;
+import com.jme3.material.Material;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
@@ -31,8 +32,8 @@ public class PickTool extends ViewportTool {
     private BitmapText linkText;
     private QuadShape textBackground;
     private Geometry textBackgroundGeometry;
-    private WireBox wireBoxLinkParent = new WireBox();
     private Geometry wireBoxGeometryLinkParent;
+    private Material wireBoxMaterial;
     /**
      * The currently picked element.
      */
@@ -62,8 +63,8 @@ public class PickTool extends ViewportTool {
         linkText.setSize(guiFont.getCharSet().getRenderedSize());
         linkText.setText("");
 
-        wireBoxGeometryLinkParent = new Geometry("linked parent", wireBoxLinkParent);
-        wireBoxGeometryLinkParent.setMaterial(assetManager.loadMaterial("Materials/LinkParentMaterial.j3m"));
+        wireBoxMaterial = assetManager.loadMaterial("Materials/LinkParentMaterial.j3m");
+        
 
         this.textBackground = new QuadShape(1, 1);
         this.textBackgroundGeometry = new Geometry("linktext", textBackground);
@@ -178,7 +179,11 @@ public class PickTool extends ViewportTool {
             BoundingVolume bv = prefab.getWorldBound();
             if (bv.getType() == BoundingVolume.Type.AABB) {
                 BoundingBox bb = (BoundingBox) bv;
-                wireBoxLinkParent.fromBoundingBox(bb);
+                if ( wireBoxGeometryLinkParent != null ){
+                    wireBoxGeometryLinkParent.removeFromParent();
+                }
+                wireBoxGeometryLinkParent = WireBox.makeGeometry(bb);
+                wireBoxGeometryLinkParent.setMaterial(wireBoxMaterial);
                 wireBoxGeometryLinkParent.setLocalTranslation(bb.getCenter().clone());
                 if (wireBoxGeometryLinkParent.getParent() == null) {
                     viewport.getRootNode().attachChild(wireBoxGeometryLinkParent);
