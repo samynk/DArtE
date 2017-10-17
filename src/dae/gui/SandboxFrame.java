@@ -122,7 +122,6 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
         settings.setVSync(true);
 
         //settings.set
-
         viewport = new SandboxViewport();
         viewport.setSettings(settings);
 
@@ -219,6 +218,7 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
         mnuAdd = new javax.swing.JMenu();
         mnuCreateRig = new javax.swing.JMenuItem();
         mnuAddRevoluteJoint = new javax.swing.JMenuItem();
+        mnuAddFreeJoint = new javax.swing.JMenuItem();
         mnuAddTarget = new javax.swing.JMenuItem();
         jSeparator4 = new javax.swing.JPopupMenu.Separator();
         mnuAddSkeleton = new javax.swing.JMenuItem();
@@ -256,7 +256,6 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("DAE Sandbox v1.0");
-        setPreferredSize(new java.awt.Dimension(1280, 720));
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
@@ -659,6 +658,14 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
             }
         });
         mnuAdd.add(mnuAddRevoluteJoint);
+
+        mnuAddFreeJoint.setText("Add Free Joint");
+        mnuAddFreeJoint.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuAddFreeJointActionPerformed(evt);
+            }
+        });
+        mnuAdd.add(mnuAddFreeJoint);
 
         mnuAddTarget.setText("Add Target");
         mnuAddTarget.addActionListener(new java.awt.event.ActionListener() {
@@ -1180,13 +1187,19 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
             if (createObjectDialog.getReturnStatus() == CreateKlatchDialog.RET_OK) {
                 String rigLocation = createObjectDialog.getAssemblyName();
                 // Create a default body.
-                Rig rig = new Rig();
-                File klatchDir = currentProject.getKlatchDirectory();
-                File rigFile = new File(klatchDir, rigLocation);
-                RigWriter.writeRig(rigFile, rig);
+                ObjectTypeCategory otc = viewport.getObjectsToCreate();
+                ObjectType ot = otc.getObjectType("Animation", "Rig");
+                if (ot != null) {
+                    Rig rig;
+                    rig = (Rig)ot.createDefault(viewport.getAssetManager(), "rig",true);
+                    
+                    File klatchDir = currentProject.getKlatchDirectory();
+                    File rigFile = new File(klatchDir, rigLocation);
+                    RigWriter.writeRig(rigFile, rig);
 
-                AssetEvent ae = new AssetEvent(AssetEventType.EDIT, FileNode.createFromPath(rigLocation));
-                GlobalObjects.getInstance().postEvent(ae);
+                    AssetEvent ae = new AssetEvent(AssetEventType.EDIT, FileNode.createFromPath(rigLocation));
+                    GlobalObjects.getInstance().postEvent(ae);
+                }
             }
         } else {
             JOptionPane.showMessageDialog(this, "<html>You must save the project before<br> you can create a rig!", "Project not saved", JOptionPane.ERROR_MESSAGE);
@@ -1366,6 +1379,10 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
         }
     }//GEN-LAST:event_mnuRemoveComponentActionPerformed
 
+    private void mnuAddFreeJointActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAddFreeJointActionPerformed
+        createObject("Animation","RevoluteJointTwoAxis",null);
+    }//GEN-LAST:event_mnuAddFreeJointActionPerformed
+
     private void createObject(String category, String type) {
         createObject(category, type, null);
     }
@@ -1394,9 +1411,6 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
                 if ("Nimbus".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
-
-
-
 
                 }
             }
@@ -1475,6 +1489,7 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
     private javax.swing.JMenuItem mnuAddCrate;
     private javax.swing.JMenuItem mnuAddCylinder;
     private javax.swing.JMenuItem mnuAddDirectionalLight;
+    private javax.swing.JMenuItem mnuAddFreeJoint;
     private javax.swing.JMenuItem mnuAddHandle;
     private javax.swing.JMenuItem mnuAddHingeJoint;
     private javax.swing.JMenuItem mnuAddNPC;
@@ -1612,9 +1627,7 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
                 }
 
             }
-        } catch (UnsupportedFlavorException ex) {
-            Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
+        } catch (UnsupportedFlavorException | IOException ex) {
             Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
         }
     }
