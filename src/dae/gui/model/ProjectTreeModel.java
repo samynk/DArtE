@@ -26,8 +26,8 @@ import javax.swing.tree.TreePath;
  */
 public class ProjectTreeModel implements TreeModel {
 
-    private ArrayList<TreeModelListener> listeners =
-            new ArrayList<TreeModelListener>();
+    private ArrayList<TreeModelListener> listeners
+            = new ArrayList<TreeModelListener>();
     private Project project;
 
     public ProjectTreeModel(Project project) {
@@ -167,13 +167,12 @@ public class ProjectTreeModel implements TreeModel {
             }
             // now add it to the correct node.
             // tree structure changed for parent node.
-
-
-            TreeModelEvent event = createInsertTreeModelEvent((ProjectTreeNode) le.getCurrentParent());
-            if (event != null) {
-                for (TreeModelListener tml : listeners) {
-                    tml.treeStructureChanged(event);
-
+            if (le.getCurrentParent() != null) {
+                TreeModelEvent event = createInsertTreeModelEvent((ProjectTreeNode) le.getCurrentParent());
+                if (event != null) {
+                    for (TreeModelListener tml : listeners) {
+                        tml.treeStructureChanged(event);
+                    }
                 }
             }
         }
@@ -275,7 +274,7 @@ public class ProjectTreeModel implements TreeModel {
         Object[] objects = {added};
 
         TreeModelEvent event = new TreeModelEvent(this, path, indices, objects);
-        */
+         */
         for (TreeModelListener tml : listeners) {
             tml.treeNodesInserted(layerAdd);
         }
