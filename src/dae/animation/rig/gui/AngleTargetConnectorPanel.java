@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.animation.rig.gui;
 
 import com.jme3.scene.Spatial;
@@ -131,10 +127,13 @@ public class AngleTargetConnectorPanel extends javax.swing.JPanel implements Inp
         cboTargetName.setModel(new DefaultComboBoxModel(targets));
     }
 
+    @Override
     public InputConnector createConnector() {
         AngleTargetConnector result = new AngleTargetConnector();
         AttachmentPoint selected = (AttachmentPoint) cboAttachmentPointName.getSelectedItem();
-        result.setAttachmentName(selected.getName());
+        if (selected != null) {
+            result.setAttachmentName(selected.getName());
+        }
         String targetKey = cboTargetName.getSelectedItem().toString();
         result.setTargetName(targetKey);
         return result;
