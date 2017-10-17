@@ -1,24 +1,13 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.prefabs.standard;
 
 import com.jme3.asset.AssetManager;
-import com.jme3.asset.AssetNotFoundException;
-import com.jme3.material.Material;
-import com.jme3.math.Vector3f;
-import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
-import com.jme3.scene.shape.Box;
-import dae.GlobalObjects;
 import dae.animation.skeleton.BodyElement;
 import dae.components.MeshComponent;
 import dae.io.XMLUtils;
 import dae.prefabs.Prefab;
 import dae.prefabs.gizmos.Gizmo;
-import dae.prefabs.ui.events.ErrorMessage;
 import java.io.IOException;
 import java.io.Writer;
 
