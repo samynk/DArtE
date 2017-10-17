@@ -18,6 +18,7 @@ public class ComponentType extends ParameterSupport {
     private String id;
     private String className;
     private int order;
+    private int cid;
     public static ComponentType PREFAB = new ComponentType("__PREFAB");
 
     /**
@@ -49,6 +50,22 @@ public class ComponentType extends ParameterSupport {
      */
     public void setId(String id) {
         this.id = id;
+    }
+    
+    /**
+     * Returns the class id of this component.
+     * @return the class id.
+     */
+    public int getCID(){
+        return cid;
+    }
+    
+    /**
+     * Sets the class id of this component.
+     * @param cidi the class id of this component.
+     */
+    public void setCID(int cidi) {
+        this.cid = cidi;
     }
 
     /**
@@ -119,4 +136,6 @@ public class ComponentType extends ParameterSupport {
             }
         }
     }
+
+
 }
