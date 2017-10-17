@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.animation.skeleton;
 
 import com.jme3.asset.AssetManager;
@@ -9,6 +5,7 @@ import com.jme3.material.Material;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Spatial;
+import dae.io.SceneSaver;
 import dae.io.XMLUtils;
 import dae.prefabs.Prefab;
 import dae.prefabs.shapes.ArrowShape;
@@ -119,6 +116,8 @@ public class AttachmentPoint extends Prefab implements BodyElement {
     }
 
     public void write(Writer w, int depth) throws IOException {
+        SceneSaver.writePrefab(this,w,depth);
+        /*
         for (int i = 0; i < depth; ++i) {
             w.write('\t');
         }
@@ -150,5 +149,6 @@ public class AttachmentPoint extends Prefab implements BodyElement {
             }
             w.write("</attachmentpoint>\n");
         }
+        */
     }
 }
