@@ -10,6 +10,8 @@ import com.jme3.font.BitmapFont;
 import com.jme3.font.BitmapText;
 import com.jme3.input.InputManager;
 import com.jme3.input.event.MouseMotionEvent;
+import com.jme3.material.Material;
+import com.jme3.math.ColorRGBA;
 import com.jme3.math.Matrix4f;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Ray;
@@ -20,6 +22,7 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.debug.WireBox;
 import dae.GlobalObjects;
+import dae.components.TransformComponent;
 import dae.gui.SandboxViewport;
 import dae.prefabs.Prefab;
 import dae.prefabs.shapes.LineShape;
@@ -47,8 +50,9 @@ public class LinkTool extends ViewportTool {
     /**
      * Used to highlight the parent
      */
-    private WireBox wireBoxLinkParent = new WireBox();
+    private final WireBox wireBoxLinkParent = new WireBox();
     private Geometry wireBoxGeometryLinkParent;
+    private Material wireBoxMaterial;
 
     /**
      * Internal link tool state.
@@ -80,22 +84,30 @@ public class LinkTool extends ViewportTool {
     public void initialize(AssetManager assetManager, InputManager inputManager) {
         // helper objects for linking
         linkShape = new LineShape(Vector3f.ZERO, Vector3f.ZERO);
-        linkShape.setLineWidth(5.0f);
 
         linkGeometry = new Geometry("link", linkShape);
+        wireBoxMaterial = assetManager.loadMaterial("Materials/LinkMaterial.j3m");
+        linkGeometry.setMaterial(wireBoxMaterial);
 
-        linkGeometry.setMaterial(assetManager.loadMaterial("Materials/LinkMaterial.j3m"));
         wireBoxGeometryLinkParent = new Geometry("linked parent", wireBoxLinkParent);
         wireBoxGeometryLinkParent.setMaterial(assetManager.loadMaterial("Materials/LinkParentMaterial.j3m"));
 
         BitmapFont guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
         linkText = new BitmapText(guiFont, false);
         linkText.setSize(guiFont.getCharSet().getRenderedSize());
+        //linkText.setAlpha(.5f);
+        //
+        //linkText.setMaterial(assetManager.loadMaterial("Materials/LinkParentMaterial.j3m"));
+        linkText.setColor(new ColorRGBA(1, 1, 1, 1));
+
         linkText.setText("");
 
         this.textBackground = new QuadShape(1, 1);
         this.textBackgroundGeometry = new Geometry("linktext", textBackground);
         textBackgroundGeometry.setMaterial(assetManager.loadMaterial("Materials/LinkTextBackgroundMaterial.j3m"));
+
+        //linkText.setQueueBucket(RenderQueue.Bucket.Transparent);
+        //textBackgroundGeometry.setQueueBucket(RenderQueue.Bucket.Transparent);
     }
 
     /**
@@ -141,6 +153,7 @@ public class LinkTool extends ViewportTool {
      *
      * @param viewport the viewport where the mouse button was released.
      */
+    @Override
     public void onMouseButtonPressed(SandboxViewport viewport) {
         if (linkState == LinkState.LINK) {
             this.currentChildElement = viewport.pick();
@@ -178,9 +191,12 @@ public class LinkTool extends ViewportTool {
 
                 Matrix4f local = parentMatrix.mult(childMatrix);
 
-                currentChildElement.setLocalTranslation(local.toTranslationVector());
-                currentChildElement.setLocalRotation(local.toRotationQuat());
-                currentChildElement.setLocalScale(local.toScaleVector());
+                TransformComponent tc = (TransformComponent) currentChildElement.getComponent("TransformComponent");
+                if (tc != null) {
+                    tc.setTranslation(local.toTranslationVector());
+                    tc.setRotation(local.toRotationQuat());
+                    tc.setScale(local.toScaleVector());
+                }
             }
 
             // remove child from its layer
@@ -190,7 +206,8 @@ public class LinkTool extends ViewportTool {
             }
 
             Level level = viewport.getLevel();
-            LevelEvent le = new LevelEvent(level, EventType.NODEMOVED, currentChildElement, previousParent, previousIndex, pn);
+            LevelEvent le = new LevelEvent(level, EventType.NODEMOVED, currentChildElement, previousParent, previousIndex, currentChildElement.getProjectParent());
+            
             GlobalObjects.getInstance().postEvent(le);
 
             viewport.activateIdleState(this);
@@ -213,6 +230,7 @@ public class LinkTool extends ViewportTool {
      *
      * @param viewport the viewport where the mouse button was released.
      */
+    @Override
     public void onMouseButtonReleased(SandboxViewport viewport) {
     }
 
@@ -245,18 +263,27 @@ public class LinkTool extends ViewportTool {
             BoundingVolume bv = prefab.getWorldBound();
             if (bv.getType() == Type.AABB) {
                 BoundingBox bb = (BoundingBox) bv;
-                wireBoxLinkParent.fromBoundingBox(bb);
+                if (wireBoxGeometryLinkParent != null) {
+                    wireBoxGeometryLinkParent.removeFromParent();
+                }
+                wireBoxGeometryLinkParent = WireBox.makeGeometry(bb);
+                wireBoxGeometryLinkParent.setMaterial(wireBoxMaterial);
                 wireBoxGeometryLinkParent.setLocalTranslation(bb.getCenter().clone());
                 if (wireBoxGeometryLinkParent.getParent() == null) {
 
                     viewport.getRootNode().attachChild(wireBoxGeometryLinkParent);
                 }
             }
-            linkText.setText(currentChildElement.getName() + "->" + prefab.getName());
-            linkText.setLocalTranslation(click2d.x, click2d.y, 0.01f);
+            String sLinkText = currentChildElement.getName() + "->" + prefab.getName();
+
+            linkText.setText(sLinkText);
+            linkText.setLocalTranslation(click2d.x, click2d.y, .2f);
+            //linkText.updateModelBound();
+            //System.out.println("Setting linkText on : " + click2d );
+
             textBackground.setDimension(linkText.getLineWidth() + 2, linkText.getLineHeight() + 4);
             textBackgroundGeometry.updateModelBound();
-            textBackgroundGeometry.setLocalTranslation(click2d.x - 1, click2d.y - linkText.getLineHeight() - 2, 0f);
+            textBackgroundGeometry.setLocalTranslation(click2d.x - 1, click2d.y - linkText.getLineHeight() - 2, .1f);
             return result.getContactPoint();
         } else {
             wireBoxGeometryLinkParent.removeFromParent();
