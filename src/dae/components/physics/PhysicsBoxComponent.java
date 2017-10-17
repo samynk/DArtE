@@ -72,10 +72,12 @@ public class PhysicsBoxComponent extends PrefabComponent {
                 bb.getExtent(exts);
 
                 BoxCollisionShape shape = new BoxCollisionShape(exts);
-                finalShape.addChildShape(shape, Vector3f.ZERO);
+                finalShape.addChildShape(shape, center);
                 mass += bb.getVolume();
             }
         }
+        
+        
         rigidBodyControl = new RigidBodyControl(finalShape, mass);
         rigidBodyControl.setRestitution(restitution);
         rigidBodyControl.setFriction(getFriction());
