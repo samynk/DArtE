@@ -4,8 +4,10 @@
  */
 package dae.prefab.standard;
 
+import dae.GlobalObjects;
 import dae.animation.rig.Rig;
 import dae.components.ComponentType;
+import dae.prefab.io.TextIOTestSuite;
 import dae.prefabs.Prefab;
 import dae.prefabs.parameters.DictionaryParameter;
 import dae.prefabs.parameters.ObjectParameter;
@@ -39,6 +41,10 @@ public class DictionaryParameterTest {
 
     @Before
     public void setUp() {
+        if (GlobalObjects.getInstance().getAssetManager() == null) {
+            TextIOTestSuite.createMockGame();
+        }
+        
         rig = new Rig();
         parameter = new DictionaryParameter(ComponentType.PREFAB,"dictionary", "target", new ObjectParameter( ComponentType.PREFAB,"object", "target"));
 
@@ -70,7 +76,7 @@ public class DictionaryParameterTest {
 
     @Test
     public void testPrefabDictionary() {
-        CrateObject co1 = new CrateObject();
+        CrateObject co1 = (CrateObject)TextIOTestSuite.createObject("Standard", "Crate", CrateObject.class);
         co1.setName("Crate1");
 
         parameter.addKey(rig, "Crate1");
