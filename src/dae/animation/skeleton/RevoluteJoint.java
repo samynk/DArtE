@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.animation.skeleton;
 
 import com.jme3.animation.Bone;
@@ -15,8 +11,10 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import dae.GlobalObjects;
 import dae.animation.rig.ConnectorType;
 import dae.animation.skeleton.debug.BoneVisualization;
+import dae.io.SceneSaver;
 import dae.io.XMLUtils;
 import dae.prefabs.Prefab;
 import dae.prefabs.shapes.HingeShape;
@@ -48,11 +46,11 @@ public class RevoluteJoint extends Prefab implements BodyElement {
     private String logName = "error";
     // needed for relative transformations
     private Matrix3f initialFrame = Matrix3f.IDENTITY;
-    private Quaternion initialFrameQuat = new Quaternion();
+    private final Quaternion initialFrameQuat = new Quaternion();
     private Matrix3f initialFrameInverse = Matrix3f.IDENTITY;
-    private Matrix3f rotMatrix = new Matrix3f();
-    private Quaternion relativeBoneRotation = new Quaternion();
-    private Quaternion inverseRotation = new Quaternion();
+    private final Matrix3f rotMatrix = new Matrix3f();
+    private final Quaternion relativeBoneRotation = new Quaternion();
+    private final Quaternion inverseRotation = new Quaternion();
     private Vector3f xAxis = Vector3f.UNIT_X;
     private Vector3f yAxis = Vector3f.UNIT_Y;
     private Vector3f zAxis = Vector3f.UNIT_Z;
@@ -87,7 +85,7 @@ public class RevoluteJoint extends Prefab implements BodyElement {
         supportedInputConnectorTypes.add(ct);
 
         ConnectorType oct = new ConnectorType("anglerevjoint", "Angle",
-                "This connector increments the current angle of the joint with the output of teh controller",
+                "This connector increments the current angle of the joint with the output of the controller",
                 "dae.animation.rig.gui.RevoluteJointOutputConnectorPanel");
         supportedOutputConnectorTypes.add(oct);
     }
@@ -167,6 +165,14 @@ public class RevoluteJoint extends Prefab implements BodyElement {
     final public float getCurrentAngle() {
         return currentAngle;
     }
+    
+    /**
+     * Set the axis of rotation.
+     * @param axis the axis of rotation.
+     */
+    public void setAxis(Vector3f axis) {
+        this.axis = axis;
+    }
 
     private void updateTransform(Vector3f axis, float dAngle) {
         // step 0 : return if difference is too smal.
@@ -234,7 +240,7 @@ public class RevoluteJoint extends Prefab implements BodyElement {
     }
 
     public void updateBoneTransform() {
-        if (chainWithParent) {
+        if (getChainWithParent()) {
             if (parent instanceof RevoluteJointTwoAxis) {
                 RevoluteJointTwoAxis rj2 = (RevoluteJointTwoAxis) parent;
                 rj2.updateBoneTransform();
@@ -245,8 +251,8 @@ public class RevoluteJoint extends Prefab implements BodyElement {
         }
         if (bone != null) {
             Matrix3f result = initialFrameInverse.mult(rotMatrix);
-            if (chainWithChild) {
-                Spatial child = this.getChild(chainChildName);
+            if (getChainWithChild()) {
+                Spatial child = this.getChild(getChainChildName());
                 if (child != null) {
                     Quaternion childRotation = child.getLocalRotation();
                     Matrix3f matrix = childRotation.toRotationMatrix();
@@ -272,6 +278,7 @@ public class RevoluteJoint extends Prefab implements BodyElement {
         return currentAngle - angleBackup;
     }
 
+    @Override
     public void attachBodyElement(BodyElement element) {
         if (element instanceof Node) {
             Node n = (Node) element;
@@ -292,9 +299,9 @@ public class RevoluteJoint extends Prefab implements BodyElement {
             }
         }
     }
-    private Vector3f tempOrigin = new Vector3f();
-    private Vector3f worldTempOrigin = new Vector3f();
-    private Vector3f worldTempAxis = new Vector3f();
+    private final Vector3f tempOrigin = new Vector3f();
+    private final Vector3f worldTempOrigin = new Vector3f();
+    private final Vector3f worldTempAxis = new Vector3f();
 
     public Vector3f getWorldRotationAxis() {
         //this.localToWorld(tempOrigin, worldTempOrigin);
@@ -458,21 +465,49 @@ public class RevoluteJoint extends Prefab implements BodyElement {
 
     @Override
     public Spatial clone() {
-        RevoluteJoint copy = new RevoluteJoint(this.getOriginalMaterial(), this.name, this.group,
-                this.location.clone(), this.axis.clone(), this.minAngle, this.maxAngle, this.radius, this.height, this.centered);
-        copy.setChaining(chainWithChild, chainWithParent);
-        copy.setChainChildName(this.chainChildName);
-        copy.setInitialLocalFrame(xAxisBackup, yAxisBackup, zAxisBackup);
-        copy.setJointColor(this.jointColor);
+        RevoluteJoint copy = new RevoluteJoint();
+        copy.objectType = objectType;
+        
+        if (objectType != null) {
+            this.duplicateComponents(copy, GlobalObjects.getInstance().getObjectsTypeCategory());
+        }
+        copy.setRenderOptions(getRadius(), getHeight(), getCentered());
         copy.createVisualization(manager);
+        
+        copy.setName(getName());
+        copy.setGroup(this.group);
+        copy.setMinAngle(this.minAngle);
+        copy.setMaxAngle(this.maxAngle);
+        copy.setAxis(axis.clone());
+        copy.getTransformComponent().setTranslation(location.clone());
+      
+        copy.setChaining(getChainWithChild(), getChainWithParent());
+        copy.setChainChildName(this.getChainChildName());
+        copy.setInitialLocalFrame(xAxisBackup, yAxisBackup, zAxisBackup);
+        copy.setJointColor(this.getJointColor());
+        
         copy.setCurrentAngle(this.currentAngle);
 
         for (Spatial child : this.children) {
             if (child instanceof BodyElement) {
                 copy.attachBodyElement((BodyElement) child.clone());
+            }else if ( child instanceof Prefab ){
+                copy.attachChild((Prefab)child.clone());
             }
         }
         return copy;
+    }
+    
+    /**
+     * Sets the render options for this revolute joint.
+     * @param radius the radius of this revolute joint.
+     * @param height the height of this revolute joint.
+     * @param centered center the revolute joint around the location.
+     */
+    public void setRenderOptions(float radius, float height, boolean centered) {
+        this.setRadius(radius);
+        this.setHeight(height);
+        this.setCentered(centered);
     }
 
     public void createVisualization(AssetManager manager) {
@@ -491,13 +526,11 @@ public class RevoluteJoint extends Prefab implements BodyElement {
     }
 
     public void setChaining(boolean chainwithchild, boolean chainwithparent) {
-        this.chainWithChild = chainwithchild;
-        this.chainWithParent = chainwithparent;
+        this.setChainWithChild(chainwithchild);
+        this.setChainWithParent(chainwithparent);
     }
 
-    public void setChainChildName(String childName) {
-        this.chainChildName = childName;
-    }
+ 
 
     public void setInitialLocalFrame(Vector3f xa, Vector3f ya, Vector3f za) {
         xAxis = xa.clone();
@@ -544,7 +577,11 @@ public class RevoluteJoint extends Prefab implements BodyElement {
         }
     }
 
+    @Override
     public void write(Writer w, int depth) throws IOException {
+        
+        SceneSaver.writePrefab(this,w,depth);
+        /*
         for (int i = 0; i < depth; ++i) {
             w.write('\t');
         }
@@ -559,8 +596,8 @@ public class RevoluteJoint extends Prefab implements BodyElement {
         // chainwithchild="true" chainchildname="headJointY">
         XMLUtils.writeAttribute(w, "axis", this.axis);
         XMLUtils.writeAttribute(w, "group", this.group);
-        XMLUtils.writeAttribute(w, "radius", this.radius);
-        XMLUtils.writeAttribute(w, "height", this.height);
+        XMLUtils.writeAttribute(w, "radius", this.getRadius());
+        XMLUtils.writeAttribute(w, "height", this.getHeight());
         XMLUtils.writeAttribute(w, "location", this.getLocalPrefabTranslation());
 
         XMLUtils.writeAttribute(w, "refaxisx", xAxisBackup);
@@ -569,11 +606,11 @@ public class RevoluteJoint extends Prefab implements BodyElement {
         XMLUtils.writeAttribute(w, "minAngle", this.minAngle);
         XMLUtils.writeAttribute(w, "maxAngle", this.maxAngle);
         XMLUtils.writeAttribute(w, "angle", this.currentAngle);
-        XMLUtils.writeAttribute(w, "chainwithchild", this.chainWithChild);
-        if (chainWithChild) {
-            XMLUtils.writeAttribute(w, "chainchildname", this.chainChildName);
+        XMLUtils.writeAttribute(w, "chainwithchild", this.getChainWithChild());
+        if (getChainWithChild()) {
+            XMLUtils.writeAttribute(w, "chainchildname", this.getChainChildName());
         }
-        XMLUtils.writeAttribute(w, "chainwithparent", this.chainWithParent);
+        XMLUtils.writeAttribute(w, "chainwithparent", this.getChainWithParent());
 
         boolean hasBodyElements = false;
         for (Spatial child : this.getChildren()) {
@@ -597,6 +634,7 @@ public class RevoluteJoint extends Prefab implements BodyElement {
             }
             w.write("</joint>\n");
         }
+        */
     }
 
     /**
@@ -608,4 +646,98 @@ public class RevoluteJoint extends Prefab implements BodyElement {
     public Quaternion getGizmoRotation() {
         return visual.getLocalRotation();
     }
+
+    /**
+     * @return the radius
+     */
+    public float getRadius() {
+        return radius;
+    }
+
+    /**
+     * @param radius the radius to set
+     */
+    public void setRadius(float radius) {
+        this.radius = radius;
+    }
+
+    /**
+     * @return the height
+     */
+    public float getHeight() {
+        return height;
+    }
+
+    /**
+     * @param height the height to set
+     */
+    public void setHeight(float height) {
+        this.height = height;
+    }
+
+    /**
+     * @return the centered
+     */
+    public boolean getCentered() {
+        return centered;
+    }
+
+    /**
+     * @param centered the centered to set
+     */
+    public void setCentered(boolean centered) {
+        this.centered = centered;
+    }
+
+    /**
+     * @return the jointColor
+     */
+    public ColorRGBA getJointColor() {
+        return jointColor;
+    }
+
+    /**
+     * @return the chainWithChild
+     */
+    public boolean getChainWithChild() {
+        return chainWithChild;
+    }
+
+    /**
+     * @param chainWithChild the chainWithChild to set
+     */
+    public void setChainWithChild(boolean chainWithChild) {
+        this.chainWithChild = chainWithChild;
+    }
+
+    /**
+     * @return the chainWithParent
+     */
+    public boolean getChainWithParent() {
+        return chainWithParent;
+    }
+
+    /**
+     * @param chainWithParent the chainWithParent to set
+     */
+    public void setChainWithParent(boolean chainWithParent) {
+        this.chainWithParent = chainWithParent;
+    }
+
+    /**
+     * @return the chainChildName
+     */
+    public String getChainChildName() {
+        return chainChildName;
+    }
+    
+    /**
+     * Sets the chain child name.
+     * @param childName the name of the child to chain.
+     */
+    public void setChainChildName(String childName) {
+        this.chainChildName = childName;
+    }
+    
+   
 }
