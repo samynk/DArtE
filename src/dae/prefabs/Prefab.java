@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.prefabs;
 
 import com.jme3.asset.AssetManager;
@@ -19,8 +15,8 @@ import com.jme3.texture.Texture;
 import dae.GlobalObjects;
 import dae.components.ComponentList;
 import dae.components.ComponentType;
-import dae.components.ObjectComponent;
 import dae.components.PrefabComponent;
+import dae.components.TransformComponent;
 import dae.prefabs.events.ComponentListener;
 import dae.prefabs.gizmos.Axis;
 import dae.prefabs.gizmos.Gizmo;
@@ -47,9 +43,9 @@ public class Prefab extends Node implements ProjectTreeNode {
 
     private String prefix = "prefab";
     private final ArrayList<UpdateObject> workList =
-            new ArrayList<UpdateObject>();
+            new ArrayList<>();
     private final ArrayList<Runnable> taskList =
-            new ArrayList<Runnable>();
+            new ArrayList<>();
     protected ObjectType objectType;
     private boolean selected = false;
     private Material originalMaterial;
@@ -60,10 +56,10 @@ public class Prefab extends Node implements ProjectTreeNode {
     private ArrayList<ComponentListener> componentListeners;
     private Vector3f pivot = Vector3f.ZERO;
     private boolean changed = false;
-    private HashMap<String, PrefabComponent> componentMap =
-            new HashMap<String, PrefabComponent>();
-    private ArrayList<PrefabComponent> sortedComponents =
-            new ArrayList<PrefabComponent>();
+    private final HashMap<String, PrefabComponent> componentMap =
+            new HashMap<>();
+    private final ArrayList<PrefabComponent> sortedComponents =
+            new ArrayList<>();
     /**
      * Defines if this prefab can have children.
      */
@@ -117,7 +113,7 @@ public class Prefab extends Node implements ProjectTreeNode {
      *
      * @param layerName the name of the layer.
      */
-    public void setLayerName(String layerName) {
+    public final void setLayerName(String layerName) {
         Parameter p = objectType.findParameter("ObjectComponent", "layer");
         p.invokeSet(this, layerName, true);
     }
@@ -135,7 +131,7 @@ public class Prefab extends Node implements ProjectTreeNode {
         return type;
     }
 
-    public void setType(String type) {
+    public final void setType(String type) {
         this.type = type;
     }
 
@@ -153,8 +149,20 @@ public class Prefab extends Node implements ProjectTreeNode {
      *
      * @param category the category of this type.
      */
-    public void setCategory(String category) {
+    public final void setCategory(String category) {
         this.category = category;
+    }
+    
+    
+    /**
+     * Gets the transform component from this prefab, or null if
+     * no such component exists, or if the component does not have the 
+     * required type.
+     * @return the TransformComponent object.
+     */
+    public TransformComponent getTransformComponent(){
+        PrefabComponent c = getComponent("TransformComponent");
+        return c instanceof TransformComponent? (TransformComponent)c:null;
     }
 
     public void setOriginalMaterial(Material material) {
@@ -184,7 +192,6 @@ public class Prefab extends Node implements ProjectTreeNode {
     /**
      * Creates a new prefab object.
      *
-     * @param name the name of the prefab.
      * @param manager the asset manager to load assets.
      * @param extraInfo extra info for the creation process.
      */
@@ -197,7 +204,7 @@ public class Prefab extends Node implements ProjectTreeNode {
      * @param name the name of the prefab.
      */
     @Override
-    public void setName(String name) {
+    public final void setName(String name) {
         Parameter p = objectType.findParameter("ObjectComponent", "name");
         if (p != null) {
             p.invokeSet(this, name, true);
@@ -208,6 +215,9 @@ public class Prefab extends Node implements ProjectTreeNode {
 
     @Override
     public String getName() {
+        if ( objectType == null){
+            return "<error>";
+        }
         Parameter p = objectType.findParameter("ObjectComponent", "name");
         if (p != null) {
             Object objectname = p.invokeGet(this);
@@ -605,32 +615,36 @@ public class Prefab extends Node implements ProjectTreeNode {
         ObjectTypeCategory otc = GlobalObjects.getInstance().getObjectsTypeCategory();
         if (objectType != null) {
             Prefab target = objectType.create(assetManager, name);
-            for (Parameter p : objectType.getAllParameters()) {
-                Object value = p.invokeGet(this);
-                Object cloned = PropertyReflector.clone(value);
-                if (value != null) {
-                    p.invokeSet(target, cloned, false);
-                }
-            }
-
-            for (PrefabComponent pc : this.getComponents()) {
-                ComponentType ct = otc.getComponent(pc.getId());
-                if (ct != null) {
-                    if (!target.hasPrefabComponent(ct.getId())) {
-                        PrefabComponent copy = ct.create();
-                        target.addPrefabComponent(copy);
-                    }
-
-                    ct.copy(this, target);
-                    PrefabComponent copied = target.getComponent(ct.getId());
-                    if (copied != null) {
-                        copied.install(target);
-                    }
-                }
-            }
+            duplicateComponents(target, otc);
             return target;
         }
         return null;
+    }
+
+    public void duplicateComponents(Prefab target, ObjectTypeCategory otc) {
+        for (Parameter p : objectType.getAllParameters()) {
+            Object value = p.invokeGet(this);
+            Object cloned = PropertyReflector.clone(value);
+            if (value != null) {
+                p.invokeSet(target, cloned, false);
+            }
+        }
+        
+        for (PrefabComponent pc : this.getComponents()) {
+            ComponentType ct = otc.getComponent(pc.getId());
+            if (ct != null) {
+                if (!target.hasPrefabComponent(ct.getId())) {
+                    PrefabComponent copy = ct.create();
+                    target.addPrefabComponent(copy);
+                }
+                
+                ct.copy(this, target);
+                PrefabComponent copied = target.getComponent(ct.getId());
+                if (copied != null) {
+                    copied.install(target);
+                }
+            }
+        }
     }
 
     /**
@@ -826,9 +840,10 @@ public class Prefab extends Node implements ProjectTreeNode {
     public void setLocalTranslation(Vector3f localTranslation) {
         super.setLocalTranslation(localTranslation);
         Parameter ptrans = this.getObjectType().findParameter("TransformComponent", "translation");
-        if (ptrans != null) {
+        if (ptrans != null ) {
             ptrans.notifyChangeInValue(this);
         }
+        
         translationChanged();
     }
 
@@ -855,6 +870,7 @@ public class Prefab extends Node implements ProjectTreeNode {
      * Checks if a prefab has children that need to be saved when the prefab is
      * written to file. First the state of the canHaveChildren is checked, next
      * a check will be performed to see if the object has savable children.
+     * @return true if this prefab has savable children, false otherwise.
      */
     public boolean hasSavableChildren() {
         if (!canHaveChildren) {
@@ -936,14 +952,17 @@ public class Prefab extends Node implements ProjectTreeNode {
         return super.attachChild(child); //To change body of generated methods, choose Tools | Templates.
     }
 
+    @Override
     public boolean hasChildren() {
         return this.getPrefabChildCount() > 0;
     }
 
+    @Override
     public ProjectTreeNode getProjectChild(int index) {
         return (ProjectTreeNode) this.getPrefabChildAt(index);
     }
 
+    @Override
     public int getIndexOfChild(ProjectTreeNode object) {
         int pindex = 0;
         for (Spatial s : this.getChildren()) {
@@ -957,6 +976,7 @@ public class Prefab extends Node implements ProjectTreeNode {
         return -1;
     }
 
+    @Override
     public ProjectTreeNode getProjectParent() {
         Node p = this.getParent();
 
@@ -971,6 +991,7 @@ public class Prefab extends Node implements ProjectTreeNode {
         }
     }
 
+    @Override
     public boolean isLeaf() {
         return false;
     }
@@ -1032,9 +1053,9 @@ public class Prefab extends Node implements ProjectTreeNode {
     public void installAllComponents() {
         Collections.sort(sortedComponents);
 
-        System.out.println("Installing components for : " + this.getName());
+        //System.out.println("Installing components for : " + this.getName());
         for (PrefabComponent pc : sortedComponents) {
-            System.out.println("Installing : " + pc.getId());
+            //System.out.println("Installing : " + pc.getId());
             pc.install(this);
         }
     }
@@ -1076,7 +1097,7 @@ public class Prefab extends Node implements ProjectTreeNode {
      */
     public void addComponentListener(ComponentListener cl) {
         if (componentListeners == null) {
-            componentListeners = new ArrayList<ComponentListener>();
+            componentListeners = new ArrayList<>();
         }
         componentListeners.add(cl);
     }
