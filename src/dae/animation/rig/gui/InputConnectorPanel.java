@@ -1,18 +1,16 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.animation.rig.gui;
 
 import com.jme3.scene.Spatial;
 import dae.animation.rig.AnimationController;
 import dae.animation.rig.ConnectorType;
 import dae.animation.rig.InputConnector;
+import dae.animation.rig.Joint;
 import dae.animation.rig.Rig;
 import dae.animation.skeleton.RevoluteJoint;
 import java.awt.CardLayout;
 import java.awt.Component;
 import java.awt.event.ItemEvent;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,9 +37,16 @@ public class InputConnectorPanel extends javax.swing.JPanel {
 
     public void setRig(Rig rig) {
         this.rig = rig;
-        List<RevoluteJoint> joints = rig.descendantMatches(RevoluteJoint.class);
+        List<Joint> joints = new ArrayList<>();
+        rig.breadthFirstTraversal((Spatial spatial) -> {
+            if ( spatial instanceof Joint){
+                joints.add((Joint)spatial);
+            }
+        });
+        
         cboJointNames.setModel(new DefaultComboBoxModel(joints.toArray()));
-        if (!joints.isEmpty()) {
+        if ( joints.size() > 0 )
+        {
             cboJointNames.setSelectedIndex(0);
             updateJoint(joints.get(0));
         }
@@ -126,11 +131,11 @@ public class InputConnectorPanel extends javax.swing.JPanel {
     private void cboJointNamesItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cboJointNamesItemStateChanged
         if (evt.getStateChange() == ItemEvent.SELECTED) {
             Object selected = evt.getItem();
-            if (selected instanceof RevoluteJoint) {
-                RevoluteJoint rj = (RevoluteJoint) selected;
-                updateJoint(rj);
+            if (selected instanceof Joint) {
+                Joint j = (Joint) selected;
+                updateJoint(j);
                 if (currentInputConnector != null) {
-                    currentInputConnector.setJointName(rj.getName());
+                    currentInputConnector.setJointName(j.getName());
                 }
             }
         }
@@ -179,7 +184,7 @@ public class InputConnectorPanel extends javax.swing.JPanel {
         }
     }
 
-    private void updateJoint(RevoluteJoint selected) {
+    private void updateJoint(Joint selected) {
         List<ConnectorType> types = selected.getInputConnectorTypes();
         cboTypes.setModel(new DefaultComboBoxModel(types.toArray()));
         cboTypes.setSelectedIndex(0);
@@ -204,8 +209,8 @@ public class InputConnectorPanel extends javax.swing.JPanel {
             if (ic != null) {
                 currentInputConnector = ic;
                 Object joint = cboJointNames.getSelectedItem();
-                if (joint != null && joint instanceof RevoluteJoint) {
-                    ic.setJointName(((RevoluteJoint) joint).getName());
+                if (joint != null && joint instanceof Joint) {
+                    ic.setJointName(((Joint) joint).getName());
                 }
             }
 
