@@ -1,18 +1,17 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.animation.rig.gui;
 
+import com.jme3.scene.SceneGraphVisitor;
 import com.jme3.scene.Spatial;
 import dae.animation.rig.AnimationController;
 import dae.animation.rig.ConnectorType;
+import dae.animation.rig.Joint;
 import dae.animation.rig.OutputConnector;
 import dae.animation.rig.Rig;
 import dae.animation.skeleton.RevoluteJoint;
 import java.awt.CardLayout;
 import java.awt.Component;
 import java.awt.event.ItemEvent;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,10 +38,19 @@ public class OutputConnectorPanel extends javax.swing.JPanel {
 
     public void setRig(Rig rig) {
         this.rig = rig;
-        List<RevoluteJoint> joints = rig.descendantMatches(RevoluteJoint.class);
+        List<Joint> joints = new ArrayList<>();
+        rig.breadthFirstTraversal((Spatial spatial) -> {
+            if ( spatial instanceof Joint){
+                joints.add((Joint)spatial);
+            }
+        });
+        
         cboJointNames.setModel(new DefaultComboBoxModel(joints.toArray()));
-        cboJointNames.setSelectedIndex(0);
-        updateJoint(joints.get(0));
+        if ( joints.size() > 0 )
+        {
+            cboJointNames.setSelectedIndex(0);
+            updateJoint(joints.get(0));
+        }
 
         setRigOnCustomizerPanel(rig);
     }
@@ -124,11 +132,11 @@ public class OutputConnectorPanel extends javax.swing.JPanel {
     private void cboJointNamesItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cboJointNamesItemStateChanged
         if (evt.getStateChange() == ItemEvent.SELECTED) {
             Object selected = evt.getItem();
-            if (selected instanceof RevoluteJoint) {
-                RevoluteJoint rj = (RevoluteJoint) selected;
-                updateJoint(rj);
+            if (selected instanceof Joint) {
+                Joint j= (Joint) selected;
+                updateJoint(j);
                 if (currentOutputConnector != null) {
-                    currentOutputConnector.setJointName(rj.getName());
+                    currentOutputConnector.setJointName(j.getName());
                 }
             }
         }
@@ -177,7 +185,7 @@ public class OutputConnectorPanel extends javax.swing.JPanel {
         }
     }
 
-    private void updateJoint(RevoluteJoint selected) {
+    private void updateJoint(Joint selected) {
         List<ConnectorType> types = selected.getOutputConnectorTypes();
         cboTypes.setModel(new DefaultComboBoxModel(types.toArray()));
         cboTypes.setSelectedIndex(0);
@@ -202,8 +210,8 @@ public class OutputConnectorPanel extends javax.swing.JPanel {
             if (oc != null) {
                 currentOutputConnector = oc;
                 Object joint = cboJointNames.getSelectedItem();
-                if (joint != null && joint instanceof RevoluteJoint) {
-                    oc.setJointName(((RevoluteJoint) joint).getName());
+                if (joint != null && joint instanceof Joint) {
+                    oc.setJointName(((Joint) joint).getName());
                 }
             }
 
