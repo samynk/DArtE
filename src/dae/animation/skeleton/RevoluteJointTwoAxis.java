@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.animation.skeleton;
 
 import com.jme3.animation.Bone;
@@ -10,11 +6,14 @@ import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
+import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import dae.animation.rig.ConnectorType;
+import dae.animation.rig.Joint;
 import dae.animation.skeleton.constraints.SectorConstraint;
 import dae.animation.skeleton.debug.BoneVisualization;
 import dae.animation.skeleton.debug.SectorVisualization;
@@ -23,8 +22,11 @@ import dae.prefabs.Prefab;
 import dae.prefabs.gizmos.Axis;
 import dae.prefabs.gizmos.RotateGizmo;
 import dae.util.MathUtil;
+import static dae.util.MathUtil.calculateDof1Rotation;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A Revolute joint that can rotate around two axis. This is useful when
@@ -32,7 +34,7 @@ import java.io.Writer;
  *
  * @author Koen Samyn
  */
-public class RevoluteJointTwoAxis extends Prefab implements BodyElement {
+public class RevoluteJointTwoAxis extends Prefab implements BodyElement, Joint {
 
     /**
      * The current angle of the first axis.
@@ -46,7 +48,16 @@ public class RevoluteJointTwoAxis extends Prefab implements BodyElement {
      * The location of the constraint. If a bone is attached this will be the
      * location of the bone otherwise the default of [1,0,0] will be used.
      */
-    private Vector3f constraintVector = new Vector3f(1, 0, 0);
+    private final Vector3f constraintVector = new Vector3f(1, 0, 0);
+    /**
+     * The current rotation axis.
+     */
+    private final Vector3f axis = new Vector3f();
+    private final Quaternion helpRotation = new Quaternion();
+    private final Vector3f axis1 = Vector3f.UNIT_Y;
+    private final Vector3f axis2 = Vector3f.UNIT_Z;
+    private final Vector2f angles = new Vector2f();
+
     // meta data
     private String group;
     // visualization
@@ -60,6 +71,27 @@ public class RevoluteJointTwoAxis extends Prefab implements BodyElement {
     private Geometry constraintGeometry;
 
     private AssetManager manager;
+
+    // the possible input connectors for this revolute joint
+    private final static ArrayList<ConnectorType> supportedInputConnectorTypes
+            = new ArrayList<ConnectorType>();
+    // the possible output connectors for this revolute joint
+    private final static ArrayList<ConnectorType> supportedOutputConnectorTypes
+            = new ArrayList<ConnectorType>();
+
+    static {
+        ConnectorType ct = new ConnectorType("angletargetrevjoint", "Angle metric",
+                "This metric calculates the angle between two vectors. "
+                + "The first vector has the joint location as its origin and the selected attachment point as endpoint."
+                + "The second vector has the joint location as its origin and the target as endpoint.",
+                "dae.animation.rig.gui.AngleTargetDof2ConnectorPanel");
+        supportedInputConnectorTypes.add(ct);
+
+        ConnectorType oct = new ConnectorType("anglerevjoint", "Angle",
+                "This connector increments the current angle of the joint with the output of the controller",
+                "dae.animation.rig.gui.FreeJointOutputConnectorPanel");
+        supportedOutputConnectorTypes.add(oct);
+    }
 
     public RevoluteJointTwoAxis() {
 
@@ -123,6 +155,37 @@ public class RevoluteJointTwoAxis extends Prefab implements BodyElement {
         updateTransforms();
     }
 
+    @Override
+    public Vector3f getWorldRotationAxis() {
+        return Vector3f.UNIT_X;
+    }
+
+    @Override
+    public void rotate(float angle) {
+        System.out.println("Angle of rotation is : " + angle);
+        System.out.println("rotation axis is : " + axis);
+        helpRotation.fromAngleAxis(angle, axis);
+
+        Quaternion q = transformNode.getLocalRotation();
+        Vector3f rotated = q.mult(constraintVector);
+        helpRotation.multLocal(rotated);
+        System.out.println("constraintVector rotated : " + rotated);
+        MathUtil.createDof2Rotation(constraintVector, rotated, axis1, axis2, q, angles);
+        phiAngle = angles.x * FastMath.RAD_TO_DEG;
+        thetaAngle = angles.y * FastMath.RAD_TO_DEG;
+       
+        System.out.println("phiAngle:" + phiAngle);
+        System.out.println("thetaAngle:" + thetaAngle);
+        updateTransforms();
+    }
+
+    @Override
+    public void setWorldRotationAxis(Vector3f axis) {
+        this.axis.set(axis);
+        this.axis.addLocal(this.getWorldTranslation());
+        this.worldToLocal(this.axis, this.axis);
+    }
+
     private void updateTransforms() {
         Quaternion q = transformNode.getLocalRotation();
         q.fromAngles(0, phiAngle * FastMath.DEG_TO_RAD, thetaAngle * FastMath.DEG_TO_RAD);
@@ -130,14 +193,14 @@ public class RevoluteJointTwoAxis extends Prefab implements BodyElement {
         Vector3f rotated = q.mult(constraintVector);
         SectorConstraint sc = (SectorConstraint) this.getComponent("SectorConstraint");
         boolean isInside = sc.checkConstraint(rotated);
-        if (isInside) {
-            this.constraintGeometry.getMaterial().setColor("Color", ColorRGBA.Blue);
-        } else {
-
-            this.constraintGeometry.getMaterial().setColor("Color", ColorRGBA.Red);
-            Vector3f constrainedVertex = sc.calculateCorrection(rotated);
-            q = MathUtil.createDof2Rotation(constraintVector, constrainedVertex, Vector3f.UNIT_Y, Vector3f.UNIT_Z, q);
-        }
+//        if (isInside) {
+//            this.constraintGeometry.getMaterial().setColor("Color", ColorRGBA.Blue);
+//        } else {
+//
+//            this.constraintGeometry.getMaterial().setColor("Color", ColorRGBA.Red);
+//            Vector3f constrainedVertex = sc.calculateCorrection(rotated);
+//            q = MathUtil.createDof2Rotation(constraintVector, constrainedVertex, axis1, axis2, q);
+//        }
         // calculate projection to rotate point back on the constraint surface.
 
         transformNode.setLocalRotation(q);
@@ -203,8 +266,6 @@ public class RevoluteJointTwoAxis extends Prefab implements BodyElement {
     /**
      * Creates a visualization of this joint.
      *
-     * @param assetManager the assetmanager that can be used to create
-     * materials.
      */
     @Override
     public void notifyLoaded() {
@@ -249,13 +310,13 @@ public class RevoluteJointTwoAxis extends Prefab implements BodyElement {
     public void write(Writer w, int depth) throws IOException {
         SceneSaver.writePrefab(this, w, depth);
     }
-    
+
     @Override
     public int attachChild(Spatial child) {
         if (child instanceof Axis || child instanceof RotateGizmo) {
             child.setLocalTranslation(this.getPivot());
             return super.attachChild(child);
-        }else{
+        } else {
             return transformNode.attachChild(child);
         }
     }
@@ -303,12 +364,15 @@ public class RevoluteJointTwoAxis extends Prefab implements BodyElement {
     @Override
     public int getPrefabChildCount() {
         int pindex = 0;
-        for (Spatial s : transformNode.getChildren()) {
-            if (s instanceof Prefab) {
-                ++pindex;
+        if (transformNode != null) {
+            for (Spatial s : transformNode.getChildren()) {
+                if (s instanceof Prefab) {
+                    ++pindex;
+                }
             }
+            return pindex;
         }
-        return pindex;
+        return 0;
     }
 
     @Override
@@ -351,5 +415,15 @@ public class RevoluteJointTwoAxis extends Prefab implements BodyElement {
      */
     public void setHeight(float height) {
         this.height = height;
+    }
+
+    @Override
+    public List<ConnectorType> getInputConnectorTypes() {
+        return supportedInputConnectorTypes;
+    }
+
+    @Override
+    public List<ConnectorType> getOutputConnectorTypes() {
+        return supportedOutputConnectorTypes;
     }
 }
