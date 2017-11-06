@@ -116,6 +116,7 @@ public class AngleTargetConnectorPanel extends javax.swing.JPanel implements Inp
     private javax.swing.JLabel lblTargetName;
     // End of variables declaration//GEN-END:variables
 
+    @Override
     public void setRig(Rig rig) {
         this.rig = rig;
         List<AttachmentPoint> attachmentPoints = rig.descendantMatches(AttachmentPoint.class);
@@ -134,11 +135,15 @@ public class AngleTargetConnectorPanel extends javax.swing.JPanel implements Inp
         if (selected != null) {
             result.setAttachmentName(selected.getName());
         }
-        String targetKey = cboTargetName.getSelectedItem().toString();
-        result.setTargetName(targetKey);
+        Object target = cboTargetName.getSelectedItem();
+        if (target != null) {
+            String targetKey = target.toString();
+            result.setTargetName(targetKey);
+        }
         return result;
     }
 
+    @Override
     public void setInputConnector(InputConnector ic) {
         if (ic instanceof AngleTargetConnector) {
             AngleTargetConnector atc = (AngleTargetConnector) ic;
@@ -151,7 +156,6 @@ public class AngleTargetConnectorPanel extends javax.swing.JPanel implements Inp
                 cboAttachmentPointName.setSelectedItem(child);
             }
             cboTargetName.setSelectedItem(targetKey);
-
         }
     }
 }
