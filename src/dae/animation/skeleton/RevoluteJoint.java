@@ -13,9 +13,9 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import dae.GlobalObjects;
 import dae.animation.rig.ConnectorType;
+import dae.animation.rig.Joint;
 import dae.animation.skeleton.debug.BoneVisualization;
 import dae.io.SceneSaver;
-import dae.io.XMLUtils;
 import dae.prefabs.Prefab;
 import dae.prefabs.shapes.HingeShape;
 import java.io.IOException;
@@ -27,7 +27,7 @@ import java.util.List;
  *
  * @author Koen
  */
-public class RevoluteJoint extends Prefab implements BodyElement {
+public class RevoluteJoint extends Prefab implements BodyElement, Joint {
 
     private float minAngle, maxAngle;
     private float currentAngle;
@@ -156,6 +156,11 @@ public class RevoluteJoint extends Prefab implements BodyElement {
         }
         updateTransform(this.axis, this.currentAngle - angleBackup);
     }
+    
+    @Override
+    public void rotate(float angle){
+        setCurrentAngle(getCurrentAngle()+angle);
+    }
 
     /**
      * Gets the current angle.
@@ -172,6 +177,11 @@ public class RevoluteJoint extends Prefab implements BodyElement {
      */
     public void setAxis(Vector3f axis) {
         this.axis = axis;
+    }
+    
+    @Override
+    public void setWorldRotationAxis(Vector3f axis) {
+        this.worldToLocal(axis, this.axis);
     }
 
     private void updateTransform(Vector3f axis, float dAngle) {
@@ -336,6 +346,7 @@ public class RevoluteJoint extends Prefab implements BodyElement {
         this.group = group;
     }
 
+    @Override
     public void reset() {
         setCurrentAngle(this.startAngle);
         for (Spatial s : this.getChildren()) {
@@ -738,6 +749,8 @@ public class RevoluteJoint extends Prefab implements BodyElement {
     public void setChainChildName(String childName) {
         this.chainChildName = childName;
     }
+
+    
     
    
 }
