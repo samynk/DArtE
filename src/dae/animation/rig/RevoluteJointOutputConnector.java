@@ -1,7 +1,7 @@
 package dae.animation.rig;
 
+import com.jme3.math.FastMath;
 import com.jme3.scene.Spatial;
-import dae.animation.skeleton.RevoluteJoint;
 import dae.io.XMLUtils;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -17,7 +17,7 @@ import org.w3c.dom.Node;
 public class RevoluteJointOutputConnector implements OutputConnector {
 
     private String jointName;
-    private RevoluteJoint joint;
+    private Joint joint;
     private boolean initialized;
     /**
      * The factor acts as a multiplier for the output of the controller.
@@ -33,8 +33,8 @@ public class RevoluteJointOutputConnector implements OutputConnector {
     public void initialize(Rig rig) {
         initialized = false;
         Spatial s = rig.getChild(jointName);
-        if (s != null && s instanceof RevoluteJoint) {
-            joint = (RevoluteJoint) s;
+        if (s != null && s instanceof Joint) {
+            joint = (Joint) s;
             initialized = true;
         }
     }
@@ -48,7 +48,7 @@ public class RevoluteJointOutputConnector implements OutputConnector {
     public void setValue(float value) {
         if ( joint != null)
         {
-            joint.setCurrentAngle(joint.getCurrentAngle() + value);
+            joint.rotate(value * factor * FastMath.DEG_TO_RAD);
         }
     }
 
