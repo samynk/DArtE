@@ -7,6 +7,7 @@ import dae.animation.skeleton.AttachmentPoint;
 import dae.animation.skeleton.RevoluteJoint;
 import dae.io.XMLUtils;
 import dae.prefabs.standard.PrefabPlaceHolder;
+import dae.util.MathUtil;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.logging.Level;
@@ -23,9 +24,9 @@ public class AngleTargetConnector implements InputConnector {
     private String jointName;
     private String targetName;
     private String attachmentName;
-    private RevoluteJoint joint;
-    private AttachmentPoint attachment;
-    private Spatial target;
+    protected Joint joint;
+    protected AttachmentPoint attachment;
+    protected Spatial target;
     private boolean initialized = false;
 
     public AngleTargetConnector() {
@@ -84,8 +85,8 @@ public class AngleTargetConnector implements InputConnector {
     public void initialize(Rig rig) {
         initialized = false;
         Spatial sjoint = rig.getChild(jointName);
-        if (sjoint instanceof RevoluteJoint) {
-            this.joint = (RevoluteJoint) sjoint;
+        if (sjoint instanceof Joint) {
+            this.joint = (Joint) sjoint;
         } else {
             return;
         }
@@ -118,8 +119,8 @@ public class AngleTargetConnector implements InputConnector {
         Vector3f vector1 = apLoc.subtract(origin);
         Vector3f vector2 = targetLoc.subtract(origin);
         
-        this.project(vector1, axis);
-        this.project(vector2, axis);
+        MathUtil.project(vector1, axis);
+        MathUtil.project(vector2, axis);
         vector1.normalizeLocal();
         vector2.normalizeLocal();
         float angle = vector1.angleBetween(vector2) * FastMath.RAD_TO_DEG;
@@ -129,12 +130,7 @@ public class AngleTargetConnector implements InputConnector {
         return angle;
     }
     
-    private void project(Vector3f toProject, Vector3f axis) {
-        float dot = axis.dot(toProject);
-        toProject.x = toProject.x - dot * axis.x;
-        toProject.y = toProject.y - dot * axis.y;
-        toProject.z = toProject.z - dot * axis.z;
-    }
+   
 
     @Override
     public InputConnector cloneConnector() {
