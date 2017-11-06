@@ -2,6 +2,7 @@ package dae.animation.rig;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
+import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
@@ -10,10 +11,13 @@ import dae.animation.skeleton.BodyElement;
 import dae.prefabs.Prefab;
 import dae.prefabs.shapes.DiamondShape;
 import dae.prefabs.types.ObjectType;
+import dae.prefabs.types.ObjectTypeCategory;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import mlproject.fuzzy.FuzzySystem;
 
 /**
@@ -36,6 +40,26 @@ public class Rig extends Prefab implements BodyElement {
 //        setLayerName("default");
         setCategory("Animation");
         setType("Rig");
+        
+        
+    }
+    
+    private void createTestRig(AssetManager manager){
+        ObjectTypeCategory otc =GlobalObjects.getInstance().getObjectsTypeCategory();
+        ObjectType ot = otc.getObjectType("Animation","RevoluteJointTwoAxis");
+        Prefab joint =  ot.create(manager, "joint");
+        this.attachChild(joint);
+        
+        ObjectType ot2 = otc.getObjectType("Animation","AttachmentPoint");
+        Prefab ap = ot2.create(manager,"knob");
+        joint.attachChild(ap);
+        ap.setLocalPrefabTranslation(new Vector3f(1,0,0));
+     
+        Prefab ap2 = ot2.create(manager,"target");
+        attachChild(ap2);
+        ap.setLocalPrefabTranslation(new Vector3f(3,4,0));
+        
+        this.setTarget("victim", ap2);
     }
 
     /**
@@ -61,7 +85,11 @@ public class Rig extends Prefab implements BodyElement {
                 rig.attachChild(modelClone);
             }
         }
-        rig.fuzzySystem = (FuzzySystem) fuzzySystem.clone();
+        try {
+            rig.fuzzySystem = (FuzzySystem) fuzzySystem.clone();
+        } catch (CloneNotSupportedException ex) {
+            Logger.getLogger(Rig.class.getName()).log(Level.SEVERE, null, ex);
+        }
         for (String targetKey : this.targetKeys) {
             rig.addTargetKey(targetKey);
         }
@@ -79,6 +107,8 @@ public class Rig extends Prefab implements BodyElement {
         Geometry g = new Geometry("rigshape", ds);
         g.setMaterial(rigMaterial);
         attachChild(g);
+        
+        // createTestRig(manager);
     }
 
     /**
