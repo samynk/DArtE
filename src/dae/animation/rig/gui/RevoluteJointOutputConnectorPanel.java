@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.animation.rig.gui;
 
 import dae.animation.rig.OutputConnector;
@@ -76,16 +72,19 @@ public class RevoluteJointOutputConnectorPanel extends javax.swing.JPanel implem
     private javax.swing.JSpinner spnFactor;
     // End of variables declaration//GEN-END:variables
 
+    @Override
     public void setRig(Rig rig) {
     }
 
+    @Override
     public OutputConnector createConnector() {
-        RevoluteJointOutputConnector connector =
+        RevoluteJointOutputConnector rjc =
                 new RevoluteJointOutputConnector();
-        connector.setFactor((Float) spnFactor.getValue());
-        return connector;
+        rjc.setFactor((Float) spnFactor.getValue());
+        return rjc;
     }
 
+    @Override
     public void setOutputConnector(OutputConnector oc) {
         if (oc instanceof RevoluteJointOutputConnector) {
             this.connector = (RevoluteJointOutputConnector) oc;
