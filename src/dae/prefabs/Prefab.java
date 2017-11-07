@@ -614,7 +614,7 @@ public class Prefab extends Node implements ProjectTreeNode {
     public Prefab duplicate(AssetManager assetManager) {
         ObjectTypeCategory otc = GlobalObjects.getInstance().getObjectsTypeCategory();
         if (objectType != null) {
-            Prefab target = objectType.create(assetManager, name);
+            Prefab target = objectType.create(assetManager, getName());
             duplicateComponents(target, otc);
             return target;
         }
@@ -876,12 +876,7 @@ public class Prefab extends Node implements ProjectTreeNode {
         if (!canHaveChildren) {
             return false;
         } else {
-            for (Spatial s : this.getChildren()) {
-                if (s instanceof Prefab) {
-                    return true;
-                }
-            }
-            return false;
+           return getPrefabChildCount() > 0;
         }
     }
 
