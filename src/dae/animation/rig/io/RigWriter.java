@@ -1,10 +1,5 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.animation.rig.io;
 
-import com.jme3.math.Quaternion;
 import com.jme3.scene.Spatial;
 import dae.animation.rig.AnimationController;
 import dae.animation.rig.AnimationListControl;
@@ -38,13 +33,14 @@ import mlproject.fuzzy.TrapezoidMemberShip;
  * @author Koen Samyn
  */
 public class RigWriter {
+    
     private final static PrefabTextExporter prefabExporter = new DefaultPrefabExporter();
 
     /**
      * Write the scene to a file.
      *
      * @param location The location of the file.
-     * @param body the body to write to file.
+     * @param rig the rig to write to file.
      */
     public static void writeRig(File location, Rig rig) {
         FileWriter fw;
@@ -66,16 +62,15 @@ public class RigWriter {
             }
         }
     }
-
+    
     public static void writeRig(Writer bw, Rig rig) throws IOException {
         bw.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
         bw.write("<rig>\n");
         int depth = 0;
-        for (Spatial child : rig.getChildren()) {
-            if (child instanceof BodyElement) {
-                BodyElement be = (BodyElement) child;
-                be.write(bw, depth + 1);
-            }
+        int prefabCount = rig.getPrefabChildCount();
+        for (int i = 0; i < prefabCount; ++i) {
+            Prefab p = (Prefab) rig.getPrefabChildAt(i);
+            SceneSaver.writePrefab(p, bw, depth);
         }
         bw.write("\t<fuzzysystems>\n");
         writeFuzzySystem(bw, rig.getFuzzySystem());
@@ -95,10 +90,9 @@ public class RigWriter {
         bw.write("\t</animationtargets>\n");
         // controller connections
         AnimationListControl alc = rig.getControl(AnimationListControl.class);
-        if ( alc != null )
-        {
+        if (alc != null) {
             bw.write("\t<controllerconnections>\n");
-            for ( AnimationController ac: alc.getAnimationControllers()){
+            for (AnimationController ac : alc.getAnimationControllers()) {
                 bw.write("\t\t<controller ");
                 XMLUtils.writeAttribute(bw, "system", ac.getSystemName());
                 XMLUtils.writeAttribute(bw, "name", ac.getName());
@@ -106,7 +100,7 @@ public class RigWriter {
                 XMLUtils.writeAttribute(bw, "outputOfSystem", ac.getControllerOutputName());
                 bw.write(">\n");
                 bw.write("\t\t\t");
-                bw.write( ac.getInput().toXML());
+                bw.write(ac.getInput().toXML());
                 bw.write("\t\t\t");
                 bw.write(ac.getOutput().toXML());
                 bw.write("\t\t</controller>\n");
@@ -117,8 +111,6 @@ public class RigWriter {
         bw.write("</rig>\n");
     }
     
-    
-
     private static void writeFuzzySystem(Writer bw, FuzzySystem fuzzySystem) throws IOException {
         bw.write("\t\t<fuzzysystem ");
         XMLUtils.writeAttribute(bw, "name", fuzzySystem.getName());
@@ -142,7 +134,7 @@ public class RigWriter {
             bw.write("\t\t\t\t</input>\n");
         }
         bw.write("\t\t\t</fuzzyinputs>\n");
-
+        
         bw.write("\t\t\t<fuzzyoutputs>\n");
         for (FuzzyVariable fuzzyVariable : fuzzySystem.getOutputs()) {
             bw.write("\t\t\t\t<output ");
@@ -182,7 +174,7 @@ public class RigWriter {
         bw.write("\t\t\t</fuzzyrules>\n");
         bw.write("\t\t</fuzzysystem>\n");
     }
-
+    
     private static void writeMemberShip(Writer bw, LeftSigmoidMemberShip lms) throws IOException {
         bw.write("\t\t\t\t\t<membership ");
         XMLUtils.writeAttribute(bw, "type", "left");
@@ -191,7 +183,7 @@ public class RigWriter {
         XMLUtils.writeAttribute(bw, "right", lms.getRight());
         bw.write("/>\n");
     }
-
+    
     private static void writeMemberShip(Writer bw, RightSigmoidMemberShip rms) throws IOException {
         bw.write("\t\t\t\t\t<membership ");
         XMLUtils.writeAttribute(bw, "type", "right");
@@ -200,7 +192,7 @@ public class RigWriter {
         XMLUtils.writeAttribute(bw, "left", rms.getLeft());
         bw.write("/>\n");
     }
-
+    
     private static void writeMemberShip(Writer bw, SigmoidMemberShip sms) throws IOException {
         bw.write("\t\t\t\t\t<membership ");
         XMLUtils.writeAttribute(bw, "type", "triangular");
@@ -210,7 +202,7 @@ public class RigWriter {
         XMLUtils.writeAttribute(bw, "right", sms.getRight());
         bw.write("/>\n");
     }
-
+    
     private static void writeMemberShip(Writer bw, TrapezoidMemberShip sms) throws IOException {
         bw.write("\t\t\t\t\t<membership ");
         XMLUtils.writeAttribute(bw, "type", "trapezoid");
@@ -221,7 +213,7 @@ public class RigWriter {
         XMLUtils.writeAttribute(bw, "right", sms.getRight());
         bw.write("/>\n");
     }
-
+    
     private static void writeMemberShip(Writer bw, SingletonMemberShip sms) throws IOException {
         bw.write("\t\t\t\t\t<membership ");
         XMLUtils.writeAttribute(bw, "type", "singleton");
