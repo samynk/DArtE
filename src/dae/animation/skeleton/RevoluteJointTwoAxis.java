@@ -3,7 +3,6 @@ package dae.animation.skeleton;
 import com.jme3.animation.Bone;
 import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
-import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector2f;
@@ -22,7 +21,6 @@ import dae.prefabs.Prefab;
 import dae.prefabs.gizmos.Axis;
 import dae.prefabs.gizmos.RotateGizmo;
 import dae.util.MathUtil;
-import static dae.util.MathUtil.calculateDof1Rotation;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
@@ -94,7 +92,7 @@ public class RevoluteJointTwoAxis extends Prefab implements BodyElement, Joint {
     }
 
     public RevoluteJointTwoAxis() {
-
+        this.canHaveChildren = true;
     }
 
     @Override
@@ -173,7 +171,7 @@ public class RevoluteJointTwoAxis extends Prefab implements BodyElement, Joint {
         MathUtil.createDof2Rotation(constraintVector, rotated, axis1, axis2, q, angles);
         phiAngle = angles.x * FastMath.RAD_TO_DEG;
         thetaAngle = angles.y * FastMath.RAD_TO_DEG;
-       
+
         System.out.println("phiAngle:" + phiAngle);
         System.out.println("thetaAngle:" + thetaAngle);
         updateTransforms();
@@ -247,12 +245,11 @@ public class RevoluteJointTwoAxis extends Prefab implements BodyElement, Joint {
     @Override
     public Spatial clone() {
 
-        RevoluteJointTwoAxis copy = new RevoluteJointTwoAxis();
+        Prefab copy = super.duplicate(manager);
 
-        for (Spatial child : this.children) {
-            if (child instanceof BodyElement) {
-                copy.attachBodyElement((BodyElement) child.clone());
-            }
+        for (int i = 0; i < this.getPrefabChildCount(); ++i) {
+            Prefab child = (Prefab) this.getPrefabChildAt(i);
+            copy.attachChild((Prefab) child.duplicate(manager));
         }
         copy.notifyLoaded();
         return copy;
