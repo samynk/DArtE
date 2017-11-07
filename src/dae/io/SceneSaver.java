@@ -71,7 +71,7 @@ public class SceneSaver {
         }
 
     }
-    
+
     public static void writeScene(BufferedWriter w, Node node) {
         try {
             w.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
@@ -304,7 +304,6 @@ public class SceneSaver {
         writeAttribute(bw, "contourmaxdeviation", nm.getContourMaxDeviation());
         return writeEndTag(bw, "navmesh", nm, depth);
     }*/
-
     private static String writePivot(Spatial child, Writer bw, int depth) throws IOException {
         XMLUtils.writeTabs(bw, depth);
         PivotGizmo pg = (PivotGizmo) child;
@@ -342,13 +341,12 @@ public class SceneSaver {
         }
 
         if (hasChildren) {
-            for (Spatial prefabChild : child.getChildren()) {
-                if (prefabChild instanceof Prefab) {
-                    writePrefab((Prefab) prefabChild, bw, depth + 1);
-                }
+            for (int i = 0; i < child.getPrefabChildCount(); ++i) {
+                Prefab prefabChild = (Prefab) child.getPrefabChildAt(i);
+                writePrefab((Prefab) prefabChild, bw, depth + 1);
             }
         }
-        if (child.getObjectType().hasParameters()){
+        if (child.getObjectType().hasParameters()) {
             prefabExporter.writePrefabParameters(bw, child, depth);
         }
         if (child.hasComponents()) {
@@ -359,7 +357,6 @@ public class SceneSaver {
                 }
             }
         }
-        
 
         if (endtag.length() > 0) {
             bw.write(endtag);
@@ -379,7 +376,7 @@ public class SceneSaver {
         bw.write("<prefab ");
         XMLUtils.writeAttribute(bw, "category", ot.getCategory());
         XMLUtils.writeAttribute(bw, "label", ot.getLabel());
-        
+
         return writeEndTag(bw, "prefab", child, depth);
     }
 }
