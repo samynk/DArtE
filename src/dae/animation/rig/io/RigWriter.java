@@ -1,10 +1,8 @@
 package dae.animation.rig.io;
 
-import com.jme3.scene.Spatial;
 import dae.animation.rig.AnimationController;
 import dae.animation.rig.AnimationListControl;
 import dae.animation.rig.Rig;
-import dae.animation.skeleton.BodyElement;
 import dae.io.SceneSaver;
 import dae.io.XMLUtils;
 import dae.io.writers.DefaultPrefabExporter;
