@@ -6,9 +6,7 @@ import com.jme3.asset.AssetLoader;
 import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
-import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
-import com.jme3.renderer.queue.RenderQueue;
 import dae.GlobalObjects;
 import dae.animation.rig.AnimationController;
 import dae.animation.rig.AnimationListControl;
@@ -17,15 +15,10 @@ import dae.animation.rig.OutputConnector;
 import dae.animation.rig.PrefabPlaceHolderCallback;
 import dae.animation.rig.Rig;
 import dae.io.SceneLoader;
-import static dae.io.SceneLoader.parseFloat3;
-import static dae.io.SceneLoader.parseQuaternion;
 import dae.io.XMLUtils;
 import dae.prefabs.Prefab;
-import dae.prefabs.magnets.MagnetParameter;
-import dae.prefabs.standard.MeshObject;
 import dae.prefabs.standard.PrefabPlaceHolder;
 import dae.prefabs.types.ObjectType;
-import dae.prefabs.types.ObjectTypeCategory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Level;
@@ -62,6 +55,7 @@ public class RigLoader implements AssetLoader {
     private Material apMaterial;
     private AssetManager assetManager;
 
+    @Override
     public Object load(AssetInfo assetInfo) throws IOException {
         Rig result = null;
         try {
@@ -84,13 +78,14 @@ public class RigLoader implements AssetLoader {
             apMaterial.setColor("Color", ColorRGBA.Green);
             apMaterial.setTexture("ColorMap", assetInfo.getManager().loadTexture("Textures/refPattern.png"));
             result = readRig(is, assetInfo.getManager());
+            
         } catch (ParserConfigurationException | SAXException | IllegalAccessException | NumberFormatException | ClassNotFoundException | InstantiationException ex) {
             Logger.getLogger(RigLoader.class.getName()).log(Level.SEVERE, null, ex);
         }
         return result;
     }
 
-    public static Rig readRig(InputStream is, AssetManager assetManager) throws IOException, ParserConfigurationException, ClassNotFoundException, InstantiationException, SAXException, NumberFormatException, IllegalAccessException {
+    public Rig readRig(InputStream is, AssetManager assetManager) throws IOException, ParserConfigurationException, ClassNotFoundException, InstantiationException, SAXException, NumberFormatException, IllegalAccessException {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
         Document doc = db.parse(is);
@@ -103,54 +98,23 @@ public class RigLoader implements AssetLoader {
         NodeList nl = root.getChildNodes();
 
         SceneLoader.readNodeChildren(nl, assetManager, GlobalObjects.getInstance().getObjectsTypeCategory(), result);
+        
+        for (int i = 0; i < nl.getLength(); ++i) {
+            org.w3c.dom.Node n = nl.item(i);
+            System.out.println("Reading node : " + n.getNodeName());
+            NamedNodeMap map = n.getAttributes();
+            switch(n.getNodeName())
+            {
+                case "fuzzysystems": readFuzzySystems(result, n);break;
+                case "animationtargets": readAnimationTargets(result, n);break;
+                case "controllerconnections":readControllerConnections(result,n);break;
+            }
+        }
+        
         return result;
     }
 
-    public Prefab createPrefab(NamedNodeMap map, AssetManager manager, ObjectTypeCategory objectsToCreate) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
-
-        String meshFile = getAttrContent("mesh", map);
-        if (meshFile == null || meshFile.length() == 0) {
-            return null;
-        }
-
-        String label = getAttrContent("type", map);
-        String name = getAttrContent("name", map);
-        String category = getAttrContent("category", map);
-        Vector3f translation = parseFloat3(getAttrContent("translation", map));
-        Vector3f scale = parseFloat3(getAttrContent("scale", map));
-        Vector3f offset = parseFloat3(getAttrContent("offset", map));
-        Quaternion rotation = parseQuaternion(getAttrContent("rotation", map));
-        String physicsMesh = getAttrContent("physicsMesh", map);
-
-        String shadowMode = getAttrContent("shadowmode", map);
-
-        ObjectType type = objectsToCreate.find(label);
-        if (type != null) {
-            Prefab p = type.create(manager, name);
-            p.setType(label);
-            p.setCategory(category);
-            p.setPhysicsMesh(physicsMesh);
-
-            MagnetParameter mp = (MagnetParameter) type.findParameter("magnets");
-            p.setMagnets(mp);
-
-            try {
-                RenderQueue.ShadowMode sm = RenderQueue.ShadowMode.valueOf(shadowMode);
-                p.setShadowMode(sm);
-            } catch (IllegalArgumentException ex) {
-            }
-
-            p.setLocalPrefabRotation(rotation);
-            p.setLocalPrefabTranslation(translation);
-            p.setLocalScale(scale);
-
-            p.setOffset(offset);
-
-            return p;
-        }
-
-        return null;
-    }
+    
 
     private BodyElement createBallJoint(Node docNode) {
         NamedNodeMap map = docNode.getAttributes();
