@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.animation.custom;
 
 import com.jme3.math.FastMath;
@@ -10,7 +6,7 @@ import java.util.Arrays;
 
 /**
  *
- * @author Koen
+ * @author Koen Samyn
  */
 public class NaturalCharacterPathSegmentXZ implements PathSegment {
 
