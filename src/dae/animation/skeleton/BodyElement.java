@@ -39,11 +39,4 @@ public interface BodyElement {
      * Shows the target objects.
      */
     public void showTargetObjects();
-    
-    /**
-     * Writes this body element and its children to an xml file.
-     * @param writer the writer to use.
-     * @param depth the depth of this element (for formatting purposes).
-     */
-    public void write(Writer w, int depth) throws IOException;
 }
