@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.io;
 
 import com.google.common.io.Files;
@@ -21,7 +17,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author samyn_000
+ * @author Koen Samyn
  */
 public class ProjectSaver {
 
@@ -82,7 +78,11 @@ public class ProjectSaver {
                     l.setRelativeLocation(true);
                     l.setLocation(levelFile);
                 }
-                bw.write(l.getLocation().getPath());
+                if ( l instanceof AssetLevel ){
+                    bw.write(l.getRelativeLocation().getPath());
+                }else{
+                    bw.write(l.getLocation().getPath());
+                }
 
                 bw.write("]]></file>\n");
                 writeExportSettings(bw, l);
