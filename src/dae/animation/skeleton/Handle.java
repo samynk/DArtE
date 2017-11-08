@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.animation.skeleton;
 
 import com.jme3.asset.AssetManager;
@@ -238,44 +234,6 @@ public class Handle extends Prefab implements BodyElement {
             if (s instanceof BodyElement) {
                 ((BodyElement) s).showTargetObjects();
             }
-        }
-    }
-    
-    public void write(Writer w, int depth) throws IOException {
-        for (int i = 0; i < depth; ++i) {
-            w.write('\t');
-        }
-        w.write("<target ");
-        XMLUtils.writeAttribute(w, "name", this.getName());
-        XMLUtils.writeAttribute(w, "location", this.getLocalTranslation());
-        Quaternion localRotation = this.getLocalRotation();
-        Vector3f rotation = new Vector3f();
-        float[] angles = new float[3];
-        localRotation.toAngles(angles);
-        rotation.set(angles[0],angles[1],angles[2]);
-        rotation.multLocal(FastMath.RAD_TO_DEG);
-        XMLUtils.writeAttribute(w, "rotation", rotation);
-
-        boolean hasBodyElements = false;
-        for (Spatial child : this.getChildren()) {
-            if (child instanceof BodyElement) {
-                hasBodyElements = true;
-                break;
-            }
-        }
-
-        if (!hasBodyElements) {
-            w.write("/>\n");
-        } else {
-            for ( Spatial child : this.getChildren()){
-                if ( child instanceof BodyElement ){
-                    ((BodyElement)child).write(w, depth+1);
-                }
-            }
-            for (int i = 0; i < depth; ++i) {
-                w.write('\t');
-            }
-            w.write("</target>\n");
         }
     }
 }

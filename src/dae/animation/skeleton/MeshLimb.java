@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.animation.skeleton;
 
 import com.jme3.scene.Node;
@@ -21,12 +17,14 @@ public class MeshLimb extends Node implements BodyElement {
         this.mesh = mesh;
     }
 
+    @Override
     public void attachBodyElement(BodyElement element) {
         if (element instanceof Node) {
             this.attachChild((Node) element);
         }
     }
 
+    @Override
     public void reset() {
         for (Spatial s : this.getChildren()) {
             if (s instanceof BodyElement) {
@@ -62,43 +60,12 @@ public class MeshLimb extends Node implements BodyElement {
         }
     }
 
+    @Override
     public void showTargetObjects() {
         for (Spatial s : this.getChildren()) {
             if (s instanceof BodyElement) {
                 ((BodyElement) s).showTargetObjects();
             }
-        }
-    }
-
-    public void write(Writer w, int depth) throws IOException{
-        for (int i = 0; i < depth; ++i) {
-            w.write('\t');
-        }
-        w.write("<limb ");
-        XMLUtils.writeAttribute(w, "name", this.getName());
-        XMLUtils.writeAttribute(w, "type", "MESH");
-        XMLUtils.writeAttribute(w, "mesh", mesh.getKey().getName());
-
-        boolean hasBodyElements = false;
-        for (Spatial child : this.getChildren()) {
-            if (child instanceof BodyElement) {
-                hasBodyElements = true;
-                break;
-            }
-        }
-
-        if (!hasBodyElements) {
-            w.write("/>\n");
-        } else {
-            for (Spatial child : this.getChildren()) {
-                if (child instanceof BodyElement) {
-                    ((BodyElement) child).write(w, depth + 1);
-                }
-            }
-            for (int i = 0; i < depth; ++i) {
-                w.write('\t');
-            }
-            w.write("</limb>\n");
         }
     }
 }

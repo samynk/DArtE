@@ -588,66 +588,6 @@ public class RevoluteJoint extends Prefab implements BodyElement, Joint {
         }
     }
 
-    @Override
-    public void write(Writer w, int depth) throws IOException {
-        
-        SceneSaver.writePrefab(this,w,depth);
-        /*
-        for (int i = 0; i < depth; ++i) {
-            w.write('\t');
-        }
-        w.write("<joint ");
-        XMLUtils.writeAttribute(w, "name", this.getName());
-        XMLUtils.writeAttribute(w, "type", "revolute");
-
-        // name="Bip01$Head"  type="Revolute" axis="[1,0,0]" group="head" radius="0.01" height="0.1" 
-        // rotation="[3.8787262E-9,0.077585526,8.486834E-8]"
-        // location="[0.0998286,-8.62694E-9,0.0]"
-        // minAngle="-80" maxAngle="80" angle="0"
-        // chainwithchild="true" chainchildname="headJointY">
-        XMLUtils.writeAttribute(w, "axis", this.axis);
-        XMLUtils.writeAttribute(w, "group", this.group);
-        XMLUtils.writeAttribute(w, "radius", this.getRadius());
-        XMLUtils.writeAttribute(w, "height", this.getHeight());
-        XMLUtils.writeAttribute(w, "location", this.getLocalPrefabTranslation());
-
-        XMLUtils.writeAttribute(w, "refaxisx", xAxisBackup);
-        XMLUtils.writeAttribute(w, "refaxisy", yAxisBackup);
-        XMLUtils.writeAttribute(w, "refaxisz", zAxisBackup);
-        XMLUtils.writeAttribute(w, "minAngle", this.minAngle);
-        XMLUtils.writeAttribute(w, "maxAngle", this.maxAngle);
-        XMLUtils.writeAttribute(w, "angle", this.currentAngle);
-        XMLUtils.writeAttribute(w, "chainwithchild", this.getChainWithChild());
-        if (getChainWithChild()) {
-            XMLUtils.writeAttribute(w, "chainchildname", this.getChainChildName());
-        }
-        XMLUtils.writeAttribute(w, "chainwithparent", this.getChainWithParent());
-
-        boolean hasBodyElements = false;
-        for (Spatial child : this.getChildren()) {
-            if (child instanceof BodyElement) {
-                hasBodyElements = true;
-                break;
-            }
-        }
-
-        if (!hasBodyElements) {
-            w.write("/>\n");
-        } else {
-            w.write(">\n");
-            for (Spatial child : this.getChildren()) {
-                if (child instanceof BodyElement) {
-                    ((BodyElement) child).write(w, depth + 1);
-                }
-            }
-            for (int i = 0; i < depth; ++i) {
-                w.write('\t');
-            }
-            w.write("</joint>\n");
-        }
-        */
-    }
-
     /**
      * Returns an extra rotation for the gizmo.
      *

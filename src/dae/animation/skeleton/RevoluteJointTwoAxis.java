@@ -302,12 +302,7 @@ public class RevoluteJointTwoAxis extends Prefab implements BodyElement, Joint {
             }
         }
     }
-
-    @Override
-    public void write(Writer w, int depth) throws IOException {
-        SceneSaver.writePrefab(this, w, depth);
-    }
-
+    
     @Override
     public int attachChild(Spatial child) {
         if (child instanceof Axis || child instanceof RotateGizmo) {
