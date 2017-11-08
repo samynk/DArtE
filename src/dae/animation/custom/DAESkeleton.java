@@ -1,11 +1,6 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.animation.custom;
 
 import com.jme3.math.Matrix4f;
-import com.jme3.scene.Node;
 import java.util.ArrayList;
 import java.util.HashMap;
 

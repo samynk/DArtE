@@ -1,14 +1,10 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.animation.custom;
 
 import java.util.HashMap;
 
 /**
  *
- * @author Koen
+ * @author Koen Samyn
  */
 public class AnimationSet {
 

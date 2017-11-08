@@ -1,14 +1,10 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.animation.custom;
 
 import com.jme3.math.Vector3f;
 
 /**
  *
- * @author Koen
+ * @author Koen Samyn
  */
 public interface Animatable {
 
