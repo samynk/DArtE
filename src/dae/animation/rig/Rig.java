@@ -12,8 +12,6 @@ import dae.prefabs.Prefab;
 import dae.prefabs.shapes.DiamondShape;
 import dae.prefabs.types.ObjectType;
 import dae.prefabs.types.ObjectTypeCategory;
-import java.io.IOException;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -32,15 +30,15 @@ public class Rig extends Prefab implements BodyElement {
     private FuzzySystem fuzzySystem = new FuzzySystem("default");
     private final ArrayList<String> targetKeys = new ArrayList<>();
     private final HashMap<String, Prefab> targets = new HashMap<>();
+    
+    private AssetManager manager;
 
     /**
      * Create a new Rig.
      */
     public Rig() {
-//        setLayerName("default");
         setCategory("Animation");
         setType("Rig");
-
     }
 
     private void createTestRig(AssetManager manager) {
@@ -93,18 +91,18 @@ public class Rig extends Prefab implements BodyElement {
         if (listControl != null) {
             listControl.cloneForSpatial(rig);
         }
+        rig.create(manager, null);
         return rig;
     }
 
     @Override
     public void create(AssetManager manager, String extraInfo) {
+        this.manager = manager;
         Material rigMaterial = manager.loadMaterial("Materials/RigMaterial.j3m");
         DiamondShape ds = new DiamondShape(0.1f, true);
         Geometry g = new Geometry("rigshape", ds);
         g.setMaterial(rigMaterial);
         attachChild(g);
-
-        // createTestRig(manager);
     }
 
     /**
@@ -123,10 +121,6 @@ public class Rig extends Prefab implements BodyElement {
      * Resets the rig to its original state.
      */
     public void reset() {
-    }
-
-    @Override
-    public void write(Writer w, int depth) throws IOException {
     }
 
     /**
