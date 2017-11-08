@@ -1,11 +1,6 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.prefab.io;
 
 import com.jme3.asset.AssetManager;
-import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.renderer.queue.RenderQueue.ShadowMode;
 import dae.GlobalObjects;
 import dae.components.MeshComponent;
@@ -13,7 +8,6 @@ import dae.components.ObjectComponent;
 import dae.components.TransformComponent;
 import dae.io.SceneLoader;
 import dae.io.SceneSaver;
-import dae.prefabs.brush.TerrainBrush;
 import dae.prefabs.standard.MeshObject;
 import dae.prefabs.types.ObjectType;
 import dae.prefabs.types.ObjectTypeCategory;

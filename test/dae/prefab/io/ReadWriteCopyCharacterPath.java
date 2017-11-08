@@ -1,15 +1,9 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.prefab.io;
 
 import dae.GlobalObjects;
 import dae.animation.custom.CharacterPath;
-import dae.animation.custom.Waypoint;
 import dae.components.ObjectComponent;
 import dae.components.PrefabComponent;
-import dae.project.Grid;
 import dae.project.Level;
 import org.junit.Test;
 import static org.junit.Assert.*;

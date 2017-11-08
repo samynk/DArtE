@@ -1,15 +1,9 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.prefab.io;
 
 import dae.GlobalObjects;
 import dae.components.ObjectComponent;
 import dae.components.PrefabComponent;
 import dae.prefabs.standard.NavigationMesh;
-import dae.prefabs.standard.PlayerStartEntity;
-import dae.prefabs.standard.SoundEntity;
 import dae.project.Level;
 import org.junit.Test;
 import static org.junit.Assert.*;

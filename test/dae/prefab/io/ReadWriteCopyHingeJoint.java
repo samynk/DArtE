@@ -1,17 +1,10 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.prefab.io;
 
-import com.jme3.bullet.control.RigidBodyControl;
-import com.jme3.bullet.joints.HingeJoint;
 import dae.GlobalObjects;
 import dae.components.ObjectComponent;
 import dae.components.PrefabComponent;
 import dae.prefabs.Prefab;
 import dae.prefabs.physics.JointPrefab;
-import dae.project.Grid;
 import dae.project.Level;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.prefab.io;
 
 import com.jme3.asset.AssetKey;
@@ -137,7 +133,8 @@ public class TextIOTestSuite {
         InputStream stream = new ByteArrayInputStream(contents.getBytes(StandardCharsets.UTF_8));
         
         try {
-            return RigLoader.readRig(stream,manager);
+            RigLoader rl = new RigLoader();
+            return rl.readRig(stream,manager);
         } catch (IOException | ParserConfigurationException | ClassNotFoundException | InstantiationException | SAXException | NumberFormatException | IllegalAccessException ex) {
             Logger.getLogger(ReadWriteRigTest.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }

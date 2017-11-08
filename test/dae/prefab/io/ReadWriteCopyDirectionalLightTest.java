@@ -1,18 +1,11 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.prefab.io;
 
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import dae.GlobalObjects;
 import dae.components.ObjectComponent;
-import dae.components.PrefabComponent;
 import dae.components.TransformComponent;
-import dae.prefabs.lights.AmbientLightPrefab;
 import dae.prefabs.lights.DirectionalLightPrefab;
-import dae.prefabs.lights.SpotLightPrefab;
 import dae.project.Level;
 import org.junit.Test;
 import static org.junit.Assert.*;
