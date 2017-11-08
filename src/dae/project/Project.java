@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.project;
 
 import java.io.File;
@@ -31,8 +27,8 @@ public class Project implements ProjectTreeNode{
      * default is the clatch subfolder in the project folder.
      */
     private String clatchDirectory = "klatches";
-    private ArrayList<File> assetFolders = new ArrayList<File>();
-    private ArrayList<Level> levels = new ArrayList<Level>();
+    private ArrayList<File> assetFolders = new ArrayList<>();
+    private ArrayList<Level> levels = new ArrayList<>();
     private boolean saved = false;
     // the classpath loader for this project.
     private URLClassLoader projectAssetsLoader;
