@@ -31,6 +31,7 @@ import com.jme3.input.event.TouchEvent;
 import com.jme3.light.AmbientLight;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.Matrix4f;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Ray;
 import com.jme3.math.Transform;
@@ -48,6 +49,7 @@ import dae.animation.skeleton.BodyLoader;
 import dae.components.ComponentType;
 import dae.components.MeshComponent;
 import dae.components.PrefabComponent;
+import dae.components.TransformComponent;
 import dae.controller.ControllerLoader;
 import dae.gui.tools.BrushTool;
 import dae.gui.tools.IdleTool;
@@ -83,6 +85,7 @@ import dae.prefabs.ui.events.AssetEvent;
 import dae.prefabs.ui.events.AssetEventType;
 import dae.prefabs.ui.events.ComponentEvent;
 import dae.prefabs.ui.events.CreateObjectEvent;
+import dae.prefabs.ui.events.CutCopyPasteEvent;
 import dae.prefabs.ui.events.GizmoEvent;
 import dae.prefabs.ui.events.GizmoType;
 import static dae.prefabs.ui.events.GizmoType.ROTATE;
@@ -96,8 +99,10 @@ import dae.prefabs.ui.events.SelectionEvent;
 import dae.prefabs.ui.events.ShadowEvent;
 import dae.prefabs.ui.events.ViewportReshapeEvent;
 import dae.prefabs.ui.events.ZoomEvent;
+import dae.project.Layer;
 import dae.project.Project;
 import dae.project.ProjectTreeNode;
+import dae.util.MathUtil;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -132,10 +137,6 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
      */
     private GizmoType gizmoType = GizmoType.NONE;
     private GizmoType newGizmoType = GizmoType.NONE;
-    /**
-     * The current pick property.
-     */
-    private String pickProperty;
 
     /**
      * The editor state.
@@ -169,7 +170,11 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
     /**
      * Selection from other thread (such as user interface).
      */
-    private ArrayList<Node> selectionFromOutside = new ArrayList<Node>();
+    private final ArrayList<Node> selectionFromOutside = new ArrayList<Node>();
+    /**
+     * Copy and cut buffer
+     */
+    private final ArrayList<Node> copyBuffer = new ArrayList<Node>();
     /**
      * shows the selected object.
      */
@@ -317,21 +322,6 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
     }
 
     public void adaptSelectionBox() {
-        Node parent = null;
-        // TODO : remove commented code when everything works again.
-        // gizmo should be removed when tool is inactive
-        // should not be needed anymore.
-        /*
-         switch (this.gizmoType) {
-         case TRANSLATE:
-         parent = a.getParent();
-         a.removeFromParent();
-         break;
-         case ROTATE:
-         parent = r.getParent();
-         r.removeFromParent();
-         }
-         */
         BoundingVolume bv = null;
         for (Node n : this.currentSelection) {
             if (n == null) {
@@ -345,7 +335,7 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
         }
         if (bv != null && bv.getType() == Type.AABB) {
             BoundingBox bb = (BoundingBox) bv;
-            if ( wireBoxGeometry != null ){
+            if (wireBoxGeometry != null) {
                 wireBoxGeometry.removeFromParent();
             }
             wireBoxGeometry = WireBox.makeGeometry(bb);
@@ -357,18 +347,6 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
         } else if (wireBoxGeometry != null) {
             wireBoxGeometry.removeFromParent();
         }
-        /*
-         if (parent != null) {
-         switch (this.gizmoType) {
-         case TRANSLATE:
-         parent.attachChild(a);
-         break;
-         case ROTATE:
-         parent.attachChild(r);
-         break;
-         }
-         }
-         */
     }
 
     @Override
@@ -404,7 +382,7 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
 
         inputManager.addRawInputListener(this);
     }
-    private ActionListener undoRedoListener = new ActionListener() {
+    private final ActionListener undoRedoListener = new ActionListener() {
         @Override
         public void onAction(String name, boolean keyPressed, float tpf) {
             if (name.equals("UNDO") && !keyPressed) {
@@ -446,8 +424,6 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
     private AnalogListener analogListener = new AnalogListener() {
         @Override
         public void onAnalog(String name, float value, float tpf) {
-            //System.out.println("EditorState is : " + editorState);
-            //System.out.println("onAnalog : " + name);
             if (editorState == EditorState.IDLE) {
                 if ("DELETE_SELECTION".equals(name)) {
                     for (Node n : currentSelection) {
@@ -497,7 +473,7 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
         if (evt.isReleased()) {
             currentTool.onMouseButtonReleased(this);
         } else if (evt.isPressed()) {
-            currentTool.onMouseButtonPressed(this);           
+            currentTool.onMouseButtonPressed(this);
         }
     }
 
@@ -875,18 +851,6 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
         }
     }
 
-    private void setupTransform(Geometry g, Vector3f contactPoint) {
-        flyCam.setEnabled(false);
-        switch (gizmoType) {
-            case TRANSLATE:
-                setupTranslateTransform(g, contactPoint);
-                break;
-            case ROTATE:
-                setupRotateTransform(g, contactPoint);
-                break;
-        }
-    }
-
     private void setupTranslateTransform(Geometry g, Vector3f contactPoint) {
         /*
          String transform = g.getUserData("Transform");
@@ -922,10 +886,10 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
         // TODO : copy to TranslateTool class.
         if (shiftIsDown) {
             // create a copy
-            ArrayList<Prefab> duplicates = new ArrayList<Prefab>();
+            ArrayList<Prefab> duplicates = new ArrayList<>();
             for (Node n : this.currentSelection) {
                 if (n instanceof Prefab) {
-                    Prefab copy = ((Prefab) n).duplicate(assetManager);
+                    Prefab copy = ((Prefab) n).duplicate(assetManager, true);
                     // copy will be added to sceneElements.
                     Quaternion q = n.getLocalRotation();
                     copy.setLocalPrefabRotation(q);
@@ -993,7 +957,7 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
     }
 
     /**
-     * This function is called when a new object is crated.
+     * This function is called when a new object is created.
      *
      * @param coe
      */
@@ -1230,6 +1194,63 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
                                 prefab.addPrefabComponent(pc);
                             }
                         }
+                    }
+                }
+            });
+        }
+    }
+
+    @Subscribe
+    public void doCutCopyPasteAction(final CutCopyPasteEvent event) {
+        synchronized (viewportTasks) {
+            viewportTasks.add(new Runnable() {
+                public void run() {
+                    switch (event.getType()) {
+                        case CUT:
+                            copyBuffer.clear();
+                            copyBuffer.addAll(currentSelection);
+                            break;
+                        case PASTE:
+                            for (Node newParent : currentSelection) {
+                                for (Node toPaste : copyBuffer) {
+                                    if (newParent == toPaste || toPaste.getParent() == newParent) {
+                                        // don't paste object on itself.
+                                        // don't paste if parent is already the parent.
+                                        continue;
+                                    }
+                                    Matrix4f local = MathUtil.changeParent(toPaste, newParent);
+                                    toPaste.setLocalTranslation(local.toTranslationVector());
+                                    toPaste.setLocalRotation(local.toRotationQuat());
+                                    toPaste.setLocalScale(local.toScaleVector());
+
+                                    ProjectTreeNode previousParent = null;
+
+                                    int index = -1;
+                                    if (toPaste instanceof ProjectTreeNode) {
+                                        ProjectTreeNode toPasteNode = (ProjectTreeNode) toPaste;
+                                        previousParent = toPasteNode.getProjectParent();
+                                        index = previousParent.getIndexOfChild(toPasteNode);
+
+                                    }
+                                    newParent.attachChild(toPaste);
+                                    if (previousParent instanceof Layer) {
+                                        Layer l = (Layer) previousParent;
+                                        l.removeNode(toPaste);
+                                    }
+                                    if (index != -1) {
+                                        LevelEvent le = new LevelEvent(level,
+                                                EventType.NODEMOVED,
+                                                toPaste,
+                                                previousParent,
+                                                index,
+                                                newParent);
+
+                                        GlobalObjects.getInstance().postEvent(le);
+                                    }
+                                }
+                            }
+                            copyBuffer.clear();
+                            break;
                     }
                 }
             });
