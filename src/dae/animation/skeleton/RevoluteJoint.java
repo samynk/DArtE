@@ -11,15 +11,11 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
-import dae.GlobalObjects;
 import dae.animation.rig.ConnectorType;
 import dae.animation.rig.Joint;
 import dae.animation.skeleton.debug.BoneVisualization;
-import dae.io.SceneSaver;
 import dae.prefabs.Prefab;
 import dae.prefabs.shapes.HingeShape;
-import java.io.IOException;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -76,13 +72,20 @@ public class RevoluteJoint extends Prefab implements BodyElement, Joint {
     private final static ArrayList<ConnectorType> supportedOutputConnectorTypes =
             new ArrayList<ConnectorType>();
 
+    public static ConnectorType ANGLE_TARGET_TYPE;
+    public static ConnectorType ANGLE_ORIENTATION_TYPE;
     static {
-        ConnectorType ct = new ConnectorType("angletargetrevjoint", "Angle target",
+        ANGLE_TARGET_TYPE = new ConnectorType("angletargetrevjoint", "Angle target",
                 "This target calculates the angle between two vectors. "
                 + "The first vector has the joint location as its origin and the selected attachment point as endpoint."
                 + "The second vector has the joint location as its origin and the target as endpoint.",
                 "dae.animation.rig.gui.AngleTargetConnectorPanel");
-        supportedInputConnectorTypes.add(ct);
+        supportedInputConnectorTypes.add(ANGLE_TARGET_TYPE);
+        
+        ANGLE_ORIENTATION_TYPE = new ConnectorType("angleorientationrevjoint", "Orientation target", "angleorientationrevjoint",
+                "dae.animation.rig.gui.AngleOrientationConnectorPanel");
+        supportedInputConnectorTypes.add(ANGLE_ORIENTATION_TYPE);
+      
 
         ConnectorType oct = new ConnectorType("anglerevjoint", "Angle",
                 "This connector increments the current angle of the joint with the output of the controller",
@@ -91,7 +94,7 @@ public class RevoluteJoint extends Prefab implements BodyElement, Joint {
     }
 
     public RevoluteJoint() {
-        axis = Vector3f.UNIT_Y.clone();
+        axis = Vector3f.UNIT_X.clone();
         location = Vector3f.ZERO;
         currentAngle = 0;
         minAngle = -45;
@@ -121,12 +124,17 @@ public class RevoluteJoint extends Prefab implements BodyElement, Joint {
         this.height = height;
         this.centered = centered;
     }
+    
+    public boolean hasSavableChildren(){
+        return this.hasChildren();
+    }
 
     /**
      * Return the supported input connector types of this joint.
      *
      * @return the supported input connector types.
      */
+    @Override
     public List<ConnectorType> getInputConnectorTypes() {
         return supportedInputConnectorTypes;
     }
@@ -136,6 +144,7 @@ public class RevoluteJoint extends Prefab implements BodyElement, Joint {
      *
      * @return the supported input connector types.
      */
+    @Override
     public List<ConnectorType> getOutputConnectorTypes() {
         return supportedOutputConnectorTypes;
     }
@@ -159,7 +168,7 @@ public class RevoluteJoint extends Prefab implements BodyElement, Joint {
     
     @Override
     public void rotate(float angle){
-        setCurrentAngle(getCurrentAngle()+angle);
+        setCurrentAngle(getCurrentAngle()+angle*FastMath.RAD_TO_DEG);
     }
 
     /**
@@ -185,6 +194,7 @@ public class RevoluteJoint extends Prefab implements BodyElement, Joint {
     }
 
     private void updateTransform(Vector3f axis, float dAngle) {
+        System.out.println("rotating over: " + dAngle);
         // step 0 : return if difference is too smal.
 //        if (FastMath.abs(dangle) < FastMath.ZERO_TOLERANCE) {
 //            return;
@@ -192,7 +202,8 @@ public class RevoluteJoint extends Prefab implements BodyElement, Joint {
         // step 1 : express the axis2 in the current axis system.
         Vector3f localAxis = this.getLocalRotation().mult(axis);
         // step 2 : create a quaternion with this local axis and angle
-        Quaternion q = AxisAngleTransform.createAxisAngleTransform(localAxis, dAngle * FastMath.DEG_TO_RAD);
+        Quaternion q = new Quaternion();
+        q.fromAngleAxis(dAngle * FastMath.DEG_TO_RAD, localAxis);
         // step 3 : rotate the current axis system with this quaternion.
         this.xAxis = q.mult(xAxis);
         this.yAxis = q.mult(yAxis);
@@ -313,6 +324,7 @@ public class RevoluteJoint extends Prefab implements BodyElement, Joint {
     private final Vector3f worldTempOrigin = new Vector3f();
     private final Vector3f worldTempAxis = new Vector3f();
 
+    @Override
     public Vector3f getWorldRotationAxis() {
         //this.localToWorld(tempOrigin, worldTempOrigin);
         //this.localToWorld(axis, worldTempAxis);
@@ -474,6 +486,7 @@ public class RevoluteJoint extends Prefab implements BodyElement, Joint {
         createVisualization(manager);
     }
 
+    /*
     @Override
     public Spatial clone() {
         RevoluteJoint copy = new RevoluteJoint();
@@ -508,6 +521,7 @@ public class RevoluteJoint extends Prefab implements BodyElement, Joint {
         }
         return copy;
     }
+    */
     
     /**
      * Sets the render options for this revolute joint.
@@ -689,8 +703,4 @@ public class RevoluteJoint extends Prefab implements BodyElement, Joint {
     public void setChainChildName(String childName) {
         this.chainChildName = childName;
     }
-
-    
-    
-   
 }
