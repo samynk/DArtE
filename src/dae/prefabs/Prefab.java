@@ -37,15 +37,15 @@ import java.util.HashMap;
 
 /**
  *
- * @author Koen
+ * @author Koen Samyn
  */
 public class Prefab extends Node implements ProjectTreeNode {
 
     private String prefix = "prefab";
-    private final ArrayList<UpdateObject> workList =
-            new ArrayList<>();
-    private final ArrayList<Runnable> taskList =
-            new ArrayList<>();
+    private final ArrayList<UpdateObject> workList
+            = new ArrayList<>();
+    private final ArrayList<Runnable> taskList
+            = new ArrayList<>();
     protected ObjectType objectType;
     private boolean selected = false;
     private Material originalMaterial;
@@ -56,10 +56,10 @@ public class Prefab extends Node implements ProjectTreeNode {
     private ArrayList<ComponentListener> componentListeners;
     private Vector3f pivot = Vector3f.ZERO;
     private boolean changed = false;
-    private final HashMap<String, PrefabComponent> componentMap =
-            new HashMap<>();
-    private final ArrayList<PrefabComponent> sortedComponents =
-            new ArrayList<>();
+    private final HashMap<String, PrefabComponent> componentMap
+            = new HashMap<>();
+    private final ArrayList<PrefabComponent> sortedComponents
+            = new ArrayList<>();
     /**
      * Defines if this prefab can have children.
      */
@@ -152,17 +152,16 @@ public class Prefab extends Node implements ProjectTreeNode {
     public final void setCategory(String category) {
         this.category = category;
     }
-    
-    
+
     /**
-     * Gets the transform component from this prefab, or null if
-     * no such component exists, or if the component does not have the 
-     * required type.
+     * Gets the transform component from this prefab, or null if no such
+     * component exists, or if the component does not have the required type.
+     *
      * @return the TransformComponent object.
      */
-    public TransformComponent getTransformComponent(){
+    public TransformComponent getTransformComponent() {
         PrefabComponent c = getComponent("TransformComponent");
-        return c instanceof TransformComponent? (TransformComponent)c:null;
+        return c instanceof TransformComponent ? (TransformComponent) c : null;
     }
 
     public void setOriginalMaterial(Material material) {
@@ -215,7 +214,7 @@ public class Prefab extends Node implements ProjectTreeNode {
 
     @Override
     public String getName() {
-        if ( objectType == null){
+        if (objectType == null) {
             return "<error>";
         }
         Parameter p = objectType.findParameter("ObjectComponent", "name");
@@ -470,7 +469,6 @@ public class Prefab extends Node implements ProjectTreeNode {
 //                trianglepoint0.setMaterial(originalMaterial);
 //                trianglepoint0.move(startWorld);
 //                //sceneElements.attachChild(trianglepoint0);
-
                 Ray ray = new Ray(startWorld, dirWorld);
                 //ray.setLimit(q.getMaxLength());
                 results = new CollisionResults();
@@ -541,7 +539,6 @@ public class Prefab extends Node implements ProjectTreeNode {
                     // angle of 45 degrees
                     // todo , make it configurable
 
-
                     if (Math.abs(diff.dot(dirWorld)) < 0.707) {
                         //System.out.println("extruding the raycast quad :" + cr.getDistance());
                         dirWorld.multLocal(cr.getDistance());
@@ -609,27 +606,38 @@ public class Prefab extends Node implements ProjectTreeNode {
      * Duplicates a prefab by duplicating all the components.
      *
      * @param assetManager the assetmanager to use for duplication.
+     * @param duplicateChildren if true, also duplicate all the children of this
+     * prefab.
      * @return a duplicate of the object, components included.
      */
-    public Prefab duplicate(AssetManager assetManager) {
+    public final Prefab duplicate(AssetManager assetManager, boolean duplicateChildren) {
         ObjectTypeCategory otc = GlobalObjects.getInstance().getObjectsTypeCategory();
+        Prefab duplicate = null;
         if (objectType != null) {
-            Prefab target = objectType.create(assetManager, getName());
-            duplicateComponents(target, otc);
-            return target;
+            duplicate = objectType.createDefault(assetManager, getName(), false);
+            duplicateComponents(duplicate, otc);
+
         }
-        return null;
+        if (duplicateChildren && duplicate != null) {
+            for (int i = 0; i < this.getPrefabChildCount(); ++i) {
+                Prefab child = (Prefab) this.getPrefabChildAt(i);
+                Prefab childCopy = child.duplicate(assetManager, true);
+                duplicate.attachChild(childCopy);
+            }
+        }
+        return duplicate;
     }
 
-    public void duplicateComponents(Prefab target, ObjectTypeCategory otc) {
+    public final void duplicateComponents(Prefab target, ObjectTypeCategory otc) {
+        /*
         for (Parameter p : objectType.getAllParameters()) {
             Object value = p.invokeGet(this);
             Object cloned = PropertyReflector.clone(value);
             if (value != null) {
                 p.invokeSet(target, cloned, false);
             }
-        }
-        
+        }*/
+
         for (PrefabComponent pc : this.getComponents()) {
             ComponentType ct = otc.getComponent(pc.getId());
             if (ct != null) {
@@ -637,7 +645,7 @@ public class Prefab extends Node implements ProjectTreeNode {
                     PrefabComponent copy = ct.create();
                     target.addPrefabComponent(copy);
                 }
-                
+
                 ct.copy(this, target);
                 PrefabComponent copied = target.getComponent(ct.getId());
                 if (copied != null) {
@@ -840,10 +848,10 @@ public class Prefab extends Node implements ProjectTreeNode {
     public void setLocalTranslation(Vector3f localTranslation) {
         super.setLocalTranslation(localTranslation);
         Parameter ptrans = this.getObjectType().findParameter("TransformComponent", "translation");
-        if (ptrans != null ) {
+        if (ptrans != null) {
             ptrans.notifyChangeInValue(this);
         }
-        
+
         translationChanged();
     }
 
@@ -870,13 +878,14 @@ public class Prefab extends Node implements ProjectTreeNode {
      * Checks if a prefab has children that need to be saved when the prefab is
      * written to file. First the state of the canHaveChildren is checked, next
      * a check will be performed to see if the object has savable children.
+     *
      * @return true if this prefab has savable children, false otherwise.
      */
     public boolean hasSavableChildren() {
         if (!canHaveChildren) {
             return false;
         } else {
-           return getPrefabChildCount() > 0;
+            return getPrefabChildCount() > 0;
         }
     }
 
@@ -973,7 +982,10 @@ public class Prefab extends Node implements ProjectTreeNode {
 
     @Override
     public ProjectTreeNode getProjectParent() {
-        Node p = this.getParent();
+        Node p = this;
+        do {
+            p = p.getParent();
+        } while (p != null && !(p instanceof ProjectTreeNode));
 
         if (p instanceof dae.project.Level) {
             dae.project.Level l = (dae.project.Level) p;
