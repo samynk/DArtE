@@ -1,9 +1,12 @@
 package dae.util;
 
 import com.jme3.math.FastMath;
+import com.jme3.math.Matrix4f;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
+import com.jme3.scene.Node;
+import dae.components.TransformComponent;
 import dae.prefabs.AxisEnum;
 
 /**
@@ -119,5 +122,32 @@ public class MathUtil {
         toProject.x = toProject.x - dot * normal.x;
         toProject.y = toProject.y - dot * normal.y;
         toProject.z = toProject.z - dot * normal.z;
+    }
+
+    /**
+     * Changes the parent of a prefab while keeping the world transformation of
+     * the prefab.
+     * @param toChange the prefab to change.
+     * @param newParent the new parent of the prefab.
+     * @return the local transformation of the child, relative to the new parent.
+     */
+    public static Matrix4f changeParent(Node toChange, Node newParent) {
+        Matrix4f parentMatrix = new Matrix4f();
+        parentMatrix.setTranslation(newParent.getWorldTranslation());
+        parentMatrix.setRotationQuaternion(newParent.getWorldRotation());
+        parentMatrix.setScale(newParent.getWorldScale());
+        parentMatrix.invertLocal();
+
+        Vector3f wtrans = toChange.getWorldTranslation().clone();
+        Quaternion wrot = toChange.getWorldRotation().clone();
+        Vector3f wscale = toChange.getWorldScale().clone();
+
+        Matrix4f childMatrix = new Matrix4f();
+        childMatrix.setTranslation(wtrans);
+        childMatrix.setRotationQuaternion(wrot);
+        childMatrix.setScale(wscale);
+
+        Matrix4f local = parentMatrix.mult(childMatrix);
+        return local;
     }
 }
