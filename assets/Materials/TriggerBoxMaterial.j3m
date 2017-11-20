@@ -6,6 +6,6 @@ Material RigMaterial : Common/MatDefs/Misc/Unshaded.j3md {
     AdditionalRenderState {
       Blend Alpha
       AlphaTestFalloff 0.0
-      FaceCull Back
+      FaceCull Off
     }
 }
