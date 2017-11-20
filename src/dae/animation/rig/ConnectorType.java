@@ -10,19 +10,19 @@ public class ConnectorType {
     /**
      * A unique id for this connector type.
      */
-    private String id;
+    private final String id;
     /**
      * The descriptive name for this connector type.
      */
-    private String name;
+    private final String name;
     /**
      * The description for the connector type.
      */
-    private String description;
+    private final String description;
     /**
      * The customizer panel for the connector type.
      */
-    private String customizerPanelClass;
+    private final String customizerPanelClass;
     
     /**
      * Creates a new InputConnectorType object for use in the connector customizer.
