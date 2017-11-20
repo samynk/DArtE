@@ -146,6 +146,7 @@ public class TranslateTool extends ViewportTool {
      *
      * @param viewport the viewport where the mouse button was released.
      */
+    @Override
     public void onMouseButtonPressed(SandboxViewport viewport) {
         if (currentState == TranslateState.IDLE) {
             Prefab p = viewport.pick();
@@ -174,10 +175,12 @@ public class TranslateTool extends ViewportTool {
         a.setLocalScale(factor / ws.x, factor / ws.y, factor / ws.z);
     }
 
+    @Override
     public void cleanup() {
         a.removeFromParent();
     }
 
+    @Override
     public void pickGizmo(Ray ray, CollisionResults results) {
         a.collideWith(ray, results);
     }
@@ -185,10 +188,12 @@ public class TranslateTool extends ViewportTool {
     /**
      * Set ups the gizmo element that was picked by the pickGizmo function.
      *
+     * @param viewport the active viewport.
      * @param g the geometry that was picked.
      * @param contactPoint the point where the geometry was picked.
      *
      */
+    @Override
     public void gizmoPicked(SandboxViewport viewport, Geometry g, Vector3f contactPoint) {
         String transform = g.getUserData("Transform");
         if ("translate_X".equals(transform)) {
