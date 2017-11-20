@@ -76,7 +76,7 @@ public class TextIOTestSuite {
         assertNotNull("Type [" + category + "," + label + "] not found", type);
         Object object = type.create(manager, label + "1");
         assertNotNull("Could not create " + category + ":" + label + "!", object);
-        assertTrue("Stroke object not instanceof Stroke", expected.isInstance(object));
+        assertTrue(category+":"+label +" object not an instance of " + expected.getName(), expected.isInstance(object));
         return object;
     }
 
