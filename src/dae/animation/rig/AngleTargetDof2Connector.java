@@ -2,6 +2,7 @@ package dae.animation.rig;
 
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
+import dae.animation.skeleton.RevoluteJointTwoAxis;
 
 /**
  * This input connector calculates the angle between the attachment point
@@ -18,7 +19,7 @@ public class AngleTargetDof2Connector extends AngleTargetConnector {
     @Override
     public float getValue() {
         
-        Vector3f origin = joint.getWorldTranslation();
+        Vector3f origin = getJoint().getWorldTranslation();
 
         Vector3f apLoc = attachment.getWorldTranslation();
         Vector3f targetLoc = target.getWorldTranslation();
@@ -31,7 +32,7 @@ public class AngleTargetDof2Connector extends AngleTargetConnector {
         vector2.normalizeLocal();
         
         axis.normalizeLocal();
-        joint.setWorldRotationAxis(axis);
+        getJoint().setWorldRotationAxis(axis);
         
         float angle = vector1.angleBetween(vector2) * FastMath.RAD_TO_DEG;
 
@@ -46,4 +47,11 @@ public class AngleTargetDof2Connector extends AngleTargetConnector {
         ac.setTargetName(getTargetName());
         return ac;
     }
+
+    @Override
+    public ConnectorType getConnectorType() {
+        return RevoluteJointTwoAxis.ANGLE_TARGET_TYPE;
+    }
+    
+    
 }
