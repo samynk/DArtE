@@ -3,6 +3,8 @@ package dae.prefabs.ui;
 import dae.prefabs.Prefab;
 import dae.prefabs.ReflectionManager;
 import dae.prefabs.parameters.Parameter;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 /**
  *
@@ -19,18 +21,35 @@ public class TextParameterUI extends javax.swing.JPanel implements ParameterUI {
      */
     public TextParameterUI() {
         initComponents();
+        txtMessage.getDocument().addDocumentListener(
+                new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                textChanged();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                textChanged();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                textChanged();
+            }
+
+        });
     }
 
     @Override
     public void setParameter(Parameter p) {
         this.parameter = p;
     }
-    
-    public Parameter getParameter(){
+
+    @Override
+    public Parameter getParameter() {
         return parameter;
     }
-    
-    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -59,24 +78,30 @@ public class TextParameterUI extends javax.swing.JPanel implements ParameterUI {
     private javax.swing.JTextField txtMessage;
     // End of variables declaration//GEN-END:variables
 
-    
-
     @Override
     public void setNode(Prefab currentSelectedNode) {
         currentNode = currentSelectedNode;
-        Object value = ReflectionManager.getInstance().invokeGetMethod(currentSelectedNode, parameter);
+        Object value = parameter.invokeGet(currentNode);
         if (value != null) {
             disregardEvent = true;
             txtMessage.setText(value.toString());
             disregardEvent = false;
         }
     }
-    
+
     /**
      * Checks if a label should be created for the UI.
+     *
      * @return true if a label should be created, false othwerise.
      */
-    public boolean needsLabel(){
+    @Override
+    public boolean needsLabel() {
         return true;
+    }
+
+    private void textChanged() {
+        if (!disregardEvent) {
+            parameter.invokeSet(currentNode, txtMessage.getText(), true);
+        }
     }
 }
