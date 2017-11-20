@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.prefabs.ui.collection.editor;
 
 import com.google.common.eventbus.Subscribe;
@@ -31,7 +27,7 @@ public class PrefabCellEditor extends javax.swing.JPanel implements TableCellEdi
     private Object currentValue;
     private Prefab parentPrefab;
     private Object pickedObject;
-    private ArrayList<CellEditorListener> listeners = new ArrayList<CellEditorListener>();
+    private final ArrayList<CellEditorListener> listeners = new ArrayList<>();
 
     /**
      * Creates new form PrefabCellEditor
