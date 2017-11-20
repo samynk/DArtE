@@ -57,7 +57,7 @@ public class DefaultPrefabImporter implements PrefabTextImporter {
         });
         parameterMap.put(IntParameter.class, new ParameterParser() {
             public Object parseParameter(Object parent, Parameter p, String value) {
-                return Float.parseFloat(value);
+                return Integer.parseInt(value);
             }
         });
         parameterMap.put(TextParameter.class, new ParameterParser() {
