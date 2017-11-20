@@ -3,6 +3,7 @@ package dae.components;
 import dae.prefabs.Prefab;
 import dae.prefabs.PropertyReflector;
 import dae.prefabs.parameters.Parameter;
+import dae.prefabs.parameters.ParameterSection;
 import dae.prefabs.types.ParameterSupport;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -51,17 +52,19 @@ public class ComponentType extends ParameterSupport {
     public void setId(String id) {
         this.id = id;
     }
-    
+
     /**
      * Returns the class id of this component.
+     *
      * @return the class id.
      */
-    public int getCID(){
+    public int getCID() {
         return cid;
     }
-    
+
     /**
      * Sets the class id of this component.
+     *
      * @param cidi the class id of this component.
      */
     public void setCID(int cidi) {
@@ -100,6 +103,14 @@ public class ComponentType extends ParameterSupport {
                 result = (PrefabComponent) component;
                 result.setId(this.id);
                 result.setOrder(this.order);
+
+                // set defaults
+                for (Parameter p : this.getAllParameters()) {
+                    Object o = p.getDefault();
+                    if ( o != null ){
+                        p.invokeSet(result, o);
+                    }
+                }
             }
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(ComponentType.class.getName()).log(Level.SEVERE, null, ex);
@@ -129,13 +140,12 @@ public class ComponentType extends ParameterSupport {
     public void copy(Prefab source, Prefab target) {
         for (Parameter p : this.getAllParameters()) {
             Object value = p.invokeGet(source);
-            
+
             if (value != null) {
                 Object cloned = PropertyReflector.clone(value);
                 p.invokeSet(target, cloned, false);
             }
         }
     }
-
 
 }
