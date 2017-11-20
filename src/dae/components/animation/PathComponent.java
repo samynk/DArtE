@@ -36,7 +36,7 @@ public class PathComponent extends PrefabComponent implements Animatable {
     private boolean isWalking;
     private Prefab parent;
     private int waypointId = 0;
-    private FuzzySystem waypointController = new FuzzySystem("waypoints");
+    private FuzzySystem waypointController = new FuzzySystem("waypoints", false);
 
     public PathComponent() {
         FuzzyVariable angle = new FuzzyVariable("angle");
@@ -61,10 +61,6 @@ public class PathComponent extends PrefabComponent implements Animatable {
         waypointController.addFuzzyRule("if angle is center then dangle is stay");
         waypointController.addFuzzyRule("if angle is right then dangle is turnleft");
         waypointController.addFuzzyRule("if angle is farright then dangle is turnleftfast");
-
-
-
-
     }
 
     @Override
