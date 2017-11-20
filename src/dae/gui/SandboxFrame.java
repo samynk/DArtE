@@ -32,6 +32,8 @@ import dae.prefabs.ui.events.BrushEvent;
 import dae.prefabs.ui.events.BrushEventType;
 import dae.prefabs.ui.events.ComponentEvent;
 import dae.prefabs.ui.events.CreateObjectEvent;
+import dae.prefabs.ui.events.CutCopyPasteEvent;
+import dae.prefabs.ui.events.CutCopyPasteType;
 import dae.prefabs.ui.events.GizmoEvent;
 import dae.prefabs.ui.events.GizmoType;
 import dae.prefabs.ui.events.LevelEvent;
@@ -194,6 +196,10 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
         mnuEdit = new javax.swing.JMenu();
         mnuUndo = new javax.swing.JMenuItem();
         mnuRedo = new javax.swing.JMenuItem();
+        jSeparator9 = new javax.swing.JPopupMenu.Separator();
+        mnuCutAction = new javax.swing.JMenuItem();
+        mnuPaste = new javax.swing.JMenuItem();
+        jSeparator10 = new javax.swing.JPopupMenu.Separator();
         mnuPreferences = new javax.swing.JMenuItem();
         mnuComponents = new javax.swing.JMenu();
         mnuAddPhysicsBox = new javax.swing.JMenuItem();
@@ -202,6 +208,10 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
         mnuPhysicsTerrain = new javax.swing.JMenuItem();
         mnuCharacterController = new javax.swing.JMenuItem();
         jSeparator5 = new javax.swing.JPopupMenu.Separator();
+        mnuAddBoxComponent = new javax.swing.JMenuItem();
+        mnuAddCylinderComponent = new javax.swing.JMenuItem();
+        mnuAddSphereComponent = new javax.swing.JMenuItem();
+        jSeparator8 = new javax.swing.JPopupMenu.Separator();
         mnuAddAnimationComponent = new javax.swing.JMenuItem();
         mnuAddPath = new javax.swing.JMenuItem();
         jSeparator6 = new javax.swing.JPopupMenu.Separator();
@@ -221,8 +231,7 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
         mnuAddFreeJoint = new javax.swing.JMenuItem();
         mnuAddTarget = new javax.swing.JMenuItem();
         jSeparator4 = new javax.swing.JPopupMenu.Separator();
-        mnuAddSkeleton = new javax.swing.JMenuItem();
-        mnuSkeleton2 = new javax.swing.JMenuItem();
+        mnuAddEye = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
         mnuAddHandle = new javax.swing.JMenuItem();
         mnuAdd2HandleAxis = new javax.swing.JMenuItem();
@@ -503,6 +512,26 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
             }
         });
         mnuEdit.add(mnuRedo);
+        mnuEdit.add(jSeparator9);
+
+        mnuCutAction.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_X, java.awt.event.InputEvent.CTRL_MASK));
+        mnuCutAction.setText("Cut");
+        mnuCutAction.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuCutActionActionPerformed(evt);
+            }
+        });
+        mnuEdit.add(mnuCutAction);
+
+        mnuPaste.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_V, java.awt.event.InputEvent.CTRL_MASK));
+        mnuPaste.setText("Paste");
+        mnuPaste.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuPasteActionPerformed(evt);
+            }
+        });
+        mnuEdit.add(mnuPaste);
+        mnuEdit.add(jSeparator10);
 
         mnuPreferences.setText("Preferences ...");
         mnuPreferences.addActionListener(new java.awt.event.ActionListener() {
@@ -556,6 +585,31 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
         });
         mnuComponents.add(mnuCharacterController);
         mnuComponents.add(jSeparator5);
+
+        mnuAddBoxComponent.setText("Add Box");
+        mnuAddBoxComponent.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuAddBoxComponentActionPerformed(evt);
+            }
+        });
+        mnuComponents.add(mnuAddBoxComponent);
+
+        mnuAddCylinderComponent.setText("Add Cylinder");
+        mnuAddCylinderComponent.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuAddCylinderComponentActionPerformed(evt);
+            }
+        });
+        mnuComponents.add(mnuAddCylinderComponent);
+
+        mnuAddSphereComponent.setText("Add Sphere");
+        mnuAddSphereComponent.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuAddSphereComponentActionPerformed(evt);
+            }
+        });
+        mnuComponents.add(mnuAddSphereComponent);
+        mnuComponents.add(jSeparator8);
 
         mnuAddAnimationComponent.setText("Add Animation Control");
         mnuAddAnimationComponent.addActionListener(new java.awt.event.ActionListener() {
@@ -676,21 +730,13 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
         mnuAdd.add(mnuAddTarget);
         mnuAdd.add(jSeparator4);
 
-        mnuAddSkeleton.setText("Add Skeleton 1");
-        mnuAddSkeleton.addActionListener(new java.awt.event.ActionListener() {
+        mnuAddEye.setText("Add Eye");
+        mnuAddEye.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuAddSkeletonActionPerformed(evt);
+                mnuAddEyeActionPerformed(evt);
             }
         });
-        mnuAdd.add(mnuAddSkeleton);
-
-        mnuSkeleton2.setText("Add Skeleton 2");
-        mnuSkeleton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuSkeleton2ActionPerformed(evt);
-            }
-        });
-        mnuAdd.add(mnuSkeleton2);
+        mnuAdd.add(mnuAddEye);
         mnuAdd.add(jSeparator1);
 
         mnuAddHandle.setText("Add Handle");
@@ -945,71 +991,9 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
         GlobalObjects.getInstance().redo();
     }//GEN-LAST:event_mnuRedoActionPerformed
 
-    private void mnuAddSkeletonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAddSkeletonActionPerformed
-        // TODO add your handling code here:
-        ObjectTypeCategory otc = viewport.getObjectsToCreate();
-        ObjectType ot = otc.getObjectType("Animation", "Skeleton");
-        if (ot != null) {
-            ot.setExtraInfo("Skeleton/Cathy/body.skel");
-            CreateObjectEvent coe = new CreateObjectEvent(ot.getObjectToCreate(), "Skeleton/Cathy/body.skel", ot);
-            GlobalObjects.getInstance().postEvent(coe);
-        }
-    }//GEN-LAST:event_mnuAddSkeletonActionPerformed
-
     private void mnuSaveProjectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSaveProjectActionPerformed
         saveProject();
     }//GEN-LAST:event_mnuSaveProjectActionPerformed
-
-    private void mnuAddHandleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAddHandleActionPerformed
-        // TODO add your handling code here:
-        ObjectTypeCategory otc = viewport.getObjectsToCreate();
-        ObjectType ot = otc.getObjectType("Animation", "Handle");
-        if (ot != null) {
-            CreateObjectEvent coe = new CreateObjectEvent(ot.getObjectToCreate(), null, ot);
-            GlobalObjects.getInstance().postEvent(coe);
-        }
-    }//GEN-LAST:event_mnuAddHandleActionPerformed
-
-    private void mnuSkeleton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSkeleton2ActionPerformed
-        // TODO add your handling code here:
-        ObjectTypeCategory otc = viewport.getObjectsToCreate();
-        ObjectType ot = otc.getObjectType("Animation", "Skeleton");
-        ot.setExtraInfo("Skeleton/Inge/body.skel");
-        if (ot != null) {
-            CreateObjectEvent coe = new CreateObjectEvent(ot.getObjectToCreate(), "Skeleton/Inge/body.skel", ot);
-            GlobalObjects.getInstance().postEvent(coe);
-        }
-    }//GEN-LAST:event_mnuSkeleton2ActionPerformed
-
-    private void mnuAdd2HandleAxisActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAdd2HandleAxisActionPerformed
-        // TODO add your handling code here:
-        ObjectTypeCategory otc = viewport.getObjectsToCreate();
-        ObjectType ot = otc.getObjectType("Animation", "TwoAxisHandle");
-        if (ot != null) {
-            CreateObjectEvent coe = new CreateObjectEvent(ot.getObjectToCreate(), null, ot);
-            GlobalObjects.getInstance().postEvent(coe);
-        }
-    }//GEN-LAST:event_mnuAdd2HandleAxisActionPerformed
-
-    private void mnuAddCharacterPathActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAddCharacterPathActionPerformed
-        // TODO add your handling code here:
-        ObjectTypeCategory otc = viewport.getObjectsToCreate();
-        ObjectType ot = otc.getObjectType("Animation", "CharacterPath");
-        if (ot != null) {
-            CreateObjectEvent coe = new CreateObjectEvent(ot.getObjectToCreate(), null, ot);
-            GlobalObjects.getInstance().postEvent(coe);
-        }
-    }//GEN-LAST:event_mnuAddCharacterPathActionPerformed
-
-    private void mnuAddWaypointActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAddWaypointActionPerformed
-        // TODO add your handling code here:
-        ObjectTypeCategory otc = viewport.getObjectsToCreate();
-        ObjectType ot = otc.getObjectType("Animation", "Waypoint");
-        if (ot != null) {
-            CreateObjectEvent coe = new CreateObjectEvent(ot.getObjectToCreate(), null, ot);
-            GlobalObjects.getInstance().postEvent(coe);
-        }
-    }//GEN-LAST:event_mnuAddWaypointActionPerformed
 
     private void btnLinkItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_btnLinkItemStateChanged
         // TODO add your handling code here:
@@ -1032,35 +1016,6 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
             GlobalObjects.getInstance().postEvent(new GizmoEvent(this, GizmoType.ROTATE));
         }
     }//GEN-LAST:event_btnRotateItemStateChanged
-
-    private void munAddFootcurveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_munAddFootcurveActionPerformed
-        ObjectTypeCategory otc = viewport.getObjectsToCreate();
-        ObjectType ot = otc.getObjectType("Animation", "Footcurve");
-        if (ot != null) {
-            CreateObjectEvent coe = new CreateObjectEvent(ot.getObjectToCreate(), null, ot);
-            GlobalObjects.getInstance().postEvent(coe);
-        }
-    }//GEN-LAST:event_munAddFootcurveActionPerformed
-
-    private void mnuHandCurveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuHandCurveActionPerformed
-        // TODO add your handling code here:
-        ObjectTypeCategory otc = viewport.getObjectsToCreate();
-        ObjectType ot = otc.getObjectType("Animation", "Handcurve");
-        if (ot != null) {
-            CreateObjectEvent coe = new CreateObjectEvent(ot.getObjectToCreate(), null, ot);
-            GlobalObjects.getInstance().postEvent(coe);
-        }
-    }//GEN-LAST:event_mnuHandCurveActionPerformed
-
-    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-        // TODO add your handling code here:
-        ObjectTypeCategory otc = viewport.getObjectsToCreate();
-        ObjectType ot = otc.getObjectType("Animation", "Handshake");
-        if (ot != null) {
-            CreateObjectEvent coe = new CreateObjectEvent(ot.getObjectToCreate(), null, ot);
-            GlobalObjects.getInstance().postEvent(coe);
-        }
-    }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     private void mnuSpotLightActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSpotLightActionPerformed
         // TODO add your handling code here:
@@ -1178,52 +1133,6 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
         }
         GlobalObjects.getInstance().postEvent(new ApplicationStoppedEvent());
     }//GEN-LAST:event_formWindowClosing
-
-    private void mnuCreateRigActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuCreateRigActionPerformed
-        if (currentProject.hasFileLocation()) {
-            createObjectDialog.setTitle("Create Rig");
-            createObjectDialog.setCurrentProject(this.currentProject);
-            createObjectDialog.setVisible(true);
-            if (createObjectDialog.getReturnStatus() == CreateKlatchDialog.RET_OK) {
-                String rigLocation = createObjectDialog.getAssemblyName();
-                // Create a default body.
-                ObjectTypeCategory otc = viewport.getObjectsToCreate();
-                ObjectType ot = otc.getObjectType("Animation", "Rig");
-                if (ot != null) {
-                    Rig rig;
-                    rig = (Rig)ot.createDefault(viewport.getAssetManager(), "rig",true);
-                    
-                    File klatchDir = currentProject.getKlatchDirectory();
-                    File rigFile = new File(klatchDir, rigLocation);
-                    RigWriter.writeRig(rigFile, rig);
-
-                    AssetEvent ae = new AssetEvent(AssetEventType.EDIT, FileNode.createFromPath(rigLocation));
-                    GlobalObjects.getInstance().postEvent(ae);
-                }
-            }
-        } else {
-            JOptionPane.showMessageDialog(this, "<html>You must save the project before<br> you can create a rig!", "Project not saved", JOptionPane.ERROR_MESSAGE);
-        }
-    }//GEN-LAST:event_mnuCreateRigActionPerformed
-
-    private void mnuAddRevoluteJointActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAddRevoluteJointActionPerformed
-        ObjectTypeCategory otc = viewport.getObjectsToCreate();
-        ObjectType ot = otc.getObjectType("Animation", "RevoluteJoint");
-        if (ot != null) {
-            CreateObjectEvent coe = new CreateObjectEvent(ot.getObjectToCreate(), null, ot);
-            GlobalObjects.getInstance().postEvent(coe);
-        }
-
-    }//GEN-LAST:event_mnuAddRevoluteJointActionPerformed
-
-    private void mnuAddTargetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAddTargetActionPerformed
-        ObjectTypeCategory otc = viewport.getObjectsToCreate();
-        ObjectType ot = otc.getObjectType("Animation", "AttachmentPoint");
-        if (ot != null) {
-            CreateObjectEvent coe = new CreateObjectEvent(ot.getObjectToCreate(), null, ot);
-            GlobalObjects.getInstance().postEvent(coe);
-        }
-    }//GEN-LAST:event_mnuAddTargetActionPerformed
 
     private void toggleAutogridItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_toggleAutogridItemStateChanged
         AutoGridEvent age = new AutoGridEvent(evt.getStateChange() == ItemEvent.SELECTED, AxisEnum.Y);
@@ -1379,9 +1288,148 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
         }
     }//GEN-LAST:event_mnuRemoveComponentActionPerformed
 
+    private void mnuAddWaypointActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAddWaypointActionPerformed
+        // TODO add your handling code here:
+        ObjectTypeCategory otc = viewport.getObjectsToCreate();
+        ObjectType ot = otc.getObjectType("Animation", "Waypoint");
+        if (ot != null) {
+            CreateObjectEvent coe = new CreateObjectEvent(ot.getObjectToCreate(), null, ot);
+            GlobalObjects.getInstance().postEvent(coe);
+        }
+    }//GEN-LAST:event_mnuAddWaypointActionPerformed
+
+    private void mnuAddCharacterPathActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAddCharacterPathActionPerformed
+        // TODO add your handling code here:
+        ObjectTypeCategory otc = viewport.getObjectsToCreate();
+        ObjectType ot = otc.getObjectType("Animation", "CharacterPath");
+        if (ot != null) {
+            CreateObjectEvent coe = new CreateObjectEvent(ot.getObjectToCreate(), null, ot);
+            GlobalObjects.getInstance().postEvent(coe);
+        }
+    }//GEN-LAST:event_mnuAddCharacterPathActionPerformed
+
+    private void mnuHandCurveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuHandCurveActionPerformed
+        // TODO add your handling code here:
+        ObjectTypeCategory otc = viewport.getObjectsToCreate();
+        ObjectType ot = otc.getObjectType("Animation", "Handcurve");
+        if (ot != null) {
+            CreateObjectEvent coe = new CreateObjectEvent(ot.getObjectToCreate(), null, ot);
+            GlobalObjects.getInstance().postEvent(coe);
+        }
+    }//GEN-LAST:event_mnuHandCurveActionPerformed
+
+    private void munAddFootcurveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_munAddFootcurveActionPerformed
+        ObjectTypeCategory otc = viewport.getObjectsToCreate();
+        ObjectType ot = otc.getObjectType("Animation", "Footcurve");
+        if (ot != null) {
+            CreateObjectEvent coe = new CreateObjectEvent(ot.getObjectToCreate(), null, ot);
+            GlobalObjects.getInstance().postEvent(coe);
+        }
+    }//GEN-LAST:event_munAddFootcurveActionPerformed
+
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        // TODO add your handling code here:
+        ObjectTypeCategory otc = viewport.getObjectsToCreate();
+        ObjectType ot = otc.getObjectType("Animation", "Handshake");
+        if (ot != null) {
+            CreateObjectEvent coe = new CreateObjectEvent(ot.getObjectToCreate(), null, ot);
+            GlobalObjects.getInstance().postEvent(coe);
+        }
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
+
+    private void mnuAdd2HandleAxisActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAdd2HandleAxisActionPerformed
+        // TODO add your handling code here:
+        ObjectTypeCategory otc = viewport.getObjectsToCreate();
+        ObjectType ot = otc.getObjectType("Animation", "TwoAxisHandle");
+        if (ot != null) {
+            CreateObjectEvent coe = new CreateObjectEvent(ot.getObjectToCreate(), null, ot);
+            GlobalObjects.getInstance().postEvent(coe);
+        }
+    }//GEN-LAST:event_mnuAdd2HandleAxisActionPerformed
+
+    private void mnuAddHandleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAddHandleActionPerformed
+        // TODO add your handling code here:
+        ObjectTypeCategory otc = viewport.getObjectsToCreate();
+        ObjectType ot = otc.getObjectType("Animation", "Handle");
+        if (ot != null) {
+            CreateObjectEvent coe = new CreateObjectEvent(ot.getObjectToCreate(), null, ot);
+            GlobalObjects.getInstance().postEvent(coe);
+        }
+    }//GEN-LAST:event_mnuAddHandleActionPerformed
+
+    private void mnuAddTargetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAddTargetActionPerformed
+        ObjectTypeCategory otc = viewport.getObjectsToCreate();
+        ObjectType ot = otc.getObjectType("Animation", "AttachmentPoint");
+        if (ot != null) {
+            CreateObjectEvent coe = new CreateObjectEvent(ot.getObjectToCreate(), null, ot);
+            GlobalObjects.getInstance().postEvent(coe);
+        }
+    }//GEN-LAST:event_mnuAddTargetActionPerformed
+
     private void mnuAddFreeJointActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAddFreeJointActionPerformed
-        createObject("Animation","RevoluteJointTwoAxis",null);
+        createObject("Animation", "RevoluteJointTwoAxis", null);
     }//GEN-LAST:event_mnuAddFreeJointActionPerformed
+
+    private void mnuAddRevoluteJointActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAddRevoluteJointActionPerformed
+        ObjectTypeCategory otc = viewport.getObjectsToCreate();
+        ObjectType ot = otc.getObjectType("Animation", "RevoluteJoint");
+        if (ot != null) {
+            CreateObjectEvent coe = new CreateObjectEvent(ot.getObjectToCreate(), null, ot);
+            GlobalObjects.getInstance().postEvent(coe);
+        }
+    }//GEN-LAST:event_mnuAddRevoluteJointActionPerformed
+
+    private void mnuCreateRigActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuCreateRigActionPerformed
+        if (currentProject.hasFileLocation()) {
+            createObjectDialog.setTitle("Create Rig");
+            createObjectDialog.setCurrentProject(this.currentProject);
+            createObjectDialog.setVisible(true);
+            if (createObjectDialog.getReturnStatus() == CreateKlatchDialog.RET_OK) {
+                String rigLocation = createObjectDialog.getAssemblyName();
+                // Create a default body.
+                ObjectTypeCategory otc = viewport.getObjectsToCreate();
+                ObjectType ot = otc.getObjectType("Animation", "Rig");
+                if (ot != null) {
+                    Rig rig;
+                    rig = (Rig) ot.createDefault(viewport.getAssetManager(), "rig", true);
+
+                    File klatchDir = currentProject.getKlatchDirectory();
+                    File rigFile = new File(klatchDir, rigLocation);
+                    RigWriter.writeRig(rigFile, rig);
+
+                    AssetEvent ae = new AssetEvent(AssetEventType.EDIT, FileNode.createFromPath(rigLocation));
+                    GlobalObjects.getInstance().postEvent(ae);
+                }
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "<html>You must save the project before<br> you can create a rig!", "Project not saved", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_mnuCreateRigActionPerformed
+
+    private void mnuAddEyeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAddEyeActionPerformed
+
+        createObject("Animation", "Eye");
+    }//GEN-LAST:event_mnuAddEyeActionPerformed
+
+    private void mnuAddCylinderComponentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAddCylinderComponentActionPerformed
+        GlobalObjects.getInstance().postEvent(new ComponentEvent("CylinderComponent"));
+    }//GEN-LAST:event_mnuAddCylinderComponentActionPerformed
+
+    private void mnuAddBoxComponentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAddBoxComponentActionPerformed
+        GlobalObjects.getInstance().postEvent(new ComponentEvent("BoxComponent"));
+    }//GEN-LAST:event_mnuAddBoxComponentActionPerformed
+
+    private void mnuAddSphereComponentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAddSphereComponentActionPerformed
+        GlobalObjects.getInstance().postEvent(new ComponentEvent("SphereComponent"));
+    }//GEN-LAST:event_mnuAddSphereComponentActionPerformed
+
+    private void mnuCutActionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuCutActionActionPerformed
+        GlobalObjects.getInstance().postEvent(new CutCopyPasteEvent(CutCopyPasteType.CUT));
+    }//GEN-LAST:event_mnuCutActionActionPerformed
+
+    private void mnuPasteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuPasteActionPerformed
+        GlobalObjects.getInstance().postEvent(new CutCopyPasteEvent(CutCopyPasteType.PASTE));
+    }//GEN-LAST:event_mnuPasteActionPerformed
 
     private void createObject(String category, String type) {
         createObject(category, type, null);
@@ -1472,23 +1520,29 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
     private javax.swing.JToolBar gizmoToolbar;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JPopupMenu.Separator jSeparator1;
+    private javax.swing.JPopupMenu.Separator jSeparator10;
     private javax.swing.JPopupMenu.Separator jSeparator2;
     private javax.swing.JPopupMenu.Separator jSeparator3;
     private javax.swing.JPopupMenu.Separator jSeparator4;
     private javax.swing.JPopupMenu.Separator jSeparator5;
     private javax.swing.JPopupMenu.Separator jSeparator6;
     private javax.swing.JPopupMenu.Separator jSeparator7;
+    private javax.swing.JPopupMenu.Separator jSeparator8;
+    private javax.swing.JPopupMenu.Separator jSeparator9;
     private javax.swing.JToggleButton jToggleButton1;
     private javax.swing.JMenu mnuAdd;
     private javax.swing.JMenuItem mnuAdd2HandleAxis;
     private javax.swing.JMenuItem mnuAddAmbientLight;
     private javax.swing.JMenuItem mnuAddAnimationComponent;
+    private javax.swing.JMenuItem mnuAddBoxComponent;
     private javax.swing.JMenuItem mnuAddCamera;
     private javax.swing.JMenuItem mnuAddCharacterPath;
     private javax.swing.JMenuItem mnuAddCollider;
     private javax.swing.JMenuItem mnuAddCrate;
     private javax.swing.JMenuItem mnuAddCylinder;
+    private javax.swing.JMenuItem mnuAddCylinderComponent;
     private javax.swing.JMenuItem mnuAddDirectionalLight;
+    private javax.swing.JMenuItem mnuAddEye;
     private javax.swing.JMenuItem mnuAddFreeJoint;
     private javax.swing.JMenuItem mnuAddHandle;
     private javax.swing.JMenuItem mnuAddHingeJoint;
@@ -1498,9 +1552,9 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
     private javax.swing.JMenuItem mnuAddPhysicsBox;
     private javax.swing.JMenuItem mnuAddPivot;
     private javax.swing.JMenuItem mnuAddRevoluteJoint;
-    private javax.swing.JMenuItem mnuAddSkeleton;
     private javax.swing.JMenuItem mnuAddSound;
     private javax.swing.JMenuItem mnuAddSphere;
+    private javax.swing.JMenuItem mnuAddSphereComponent;
     private javax.swing.JMenuItem mnuAddSpotLight;
     private javax.swing.JMenuItem mnuAddTarget;
     private javax.swing.JMenuItem mnuAddTriggerBox;
@@ -1510,6 +1564,7 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
     private javax.swing.JMenuItem mnuConvexShape;
     private javax.swing.JMenuItem mnuCreateRig;
     private javax.swing.JMenuItem mnuCreateTerrainBrush;
+    private javax.swing.JMenuItem mnuCutAction;
     private javax.swing.JMenu mnuEdit;
     private javax.swing.JMenu mnuEntities;
     private javax.swing.JMenuItem mnuExit;
@@ -1522,6 +1577,7 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
     private javax.swing.JMenu mnuMetaData;
     private javax.swing.JMenuItem mnuNewProject;
     private javax.swing.JMenuItem mnuOpenScene;
+    private javax.swing.JMenuItem mnuPaste;
     private javax.swing.JMenu mnuPhysics;
     private javax.swing.JMenuItem mnuPhysicsTerrain;
     private javax.swing.JMenuItem mnuPreferences;
@@ -1529,7 +1585,6 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
     private javax.swing.JMenuItem mnuRemoveComponent;
     private javax.swing.JMenuBar mnuSandboxMenu;
     private javax.swing.JMenuItem mnuSaveProject;
-    private javax.swing.JMenuItem mnuSkeleton2;
     private javax.swing.JMenuItem mnuSpotLight;
     private javax.swing.JMenu mnuStandardObjects;
     private javax.swing.JMenuItem mnuTerrain;
@@ -1578,22 +1633,27 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
         setCurrentProject(p);
     }
 
+    @Override
     public void dragEnter(DropTargetDragEvent dtde) {
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        
     }
 
+    @Override
     public void dragOver(DropTargetDragEvent dtde) {
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        
     }
 
+    @Override
     public void dropActionChanged(DropTargetDragEvent dtde) {
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        
     }
 
+    @Override
     public void dragExit(DropTargetEvent dte) {
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        
     }
 
+    @Override
     public void drop(DropTargetDropEvent dtde) {
         // something was dropped on the application
         //System.out.println("dtde:" + dtde.getDropAction());
