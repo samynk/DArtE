@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.prefabs;
 
 import com.jme3.asset.AssetManager;
@@ -58,12 +54,14 @@ public class Klatch extends Prefab {
         return k;
     }
 
+    /*
     @Override
-    public Prefab duplicate(AssetManager assetManager) {
+    public Prefab duplicate(AssetManager assetManager, boolean duplicateChildren) {
         Prefab duplicate = (Prefab)clone();
         duplicate.setLocalPrefabTranslation(this.getWorldTranslation());
-        return (Prefab)clone();
+        return (Prefab)super.duplicate(assetManager,duplicateChildren);
     }
+    */
     
     
     
