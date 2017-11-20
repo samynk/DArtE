@@ -72,6 +72,7 @@ public class RevoluteJointOutputConnector implements OutputConnector {
     public OutputConnector cloneConnector() {
         RevoluteJointOutputConnector rjoc = new RevoluteJointOutputConnector();
         rjoc.setJointName(jointName);
+        rjoc.factor = factor;
         rjoc.initialized = false;
         return rjoc;
     }
