@@ -12,7 +12,7 @@ import org.junit.BeforeClass;
 
 /**
  *
- * @author samyn_000
+ * @author Koen Samyn
  */
 public class ReadWriteCopyAmbientLightTest {
 
