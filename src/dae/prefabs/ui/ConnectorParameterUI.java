@@ -36,7 +36,6 @@ public class ConnectorParameterUI extends javax.swing.JPanel implements Paramete
         java.awt.GridBagConstraints gridBagConstraints;
 
         lblLabel = new javax.swing.JLabel();
-        txtFuzzySystemName = new javax.swing.JTextField();
         btnEditRigConnectors = new javax.swing.JButton();
 
         setLayout(new java.awt.GridBagLayout());
@@ -48,15 +47,6 @@ public class ConnectorParameterUI extends javax.swing.JPanel implements Paramete
         gridBagConstraints.gridy = 0;
         add(lblLabel, gridBagConstraints);
 
-        txtFuzzySystemName.setEditable(false);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(1, 4, 0, 0);
-        add(txtFuzzySystemName, gridBagConstraints);
-
         btnEditRigConnectors.setText("Edit ...");
         btnEditRigConnectors.setPreferredSize(null);
         btnEditRigConnectors.addActionListener(new java.awt.event.ActionListener() {
@@ -67,6 +57,8 @@ public class ConnectorParameterUI extends javax.swing.JPanel implements Paramete
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 0);
         add(btnEditRigConnectors, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
@@ -85,7 +77,6 @@ public class ConnectorParameterUI extends javax.swing.JPanel implements Paramete
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnEditRigConnectors;
     private javax.swing.JLabel lblLabel;
-    private javax.swing.JTextField txtFuzzySystemName;
     // End of variables declaration//GEN-END:variables
 
     public void setParameter(Parameter p) {
@@ -103,14 +94,15 @@ public class ConnectorParameterUI extends javax.swing.JPanel implements Paramete
         Object value = ReflectionManager.getInstance().invokeGetMethod(currentSelectedNode,p); 
         if (value instanceof FuzzySystem) {
             FuzzySystem fs = (FuzzySystem) value;
-            txtFuzzySystemName.setText(fs.getName());
+            //txtFuzzySystemName.setText(fs.getName());
         }
     }
     
     /**
      * Checks if a label should be created for the UI.
-     * @return true if a label should be created, false othwerise.
+     * @return true if a label should be created, false otherwise.
      */
+    @Override
     public boolean needsLabel(){
         return true;
     }
