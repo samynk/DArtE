@@ -46,17 +46,6 @@ public class CylinderObject extends Prefab {
     }
 
     @Override
-    public Prefab duplicate(AssetManager manager) {
-        CylinderObject co = new CylinderObject( this.radius, height, axialSegments, radialSegments);
-        co.physicsSpace = physicsSpace;
-        co.initialize( manager, getObjectType(), null) ;
-        co.setName(name);
-        co.setType( this.getType() );
-        co.setCategory( this.getCategory() );
-        return co;
-    }
-
-    @Override
     public String getPrefix() {
         return "Cylinder";
     }
