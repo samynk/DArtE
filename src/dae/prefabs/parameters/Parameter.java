@@ -218,7 +218,9 @@ public class Parameter {
                 for (ChangeListener cl : listeners) {
                     cl.stateChanged(new ChangeEvent(prefab));
                 }
+                prefab.setChanged(true, false);
             }
+            
         }
     }
 
