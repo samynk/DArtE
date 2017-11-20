@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.prefabs.standard;
 
 import com.jme3.asset.AssetManager;
@@ -33,17 +29,6 @@ public class SphereObject extends Prefab {
     public SphereObject(float radius) {
         this.radius = radius;
         setPivot(new Vector3f(0, -radius, 0));
-    }
-    
-    @Override
-    public Prefab duplicate(AssetManager manager) {
-        SphereObject so = new SphereObject(this.radius);
-        so.space = this.space;
-        so.create( manager, null);
-        so.setName(name);
-        so.setType(this.getType());
-        so.setCategory(this.getCategory());
-        return so;
     }
     
     @Override
