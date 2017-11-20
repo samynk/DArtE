@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package dae.animation.skeleton.debug;
 
 import com.jme3.math.FastMath;
