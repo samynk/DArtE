@@ -212,7 +212,7 @@ public class SceneLoader implements AssetLoader {
 
 
         if (type != null) {
-            Prefab p = type.create(manager, "prefab");
+            Prefab p = type.createDefault(manager, "prefab",false);
             MagnetParameter mp = (MagnetParameter) type.findParameter("magnets");
             p.setMagnets(mp);
             return p;
@@ -358,7 +358,6 @@ public class SceneLoader implements AssetLoader {
     public static void readNodeChildren(NodeList nl, AssetManager am, ObjectTypeCategory objectsToCreate, Node parentNode) throws IllegalAccessException, NumberFormatException, ClassNotFoundException, InstantiationException {
         for (int i = 0; i < nl.getLength(); ++i) {
             org.w3c.dom.Node n = nl.item(i);
-            System.out.println("Reading node : " + n.getNodeName());
             NamedNodeMap map = n.getAttributes();
             Prefab currentPrefab = null;
             if ("body".equals(n.getNodeName())) {
