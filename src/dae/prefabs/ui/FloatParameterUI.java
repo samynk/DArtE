@@ -82,6 +82,7 @@ public class FloatParameterUI extends javax.swing.JPanel implements ParameterUI 
         parameter = (FloatParameter) p;
     }
     
+    @Override
     public Parameter getParameter(){
         return parameter;
     }
@@ -100,6 +101,7 @@ public class FloatParameterUI extends javax.swing.JPanel implements ParameterUI 
      * Checks if a label should be created for the UI.
      * @return true if a label should be created, false othwerise.
      */
+    @Override
     public boolean needsLabel(){
         return true;
     }
