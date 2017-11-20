@@ -26,15 +26,17 @@ import java.util.logging.Logger;
  */
 public class ObjectType extends ParameterSupport {
 
-    private String label;
-    private String category;
+    private final String label;
+    private final String category;
     private String objectClass;
     private String extraInfo;
     private boolean loadFromExtraInfo = false;
     private final int cid;
-    private ArrayList<ComponentType> componentTypes = new ArrayList<ComponentType>();
-    private HashMap<String, ComponentType> componentMap = new HashMap<String, ComponentType>();
-    private HashMap<String, HashMap<String, Object>> defaultMap = new HashMap<String, HashMap<String, Object>>();
+    private final ArrayList<ComponentType> componentTypes = new ArrayList<>();
+    private final HashMap<String, ComponentType> componentMap = new HashMap<>();
+    private final HashMap<String, HashMap<String, Object>> defaultMap = new HashMap<>();
+    private final ArrayList<ObjectType> childObjects = new ArrayList<>();
+    
 
     /*
      * Creates a new objectype.
@@ -52,6 +54,18 @@ public class ObjectType extends ParameterSupport {
         this.extraInfo = extraInfo;
         this.loadFromExtraInfo = loadFromExtraInfo;
         this.cid = cid;
+    }
+    
+    /**
+     * Initializes this ObjectType with another object type.
+     * @param tc the object to copy.
+     */
+    public ObjectType(ObjectType tc){
+        this(tc.category,tc.label,tc.objectClass,tc.extraInfo,tc.loadFromExtraInfo,tc.cid);
+        
+        for (ComponentType ct: tc.componentTypes){
+            this.addComponentType(ct);
+        }
     }
 
     /**
@@ -112,9 +126,17 @@ public class ObjectType extends ParameterSupport {
      *
      * @param ct the component type to add.
      */
-    public void addComponentType(ComponentType ct) {
+    public final void addComponentType(ComponentType ct) {
         this.componentTypes.add(ct);
         componentMap.put(ct.getId(), ct);
+    }
+    
+    /**
+     * Child objects to create when this type of object is created.
+     * @param child the child object to create.
+     */
+    public final void addChildObject(ObjectType child){
+        this.childObjects.add(child);
     }
 
     /**
@@ -145,6 +167,12 @@ public class ObjectType extends ParameterSupport {
 
         initializePrefab(p, name);
         p.notifyLoaded();
+        
+        for (ObjectType child : this.childObjects){
+            Prefab childPrefab = child.create(manager, name);
+            p.attachChild(childPrefab);
+        }
+        
         return p;
     }
 
@@ -267,9 +295,8 @@ public class ObjectType extends ParameterSupport {
     /**
      * Finds the parameter that is bound to the given component for the given
      * property.
-     *
-     * @param transformComponent
-     * @param property
+     * @param componentId the component id of the component that holds the property.
+     * @param property the property to find.
      * @return the Parameter object or null if the parameter is not found.
      */
     public Parameter findParameter(String componentId, String property) {
@@ -305,7 +332,7 @@ public class ObjectType extends ParameterSupport {
     public void setDefaultValue(String componentId, String propertyId, Object parsed) {
         HashMap<String, Object> categoryMap = this.defaultMap.get(componentId);
         if (categoryMap == null) {
-            categoryMap = new HashMap<String, Object>();
+            categoryMap = new HashMap<>();
             defaultMap.put(componentId, categoryMap);
         }
         categoryMap.put(propertyId, parsed);
