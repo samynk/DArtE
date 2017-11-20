@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.animation.rig.gui;
 
 import dae.animation.rig.AnimationController;
@@ -43,6 +39,7 @@ public class RigConnectorPanel extends javax.swing.JPanel {
         }
         listModel = new AnimationControllerListModel(alc);
         lstConnectors.setModel(listModel);
+        lstConnectors.setSelectedIndex(0);
     }
 
     /**
