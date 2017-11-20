@@ -55,18 +55,6 @@ public class TriggerBox extends Prefab {
         this.physicsSpace = space;
         createControl();
     }
-    
-    @Override
-    public Prefab duplicate(AssetManager manager) {
-        TriggerBox to = new TriggerBox();
-        to.dimension = dimension;
-        to.create( manager, null) ;
-        to.setName(name);
-        to.addPhysics(physicsSpace);
-        to.setType( this.getType() );
-        to.setCategory( this.getCategory() );
-        return to;
-    }
 
     /**
      * Creates the control on the basis of the current dimensions.
