@@ -84,7 +84,36 @@
                 <parameter type="integer" id="collisionGroup" constraint="positive"/>
             </parameters>
         </component>
-        
+        <component id="SphereComponent" className="dae.components.shapes.SphereComponent">
+            <parameters section="Sphere">
+                <parameter type="boolean" id="visible" default="true"/>
+                <parameter type="color" id="diffuseColor" default="[1,1,1,1]"/>
+                <parameter type="float" id="radius" default="1"/>
+                <parameter type="integer" id="radialSegments" min="4" max="16" default="8" />
+                <parameter type="integer" id="axialSegments" min="4" max="16" default="8"/>
+            </parameters>
+        </component>
+        <component id="BoxComponent" className="dae.components.shapes.BoxComponent">
+            <parameters section="Box">
+                <parameter type="boolean" id="visible" default="true"/>
+                <parameter type="color" id="diffuseColor" default="[1,1,1,1]"/>
+                <parameter type="float" id="length" default="1"/>
+                <parameter type="float" id="width" default="1"/>
+                <parameter type="float" id="height" default="1"/>
+                <parameter type="float3" id="center" default="[0,0,0]"/>
+            </parameters>
+        </component>
+        <component id="CylinderComponent" className="dae.components.shapes.CylinderComponent">
+            <parameters section="Cylinder">
+                <parameter type="boolean" id="visible" default="true"/>
+                <parameter type="color" id="diffuseColor" default="[1,1,1,1]"/>
+                <parameter type="float" id="radius" default="1"/>
+                <parameter type="float" id="height" default="2"/>
+                <parameter type="integer" id="radialSegments" min="4" max="16" default="8" />
+                <parameter type="integer" id="axialSegments" min="4" max="16" default="8"/>
+                <parameter type="float3" id="rotation" default="[0,90,0]" converter="dae.prefabs.parameters.converter.QuaternionConverter"/>
+            </parameters>
+        </component>
     </components>
     <collection name="Standard" >
         <object label="Ground" class="dae.project.Grid">
@@ -338,6 +367,7 @@
                 <parameter type="fuzzy" id="fuzzySystem"/>
                 <parameter type="object" collectiontype="dictionary" id="target"/>
                 <parameter type="connector" id="rigconnector"/>
+                <parameter type="object" collectiontype="list" id="behaviour"/>
             </parameters>
         </object>
         <object label="Skeleton" class="dae.animation.skeleton.Body" defaultloader="true">
@@ -387,6 +417,21 @@
                 <parameter type="float" id="thetaAngle"/>
                 <parameter type="float" id="phiAngle"/>
             </parameters>
+            <child category="Animation" label="AttachmentPoint">
+                <default cid="TransformComponent" id="translation" value="[1,0,0]"/>
+                <default cid="ObjectComponent" id="name" value="target"/>
+            </child>
+        </object>
+        <object label="Eye" class="dae.prefabs.standard.MeshObject">
+            <component id="ObjectComponent"/>
+            <component id="TransformComponent"/>
+            <component id="SphereComponent"/>
+            <component id="BoxComponent">
+                <default id="length" value="0.4"/>
+                <default id="width" value="1.2"/>
+                <default id="height" value="0.2"/>
+                <default id="center" value="[.8,0,0]"/>
+            </component>
         </object>
         <object label="Handle" class="dae.prefabs.standard.MeshObject" mesh="Skeleton/Helpers/Handle.j3o">
             <component id="ObjectComponent"/>
