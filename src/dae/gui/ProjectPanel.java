@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.gui;
 
 import com.google.common.eventbus.Subscribe;
@@ -206,7 +202,6 @@ public class ProjectPanel extends javax.swing.JPanel implements TreeSelectionLis
     }// </editor-fold>//GEN-END:initComponents
 
     private void mnuAddLevelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAddLevelActionPerformed
-        // TODO add your handling code here:
         createLayerDialog.setLocationRelativeTo(this);
         createLayerDialog.setCurrentProject(currentProject);
         createLayerDialog.setVisible(true);
@@ -222,7 +217,6 @@ public class ProjectPanel extends javax.swing.JPanel implements TreeSelectionLis
     }//GEN-LAST:event_mnuAddLevelActionPerformed
 
     private void mnuRemoveLevelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuRemoveLevelActionPerformed
-        // TODO add your handling code here:
         if (currentProject.getNrOfLevels() > 1) {
             Object selected = projectTree.getSelectionPath().getLastPathComponent();
             if (selected instanceof Level) {
@@ -298,6 +292,7 @@ public class ProjectPanel extends javax.swing.JPanel implements TreeSelectionLis
     private javax.swing.JScrollPane scrTreeContainer;
     // End of variables declaration//GEN-END:variables
 
+    @Override
     public void valueChanged(TreeSelectionEvent e) {
         if (silentSelection) {
             return;
