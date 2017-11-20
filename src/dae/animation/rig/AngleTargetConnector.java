@@ -19,106 +19,35 @@ import org.w3c.dom.Node;
  *
  * @author Koen Samyn
  */
-public class AngleTargetConnector implements InputConnector {
+public class AngleTargetConnector extends InputConnector {
 
-    private String jointName;
     private String targetName;
     private String attachmentName;
-    protected Joint joint;
-    protected AttachmentPoint attachment;
-    protected Spatial target;
-    private boolean initialized = false;
+
+    
 
     public AngleTargetConnector() {
     }
+
     
-    @Override
-    public boolean isInitialized(){
-        return initialized;
-    }
-
-    /**
-     * @return the jointName
-     */
-    @Override
-    public String getJointName() {
-        return jointName;
-    }
-
-    /**
-     * @param jointName the jointName to set
-     */
-    @Override
-    public void setJointName(String jointName) {
-        this.jointName = jointName;
-    }
-
-    /**
-     * @return the targetName
-     */
-    public String getTargetName() {
-        return targetName;
-    }
-
-    /**
-     * @param targetName the targetName to set
-     */
-    public void setTargetName(String targetName) {
-        this.targetName = targetName;
-    }
-
-    /**
-     * @return the attachmentName
-     */
-    public String getAttachmentName() {
-        return attachmentName;
-    }
-
-    /**
-     * @param attachmentName the attachmentName to set
-     */
-    public void setAttachmentName(String attachmentName) {
-        this.attachmentName = attachmentName;
-    }
 
     @Override
     public void initialize(Rig rig) {
-        initialized = false;
-        Spatial sjoint = rig.getChild(jointName);
-        if (sjoint instanceof Joint) {
-            this.joint = (Joint) sjoint;
-        } else {
-            return;
-        }
-
-        Spatial sattachment = rig.getChild(attachmentName);
-        if (sattachment instanceof AttachmentPoint) {
-            this.attachment = (AttachmentPoint) sattachment;
-        } else {
-            return;
-        }
-
-        // search for the target from the top level.
-        target = rig.getTarget(targetName);
         
-        if (target != null && !(target instanceof PrefabPlaceHolder)) {
-            initialized = true;
-        }
-
     }
 
     @Override
     public float getValue() {
-        Vector3f axis = joint.getWorldRotationAxis();
+        Vector3f axis = getJoint().getWorldRotationAxis();
         axis.normalizeLocal();
-        Vector3f origin = joint.getWorldTranslation();
+        Vector3f origin = getJoint().getWorldTranslation();
 
         Vector3f apLoc = attachment.getWorldTranslation();
         Vector3f targetLoc = target.getWorldTranslation();
 
         Vector3f vector1 = apLoc.subtract(origin);
         Vector3f vector2 = targetLoc.subtract(origin);
-        
+
         MathUtil.project(vector1, axis);
         MathUtil.project(vector2, axis);
         vector1.normalizeLocal();
@@ -129,31 +58,32 @@ public class AngleTargetConnector implements InputConnector {
         }
         return angle;
     }
-    
-   
 
     @Override
     public InputConnector cloneConnector() {
         AngleTargetConnector ac = new AngleTargetConnector();
         ac.setAttachmentName(attachmentName);
-        ac.setJointName(jointName);
+        ac.setJointName(getJointName());
         ac.setTargetName(targetName);
-        ac.initialized = false;
+        ac.setInitialized(false);
         return ac;
     }
 
     /**
      * Creates an xml representation of this input connector.
+     *
      * @return this object as an xml string.
      */
     @Override
     public String toXML() {
         try {
             StringWriter sw = new StringWriter();
-            sw.write("<input class='dae.animation.rig.AngleTargetConnector' " );
-            XMLUtils.writeAttribute( sw, "jointName", jointName);
-            XMLUtils.writeAttribute( sw, "attachmentName", attachmentName);
-            XMLUtils.writeAttribute( sw, "targetName", targetName);
+            sw.write("<input class='");
+            sw.write(this.getClass().getCanonicalName());
+            sw.write("' ");
+            XMLUtils.writeAttribute(sw, "jointName", getJointName());
+            XMLUtils.writeAttribute(sw, "attachmentName", attachmentName);
+            XMLUtils.writeAttribute(sw, "targetName", targetName);
             sw.write("/>\n");
             return sw.toString();
         } catch (IOException ex) {
@@ -161,13 +91,17 @@ public class AngleTargetConnector implements InputConnector {
         }
         return "";
     }
-    
+
     @Override
-    public void fromXML(Node inputNode)
-    {
+    public void fromXML(Node inputNode) {
         NamedNodeMap map = inputNode.getAttributes();
-        this.jointName = XMLUtils.getAttribute("jointName", map);
+        setJointName(XMLUtils.getAttribute("jointName", map));
         this.attachmentName = XMLUtils.getAttribute("attachmentName", map);
         this.targetName = XMLUtils.getAttribute("targetName", map);
+    }
+
+    @Override
+    public ConnectorType getConnectorType() {
+        return RevoluteJoint.ANGLE_TARGET_TYPE;
     }
 }
