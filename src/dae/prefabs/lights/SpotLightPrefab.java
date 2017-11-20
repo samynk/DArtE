@@ -98,30 +98,6 @@ public class SpotLightPrefab extends Prefab implements ShadowCastSupport {
         return (Node) clone();
     }
 
-    @Override
-    public Spatial clone() {
-        Prefab duplicate = duplicate(manager);
-
-        return duplicate;
-    }
-
-    @Override
-    public Prefab duplicate(AssetManager assetManager) {
-        SpotLightPrefab sl = new SpotLightPrefab();
-
-        sl.setLocalPrefabTranslation(this.getLocalPrefabTranslation());
-        sl.setLocalPrefabRotation(this.getLocalPrefabRotation());
-        sl.setLocalScale(this.getLocalScale());
-        sl.initialize(assetManager, getObjectType(), null);
-        sl.setName(this.getName());
-        sl.setSpotLightIntensity(this.spotLightIntensity);
-        sl.setSpotLightColor(this.spotLightColor.clone());
-        sl.setSpotRange(this.spotLight.getSpotRange());
-        sl.setSpotInnerAngle(this.spotLight.getSpotInnerAngle() * FastMath.RAD_TO_DEG);
-        sl.setSpotOuterAngle(this.spotLight.getSpotOuterAngle() * FastMath.RAD_TO_DEG);
-        return sl;
-    }
-
     private Spatial createLightCone(Vector3f axis, float angle, float length, int lengthSegments, int radialSegments, Material lightMaterial, boolean generateTexCoords) {
         ConeShape result = new ConeShape(axis, angle, length, lengthSegments, radialSegments, generateTexCoords, Vector2f.UNIT_XY);
         Geometry innerCone = new Geometry("lightCone", result);
