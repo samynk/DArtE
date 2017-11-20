@@ -101,8 +101,6 @@ public class RigLoader implements AssetLoader {
         
         for (int i = 0; i < nl.getLength(); ++i) {
             org.w3c.dom.Node n = nl.item(i);
-            System.out.println("Reading node : " + n.getNodeName());
-            NamedNodeMap map = n.getAttributes();
             switch(n.getNodeName())
             {
                 case "fuzzysystems": readFuzzySystems(result, n);break;
@@ -349,7 +347,7 @@ public class RigLoader implements AssetLoader {
             Node child = nl.item(i);
             if (child.getNodeName().equals("fuzzysystem")) {
                 String name = getAttrContent("name", child.getAttributes());
-                FuzzySystem system = new FuzzySystem(name);
+                FuzzySystem system = new FuzzySystem(name,false);
                 rig.setFuzzySystem(system);
                 readFuzzySystem(system, child);
             }
