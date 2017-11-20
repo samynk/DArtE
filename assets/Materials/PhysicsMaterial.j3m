@@ -1,0 +1,10 @@
+Material My Material : Common/MatDefs/Light/Lighting.j3md {
+     MaterialParameters {
+        DiffuseMap : Textures/pivotpattern.png
+        Diffuse : 0.6 1.0 0.2 .5
+        UseVertexColor : false
+        UseMaterialColors : true
+     }
+    AdditionalRenderState {
+    }
+}
