@@ -2,7 +2,6 @@ package dae.animation.rig;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
-import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
@@ -10,8 +9,6 @@ import dae.GlobalObjects;
 import dae.animation.skeleton.BodyElement;
 import dae.prefabs.Prefab;
 import dae.prefabs.shapes.DiamondShape;
-import dae.prefabs.types.ObjectType;
-import dae.prefabs.types.ObjectTypeCategory;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -27,10 +24,10 @@ import mlproject.fuzzy.FuzzySystem;
  */
 public class Rig extends Prefab implements BodyElement {
 
-    private FuzzySystem fuzzySystem = new FuzzySystem("default");
+    private FuzzySystem fuzzySystem = new FuzzySystem("default", true);
     private final ArrayList<String> targetKeys = new ArrayList<>();
     private final HashMap<String, Prefab> targets = new HashMap<>();
-    
+
     private AssetManager manager;
 
     /**
@@ -39,24 +36,6 @@ public class Rig extends Prefab implements BodyElement {
     public Rig() {
         setCategory("Animation");
         setType("Rig");
-    }
-
-    private void createTestRig(AssetManager manager) {
-        ObjectTypeCategory otc = GlobalObjects.getInstance().getObjectsTypeCategory();
-        ObjectType ot = otc.getObjectType("Animation", "RevoluteJointTwoAxis");
-        Prefab joint = ot.create(manager, "joint");
-        this.attachChild(joint);
-
-        ObjectType ot2 = otc.getObjectType("Animation", "AttachmentPoint");
-        Prefab ap = ot2.create(manager, "knob");
-        joint.attachChild(ap);
-        ap.setLocalPrefabTranslation(new Vector3f(1, 0, 0));
-
-        Prefab ap2 = ot2.create(manager, "target");
-        attachChild(ap2);
-        ap.setLocalPrefabTranslation(new Vector3f(3, 4, 0));
-
-        this.setTarget("victim", ap2);
     }
 
     /**
@@ -73,11 +52,12 @@ public class Rig extends Prefab implements BodyElement {
             this.duplicateComponents(rig, GlobalObjects.getInstance().getObjectsTypeCategory());
         }
 
-        
-        for (int i = 0 ; i < this.getPrefabChildCount(); ++i) {
-            Prefab toClone = (Prefab)this.getPrefabChildAt(i);
-            Spatial modelClone = toClone.clone();
-            rig.attachChild(modelClone);
+        for (int i = 0; i < this.getPrefabChildCount(); ++i) {
+            Prefab toClone = (Prefab) this.getPrefabChildAt(i);
+            Spatial modelClone = toClone.duplicate(this.manager, true);
+            if (modelClone != null) {
+                rig.attachChild(modelClone);
+            }
         }
         try {
             rig.fuzzySystem = (FuzzySystem) fuzzySystem.clone();
