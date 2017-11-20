@@ -67,7 +67,6 @@ public class IntParameterUI extends javax.swing.JPanel implements ParameterUI {
         if (disregardEvent) {
             return;
         }
-        String property = parameter.getId();
         if (currentNode != null) {
             currentNode.addUpdateObject(new UpdateObject(parameter, (Integer) spnIntegerValue.getValue(), true));
         }
