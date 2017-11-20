@@ -97,7 +97,7 @@ public class AssetLevel extends Level {
             super.levelShown(manager, state);
             if (!levelShown) {
                 ObjectType type = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Mesh", "Standard");
-                MeshObject mo = (MeshObject)type.create(manager, name);
+                MeshObject mo = (MeshObject) type.create(manager, name);
                 //TODO pass asset location to asset level.
                 //mo.initialize( manager, type, assetLocation);
                 this.attachChild(mo);
@@ -125,10 +125,12 @@ public class AssetLevel extends Level {
             // must be loaded as separate 
             try {
                 Rig rig = (Rig) manager.loadModel(assetLocation);
-                attachChild(rig);
-                LevelEvent le = new LevelEvent(this, LevelEvent.EventType.NODEADDED, rig);
-                GlobalObjects.getInstance().postEvent(le);
-                savableObject = rig;
+                if (rig != null) {
+                    attachChild(rig);
+                    LevelEvent le = new LevelEvent(this, LevelEvent.EventType.NODEADDED, rig);
+                    GlobalObjects.getInstance().postEvent(le);
+                    savableObject = rig;
+                }
             } catch (AssetNotFoundException ex) {
                 GlobalObjects.getInstance().postEvent(new ErrorMessage("Could not load " + assetLocation));
             }
