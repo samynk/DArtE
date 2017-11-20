@@ -200,7 +200,7 @@ public class OutputConnectorPanel extends javax.swing.JPanel {
             String jointName = currentOutputConnector.getJointName();
             if (jointName != null) {
                 Spatial child = rig.getChild(jointName);
-                if (child instanceof RevoluteJoint) {
+                if (child instanceof Joint) {
                     cboJointNames.setSelectedItem(child);
                 }
             }
