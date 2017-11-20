@@ -16,13 +16,11 @@ import dae.animation.rig.Joint;
 import dae.animation.skeleton.constraints.SectorConstraint;
 import dae.animation.skeleton.debug.BoneVisualization;
 import dae.animation.skeleton.debug.SectorVisualization;
-import dae.io.SceneSaver;
 import dae.prefabs.Prefab;
 import dae.prefabs.gizmos.Axis;
 import dae.prefabs.gizmos.RotateGizmo;
+import dae.project.ProjectTreeNode;
 import dae.util.MathUtil;
-import java.io.IOException;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -77,13 +75,15 @@ public class RevoluteJointTwoAxis extends Prefab implements BodyElement, Joint {
     private final static ArrayList<ConnectorType> supportedOutputConnectorTypes
             = new ArrayList<ConnectorType>();
 
+    public static ConnectorType ANGLE_TARGET_TYPE;
+
     static {
-        ConnectorType ct = new ConnectorType("angletargetrevjoint", "Angle metric",
+        ANGLE_TARGET_TYPE = new ConnectorType("angletargetrevjoint", "Angle metric",
                 "This metric calculates the angle between two vectors. "
                 + "The first vector has the joint location as its origin and the selected attachment point as endpoint."
                 + "The second vector has the joint location as its origin and the target as endpoint.",
                 "dae.animation.rig.gui.AngleTargetDof2ConnectorPanel");
-        supportedInputConnectorTypes.add(ct);
+        supportedInputConnectorTypes.add(ANGLE_TARGET_TYPE);
 
         ConnectorType oct = new ConnectorType("anglerevjoint", "Angle",
                 "This connector increments the current angle of the joint with the output of the controller",
@@ -242,6 +242,7 @@ public class RevoluteJointTwoAxis extends Prefab implements BodyElement, Joint {
         phiAngle = 0;
     }
 
+    /*
     @Override
     public Spatial clone() {
 
@@ -254,7 +255,7 @@ public class RevoluteJointTwoAxis extends Prefab implements BodyElement, Joint {
         copy.notifyLoaded();
         return copy;
     }
-
+     */
     public void setAttachedBone(Bone b) {
         this.bone = b;
         b.setUserControl(true);
@@ -302,7 +303,7 @@ public class RevoluteJointTwoAxis extends Prefab implements BodyElement, Joint {
             }
         }
     }
-    
+
     @Override
     public int attachChild(Spatial child) {
         if (child instanceof Axis || child instanceof RotateGizmo) {
@@ -376,6 +377,19 @@ public class RevoluteJointTwoAxis extends Prefab implements BodyElement, Joint {
 
             }
             ++pindex;
+        }
+        return -1;
+    }
+
+    @Override
+    public int getIndexOfChild(ProjectTreeNode object) {
+        int pindex = 0;
+        for (Spatial s : transformNode.getChildren()) {
+            if (s == object) {
+                return pindex;
+            } else if (s instanceof ProjectTreeNode) {
+                ++pindex;
+            }
         }
         return -1;
     }
