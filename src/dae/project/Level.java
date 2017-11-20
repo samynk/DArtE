@@ -77,20 +77,20 @@ public class Level extends Node implements ProjectTreeNode {
      */
     protected void createLights(AssetManager manager) {
         ObjectType type = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Light", "DirectionalLight");
-        
-        DirectionalLightPrefab light1 = (DirectionalLightPrefab)type.create(manager,"Light1");
+
+        DirectionalLightPrefab light1 = (DirectionalLightPrefab) type.create(manager, "Light1");
         light1.setDirectionalLightColor(new ColorRGBA(0.97f, 0.91f, 0.69f, 1.0f).mult(0.75f));
         light1.setLocalTranslation(new Vector3f(2, 2, 2));
         light1.setLightDirection(new Vector3f(FastMath.cos(FastMath.PI * 2 / 3), -.6f, FastMath.sin(FastMath.PI * 2 / 3)));
         attachChild(light1);
 
-        DirectionalLightPrefab light2 = (DirectionalLightPrefab)type.create(manager,"Light2");
+        DirectionalLightPrefab light2 = (DirectionalLightPrefab) type.create(manager, "Light2");
         light2.setDirectionalLightColor(new ColorRGBA(0.97f, 0.91f, 0.69f, 1.0f).mult(0.75f));
         light2.setLocalTranslation(new Vector3f(-2, 2, 2));
         light2.setLightDirection(new Vector3f(FastMath.cos(FastMath.PI * 4 / 3), -.6f, FastMath.sin(FastMath.PI * 4 / 3)).normalizeLocal());
         attachChild(light2);
 
-        DirectionalLightPrefab backlight = (DirectionalLightPrefab)type.create(manager,"Backlight");
+        DirectionalLightPrefab backlight = (DirectionalLightPrefab) type.create(manager, "Backlight");
         backlight.setDirectionalLightColor(new ColorRGBA(0.65f, 0.65f, 0.78f, 1.0f).mult(0.75f));
         backlight.setLocalTranslation(new Vector3f(2, 2, -2));
         backlight.setLightDirection(new Vector3f(1.0f, -.6f, 0.0f).normalizeLocal());
@@ -99,10 +99,10 @@ public class Level extends Node implements ProjectTreeNode {
         defaultLights.add(light1);
         defaultLights.add(light2);
         defaultLights.add(backlight);
-        
+
         if (ground == null) {
             ObjectType gridtype = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Standard", "Ground");
-            ground = (Grid)gridtype.create(manager, name);
+            ground = (Grid) gridtype.create(manager, name);
             this.attachChild(ground);
             LevelEvent le = new LevelEvent(this, EventType.NODEADDED, ground);
             GlobalObjects.getInstance().postEvent(le);
@@ -250,7 +250,7 @@ public class Level extends Node implements ProjectTreeNode {
      */
     public void levelShown(AssetManager manager, BulletAppState state) {
         this.manager = manager;
-        
+
         if (this.createDefaultLights) {
             this.createLights(manager);
             createDefaultLights = false;
@@ -503,7 +503,6 @@ public class Level extends Node implements ProjectTreeNode {
     @Override
     public void updateLogicalState(float tpf) {
 
-
         Runnable r = todoQueue.poll();
         while (r != null) {
             r.run();
@@ -537,7 +536,7 @@ public class Level extends Node implements ProjectTreeNode {
     }
 
     /**
-     * Makes all the internal handle objects unvisible.
+     * Makes all the internal handle objects invisible.
      */
     private void hideTargetObjects() {
         for (Spatial s : this.getChildren()) {
@@ -549,7 +548,7 @@ public class Level extends Node implements ProjectTreeNode {
     }
 
     /**
-     * Makes all the internal handle objects unvisible.
+     * Makes all the internal handle objects invisible.
      */
     private void showTargetObjects() {
         for (Spatial s : this.getChildren()) {
@@ -570,10 +569,12 @@ public class Level extends Node implements ProjectTreeNode {
     }
 
     // project tree node implementation
+    @Override
     public boolean hasChildren() {
         return layers.size() > 0;
     }
 
+    @Override
     public int getIndexOfChild(ProjectTreeNode object) {
         return layers.indexOf(object);
     }
