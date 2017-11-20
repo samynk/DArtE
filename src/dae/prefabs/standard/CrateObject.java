@@ -60,19 +60,6 @@ public class CrateObject extends Prefab {
         recreate(manager);
     }
     
-    @Override
-    public Prefab duplicate(AssetManager manager)
-    {
-        CrateObject co = new CrateObject(bottom,top);
-        co.physicsSpace = physicsSpace;
-        co.setPivot(getPivot());
-        co.initialize( manager, getObjectType(), null) ;
-        co.setName(name);
-        co.setType( this.getType() );
-        co.setCategory( this.getCategory() );
-        return co;
-    }
-    
     private void recreate(AssetManager manager)
     {
         if ( box != null ){
