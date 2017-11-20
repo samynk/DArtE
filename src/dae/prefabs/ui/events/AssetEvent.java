@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package dae.prefabs.ui.events;
 
 import dae.prefabs.ui.classpath.FileNode;
@@ -12,8 +7,8 @@ import dae.prefabs.ui.classpath.FileNode;
  * @author Koen Samyn
  */
 public class AssetEvent {
-    private AssetEventType eventType;
-    private FileNode node;
+    private final AssetEventType eventType;
+    private final FileNode node;
     
     /**
      * Creates a new AssetEvent.
