@@ -164,6 +164,11 @@ public class InputConnectorPanel extends javax.swing.JPanel {
                         // if the customizer panel switches create a new InputConnector
                         currentInputConnector = createNewInputConnector();
                         currentAnimationController.setInput(currentInputConnector);
+                        Object selected = cboJointNames.getSelectedItem();
+                        if ( selected != null && selected instanceof Joint)
+                        {
+                            currentInputConnector.setJointName(((Joint)selected).getName());
+                        }
                     }
                     setInputConnectorOnCustomizerPanel();
                     return;
@@ -175,11 +180,7 @@ public class InputConnectorPanel extends javax.swing.JPanel {
             pnlConnectorTypes.add((JComponent) panel, ict.getId());
             currentPanelId = ict.getId();
             cl.show(pnlConnectorTypes, ict.getId());
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
             Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
         }
     }
@@ -199,10 +200,11 @@ public class InputConnectorPanel extends javax.swing.JPanel {
             String jointName = currentInputConnector.getJointName();
             if (jointName != null) {
                 Spatial child = rig.getChild(jointName);
-                if (child instanceof RevoluteJoint) {
+                if (child instanceof Joint) {
                     cboJointNames.setSelectedItem(child);
                 }
             }
+            cboTypes.setSelectedItem(currentInputConnector.getConnectorType());
             setInputConnectorOnCustomizerPanel();
         } else {
             InputConnector ic = createNewInputConnector();
