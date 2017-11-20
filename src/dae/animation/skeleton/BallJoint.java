@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.animation.skeleton;
 
 import com.jme3.material.Material;
@@ -19,7 +15,7 @@ import java.io.Writer;
 
 /**
  *
- * @author Koen
+ * @author Koen Samyn
  */
 public class BallJoint extends Node implements BodyElement {
 
@@ -112,7 +108,8 @@ public class BallJoint extends Node implements BodyElement {
         if (Float.isNaN(angle) || Float.isInfinite(angle)) {
             System.out.println("oh oh");
         }
-        Quaternion q = AxisAngleTransform.createAxisAngleTransform(rotAxis, angle);
+        Quaternion q = new Quaternion();
+        q.fromAngleAxis(angle, rotAxis);
         childTransformNode.setLocalRotation(q);
     }
 
@@ -143,9 +140,5 @@ public class BallJoint extends Node implements BodyElement {
                 ((BodyElement)s).showTargetObjects();
             }
         }
-    }
-
-    public void write(Writer w, int depth) throws IOException {
-        throw new UnsupportedOperationException("Ball joint is no longer supported"); //To change body of generated methods, choose Tools | Templates.
     }
 }
