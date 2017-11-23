@@ -15,6 +15,7 @@ import com.jme3.texture.Texture;
 import dae.GlobalObjects;
 import dae.components.ComponentList;
 import dae.components.ComponentType;
+import dae.components.ObjectComponent;
 import dae.components.PrefabComponent;
 import dae.components.TransformComponent;
 import dae.prefabs.events.ComponentListener;
@@ -39,7 +40,7 @@ import java.util.HashMap;
  *
  * @author Koen Samyn
  */
-public class Prefab extends Node implements ProjectTreeNode {
+public class Prefab extends Node implements ProjectTreeNode, LayerTaggable {
 
     private String prefix = "prefab";
     private final ArrayList<UpdateObject> workList
@@ -162,6 +163,17 @@ public class Prefab extends Node implements ProjectTreeNode {
     public TransformComponent getTransformComponent() {
         PrefabComponent c = getComponent("TransformComponent");
         return c instanceof TransformComponent ? (TransformComponent) c : null;
+    }
+    
+      /**
+     * Gets the transform component from this prefab, or null if no such
+     * component exists, or if the component does not have the required type.
+     *
+     * @return the TransformComponent object.
+     */
+    public ObjectComponent getObjectComponent() {
+        PrefabComponent c = getComponent("ObjectComponent");
+        return c instanceof ObjectComponent ? (ObjectComponent) c : null;
     }
 
     public void setOriginalMaterial(Material material) {
@@ -575,15 +587,7 @@ public class Prefab extends Node implements ProjectTreeNode {
     private FillerParameter getFillerParameter() {
         return this.fillers;
     }
-
-    protected Material createStandardMaterial(AssetManager am, String textureName, Texture.WrapMode mode, ColorRGBA color) {
-        Material mat = new Material(am, "Common/MatDefs/Light/Lighting.j3md");
-        Texture ref = am.loadTexture(textureName);
-        ref.setWrap(mode);
-        mat.setTexture("DiffuseMap", ref);
-        return mat;
-    }
-
+    
     /**
      * @return the physicsMesh
      */
@@ -1198,5 +1202,35 @@ public class Prefab extends Node implements ProjectTreeNode {
         if (pc != null) {
             removePrefabComponent(pc);
         }
+    }
+
+    @Override
+    public void addToLayer(String layer) {
+        ObjectComponent oc = getObjectComponent();
+        if ( oc != null ){
+            oc.setLayer(layer);
+        }
+    }
+    
+    @Override
+    public void removeFromLayer(String layer){
+        ObjectComponent oc = getObjectComponent();
+        if ( oc != null ){
+            oc.setLayer(layer);
+        }
+    }
+
+    @Override
+    public void setVisible(boolean visible) {
+        if ( visible ){
+            setCullHint(CullHint.Dynamic);
+        }else{
+            setCullHint(CullHint.Always);
+        }
+    }
+
+    @Override
+    public boolean isVisible() {
+        return getCullHint() != CullHint.Always;
     }
 }
