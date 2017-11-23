@@ -1,12 +1,10 @@
 package dae.animation.rig.io;
 
-import dae.animation.skeleton.*;
 import com.jme3.asset.AssetInfo;
 import com.jme3.asset.AssetLoader;
 import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
-import com.jme3.math.Vector3f;
 import dae.GlobalObjects;
 import dae.animation.rig.AnimationController;
 import dae.animation.rig.AnimationListControl;
@@ -113,232 +111,9 @@ public class RigLoader implements AssetLoader {
     }
 
     
-
-    private BodyElement createBallJoint(Node docNode) {
-        NamedNodeMap map = docNode.getAttributes();
-        String saxis = getAttrContent("axis", map);
-        String slocation = getAttrContent("location", map);
-        String srotation = getAttrContent("rotation", map);
-        String sname = getAttrContent("name", map);
-        String sminTheta = getAttrContent("minTheta", map);
-        String smaxTheta = getAttrContent("maxTheta", map);
-        String sminPhi = getAttrContent("minPhi", map);
-        String smaxPhi = getAttrContent("maxPhi", map);
-        String scurrentTheta = getAttrContent("currentTheta", map);
-        String scurrentPhi = getAttrContent("currentPhi", map);
-
-        Vector3f axis = parseVector3f(saxis);
-        Vector3f location = parseVector3f(slocation);
-        Vector3f rotation = parseVector3f(srotation);
-
-        float mintheta = Float.parseFloat(sminTheta);
-        float maxtheta = Float.parseFloat(smaxTheta);
-        float minphi = Float.parseFloat(sminPhi);
-        float maxphi = Float.parseFloat(smaxPhi);
-        float currenttheta = Float.parseFloat(scurrentTheta);
-        float currentphi = Float.parseFloat(scurrentPhi);
-
-        BallJoint bj = new BallJoint(ballJointMaterial,
-                rotation, location, axis,
-                currenttheta, currentphi,
-                minphi, maxphi,
-                mintheta, maxtheta);
-        bj.setName(sname);
-        return bj;
-    }
-
-    private BodyElement createRevoluteJoint(Node docNode) {
-        NamedNodeMap map = docNode.getAttributes();
-
-        String saxis = getAttrContent("axis", map);
-        String slocation = getAttrContent("location", map);
-        String sname = getAttrContent("name", map);
-
-        String sgroup = getAttrContent("group", map);
-        String sangle = getAttrContent("angle", map);
-        String sminangle = getAttrContent("minAngle", map);
-        String smaxangle = getAttrContent("maxAngle", map);
-
-        String scentered = getAttrContent("centered", map);
-        String sradius = getAttrContent("radius", map);
-        String sheight = getAttrContent("height", map);
-        String log = getAttrContent("log", map);
-        boolean blog = Boolean.parseBoolean(log);
-        String logScale = getAttrContent("logScale", map);
-        float fScale = logScale.length() > 0 ? Float.parseFloat(logScale) : 1.0f;
-        String logOffset = getAttrContent("logOffset", map);
-        float fOffset = logOffset.length() > 0 ? Float.parseFloat(logOffset) : 0.0f;
-        String logSymbol = getAttrContent("logSymbol", map);
-
-        ColorRGBA jointColor = ColorRGBA.Blue;
-        String sjointColor = getAttrContent("jointcolor", map);
-        if (sjointColor.length() > 0) {
-            jointColor = parseColor(sjointColor);
-
-        }
-
-        String logTranslation = getAttrContent("logTranslation", map);
-        boolean blogTrans = Boolean.parseBoolean(logTranslation);
-
-        boolean centered = scentered.length() > 0 ? Boolean.parseBoolean(scentered) : false;
-        float radius = sradius.length() > 0 ? Float.parseFloat(sradius) : 0.1f;
-        float height = sheight.length() > 0 ? Float.parseFloat(sheight) : 2.5f;
-
-        Vector3f axis = parseVector3f(saxis);
-        Vector3f location = parseVector3f(slocation);
-
-        float angle = Float.parseFloat(sangle);
-        float minangle = Float.parseFloat(sminangle);
-        float maxangle = Float.parseFloat(smaxangle);
-
-        ObjectType rjType = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Animation", "RevoluteJoint");
-        //RevoluteJoint rj = new RevoluteJoint(revJointMaterial, sname, sgroup, location, axis, minangle, maxangle, radius, height, centered);
-        RevoluteJoint rj = (RevoluteJoint) rjType.createDefault(assetManager, sname, true);
-
-        rj.setGroup(sgroup);
-        rj.setMinAngle(minangle);
-        rj.setMaxAngle(maxangle);
-        rj.setAxis(axis);
-        rj.getTransformComponent().setTranslation(location);
-        rj.setRenderOptions(radius, height, centered);
-
-        rj.setLogRotations(blog);
-        rj.setLogOffset(fOffset);
-        rj.setLogPostScale(fScale);
-        rj.setLogSymbol(logSymbol);
-        rj.setLogTranslation(blogTrans);
-
-        String saxisx = getAttrContent("refaxisx", map);
-        String saxisy = getAttrContent("refaxisy", map);
-        String saxisz = getAttrContent("refaxisz", map);
-        if (saxisx.length() > 0 && saxisy.length() > 0 && saxisz.length() > 0) {
-            Vector3f xa = parseVector3f(saxisx);
-            Vector3f ya = parseVector3f(saxisy);
-            Vector3f za = parseVector3f(saxisz);
-            rj.setInitialLocalFrame(xa, ya, za);
-        }
-        rj.setCurrentAngle(angle);
-
-        String sChainWithChild = getAttrContent("chainwithchild", map);
-        boolean chainwithchild = Boolean.parseBoolean(sChainWithChild);
-
-        String sChainWithParent = getAttrContent("chainwithparent", map);
-        boolean chainwithparent = Boolean.parseBoolean(sChainWithParent);
-
-        rj.setChaining(chainwithchild, chainwithparent);
-        String childName = getAttrContent("chainchildname", map);
-        rj.setChainChildName(childName);
-        rj.setJointColor(jointColor);
-        rj.createVisualization(assetManager);
-
-        return rj;
-    }
-
-    private BodyElement createTarget(Node targetNode) {
-        NamedNodeMap map = targetNode.getAttributes();
-
-        String slocation = getAttrContent("location", map);
-        String sname = getAttrContent("name", map);
-        String srotation = getAttrContent("rotation", map);
-
-        Vector3f location = parseVector3f(slocation);
-        Vector3f rotation = parseVector3f(srotation);
-
-        ObjectType objectType = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Animation", "Handle");
-        Handle result = (Handle) objectType.create(assetManager, sname);
-        result.setTransformation(location, rotation);
-        return result;
-    }
-
-    private BodyElement createFixedJoint(Node docNode) {
-        NamedNodeMap map = docNode.getAttributes();
-
-        String slocation = getAttrContent("location", map);
-        String sname = getAttrContent("name", map);
-        String srotation = getAttrContent("rotation", map);
-
-        Vector3f location = parseVector3f(slocation);
-        Vector3f rotation = parseVector3f(srotation);
-        return new FixedJoint(this.limbMaterial, sname, location, rotation);
-    }
-
-    private BodyElement createCylindricalLimb(Node docNode) {
-        NamedNodeMap map = docNode.getAttributes();
-        String type = getAttrContent("type", map);
-        if (type.equalsIgnoreCase("CYLINDRICAL")) {
-            String sname = getAttrContent("name", map);
-            String sradius = getAttrContent("radius", map);
-            String sheight = getAttrContent("height", map);
-            CylindricalLimb l = new CylindricalLimb(limbMaterial, sname, Float.parseFloat(sradius), Float.parseFloat(sheight));
-            return l;
-        } else {
-            return null;
-        }
-    }
-
-    private BodyElement createBoxLimb(Node docNode) {
-        NamedNodeMap map = docNode.getAttributes();
-
-        String sname = getAttrContent("name", map);
-        String slength = getAttrContent("length", map);
-        String swidth = getAttrContent("width", map);
-        String sheight = getAttrContent("height", map);
-        BoxLimb box = new BoxLimb(limbMaterial, sname, Float.parseFloat(slength), Float.parseFloat(swidth), Float.parseFloat(sheight));
-        return box;
-    }
-
     private String getAttrContent(String key, NamedNodeMap map) {
         Node attr = map.getNamedItem(key);
         return attr != null ? attr.getTextContent() : "";
-    }
-
-    private Vector3f parseVector3f(String vector3f) {
-        if (vector3f == null) {
-            return new Vector3f();
-        }
-        int startIndex = vector3f.indexOf('[');
-        int endIndex = vector3f.lastIndexOf(']');
-        if (startIndex < 0 || endIndex < 0) {
-            return new Vector3f();
-        }
-
-        String[] xyz = vector3f.substring(startIndex + 1, endIndex).split(",");
-        if (xyz.length != 3) {
-            return new Vector3f();
-        } else {
-            float x = Float.parseFloat(xyz[0]);
-            float y = Float.parseFloat(xyz[1]);
-            float z = Float.parseFloat(xyz[2]);
-            Vector3f result = new Vector3f(x, y, z);
-            return result;
-        }
-    }
-
-    private ColorRGBA parseColor(String vector3f) {
-        if (vector3f == null) {
-            return ColorRGBA.Pink;
-        }
-        int startIndex = vector3f.indexOf('[');
-        int endIndex = vector3f.lastIndexOf(']');
-        if (startIndex < 0 || endIndex < 0) {
-            return ColorRGBA.Pink;
-        }
-
-        String[] xyz = vector3f.substring(startIndex + 1, endIndex).split(",");
-        if (xyz.length == 3) {
-            float x = Float.parseFloat(xyz[0]);
-            float y = Float.parseFloat(xyz[1]);
-            float z = Float.parseFloat(xyz[2]);
-            return new ColorRGBA(x / 255.0f, y / 255.0f, z / 255.0f, 1.0f);
-        } else if (xyz.length == 4) {
-            float x = Float.parseFloat(xyz[0]);
-            float y = Float.parseFloat(xyz[1]);
-            float z = Float.parseFloat(xyz[2]);
-            float a = Float.parseFloat(xyz[3]);
-            return new ColorRGBA(x / 255.0f, y / 255.0f, z / 255.0f, a / 255.0f);
-        } else {
-            return ColorRGBA.Pink;
-        }
     }
 
     private void readFuzzySystems(Rig rig, Node docNode) {
@@ -508,11 +283,7 @@ public class RigLoader implements AssetLoader {
                                 ic.fromXML(io);
                                 ac.setInput(ic);
                             }
-                        } catch (ClassNotFoundException ex) {
-                            Logger.getLogger(RigLoader.class.getName()).log(Level.SEVERE, null, ex);
-                        } catch (InstantiationException ex) {
-                            Logger.getLogger(RigLoader.class.getName()).log(Level.SEVERE, null, ex);
-                        } catch (IllegalAccessException ex) {
+                        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
                             Logger.getLogger(RigLoader.class.getName()).log(Level.SEVERE, null, ex);
                         }
 
@@ -525,11 +296,7 @@ public class RigLoader implements AssetLoader {
                                 oc.fromXML(io);
                                 ac.setOutput(oc);
                             }
-                        } catch (ClassNotFoundException ex) {
-                            Logger.getLogger(RigLoader.class.getName()).log(Level.SEVERE, null, ex);
-                        } catch (InstantiationException ex) {
-                            Logger.getLogger(RigLoader.class.getName()).log(Level.SEVERE, null, ex);
-                        } catch (IllegalAccessException ex) {
+                        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
                             Logger.getLogger(RigLoader.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
