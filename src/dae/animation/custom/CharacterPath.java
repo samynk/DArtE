@@ -10,7 +10,7 @@ import com.jme3.scene.Mesh;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.VertexBuffer;
 import com.jme3.util.BufferUtils;
-import dae.animation.skeleton.Body;
+import dae.animation.rig.Rig;
 import dae.prefabs.Prefab;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
@@ -18,13 +18,13 @@ import java.util.ArrayList;
 /**
  * Defines a path for a character to walk on.
  *
- * @author Koen
+ * @author Koen Samyn
  */
 public class CharacterPath extends Prefab {
 
-    private ArrayList<Vector3f> waypoints =
-            new ArrayList<Vector3f>();
-    private ArrayList<Waypoint> waypointList = new ArrayList<Waypoint>();
+    private final ArrayList<Vector3f> waypoints =
+            new ArrayList<>();
+    private final ArrayList<Waypoint> waypointList = new ArrayList<>();
     private Vector3f finalLookAt;
     /**
      * The current segment of the character path.
@@ -47,7 +47,7 @@ public class CharacterPath extends Prefab {
     /**
      * The body that will walk on the path.
      */
-    private Body body;
+    private Rig body;
 
     /**
      * Creates a new CharacterPath object.
@@ -317,8 +317,10 @@ public class CharacterPath extends Prefab {
     }
 
     public void createPathFootsteps() {
+        // todo create components to define footstep behaviour in a rig.
+        /*
         if (body != null) {
-            body.clearFootSteps();
+            // body.clearFootSteps();
             waypoints.clear();
             // add the translation of the body as a local translation relative to this 
             // character path.
@@ -381,9 +383,12 @@ public class CharacterPath extends Prefab {
                 currentSegment++;
             }
         }
+        */
     }
 
     public PathSegment getCRCurrentSegment() {
+        //todo add component to define forward direction in rig.
+        /*
         if (currentSegment < waypoints.size() - 1) {
             Vector3f p1 = waypoints.get(currentSegment);
             Vector3f p2 = waypoints.get(currentSegment + 1);
@@ -410,9 +415,11 @@ public class CharacterPath extends Prefab {
         } else {
             return null;
         }
+        */
+        return null;
     }
 
-    public void setCharacter(Body body) {
+    public void setCharacter(Rig rig) {
         this.body = body;
     }
 
