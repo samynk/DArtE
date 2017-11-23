@@ -1,8 +1,5 @@
 package dae.prefabs;
 
-import dae.GlobalObjects;
-import dae.components.PrefabComponent;
-import dae.prefabs.prefab.undo.UndoPrefabPropertyEdit;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -16,11 +13,11 @@ import java.util.logging.Logger;
  */
 public class PropertyReflector {
 
-    private Class clazz;
-    private HashMap<String, Method> getMethods =
-            new HashMap<String, Method>();
-    private HashMap<String, Method> setMethods =
-            new HashMap<String, Method>();
+    private final Class clazz;
+    private final HashMap<String, Method> getMethods =
+            new HashMap<>();
+    private final HashMap<String, Method> setMethods =
+            new HashMap<>();
 
     /**
      * Creates a new PropertyReflector object for the given class.
@@ -76,9 +73,7 @@ public class PropertyReflector {
         try {
             m.invoke(component, value);
             return true;
-        } catch (IllegalAccessException ex) {
-            Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
-        } catch (InvocationTargetException ex) {
+        } catch (IllegalAccessException | InvocationTargetException ex) {
             Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
         } catch (IllegalArgumentException ex) {
             Logger.getLogger("DArtE").log(Level.SEVERE, "Problem setting {0}, on prefab{1}:{2}", new Object[]{property, component, value});
@@ -132,18 +127,16 @@ public class PropertyReflector {
                 String p = Character.toUpperCase(property.charAt(0)) + property.substring(1);
                 m = clazz.getMethod("get" + p);
                 getMethods.put(property, m);
-            } catch (NoSuchMethodException ex) {
-                //Logger.getLogger(Prefab.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (SecurityException ex) {
+            } catch (NoSuchMethodException | SecurityException ex) {
                 //Logger.getLogger(Prefab.class.getName()).log(Level.SEVERE, null, ex);
             }
+            //Logger.getLogger(Prefab.class.getName()).log(Level.SEVERE, null, ex);
+            
         }
         if (m != null) {
             try {
                 return m.invoke(component);
-            } catch (IllegalAccessException ex) {
-                Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
-            } catch (InvocationTargetException ex) {
+            } catch (IllegalAccessException | InvocationTargetException ex) {
                 Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
             } catch (IllegalArgumentException ex) {
                 Logger.getLogger("DArtE").log(Level.SEVERE, "Problem getting {0}, on prefab{1}", new Object[]{property, component.toString()});
@@ -172,15 +165,7 @@ public class PropertyReflector {
                 } else {
                     return toClone;
                 }
-            } catch (NoSuchMethodException ex) {
-                Logger.getLogger(Prefab.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (SecurityException ex) {
-                Logger.getLogger(Prefab.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IllegalAccessException ex) {
-                Logger.getLogger(Prefab.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IllegalArgumentException ex) {
-                Logger.getLogger(Prefab.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (InvocationTargetException ex) {
+            } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
                 Logger.getLogger(Prefab.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
@@ -193,15 +178,7 @@ public class PropertyReflector {
             if (m != null) {
                 m.invoke(base);
             }
-        } catch (NoSuchMethodException ex) {
-            Logger.getLogger(Prefab.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SecurityException ex) {
-            Logger.getLogger(Prefab.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            Logger.getLogger(Prefab.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalArgumentException ex) {
-            Logger.getLogger(Prefab.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InvocationTargetException ex) {
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
             Logger.getLogger(Prefab.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -223,15 +200,7 @@ public class PropertyReflector {
             if ( result instanceof Integer){
                 return (Integer)result;
             }
-        } catch (NoSuchMethodException ex) {
-            Logger.getLogger(PropertyReflector.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SecurityException ex) {
-            Logger.getLogger(PropertyReflector.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            Logger.getLogger(PropertyReflector.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalArgumentException ex) {
-            Logger.getLogger(PropertyReflector.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InvocationTargetException ex) {
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
             Logger.getLogger(PropertyReflector.class.getName()).log(Level.SEVERE, null, ex);
         }
         return 0;
@@ -243,15 +212,7 @@ public class PropertyReflector {
             Method m = clazz.getMethod("get" + p + "At",getPrimitiveType(Integer.class));
             Object result = m.invoke(prefab,index);
             return result;
-        } catch (NoSuchMethodException ex) {
-            Logger.getLogger(PropertyReflector.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SecurityException ex) {
-            Logger.getLogger(PropertyReflector.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            Logger.getLogger(PropertyReflector.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalArgumentException ex) {
-            Logger.getLogger(PropertyReflector.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InvocationTargetException ex) {
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
             Logger.getLogger(PropertyReflector.class.getName()).log(Level.SEVERE, null, ex);
         }
         return 0;
@@ -262,15 +223,7 @@ public class PropertyReflector {
         try {
             Method m = clazz.getMethod("add" + p ,object.getClass());
             m.invoke(prefab,object);
-        } catch (NoSuchMethodException ex) {
-            Logger.getLogger(PropertyReflector.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SecurityException ex) {
-            Logger.getLogger(PropertyReflector.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            Logger.getLogger(PropertyReflector.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalArgumentException ex) {
-            Logger.getLogger(PropertyReflector.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InvocationTargetException ex) {
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
             Logger.getLogger(PropertyReflector.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
