@@ -21,8 +21,8 @@ public class AngleTargetDof2Connector extends AngleTargetConnector {
         
         Vector3f origin = getJoint().getWorldTranslation();
 
-        Vector3f apLoc = attachment.getWorldTranslation();
-        Vector3f targetLoc = target.getWorldTranslation();
+        Vector3f apLoc = getAttachment().getWorldTranslation();
+        Vector3f targetLoc = getTarget().getWorldTranslation();
 
         Vector3f vector1 = apLoc.subtract(origin);
         Vector3f vector2 = targetLoc.subtract(origin);
@@ -52,6 +52,7 @@ public class AngleTargetDof2Connector extends AngleTargetConnector {
     public ConnectorType getConnectorType() {
         return RevoluteJointTwoAxis.ANGLE_TARGET_TYPE;
     }
+    
     
     
 }
