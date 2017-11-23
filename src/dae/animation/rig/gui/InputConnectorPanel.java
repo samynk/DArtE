@@ -39,14 +39,13 @@ public class InputConnectorPanel extends javax.swing.JPanel {
         this.rig = rig;
         List<Joint> joints = new ArrayList<>();
         rig.breadthFirstTraversal((Spatial spatial) -> {
-            if ( spatial instanceof Joint){
-                joints.add((Joint)spatial);
+            if (spatial instanceof Joint) {
+                joints.add((Joint) spatial);
             }
         });
-        
+
         cboJointNames.setModel(new DefaultComboBoxModel(joints.toArray()));
-        if ( joints.size() > 0 )
-        {
+        if (joints.size() > 0) {
             cboJointNames.setSelectedIndex(0);
             updateJoint(joints.get(0));
         }
@@ -165,9 +164,8 @@ public class InputConnectorPanel extends javax.swing.JPanel {
                         currentInputConnector = createNewInputConnector();
                         currentAnimationController.setInput(currentInputConnector);
                         Object selected = cboJointNames.getSelectedItem();
-                        if ( selected != null && selected instanceof Joint)
-                        {
-                            currentInputConnector.setJointName(((Joint)selected).getName());
+                        if (selected != null && selected instanceof Joint) {
+                            currentInputConnector.setJointName(((Joint) selected).getName());
                         }
                     }
                     setInputConnectorOnCustomizerPanel();
@@ -188,8 +186,14 @@ public class InputConnectorPanel extends javax.swing.JPanel {
     private void updateJoint(Joint selected) {
         List<ConnectorType> types = selected.getInputConnectorTypes();
         cboTypes.setModel(new DefaultComboBoxModel(types.toArray()));
-        cboTypes.setSelectedIndex(0);
-        updateCustomizerPanel(types.get(0));
+        if (currentAnimationController == null || currentAnimationController.getInput() == null) {
+            cboTypes.setSelectedIndex(0);
+            updateCustomizerPanel(types.get(0));
+        } else {
+            InputConnector ic = currentAnimationController.getInput();
+            cboTypes.setSelectedItem(ic.getConnectorType());
+            updateCustomizerPanel(ic.getConnectorType());
+        }
     }
 
     public void setAnimationController(AnimationController ac) {
@@ -197,12 +201,9 @@ public class InputConnectorPanel extends javax.swing.JPanel {
         if (ac.getInput() != null) {
             currentInputConnector = ac.getInput();
             currentInputConnector.initialize(rig);
-            String jointName = currentInputConnector.getJointName();
-            if (jointName != null) {
-                Spatial child = rig.getChild(jointName);
-                if (child instanceof Joint) {
-                    cboJointNames.setSelectedItem(child);
-                }
+            Joint j = currentInputConnector.getJoint();
+            if (j != null) {
+                cboJointNames.setSelectedItem(j);
             }
             cboTypes.setSelectedItem(currentInputConnector.getConnectorType());
             setInputConnectorOnCustomizerPanel();
