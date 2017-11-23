@@ -6,13 +6,10 @@ import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
-import dae.io.XMLUtils;
-import java.io.IOException;
-import java.io.Writer;
 
 /**
  *
- * @author Koen
+ * @author Koen Samyn
  */
 public class FixedJoint extends Node implements BodyElement, ChannelSupport {
 
@@ -120,6 +117,7 @@ public class FixedJoint extends Node implements BodyElement, ChannelSupport {
     }
     
    
+    @Override
     public void showTargetObjects() {
         for( Spatial s: this.getChildren())
         {
