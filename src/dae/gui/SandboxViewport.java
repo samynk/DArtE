@@ -45,11 +45,9 @@ import com.jme3.shadow.AbstractShadowRenderer;
 import dae.DAECamAppState;
 import dae.GlobalObjects;
 import dae.animation.rig.io.RigLoader;
-import dae.animation.skeleton.BodyLoader;
 import dae.components.ComponentType;
 import dae.components.MeshComponent;
 import dae.components.PrefabComponent;
-import dae.components.TransformComponent;
 import dae.controller.ControllerLoader;
 import dae.gui.tools.BrushTool;
 import dae.gui.tools.IdleTool;
@@ -215,7 +213,6 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
     public void simpleInitApp() {
 
         assetManager.registerLoader(ObjectTypeReader.class, "types");
-        assetManager.registerLoader(BodyLoader.class, "skel");
         assetManager.registerLoader(ControllerLoader.class, "fcl");
         assetManager.registerLoader(SceneLoader.class, "klatch");
         assetManager.registerLoader(RigLoader.class, "rig");
