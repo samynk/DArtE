@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.animation.trajectory;
 
 import com.jme3.asset.AssetManager;
@@ -13,7 +9,9 @@ import com.jme3.math.FastMath;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
-import dae.animation.skeleton.Body;
+import dae.GlobalObjects;
+import dae.animation.rig.Rig;
+
 
 /**
  *
@@ -22,7 +20,7 @@ import dae.animation.skeleton.Body;
 public class RayCastFootSteps {
     // the body to do the raycasting for.
 
-    private Body body;
+    private Rig body;
     // the first foot to start with.
     private String type = "right";
     // the node to do the ray casting from
@@ -32,11 +30,12 @@ public class RayCastFootSteps {
     public Material leftFootMaterial;
     public Material rightFootMaterial;
 
-    public RayCastFootSteps(Body body) {
+    public RayCastFootSteps(Rig body) {
         this.body = body;
         rootNode = body.getParent();
-
-        AssetManager assetInfo = body.getAssetManager();
+        
+        
+        AssetManager assetInfo = GlobalObjects.getInstance().getAssetManager();
         leftFootMaterial = new Material(assetInfo,
                 "Common/MatDefs/Misc/Unshaded.j3md");
         leftFootMaterial.setColor("Color", ColorRGBA.White);
@@ -46,7 +45,7 @@ public class RayCastFootSteps {
                 "Common/MatDefs/Misc/Unshaded.j3md");
         rightFootMaterial.setColor("Color", ColorRGBA.White);
         rightFootMaterial.setTexture("ColorMap", assetInfo.loadTexture("Textures/rfoot.png"));
-        //calculateNextFootStep();
+                //calculateNextFootStep();
     }
 
     public FootStep getCurrentFootStep() {
