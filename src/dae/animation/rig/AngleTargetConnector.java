@@ -21,19 +21,7 @@ import org.w3c.dom.Node;
  */
 public class AngleTargetConnector extends InputConnector {
 
-    private String targetName;
-    private String attachmentName;
-
-    
-
     public AngleTargetConnector() {
-    }
-
-    
-
-    @Override
-    public void initialize(Rig rig) {
-        
     }
 
     @Override
@@ -42,8 +30,8 @@ public class AngleTargetConnector extends InputConnector {
         axis.normalizeLocal();
         Vector3f origin = getJoint().getWorldTranslation();
 
-        Vector3f apLoc = attachment.getWorldTranslation();
-        Vector3f targetLoc = target.getWorldTranslation();
+        Vector3f apLoc = getAttachment().getWorldTranslation();
+        Vector3f targetLoc = getTarget().getWorldTranslation();
 
         Vector3f vector1 = apLoc.subtract(origin);
         Vector3f vector2 = targetLoc.subtract(origin);
@@ -62,9 +50,9 @@ public class AngleTargetConnector extends InputConnector {
     @Override
     public InputConnector cloneConnector() {
         AngleTargetConnector ac = new AngleTargetConnector();
-        ac.setAttachmentName(attachmentName);
+        ac.setAttachmentName(getAttachmentName());
         ac.setJointName(getJointName());
-        ac.setTargetName(targetName);
+        ac.setTargetName(getTargetName());
         ac.setInitialized(false);
         return ac;
     }
@@ -79,11 +67,12 @@ public class AngleTargetConnector extends InputConnector {
         try {
             StringWriter sw = new StringWriter();
             sw.write("<input class='");
-            sw.write(this.getClass().getCanonicalName());
+            String canonicalName = this.getClass().getCanonicalName();
+            sw.write(canonicalName);
             sw.write("' ");
             XMLUtils.writeAttribute(sw, "jointName", getJointName());
-            XMLUtils.writeAttribute(sw, "attachmentName", attachmentName);
-            XMLUtils.writeAttribute(sw, "targetName", targetName);
+            XMLUtils.writeAttribute(sw, "attachmentName", getAttachmentName());
+            XMLUtils.writeAttribute(sw, "targetName", getTargetName());
             sw.write("/>\n");
             return sw.toString();
         } catch (IOException ex) {
@@ -96,8 +85,8 @@ public class AngleTargetConnector extends InputConnector {
     public void fromXML(Node inputNode) {
         NamedNodeMap map = inputNode.getAttributes();
         setJointName(XMLUtils.getAttribute("jointName", map));
-        this.attachmentName = XMLUtils.getAttribute("attachmentName", map);
-        this.targetName = XMLUtils.getAttribute("targetName", map);
+        setAttachmentName(XMLUtils.getAttribute("attachmentName", map));
+        setTargetName(XMLUtils.getAttribute("targetName", map));
     }
 
     @Override
