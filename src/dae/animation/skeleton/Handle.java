@@ -11,10 +11,7 @@ import com.jme3.scene.Mesh;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.VertexBuffer;
 import com.jme3.util.BufferUtils;
-import dae.io.XMLUtils;
 import dae.prefabs.Prefab;
-import java.io.IOException;
-import java.io.Writer;
 
 /**
  * A handle object can define a number of targets for an animation. The most
@@ -171,7 +168,7 @@ public class Handle extends Prefab implements BodyElement {
 
     @Override
     public String getPrefix() {
-        return "Crate";
+        return "handle";
     }
 
     /**
