@@ -6,7 +6,6 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Spatial;
 import dae.io.SceneSaver;
-import dae.io.XMLUtils;
 import dae.prefabs.Prefab;
 import dae.prefabs.shapes.ArrowShape;
 import java.io.IOException;
@@ -113,42 +112,5 @@ public class AttachmentPoint extends Prefab implements BodyElement {
                 ((BodyElement) s).showTargetObjects();
             }
         }
-    }
-
-    public void write(Writer w, int depth) throws IOException {
-        SceneSaver.writePrefab(this,w,depth);
-        /*
-        for (int i = 0; i < depth; ++i) {
-            w.write('\t');
-        }
-        w.write("<attachmentpoint ");
-        XMLUtils.writeAttribute(w, "name", this.getName());
-        XMLUtils.writeAttribute(w, "location", this.getLocalTranslation());
-        XMLUtils.writeAttribute(w, "alignmentAxis1", this.getLocalAxis1());
-        XMLUtils.writeAttribute(w, "alignmentAxis2", this.getLocalAxis2());
-
-        boolean hasBodyElements = false;
-        for (Spatial child : this.getChildren()) {
-            if (child instanceof BodyElement) {
-                hasBodyElements = true;
-                break;
-            }
-        }
-
-        if (!hasBodyElements) {
-            w.write("/>\n");
-        } else {
-            w.write(">\n");
-            for ( Spatial child : this.getChildren()){
-                if ( child instanceof BodyElement ){
-                    ((BodyElement)child).write(w, depth+1);
-                }
-            }
-            for (int i = 0; i < depth; ++i) {
-                w.write('\t');
-            }
-            w.write("</attachmentpoint>\n");
-        }
-        */
     }
 }
