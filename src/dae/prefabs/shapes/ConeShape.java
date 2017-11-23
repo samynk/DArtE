@@ -24,7 +24,7 @@ public class ConeShape extends Mesh {
      * @param coneAngle the angle of the cone.
      * @param length the length of the cone.
      * @param lengthSegments the number of length segments.
-     * @param radialSegment the number of radial segments.
+     * @param radialSegments the number of radial segments.
      * @param generateTexCoords generate texture coordinates or not.
      * @param texScale the texture scaling for the mesh.
      */
