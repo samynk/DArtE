@@ -6,7 +6,6 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import dae.GlobalObjects;
-import dae.animation.skeleton.Body;
 import dae.components.ComponentType;
 import dae.components.PrefabComponent;
 import dae.io.writers.DefaultPrefabExporter;
@@ -16,11 +15,7 @@ import dae.prefabs.Prefab;
 import dae.prefabs.brush.BrushBatch;
 import dae.prefabs.gizmos.PivotGizmo;
 import dae.prefabs.standard.J3ONPC;
-import dae.prefabs.standard.NPCLocationEntity;
-import dae.prefabs.standard.NavigationMesh;
 import dae.prefabs.standard.SituationEntity;
-import dae.prefabs.standard.Terrain;
-import dae.prefabs.standard.TriggerBox;
 import dae.prefabs.types.ObjectType;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -231,21 +226,6 @@ public class SceneSaver {
         return writeEndTag(bw, "klatch", k, depth);
     }
 
-    private static String writeBody(Writer bw, Spatial child, int depth) throws IOException {
-        XMLUtils.writeTabs(bw, depth);
-        bw.write("<body ");
-        Body b = (Body) child;
-        writeAttribute(bw, "name", b.getName());
-        writeAttribute(bw, "category", b.getCategory());
-        writeAttribute(bw, "type", b.getType());
-        writeAttribute(bw, "prefix", b.getPrefix());
-        writeAttribute(bw, "translation", b.getLocalTranslation());
-        writeAttribute(bw, "rotation", b.getLocalRotation());
-        writeAttribute(bw, "scale", b.getLocalScale());
-        writeAttribute(bw, "skeleton", b.getSkeletonFile());
-        return writeEndTag(bw, "body", b, depth);
-    }
-
     private static String writeJ3ONPC(Writer bw, Spatial child, int depth) throws IOException {
         XMLUtils.writeTabs(bw, depth);
         bw.write("<j3onpc ");
@@ -324,9 +304,7 @@ public class SceneSaver {
     public static void writePrefab(Prefab child, Writer bw, int depth) throws IOException {
         boolean hasChildren = child.hasSavableChildren();
         String endtag = "";
-        if (child instanceof Body) {
-            endtag = writeBody(bw, child, depth);
-        } else if (child instanceof J3ONPC) {
+        if (child instanceof J3ONPC) {
             endtag = writeJ3ONPC(bw, child, depth);
         } else if (child instanceof SituationEntity) {
             endtag = writeSituationEntity(bw, child, depth);
