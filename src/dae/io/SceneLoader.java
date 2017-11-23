@@ -15,7 +15,6 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
 import dae.GlobalObjects;
-import dae.animation.skeleton.Body;
 import dae.components.ComponentType;
 import dae.components.PrefabComponent;
 import dae.io.readers.DefaultPrefabImporter;
@@ -130,28 +129,6 @@ public class SceneLoader implements AssetLoader {
                 Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
             }
         }
-    }
-
-    public static Prefab createBody(NamedNodeMap map, AssetManager manager, ObjectTypeCategory objectsToCreate) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
-        String name = getAttrContent("name", map);
-        String type = getAttrContent("type", map);
-        String category = getAttrContent("category", map);
-        Vector3f translation = parseFloat3(getAttrContent("translation", map));
-        Quaternion rot = parseQuaternion(getAttrContent("rotation", map));
-        Vector3f scale = parseFloat3(getAttrContent("scale", map));
-        String skeletonFile = getAttrContent("skeleton", map);
-
-        Body b = (Body) manager.loadModel(new ModelKey(skeletonFile));
-        b.setType(type);
-        b.setCategory(category);
-
-
-        b.setName(name);
-        b.setLocalRotation(rot);
-        b.setLocalTranslation(translation);
-        b.setLocalScale(scale);
-
-        return b;
     }
 
     public static Prefab createJ3ONPC(NamedNodeMap map, AssetManager manager, ObjectTypeCategory objectsToCreate) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
@@ -360,9 +337,7 @@ public class SceneLoader implements AssetLoader {
             org.w3c.dom.Node n = nl.item(i);
             NamedNodeMap map = n.getAttributes();
             Prefab currentPrefab = null;
-            if ("body".equals(n.getNodeName())) {
-                currentPrefab = createBody(map, am, objectsToCreate);
-            } else if ("j3onpc".equals(n.getNodeName())) {
+            if ("j3onpc".equals(n.getNodeName())) {
                 currentPrefab = createJ3ONPC(map, am, objectsToCreate);
             } else if ("prefab".equals(n.getNodeName())) {
                 currentPrefab = createPrefab(map, am, objectsToCreate);
