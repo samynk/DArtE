@@ -2,8 +2,6 @@ package dae.project;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.bullet.BulletAppState;
-import com.jme3.light.DirectionalLight;
-import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
@@ -38,14 +36,15 @@ public class Level extends Node implements ProjectTreeNode {
     private File location;
     private AxisEnum upAxis = AxisEnum.Z;
     protected Grid ground;
-    private HashMap<String, Layer> layerMap = new HashMap<String, Layer>();
-    private ArrayList<Layer> layers = new ArrayList<Layer>();
-    private PhysicsLayer physicsLayer;
+    private final HashMap<String, Layer> layerMap = new HashMap<>();
+    private final ArrayList<Layer> layers = new ArrayList<Layer>();
+    private final PhysicsLayer physicsLayer;
+    
     protected Project project;
     private boolean relativeLocation = true;
     private boolean createDefaultLights = true;
-    protected ArrayList<Prefab> defaultLights = new ArrayList<Prefab>();
-    private HashMap<String, File> exportLocations = new HashMap<String, File>();
+    protected ArrayList<Prefab> defaultLights = new ArrayList<>();
+    private final HashMap<String, File> exportLocations = new HashMap<>();
     private boolean exportOnSave = true;
     private CameraFrame lastCamera;
     /**
@@ -74,6 +73,7 @@ public class Level extends Node implements ProjectTreeNode {
 
     /**
      * Create some default lighting.
+     * @param manager the asset manager to use for the lighting.
      */
     protected void createLights(AssetManager manager) {
         ObjectType type = GlobalObjects.getInstance().getObjectsTypeCategory().getObjectType("Light", "DirectionalLight");
@@ -116,7 +116,8 @@ public class Level extends Node implements ProjectTreeNode {
     /**
      * Adds a new layer with the given name
      *
-     * @param layer
+     * @param layer the layer name
+     * @return the new layer object.
      */
     public final Layer addLayer(String layer) {
         Layer l = new Layer(layer);
@@ -140,6 +141,7 @@ public class Level extends Node implements ProjectTreeNode {
     /**
      * Checks if this level has a layer with the given name.
      *
+     * @param layerName the name of the layer.
      * @return true if the layer exists, false otherwise.
      */
     public boolean hasLayer(String layerName) {
@@ -247,6 +249,7 @@ public class Level extends Node implements ProjectTreeNode {
      * Notification that the level has been added to the viewport.
      *
      * @param manager the manager to use for loading .
+     * @param state the physics simulation object.
      */
     public void levelShown(AssetManager manager, BulletAppState state) {
         this.manager = manager;
@@ -333,6 +336,7 @@ public class Level extends Node implements ProjectTreeNode {
 
     /**
      * Attaches a child to this node, and adds it to the correct layer.
+     * @param node the node to attach.
      */
     @Override
     public int attachChild(Spatial node) {
@@ -489,7 +493,7 @@ public class Level extends Node implements ProjectTreeNode {
     /**
      * Threading related/
      */
-    ConcurrentLinkedDeque<Runnable> todoQueue = new ConcurrentLinkedDeque<Runnable>();
+    ConcurrentLinkedDeque<Runnable> todoQueue = new ConcurrentLinkedDeque<>();
 
     /**
      * Posts a new task to the executor.
@@ -583,10 +587,12 @@ public class Level extends Node implements ProjectTreeNode {
         return layers.size() > 0;
     }
 
+    @Override
     public ProjectTreeNode getProjectChild(int index) {
         return layers.get(index);
     }
 
+    @Override
     public ProjectTreeNode getProjectParent() {
         return this.project;
     }
