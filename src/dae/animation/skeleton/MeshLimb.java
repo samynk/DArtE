@@ -2,9 +2,6 @@ package dae.animation.skeleton;
 
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
-import dae.io.XMLUtils;
-import java.io.IOException;
-import java.io.Writer;
 
 /**
  *
