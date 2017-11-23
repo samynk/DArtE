@@ -1,12 +1,6 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package dae.gui.renderers;
 
 
-import dae.animation.skeleton.Body;
 import dae.prefabs.Klatch;
 import dae.project.Grid;
 import dae.project.Layer;
@@ -24,15 +18,15 @@ import javax.swing.tree.DefaultTreeCellRenderer;
  * @author Koen
  */
 public class ProjectTreeCellRenderer extends DefaultTreeCellRenderer {
-    private Icon imgProject;
-    private Icon imgGrid;
-    private Icon imgLayer;
-    private Icon imgLevel;
-    private Icon imgBody;
-    private Icon imgPrefab;
+    private final Icon imgProject;
+    private final Icon imgGrid;
+    private final Icon imgLayer;
+    private final Icon imgLevel;
+    private final Icon imgBody;
+    private final Icon imgPrefab;
     
-     private Icon imgJ3O; 
-     private Icon imgKlatch; 
+     private final Icon imgJ3O; 
+     private final Icon imgKlatch; 
 
 
     public ProjectTreeCellRenderer() {
@@ -60,8 +54,6 @@ public class ProjectTreeCellRenderer extends DefaultTreeCellRenderer {
             label.setIcon(imgLayer);
         }else if (value instanceof Level){
             label.setIcon(imgLevel);
-        }else if (value instanceof Body){
-            label.setIcon(imgBody);
         }else if (value instanceof Klatch){
             label.setIcon(imgKlatch);
         }else{
