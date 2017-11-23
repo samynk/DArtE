@@ -16,10 +16,6 @@ import dae.animation.rig.Joint;
 import dae.animation.skeleton.constraints.SectorConstraint;
 import dae.animation.skeleton.debug.BoneVisualization;
 import dae.animation.skeleton.debug.SectorVisualization;
-import dae.prefabs.Prefab;
-import dae.prefabs.gizmos.Axis;
-import dae.prefabs.gizmos.RotateGizmo;
-import dae.project.ProjectTreeNode;
 import dae.util.MathUtil;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +26,7 @@ import java.util.List;
  *
  * @author Koen Samyn
  */
-public class RevoluteJointTwoAxis extends Prefab implements BodyElement, Joint {
+public class RevoluteJointTwoAxis extends JointPrefab implements BodyElement, Joint {
 
     /**
      * The current angle of the first axis.
@@ -56,13 +52,8 @@ public class RevoluteJointTwoAxis extends Prefab implements BodyElement, Joint {
 
     // meta data
     private String group;
-    // visualization
-    private float radius = 0.5f;
-    private float height = 0.6f;
     // the connected bone
     private Bone bone;
-    // the transformnode that contains the joint rotation.
-    private Node transformNode;
     // constraint geometry
     private Geometry constraintGeometry;
 
@@ -75,10 +66,10 @@ public class RevoluteJointTwoAxis extends Prefab implements BodyElement, Joint {
     private final static ArrayList<ConnectorType> supportedOutputConnectorTypes
             = new ArrayList<ConnectorType>();
 
-    public static ConnectorType ANGLE_TARGET_TYPE;
+    public final static ConnectorType ANGLE_TARGET_TYPE;
 
     static {
-        ANGLE_TARGET_TYPE = new ConnectorType("angletargetrevjoint", "Angle metric",
+        ANGLE_TARGET_TYPE = new ConnectorType("angletargetrevjointdof2", "Angle metric",
                 "This metric calculates the angle between two vectors. "
                 + "The first vector has the joint location as its origin and the selected attachment point as endpoint."
                 + "The second vector has the joint location as its origin and the target as endpoint.",
@@ -98,16 +89,6 @@ public class RevoluteJointTwoAxis extends Prefab implements BodyElement, Joint {
     @Override
     protected void create(AssetManager manager, String extraInfo) {
         this.manager = manager;
-        transformNode = new Node("transform");
-        super.attachChild(transformNode);
-
-        BoneVisualization bv = new BoneVisualization(this.constraintVector, .05f, 1.0f, 12);
-        Geometry boneGeo = new Geometry("bone", bv);
-        Material boneMat = manager.loadMaterial("Materials/RigMaterial.j3m");
-
-        boneGeo.setMaterial(boneMat);
-        transformNode.attachChild(boneGeo);
-
     }
 
     /**
@@ -160,20 +141,20 @@ public class RevoluteJointTwoAxis extends Prefab implements BodyElement, Joint {
 
     @Override
     public void rotate(float angle) {
-        System.out.println("Angle of rotation is : " + angle);
-        System.out.println("rotation axis is : " + axis);
+        //System.out.println("Angle of rotation is : " + angle);
+        //System.out.println("rotation axis is : " + axis);
         helpRotation.fromAngleAxis(angle, axis);
 
-        Quaternion q = transformNode.getLocalRotation();
+        Quaternion q = getTransformNode().getLocalRotation();
         Vector3f rotated = q.mult(constraintVector);
         helpRotation.multLocal(rotated);
-        System.out.println("constraintVector rotated : " + rotated);
+        //System.out.println("constraintVector rotated : " + rotated);
         MathUtil.createDof2Rotation(constraintVector, rotated, axis1, axis2, q, angles);
         phiAngle = angles.x * FastMath.RAD_TO_DEG;
         thetaAngle = angles.y * FastMath.RAD_TO_DEG;
 
-        System.out.println("phiAngle:" + phiAngle);
-        System.out.println("thetaAngle:" + thetaAngle);
+        //System.out.println("phiAngle:" + phiAngle);
+        //System.out.println("thetaAngle:" + thetaAngle);
         updateTransforms();
     }
 
@@ -185,7 +166,7 @@ public class RevoluteJointTwoAxis extends Prefab implements BodyElement, Joint {
     }
 
     private void updateTransforms() {
-        Quaternion q = transformNode.getLocalRotation();
+        Quaternion q = getTransformNode().getLocalRotation();
         q.fromAngles(0, phiAngle * FastMath.DEG_TO_RAD, thetaAngle * FastMath.DEG_TO_RAD);
 
         Vector3f rotated = q.mult(constraintVector);
@@ -201,7 +182,7 @@ public class RevoluteJointTwoAxis extends Prefab implements BodyElement, Joint {
 //        }
         // calculate projection to rotate point back on the constraint surface.
 
-        transformNode.setLocalRotation(q);
+        getTransformNode().setLocalRotation(q);
 
         updateBoneTransform();
     }
@@ -242,20 +223,6 @@ public class RevoluteJointTwoAxis extends Prefab implements BodyElement, Joint {
         phiAngle = 0;
     }
 
-    /*
-    @Override
-    public Spatial clone() {
-
-        Prefab copy = super.duplicate(manager);
-
-        for (int i = 0; i < this.getPrefabChildCount(); ++i) {
-            Prefab child = (Prefab) this.getPrefabChildAt(i);
-            copy.attachChild((Prefab) child.duplicate(manager));
-        }
-        copy.notifyLoaded();
-        return copy;
-    }
-     */
     public void setAttachedBone(Bone b) {
         this.bone = b;
         b.setUserControl(true);
@@ -277,11 +244,12 @@ public class RevoluteJointTwoAxis extends Prefab implements BodyElement, Joint {
             if (constraintGeometry != null) {
                 constraintGeometry.removeFromParent();
             }
-            Mesh constraint = new SectorVisualization(sc.getBaseAxis(), sc.getAngle(), this.radius);
+            Mesh constraint = new SectorVisualization(sc.getBaseAxis(), sc.getAngle(),1.0f);
             constraintGeometry = new Geometry("sectorConstraint", constraint); // using our custom mesh object
             Material mat = manager.loadMaterial("Materials/TriggerBoxMaterial.j3m");
             //mat.setColor("Color", ColorRGBA.Red);
             constraintGeometry.setMaterial(mat);
+            
             super.attachChild(constraintGeometry);
         }
     }
@@ -302,125 +270,6 @@ public class RevoluteJointTwoAxis extends Prefab implements BodyElement, Joint {
                 ((BodyElement) s).showTargetObjects();
             }
         }
-    }
-
-    @Override
-    public int attachChild(Spatial child) {
-        if (child instanceof Axis || child instanceof RotateGizmo) {
-            child.setLocalTranslation(this.getPivot());
-            return super.attachChild(child);
-        } else {
-            return transformNode.attachChild(child);
-        }
-    }
-
-    /**
-     * Checks if a prefab has children that need to be saved when the prefab is
-     * written to file. First the state of the canHaveChildren is checked, next
-     * a check will be performed to see if the object has savable children.
-     *
-     * @return true if this prefab has savable children, false otherwise.
-     */
-    @Override
-    public boolean hasSavableChildren() {
-        if (!canHaveChildren) {
-            return false;
-        } else {
-            for (Spatial s : transformNode.getChildren()) {
-                if (s instanceof Prefab) {
-                    return true;
-                }
-            }
-            return false;
-        }
-    }
-
-    @Override
-    public boolean canHaveChildren() {
-        return canHaveChildren;
-    }
-
-    @Override
-    public Object getPrefabChildAt(int index) {
-        int pindex = 0;
-        for (Spatial s : transformNode.getChildren()) {
-            if (s instanceof Prefab) {
-                if (pindex == index) {
-                    return s;
-                }
-                ++pindex;
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public int getPrefabChildCount() {
-        int pindex = 0;
-        if (transformNode != null) {
-            for (Spatial s : transformNode.getChildren()) {
-                if (s instanceof Prefab) {
-                    ++pindex;
-                }
-            }
-            return pindex;
-        }
-        return 0;
-    }
-
-    @Override
-    public int indexOfPrefab(Prefab prefab) {
-        int pindex = 0;
-        for (Spatial s : transformNode.getChildren()) {
-            if (s == prefab) {
-                return pindex;
-
-            }
-            ++pindex;
-        }
-        return -1;
-    }
-
-    @Override
-    public int getIndexOfChild(ProjectTreeNode object) {
-        int pindex = 0;
-        for (Spatial s : transformNode.getChildren()) {
-            if (s == object) {
-                return pindex;
-            } else if (s instanceof ProjectTreeNode) {
-                ++pindex;
-            }
-        }
-        return -1;
-    }
-
-    // visualization parameters
-    /**
-     * @return the radius
-     */
-    public float getRadius() {
-        return radius;
-    }
-
-    /**
-     * @param radius the radius to set
-     */
-    public void setRadius(float radius) {
-        this.radius = radius;
-    }
-
-    /**
-     * @return the height
-     */
-    public float getHeight() {
-        return height;
-    }
-
-    /**
-     * @param height the height to set
-     */
-    public void setHeight(float height) {
-        this.height = height;
     }
 
     @Override
