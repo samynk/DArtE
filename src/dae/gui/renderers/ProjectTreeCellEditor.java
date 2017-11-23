@@ -1,20 +1,9 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package dae.gui.renderers;
 
 
-import dae.animation.skeleton.Body;
-import dae.project.Grid;
-import dae.project.Layer;
-import dae.project.Level;
-import dae.project.Project;
 import java.awt.Component;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.JLabel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellEditor;
 
@@ -23,12 +12,12 @@ import javax.swing.tree.DefaultTreeCellEditor;
  * @author Koen
  */
 public class ProjectTreeCellEditor extends DefaultTreeCellEditor{
-    private Icon imgProject;
-    private Icon imgGrid;
-    private Icon imgLayer;
-    private Icon imgLevel;
-    private Icon imgBody;
-    private Icon imgPrefab;
+    private final Icon imgProject;
+    private final Icon imgGrid;
+    private final Icon imgLayer;
+    private final Icon imgLevel;
+    private final Icon imgBody;
+    private final Icon imgPrefab;
 
 
     public ProjectTreeCellEditor(JTree tree, ProjectTreeCellRenderer renderer) {
