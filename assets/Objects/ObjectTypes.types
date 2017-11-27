@@ -14,7 +14,7 @@
                 <parameter type="float3" id="scale"/>
             </parameters>
         </component>
-        <component id="MeshComponent" className="dae.components.MeshComponent" cid="2">
+        <component id="MeshComponent" className="dae.components.MeshComponent" order="3" cid="2">
             <parameters section="Mesh">
                 <parameter type="file" id="meshFile" extension="j3o|ovm"/>
             </parameters>
@@ -25,7 +25,7 @@
                 <parameter type="choice" id="animation" listento="animationSet" values="animations" />
             </parameters>
         </component>
-        <component id="SectorConstraint" className="dae.animation.skeleton.constraints.SectorConstraint">
+        <component id="SectorConstraint" className="dae.animation.skeleton.constraints.SectorConstraint" order="4">
             <parameters section="Constraints">
                 <parameter type="float3" id="baseAxis" />
                 <parameter type="float" id="angle" />
@@ -112,6 +112,16 @@
                 <parameter type="integer" id="radialSegments" min="4" max="16" default="8" />
                 <parameter type="integer" id="axialSegments" min="4" max="16" default="8"/>
                 <parameter type="float3" id="rotation" default="[0,90,0]" converter="dae.prefabs.parameters.converter.QuaternionConverter"/>
+            </parameters>
+        </component>
+        <component id="BoneComponent" className="dae.components.shapes.BoneComponent">
+            <parameters section="Bone">
+                <parameter type="boolean" id="visible" default="true"/>
+                <parameter type="color" id="diffuseColor" default="[1,1,0,1]"/>
+                <parameter type="float3" id="axis" default="[1,0,0]"/>
+                <parameter type="float" id="radius" default=".2"/>
+                <parameter type="float" id="height" default="2"/>
+                <parameter type="integer" id="sides" min="4" max="16" default="8" />
             </parameters>
         </component>
     </components>
@@ -387,11 +397,7 @@
         <object label="RevoluteJoint" class="dae.animation.skeleton.RevoluteJoint">
             <component id="ObjectComponent"/>
             <component id="TransformComponent"/>
-            <parameters section="Kinematic Chain">
-                <parameter type="boolean" id="chainWithParent"/>
-                <parameter type="boolean" id="chainWithChild"/>
-                <parameter type="string" id="chainChildName"/>
-            </parameters>
+            <component id="BoneComponent"/>
             <parameters section="Object">
                 <parameter type="string" id="group"/>
                 <parameter type="float" id="currentAngle"/>
