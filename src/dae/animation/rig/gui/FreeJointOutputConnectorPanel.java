@@ -61,7 +61,6 @@ public class FreeJointOutputConnectorPanel extends javax.swing.JPanel implements
     }// </editor-fold>//GEN-END:initComponents
 
     private void spnFactorStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spnFactorStateChanged
-        // TODO add your handling code here:
         if (connector != null) {
             connector.setFactor((Float)spnFactor.getValue());
         }
