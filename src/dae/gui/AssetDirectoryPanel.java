@@ -160,7 +160,6 @@ public class AssetDirectoryPanel extends javax.swing.JPanel implements DocumentL
     }// </editor-fold>//GEN-END:initComponents
 
     private void txtSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSearchActionPerformed
-        // TODO add your handling code here:
         adaptFilter();
         if (currentProject != null) {
             this.buildAssetTree(currentProject);
@@ -169,21 +168,20 @@ public class AssetDirectoryPanel extends javax.swing.JPanel implements DocumentL
     }//GEN-LAST:event_txtSearchActionPerformed
 
     private void assetTreeMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_assetTreeMousePressed
-        // TODO add your handling code here:
+        
 //        if (evt.isPopupTrigger()) {
 //            showAssetTreePopup(evt);
 //        }
     }//GEN-LAST:event_assetTreeMousePressed
 
     private void assetTreeMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_assetTreeMouseReleased
-        // TODO add your handling code here:
+       
 //        if (evt.isPopupTrigger()) {
 //            showAssetTreePopup(evt);
 //        }
     }//GEN-LAST:event_assetTreeMouseReleased
 
     private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
-        // TODO add your handling code here:
         adaptFilter();
     }//GEN-LAST:event_btnSearchActionPerformed
 
@@ -301,14 +299,17 @@ public class AssetDirectoryPanel extends javax.swing.JPanel implements DocumentL
         txtNewDirectory.setText("");
     }
 
+    @Override
     public void insertUpdate(DocumentEvent e) {
         updateButton();
     }
 
+    @Override
     public void removeUpdate(DocumentEvent e) {
         updateButton();
     }
 
+    @Override
     public void changedUpdate(DocumentEvent e) {
         updateButton();
     }
