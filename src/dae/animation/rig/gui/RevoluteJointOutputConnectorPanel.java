@@ -61,9 +61,8 @@ public class RevoluteJointOutputConnectorPanel extends javax.swing.JPanel implem
     }// </editor-fold>//GEN-END:initComponents
 
     private void spnFactorStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spnFactorStateChanged
-        // TODO add your handling code here:
         if (connector != null) {
-            connector.setFactor((Float)spnFactor.getValue());
+            connector.setFactor((Float) spnFactor.getValue());
         }
     }//GEN-LAST:event_spnFactorStateChanged
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -78,8 +77,8 @@ public class RevoluteJointOutputConnectorPanel extends javax.swing.JPanel implem
 
     @Override
     public OutputConnector createConnector() {
-        RevoluteJointOutputConnector rjc =
-                new RevoluteJointOutputConnector();
+        RevoluteJointOutputConnector rjc
+                = new RevoluteJointOutputConnector();
         rjc.setFactor((Float) spnFactor.getValue());
         return rjc;
     }
