@@ -89,7 +89,6 @@ public class AngleTargetConnectorPanel extends javax.swing.JPanel implements Inp
     }// </editor-fold>//GEN-END:initComponents
 
     private void cboTargetNameItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cboTargetNameItemStateChanged
-        // TODO add your handling code here:
         if (currentConnector != null) {
             String name = (String) evt.getItem();
             if (name != null) {
@@ -99,7 +98,6 @@ public class AngleTargetConnectorPanel extends javax.swing.JPanel implements Inp
     }//GEN-LAST:event_cboTargetNameItemStateChanged
 
     private void cboAttachmentPointNameItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cboAttachmentPointNameItemStateChanged
-        // TODO add your handling code here:
         if (currentConnector != null) {
             Object attachmentPoint = evt.getItem();
             if (attachmentPoint != null && attachmentPoint instanceof AttachmentPoint) {
