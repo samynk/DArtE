@@ -11,10 +11,10 @@ import com.jme3.util.BufferUtils;
  * @author Koen Samyn
  */
 public class BoneVisualization extends Mesh{
-    private Vector3f axis;
-    private float radius;
-    private float height;
-    private int sides;
+    private final Vector3f axis;
+    private final float radius;
+    private final float height;
+    private final int sides;
     
     public BoneVisualization(Vector3f axis, float radius, float height, int sides){
         this.axis = axis;
