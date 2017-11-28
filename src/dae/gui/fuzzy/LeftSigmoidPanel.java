@@ -161,12 +161,10 @@ public class LeftSigmoidPanel extends javax.swing.JPanel implements DocumentList
     }// </editor-fold>//GEN-END:initComponents
 
     private void spnCenterStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spnCenterStateChanged
-        // TODO add your handling code here:
         membership.setCenter((Float) spnCenter.getValue());
     }//GEN-LAST:event_spnCenterStateChanged
 
     private void spnRightStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spnRightStateChanged
-        // TODO add your handling code here:
         membership.setRight((Float) spnRight.getValue());
     }//GEN-LAST:event_spnRightStateChanged
     // Variables declaration - do not modify//GEN-BEGIN:variables
