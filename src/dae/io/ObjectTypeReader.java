@@ -39,6 +39,7 @@ import dae.prefabs.types.ObjectTypeCategory;
 import dae.prefabs.types.ObjectTypeCollection;
 import dae.prefabs.types.ObjectTypeInstance;
 import dae.prefabs.types.ObjectTypeParameter;
+import dae.prefabs.types.ObjectTypeUI;
 import dae.prefabs.types.ParameterSupport;
 import java.io.IOException;
 import java.io.InputStream;
@@ -96,13 +97,7 @@ public class ObjectTypeReader implements AssetLoader {
             }
 
             return result;
-        } catch (SAXException ex) {
-            Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
-            return result;
-        } catch (ParserConfigurationException ex) {
-            Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
-            return result;
-        } catch (IOException ex) {
+        } catch (SAXException | ParserConfigurationException | IOException ex) {
             Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
             return result;
         }
@@ -134,6 +129,7 @@ public class ObjectTypeReader implements AssetLoader {
                 readComponents(main, current, ot);
                 readParameterSections(current, ot);
                 readChildren(main, current, ot);
+                readAdditionalUI(main,current,ot);
             }
         }
     }
@@ -668,5 +664,25 @@ public class ObjectTypeReader implements AssetLoader {
             }
         }
         return oti;
+    }
+
+    private void readAdditionalUI(ObjectTypeCategory main, Node current, ObjectType ot) {
+        NodeList nl = current.getChildNodes();
+        for (int i = 0; i < nl.getLength(); ++i) {
+            Node child = nl.item(i);
+            if (child.getNodeName().equals("ui")) {
+                NamedNodeMap map = child.getAttributes();
+                
+                String guiClass = getAttrContent("class", map);
+                String location = getAttrContent("location", map);
+                boolean replace = XMLUtils.parseBoolean("replace", map);
+                boolean remove = XMLUtils.parseBoolean("remove",map);
+                String tag = getAttrContent("label",map);
+                String i18nTag = translations.getString(tag);
+                
+                ObjectTypeUI ui = new ObjectTypeUI(guiClass, location,i18nTag,replace,remove);
+                ot.setObjectTypeUI(ui);
+            }
+        }
     }
 }
