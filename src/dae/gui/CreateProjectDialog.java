@@ -373,7 +373,6 @@ public class CreateProjectDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_closeDialog
 
     private void btnAddFolderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddFolderActionPerformed
-        // TODO add your handling code here:
         int option = directoryChooser.showOpenDialog(this);
         if (option == JFileChooser.APPROVE_OPTION) {
             File selected = directoryChooser.getSelectedFile();
