@@ -6,11 +6,13 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import dae.GlobalObjects;
+import dae.animation.rig.timing.Behaviour;
 import dae.animation.skeleton.BodyElement;
 import dae.prefabs.Prefab;
 import dae.prefabs.shapes.DiamondShape;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import mlproject.fuzzy.FuzzySystem;
@@ -28,7 +30,11 @@ public class Rig extends Prefab implements BodyElement {
     private final ArrayList<String> targetKeys = new ArrayList<>();
     private final HashMap<String, Prefab> targets = new HashMap<>();
 
+    private final ArrayList<Behaviour> behaviours = new ArrayList<>();
+    private final HashMap<String,Behaviour> behaviourMap = new HashMap<>();
+
     private AssetManager manager;
+    private int defaultFPS = 15;
 
     /**
      * Create a new Rig.
@@ -128,6 +134,8 @@ public class Rig extends Prefab implements BodyElement {
     // T getProperty( String key );
     /**
      * Get the indexed target.
+     *
+     * @param key the for the target.
      */
     public void addTargetKey(String key) {
         targetKeys.add(key);
@@ -166,5 +174,44 @@ public class Rig extends Prefab implements BodyElement {
 
     public Prefab getTarget(String key) {
         return targets.get(key);
+    }
+
+    // implementation of dictionary prototype.
+    // void addPropertyKey( String key ); 
+    //  void removePropertyKey( String key );
+    // 
+    // int getNrOfPropertyKeys();
+    // int getIndexOfPropertyKey(String key);
+    // String getPropertyKeyAt(int index);
+    // 
+    // void setProperty( String key, T value);
+    // T getProperty( String key );
+    public List<Behaviour> getBehaviours(){
+        return this.behaviours;
+    }
+
+    public boolean containsBehaviour(String name) {
+        return behaviourMap.containsKey(name);
+    }
+    
+    public void addBehaviour(Behaviour b){
+        behaviours.add(b);
+        behaviourMap.put(b.getName(),b);
+    }
+    
+    public void removeBehaviour(String name){
+        Behaviour b = behaviourMap.get(name);
+        if ( b != null ){
+            behaviours.remove(b);
+            behaviourMap.remove(name);
+        }
+    }
+    
+    public int getDefaultFPS(){
+        return defaultFPS;
+    }
+    
+    public void setDefaultFPS(int fps){
+        this.defaultFPS = fps;
     }
 }
