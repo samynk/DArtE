@@ -36,7 +36,8 @@ public class ObjectType extends ParameterSupport {
     private final HashMap<String, ComponentType> componentMap = new HashMap<>();
     private final HashMap<String, HashMap<String, Object>> defaultMap = new HashMap<>();
     private final ArrayList<ObjectType> childObjects = new ArrayList<>();
-    
+
+    private ObjectTypeUI objectTypeUI;
 
     /*
      * Creates a new objectype.
@@ -55,15 +56,16 @@ public class ObjectType extends ParameterSupport {
         this.loadFromExtraInfo = loadFromExtraInfo;
         this.cid = cid;
     }
-    
+
     /**
      * Initializes this ObjectType with another object type.
+     *
      * @param tc the object to copy.
      */
-    public ObjectType(ObjectType tc){
-        this(tc.category,tc.label,tc.objectClass,tc.extraInfo,tc.loadFromExtraInfo,tc.cid);
-        
-        for (ComponentType ct: tc.componentTypes){
+    public ObjectType(ObjectType tc) {
+        this(tc.category, tc.label, tc.objectClass, tc.extraInfo, tc.loadFromExtraInfo, tc.cid);
+
+        for (ComponentType ct : tc.componentTypes) {
             this.addComponentType(ct);
         }
     }
@@ -130,12 +132,13 @@ public class ObjectType extends ParameterSupport {
         this.componentTypes.add(ct);
         componentMap.put(ct.getId(), ct);
     }
-    
+
     /**
      * Child objects to create when this type of object is created.
+     *
      * @param child the child object to create.
      */
-    public final void addChildObject(ObjectType child){
+    public final void addChildObject(ObjectType child) {
         this.childObjects.add(child);
     }
 
@@ -167,12 +170,12 @@ public class ObjectType extends ParameterSupport {
 
         initializePrefab(p, name);
         p.notifyLoaded();
-        
-        for (ObjectType child : this.childObjects){
+
+        for (ObjectType child : this.childObjects) {
             Prefab childPrefab = child.create(manager, name);
             p.attachChild(childPrefab);
         }
-        
+
         return p;
     }
 
@@ -250,7 +253,7 @@ public class ObjectType extends ParameterSupport {
             if (initializeComponents) {
                 this.initializePrefab(p, name);
             }
-            
+
         } catch (InstantiationException | IllegalAccessException | ClassNotFoundException ex) {
             Logger.getLogger(ObjectType.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -295,7 +298,9 @@ public class ObjectType extends ParameterSupport {
     /**
      * Finds the parameter that is bound to the given component for the given
      * property.
-     * @param componentId the component id of the component that holds the property.
+     *
+     * @param componentId the component id of the component that holds the
+     * property.
      * @param property the property to find.
      * @return the Parameter object or null if the parameter is not found.
      */
@@ -371,5 +376,17 @@ public class ObjectType extends ParameterSupport {
             Logger.getLogger(ObjectType.class.getName()).log(Level.SEVERE, null, ex);
         }
         return def;
+    }
+
+    public void setObjectTypeUI(ObjectTypeUI ui) {
+        this.objectTypeUI = ui;
+    }
+
+    public ObjectTypeUI getObjectTypeUI() {
+        return objectTypeUI;
+    }
+
+    public boolean hasObjectTypeUI() {
+        return objectTypeUI != null;
     }
 }
