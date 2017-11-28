@@ -31,6 +31,8 @@ public class EditFuzzySystemDialog extends javax.swing.JDialog implements Window
 
     /**
      * Creates new form EdiitFuzzySystemDialog
+     * @param parent
+     * @param modal
      */
     public EditFuzzySystemDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
@@ -222,22 +224,27 @@ public class EditFuzzySystemDialog extends javax.swing.JDialog implements Window
         tabSystem.setSelectedIndex(0);
     }
 
+    @Override
     public void windowClosing(WindowEvent e) {
         
     }
 
+    @Override
     public void windowClosed(WindowEvent e) {
         
     }
 
+    @Override
     public void windowIconified(WindowEvent e) {
        
     }
 
+    @Override
     public void windowDeiconified(WindowEvent e) {
        
     }
 
+    @Override
     public void windowActivated(WindowEvent e) {
         fuzzyInputVariablePanel1.setFuzzySystem(system);
         ruleBlockPanel1.setFuzzySystem(system);
@@ -246,6 +253,7 @@ public class EditFuzzySystemDialog extends javax.swing.JDialog implements Window
         
     }
 
+    @Override
     public void windowDeactivated(WindowEvent e) {
         
     }
