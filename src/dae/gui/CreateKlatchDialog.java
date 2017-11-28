@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.gui;
 
 import dae.prefabs.ui.classpath.FileNode;
@@ -220,7 +216,6 @@ public class CreateKlatchDialog extends javax.swing.JDialog implements TreeSelec
     }//GEN-LAST:event_closeDialog
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
-        // TODO add your handling code here:
         okButton.setEnabled(false);
         this.assetDirectoryPanel1.buildAssetTree(currentProject);
         txtAssemblyName.setText("");
@@ -298,14 +293,17 @@ public class CreateKlatchDialog extends javax.swing.JDialog implements TreeSelec
         okButton.setEnabled(currentSelection != null && txtAssemblyName.getText().length() > 0);
     }
 
+    @Override
     public void insertUpdate(DocumentEvent e) {
         adaptFileName();
     }
 
+    @Override
     public void removeUpdate(DocumentEvent e) {
         adaptFileName();
     }
 
+    @Override
     public void changedUpdate(DocumentEvent e) {
         adaptFileName();
     }
@@ -313,7 +311,7 @@ public class CreateKlatchDialog extends javax.swing.JDialog implements TreeSelec
     public String getAssemblyName() {
         StringBuilder name = new StringBuilder();
         if (currentSelection != null) {
-            String fullName = "";
+            String fullName;
             if (currentSelection.isFile()) {
                 fullName = currentSelection.getParentNode().getFullName();
             } else {
