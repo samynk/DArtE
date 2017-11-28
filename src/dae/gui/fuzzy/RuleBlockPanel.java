@@ -205,7 +205,7 @@ public class RuleBlockPanel extends javax.swing.JPanel implements DocumentListen
     }//GEN-LAST:event_btnAddRuleBlockActionPerformed
 
     private void btnDeleteRuleBlockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteRuleBlockActionPerformed
-        // TODO add your handling code here:
+
     }//GEN-LAST:event_btnDeleteRuleBlockActionPerformed
 
     private void lstRuleBlocksValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_lstRuleBlocksValueChanged
