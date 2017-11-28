@@ -83,7 +83,6 @@ public class PrefabCellEditor extends javax.swing.JPanel implements TableCellEdi
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnTogglePickItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_btnTogglePickItemStateChanged
-        // TODO add your handling code here:
         if (evt.getStateChange() == ItemEvent.SELECTED) {
             GizmoEvent ge = new GizmoEvent(this, GizmoType.PICK);
             ge.setPickProperty(parentPrefab.getName());
@@ -98,6 +97,7 @@ public class PrefabCellEditor extends javax.swing.JPanel implements TableCellEdi
     private javax.swing.JLabel lblPrefabName;
     // End of variables declaration//GEN-END:variables
 
+    @Override
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
         if (value != null) {
             lblPrefabName.setText(value.toString());
@@ -110,18 +110,22 @@ public class PrefabCellEditor extends javax.swing.JPanel implements TableCellEdi
         return this;
     }
 
+    @Override
     public Object getCellEditorValue() {
         return pickedObject;
     }
 
+    @Override
     public boolean isCellEditable(EventObject anEvent) {
         return true;
     }
 
+    @Override
     public boolean shouldSelectCell(EventObject anEvent) {
         return true;
     }
 
+    @Override
     public boolean stopCellEditing() {
         fireEditingStopped();
         GizmoEvent ge = new GizmoEvent(this, GizmoType.TRANSLATE);
@@ -129,16 +133,19 @@ public class PrefabCellEditor extends javax.swing.JPanel implements TableCellEdi
         return true;
     }
 
+    @Override
     public void cancelCellEditing() {
         fireEditingCanceled();
         GizmoEvent ge = new GizmoEvent(this, GizmoType.TRANSLATE);
         GlobalObjects.getInstance().postEvent(ge);
     }
 
+    @Override
     public void addCellEditorListener(CellEditorListener l) {
         listeners.add(l);
     }
 
+    @Override
     public void removeCellEditorListener(CellEditorListener l) {
         listeners.remove(l);
     }
