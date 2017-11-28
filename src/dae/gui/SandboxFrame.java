@@ -11,6 +11,7 @@ import dae.animation.rig.Rig;
 import dae.animation.rig.io.RigWriter;
 import dae.components.MeshComponent;
 import dae.gui.events.ApplicationStoppedEvent;
+import dae.gui.events.DAEKeyboardManager;
 import dae.gui.renderers.TransformSpaceRenderer;
 import dae.io.ProjectLoader;
 import dae.io.ProjectSaver;
@@ -25,6 +26,8 @@ import dae.prefabs.gizmos.events.GizmoSpaceChangedEvent;
 import dae.prefabs.gizmos.events.RotateGizmoSpaceChangedEvent;
 import dae.prefabs.types.ObjectType;
 import dae.prefabs.types.ObjectTypeCategory;
+import dae.prefabs.types.ObjectTypePanel;
+import dae.prefabs.types.ObjectTypeUI;
 import dae.prefabs.ui.classpath.FileNode;
 import dae.prefabs.ui.events.AssetEvent;
 import dae.prefabs.ui.events.AssetEventType;
@@ -50,6 +53,7 @@ import dae.project.Project;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.HeadlessException;
+import java.awt.KeyboardFocusManager;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.DropTarget;
@@ -69,6 +73,7 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import java.util.prefs.Preferences;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
@@ -81,12 +86,12 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  */
 public class SandboxFrame extends javax.swing.JFrame implements DropTargetListener {
 
-    private SandboxViewport viewport;
-    private CreateProjectDialog createProjectDialog;
-    private CreateKlatchDialog createObjectDialog;
+    private final SandboxViewport viewport;
+    private final CreateProjectDialog createProjectDialog;
+    private final CreateKlatchDialog createObjectDialog;
     private RemoveComponentDialog removeComponentDialog;
-    private FileNameExtensionFilter sandboxFilter = new FileNameExtensionFilter("Sandbox Files", "zbk");
-    private FileNameExtensionFilter sceneFilter = new FileNameExtensionFilter("Scene files", "scene");
+    private final FileNameExtensionFilter sandboxFilter = new FileNameExtensionFilter("Sandbox Files", "zbk");
+    private final FileNameExtensionFilter sceneFilter = new FileNameExtensionFilter("Scene files", "scene");
     /**
      * The current project.
      */
@@ -105,6 +110,8 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
      */
     public SandboxFrame() {
         JPopupMenu.setDefaultLightWeightPopupEnabled(false);
+        KeyboardFocusManager kfm = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+        kfm.addKeyEventDispatcher(new DAEKeyboardManager());
         initComponents();
         cboTranslateSpace.setModel(new DefaultComboBoxModel(TranslateGizmoSpace.values()));
         cboRotateSpace.setModel(new DefaultComboBoxModel(RotateGizmoSpace.values()));
@@ -925,7 +932,6 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
     }// </editor-fold>//GEN-END:initComponents
 
     private void mnuOpenSceneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuOpenSceneActionPerformed
-        // TODO add your handling code here:
         String recentFiles = Preferences.userRoot().get("RecentFiles", "");
         int colonIndex = recentFiles.lastIndexOf('\0');
         String lastFile = recentFiles.substring(colonIndex + 1);
@@ -944,7 +950,6 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
     }//GEN-LAST:event_mnuOpenSceneActionPerformed
 
     private void mnuNewProjectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuNewProjectActionPerformed
-        // TODO add your handling code here:
         createProjectDialog.setLocationRelativeTo(this);
         createProjectDialog.setVisible(true);
 
@@ -972,22 +977,14 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
     }//GEN-LAST:event_mnuPreferencesActionPerformed
 
     private void mnuAddCrateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAddCrateActionPerformed
-
-        ObjectTypeCategory otc = viewport.getObjectsToCreate();
-        ObjectType ot = otc.getObjectType("Standard", "Crate");
-        if (ot != null) {
-            CreateObjectEvent coe = new CreateObjectEvent(ot.getObjectToCreate(), null, ot);
-            GlobalObjects.getInstance().postEvent(coe);
-        }
+        createObject("Standard", "Crate");
     }//GEN-LAST:event_mnuAddCrateActionPerformed
 
     private void mnuUndoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuUndoActionPerformed
-        // TODO add your handling code here:
         GlobalObjects.getInstance().undo();
     }//GEN-LAST:event_mnuUndoActionPerformed
 
     private void mnuRedoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuRedoActionPerformed
-        // TODO add your handling code here:
         GlobalObjects.getInstance().redo();
     }//GEN-LAST:event_mnuRedoActionPerformed
 
@@ -996,7 +993,6 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
     }//GEN-LAST:event_mnuSaveProjectActionPerformed
 
     private void btnLinkItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_btnLinkItemStateChanged
-        // TODO add your handling code here:
         if (evt.getStateChange() == ItemEvent.SELECTED) {
             GlobalObjects.getInstance().postEvent(new GizmoEvent(this, GizmoType.LINK));
         }
@@ -1004,111 +1000,59 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
     }//GEN-LAST:event_btnLinkItemStateChanged
 
     private void btnMoveItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_btnMoveItemStateChanged
-        // TODO add your handling code here:
         if (evt.getStateChange() == ItemEvent.SELECTED) {
             GlobalObjects.getInstance().postEvent(new GizmoEvent(this, GizmoType.TRANSLATE));
         }
     }//GEN-LAST:event_btnMoveItemStateChanged
 
     private void btnRotateItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_btnRotateItemStateChanged
-        // TODO add your handling code here:
         if (evt.getStateChange() == ItemEvent.SELECTED) {
             GlobalObjects.getInstance().postEvent(new GizmoEvent(this, GizmoType.ROTATE));
         }
     }//GEN-LAST:event_btnRotateItemStateChanged
 
     private void mnuSpotLightActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSpotLightActionPerformed
-        // TODO add your handling code here:
-        ObjectTypeCategory otc = viewport.getObjectsToCreate();
-        ObjectType ot = otc.getObjectType("Light", "SpotLight");
-        if (ot != null) {
-            CreateObjectEvent coe = new CreateObjectEvent(ot.getObjectToCreate(), null, ot);
-            GlobalObjects.getInstance().postEvent(coe);
-        }
+        createObject("Light", "SpotLight");
     }//GEN-LAST:event_mnuSpotLightActionPerformed
 
     private void mnuPhysicsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuPhysicsActionPerformed
-        // TODO add your handling code here:
+
     }//GEN-LAST:event_mnuPhysicsActionPerformed
 
     private void mnuAddSphereActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAddSphereActionPerformed
-        // TODO add your handling code here:
-        ObjectTypeCategory otc = viewport.getObjectsToCreate();
-        ObjectType ot = otc.getObjectType("Standard", "Sphere");
-        if (ot != null) {
-            CreateObjectEvent coe = new CreateObjectEvent(ot.getObjectToCreate(), null, ot);
-            GlobalObjects.getInstance().postEvent(coe);
-        }
+        createObject("Standard", "Sphere");
     }//GEN-LAST:event_mnuAddSphereActionPerformed
 
     private void mnuAddCylinderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAddCylinderActionPerformed
-        // TODO add your handling code here:
-        ObjectTypeCategory otc = viewport.getObjectsToCreate();
-        ObjectType ot = otc.getObjectType("Standard", "Cylinder");
-        if (ot != null) {
-            CreateObjectEvent coe = new CreateObjectEvent(ot.getObjectToCreate(), null, ot);
-            GlobalObjects.getInstance().postEvent(coe);
-        }
+        createObject("Standard", "Cylinder");
     }//GEN-LAST:event_mnuAddCylinderActionPerformed
 
     private void mnuAddHingeJointActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAddHingeJointActionPerformed
-        // TODO add your handling code here:
-        ObjectTypeCategory otc = viewport.getObjectsToCreate();
-        ObjectType ot = otc.getObjectType("Standard", "HingeJoint");
-        if (ot != null) {
-            CreateObjectEvent coe = new CreateObjectEvent(ot.getObjectToCreate(), null, ot);
-            GlobalObjects.getInstance().postEvent(coe);
-        }
+        createObject("Standard", "HingeJoint");
     }//GEN-LAST:event_mnuAddHingeJointActionPerformed
 
     private void mnuAddPivotActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAddPivotActionPerformed
-        // TODO add your handling code here:
-        ObjectTypeCategory otc = viewport.getObjectsToCreate();
-        ObjectType ot = otc.getObjectType("Metadata", "Pivot");
-        if (ot != null) {
-            CreateObjectEvent coe = new CreateObjectEvent(ot.getObjectToCreate(), null, ot);
-            GlobalObjects.getInstance().postEvent(coe);
-        }
+        createObject("Metadata", "Pivot");
     }//GEN-LAST:event_mnuAddPivotActionPerformed
 
     private void btnZoomExtentsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZoomExtentsActionPerformed
-        // TODO add your handling code here:
         ZoomEvent ze = new ZoomEvent(ZoomEventType.EXTENTS_SELECTED);
         GlobalObjects.getInstance().postEvent(ze);
     }//GEN-LAST:event_btnZoomExtentsActionPerformed
 
     private void mnuAddSpotLightActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAddSpotLightActionPerformed
-        // TODO add your handling code here:
-        ObjectTypeCategory otc = viewport.getObjectsToCreate();
-        ObjectType ot = otc.getObjectType("Light", "PointLight");
-        if (ot != null) {
-            CreateObjectEvent coe = new CreateObjectEvent(ot.getObjectToCreate(), null, ot);
-            GlobalObjects.getInstance().postEvent(coe);
-        }
+        createObject("Light", "PointLight");
     }//GEN-LAST:event_mnuAddSpotLightActionPerformed
 
     private void mnuAddDirectionalLightActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAddDirectionalLightActionPerformed
-        // TODO add your handling code here:
-        ObjectTypeCategory otc = viewport.getObjectsToCreate();
-        ObjectType ot = otc.getObjectType("Light", "DirectionalLight");
-        if (ot != null) {
-            CreateObjectEvent coe = new CreateObjectEvent(ot.getObjectToCreate(), null, ot);
-            GlobalObjects.getInstance().postEvent(coe);
-        }
+        createObject("Light", "DirectionalLight");
     }//GEN-LAST:event_mnuAddDirectionalLightActionPerformed
 
     private void mnuAddAmbientLightActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAddAmbientLightActionPerformed
-        // TODO add your handling code here:
-        ObjectTypeCategory otc = viewport.getObjectsToCreate();
-        ObjectType ot = otc.getObjectType("Light", "AmbientLight");
-        if (ot != null) {
-            CreateObjectEvent coe = new CreateObjectEvent(ot.getObjectToCreate(), null, ot);
-            GlobalObjects.getInstance().postEvent(coe);
-        }
+        createObject("Light", "AmbientLight");
     }//GEN-LAST:event_mnuAddAmbientLightActionPerformed
 
     private void cboTranslateSpaceItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cboTranslateSpaceItemStateChanged
-        // TODO add your handling code here:
         if (evt.getStateChange() == ItemEvent.SELECTED) {
             TranslateGizmoSpace tgc = (TranslateGizmoSpace) evt.getItem();
             GlobalObjects.getInstance().postEvent(new GizmoSpaceChangedEvent(tgc));
@@ -1116,7 +1060,6 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
     }//GEN-LAST:event_cboTranslateSpaceItemStateChanged
 
     private void cboRotateSpaceItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cboRotateSpaceItemStateChanged
-        // TODO add your handling code here:
         if (evt.getStateChange() == ItemEvent.SELECTED) {
             RotateGizmoSpace tgc = (RotateGizmoSpace) evt.getItem();
             GlobalObjects.getInstance().postEvent(new RotateGizmoSpaceChangedEvent(tgc));
@@ -1154,12 +1097,7 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
     }//GEN-LAST:event_mnuGettingStartedActionPerformed
 
     private void mnuAddCameraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAddCameraActionPerformed
-        ObjectTypeCategory otc = viewport.getObjectsToCreate();
-        ObjectType ot = otc.getObjectType("Standard", "Camera");
-        if (ot != null) {
-            CreateObjectEvent coe = new CreateObjectEvent(ot.getObjectToCreate(), null, ot);
-            GlobalObjects.getInstance().postEvent(coe);
-        }
+        createObject("Standard", "Camera");
     }//GEN-LAST:event_mnuAddCameraActionPerformed
 
     private void mnuImportSceneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuImportSceneActionPerformed
@@ -1211,7 +1149,6 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
     }//GEN-LAST:event_mnuAddTriggerBoxActionPerformed
 
     private void mnuAddNPCActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAddNPCActionPerformed
-        // TODO add your handling code here:
         createObject("Standard", "J3ONPC", "Characters/Male/Character1/character1.j3o");
     }//GEN-LAST:event_mnuAddNPCActionPerformed
 
@@ -1289,81 +1226,35 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
     }//GEN-LAST:event_mnuRemoveComponentActionPerformed
 
     private void mnuAddWaypointActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAddWaypointActionPerformed
-        // TODO add your handling code here:
-        ObjectTypeCategory otc = viewport.getObjectsToCreate();
-        ObjectType ot = otc.getObjectType("Animation", "Waypoint");
-        if (ot != null) {
-            CreateObjectEvent coe = new CreateObjectEvent(ot.getObjectToCreate(), null, ot);
-            GlobalObjects.getInstance().postEvent(coe);
-        }
+        createObject("Animation", "Waypoint");
     }//GEN-LAST:event_mnuAddWaypointActionPerformed
 
     private void mnuAddCharacterPathActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAddCharacterPathActionPerformed
-        // TODO add your handling code here:
-        ObjectTypeCategory otc = viewport.getObjectsToCreate();
-        ObjectType ot = otc.getObjectType("Animation", "CharacterPath");
-        if (ot != null) {
-            CreateObjectEvent coe = new CreateObjectEvent(ot.getObjectToCreate(), null, ot);
-            GlobalObjects.getInstance().postEvent(coe);
-        }
+        createObject("Animation", "CharacterPath");
     }//GEN-LAST:event_mnuAddCharacterPathActionPerformed
 
     private void mnuHandCurveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuHandCurveActionPerformed
-        // TODO add your handling code here:
-        ObjectTypeCategory otc = viewport.getObjectsToCreate();
-        ObjectType ot = otc.getObjectType("Animation", "Handcurve");
-        if (ot != null) {
-            CreateObjectEvent coe = new CreateObjectEvent(ot.getObjectToCreate(), null, ot);
-            GlobalObjects.getInstance().postEvent(coe);
-        }
+        createObject("Animation", "Handcurve");
     }//GEN-LAST:event_mnuHandCurveActionPerformed
 
     private void munAddFootcurveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_munAddFootcurveActionPerformed
-        ObjectTypeCategory otc = viewport.getObjectsToCreate();
-        ObjectType ot = otc.getObjectType("Animation", "Footcurve");
-        if (ot != null) {
-            CreateObjectEvent coe = new CreateObjectEvent(ot.getObjectToCreate(), null, ot);
-            GlobalObjects.getInstance().postEvent(coe);
-        }
+        createObject("Animation", "Footcurve");
     }//GEN-LAST:event_munAddFootcurveActionPerformed
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-        // TODO add your handling code here:
-        ObjectTypeCategory otc = viewport.getObjectsToCreate();
-        ObjectType ot = otc.getObjectType("Animation", "Handshake");
-        if (ot != null) {
-            CreateObjectEvent coe = new CreateObjectEvent(ot.getObjectToCreate(), null, ot);
-            GlobalObjects.getInstance().postEvent(coe);
-        }
+        createObject("Animation", "Handshake");
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     private void mnuAdd2HandleAxisActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAdd2HandleAxisActionPerformed
-        // TODO add your handling code here:
-        ObjectTypeCategory otc = viewport.getObjectsToCreate();
-        ObjectType ot = otc.getObjectType("Animation", "TwoAxisHandle");
-        if (ot != null) {
-            CreateObjectEvent coe = new CreateObjectEvent(ot.getObjectToCreate(), null, ot);
-            GlobalObjects.getInstance().postEvent(coe);
-        }
+        createObject("Animation", "TwoAxisHandle");
     }//GEN-LAST:event_mnuAdd2HandleAxisActionPerformed
 
     private void mnuAddHandleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAddHandleActionPerformed
-        // TODO add your handling code here:
-        ObjectTypeCategory otc = viewport.getObjectsToCreate();
-        ObjectType ot = otc.getObjectType("Animation", "Handle");
-        if (ot != null) {
-            CreateObjectEvent coe = new CreateObjectEvent(ot.getObjectToCreate(), null, ot);
-            GlobalObjects.getInstance().postEvent(coe);
-        }
+        createObject("Animation", "Handle");
     }//GEN-LAST:event_mnuAddHandleActionPerformed
 
     private void mnuAddTargetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAddTargetActionPerformed
-        ObjectTypeCategory otc = viewport.getObjectsToCreate();
-        ObjectType ot = otc.getObjectType("Animation", "AttachmentPoint");
-        if (ot != null) {
-            CreateObjectEvent coe = new CreateObjectEvent(ot.getObjectToCreate(), null, ot);
-            GlobalObjects.getInstance().postEvent(coe);
-        }
+        createObject("Animation", "AttachmentPoint");
     }//GEN-LAST:event_mnuAddTargetActionPerformed
 
     private void mnuAddFreeJointActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAddFreeJointActionPerformed
@@ -1371,12 +1262,7 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
     }//GEN-LAST:event_mnuAddFreeJointActionPerformed
 
     private void mnuAddRevoluteJointActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAddRevoluteJointActionPerformed
-        ObjectTypeCategory otc = viewport.getObjectsToCreate();
-        ObjectType ot = otc.getObjectType("Animation", "RevoluteJoint");
-        if (ot != null) {
-            CreateObjectEvent coe = new CreateObjectEvent(ot.getObjectToCreate(), null, ot);
-            GlobalObjects.getInstance().postEvent(coe);
-        }
+        createObject("Animation", "RevoluteJoint");
     }//GEN-LAST:event_mnuAddRevoluteJointActionPerformed
 
     private void mnuCreateRigActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuCreateRigActionPerformed
@@ -1635,22 +1521,22 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
 
     @Override
     public void dragEnter(DropTargetDragEvent dtde) {
-        
+
     }
 
     @Override
     public void dragOver(DropTargetDragEvent dtde) {
-        
+
     }
 
     @Override
     public void dropActionChanged(DropTargetDragEvent dtde) {
-        
+
     }
 
     @Override
     public void dragExit(DropTargetEvent dte) {
-        
+
     }
 
     @Override
@@ -1776,19 +1662,37 @@ public class SandboxFrame extends javax.swing.JFrame implements DropTargetListen
             return;
         }
         if (SwingUtilities.isEventDispatchThread()) {
-            selectedPrefab = se.getSelectedNode();
+            adjustUI(se);
         } else {
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    selectedPrefab = se.getSelectedNode();
-                }
+            SwingUtilities.invokeLater(() -> {
+                adjustUI(se);
             });
         }
     }
 
-    private void saveProject() throws HeadlessException {
-        // TODO add your handling code here:
+    private void adjustUI(SelectionEvent se) {
+        Prefab selected = se.getSelectedNode();
+        if (selected != selectedPrefab) {
+            selectedPrefab = selected;
+            ObjectType type = selectedPrefab.getObjectType();
+            if (type.hasObjectTypeUI()) {
+                ObjectTypeUI ui = type.getObjectTypeUI();
+                ObjectTypePanel panel = ui.getPanel();
+                panel.setPrefab(selected);
+                if (panel instanceof JComponent) {
+                    switch (ui.getLocation()) {
+                        case "horizontalTabs":
+                            JComponent c = (JComponent) panel;
+                            pnlTabOutputs.add(ui.getLabel(), (JComponent) panel);
+                            pnlTabOutputs.setSelectedComponent(c);
+                            break;
+                    }
+                }
+            }
+        }
+    }
 
+    private void saveProject() throws HeadlessException {
         if (currentProject != null) {
             if (currentProject.hasFileLocation()) {
                 try {
