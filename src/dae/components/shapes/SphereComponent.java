@@ -17,36 +17,23 @@ import dae.prefabs.Prefab;
  * by assembling all required functionality instead of subclassing the prefab.
  * @author Koen.Samyn
  */
-public class SphereComponent extends PrefabComponent{
+public class SphereComponent extends VisualComponent{
     private int radialSegments;
     private int axialSegments;
     private float radius;
     
-    private Geometry sphereGeo;
-
     @Override
-    public void install(Prefab parent) {
+    protected void createShape(Prefab parent) {
         Sphere sphere = new Sphere(axialSegments, radialSegments,radius);
-        sphereGeo = new Geometry("sphere", sphere);
+        Geometry visual = new Geometry("sphere", sphere);
         
         AssetManager am = GlobalObjects.getInstance().getAssetManager();
-        Material boneMat = am.loadMaterial("Materials/RigMaterial.j3m");
+        Material mat = am.loadMaterial("Materials/RigMaterial.j3m");
 
-        sphereGeo.setMaterial(boneMat);
+        visual.setMaterial(mat);
         
-        parent.attachChild(sphereGeo);
-    }
-
-    @Override
-    public void deinstall() {
-        if ( sphereGeo != null ){
-            sphereGeo.removeFromParent();
-        }
-    }
-
-    @Override
-    public void installGameComponent(Spatial parent) {
-        
+        setVisual(visual);
+        setMaterial(mat);
     }
     
     /**
@@ -61,6 +48,7 @@ public class SphereComponent extends PrefabComponent{
      */
     public void setRadialSegments(int radialSegments) {
         this.radialSegments = radialSegments;
+        recreate();
     }
 
     /**
@@ -75,6 +63,7 @@ public class SphereComponent extends PrefabComponent{
      */
     public void setAxialSegments(int axialSegments) {
         this.axialSegments = axialSegments;
+        recreate();
     }
 
     /**
@@ -89,5 +78,6 @@ public class SphereComponent extends PrefabComponent{
      */
     public void setRadius(float radius) {
         this.radius = radius;
+        recreate();
     }
 }
