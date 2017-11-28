@@ -149,7 +149,6 @@ public class PreferencesDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_closeDialog
 
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
-        // TODO add your handling code here:
         for (Component c : this.preferencesTab.getComponents()) {
             if (c instanceof PreferencePanel) {
                 PreferencePanel pp = (PreferencePanel) c;
