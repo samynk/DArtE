@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.gui.fuzzy;
 
 import java.awt.Color;
@@ -165,12 +161,10 @@ public class RightSigmoidPanel extends javax.swing.JPanel implements DocumentLis
     }// </editor-fold>//GEN-END:initComponents
 
     private void spnLeftStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spnLeftStateChanged
-        // TODO add your handling code here:
         membership.setLeft((Float) spnLeft.getValue());
     }//GEN-LAST:event_spnLeftStateChanged
 
     private void spnCenterStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spnCenterStateChanged
-        // TODO add your handling code here:
         membership.setCenter((Float) spnCenter.getValue());
     }//GEN-LAST:event_spnCenterStateChanged
     // Variables declaration - do not modify//GEN-BEGIN:variables
