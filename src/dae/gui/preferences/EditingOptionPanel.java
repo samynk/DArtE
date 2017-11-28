@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package dae.gui.preferences;
 
 import com.jme3.math.Vector3f;
@@ -202,7 +197,6 @@ public class EditingOptionPanel extends javax.swing.JPanel implements Preference
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnClearRecentFileListActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearRecentFileListActionPerformed
-        // TODO add your handling code here:
         GlobalObjects.getInstance().clearRecentFileList();
     }//GEN-LAST:event_btnClearRecentFileListActionPerformed
 
