@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.gui.fuzzy;
 
 import java.awt.Color;
@@ -35,11 +31,11 @@ public class SigmoidPanel extends javax.swing.JPanel implements DocumentListener
         }
         txtMembershipName.getDocument().addDocumentListener(this);
         errorColor = UIManager.getDefaults().getColor("nimbusRed");
-        if ( errorColor == null ){
+        if (errorColor == null) {
             errorColor = Color.RED;
         }
         normalColor = UIManager.getDefaults().getColor("text");
-        if ( normalColor == null ){
+        if (normalColor == null) {
             normalColor = Color.BLACK;
         }
     }
@@ -165,17 +161,14 @@ public class SigmoidPanel extends javax.swing.JPanel implements DocumentListener
     }// </editor-fold>//GEN-END:initComponents
 
     private void spnCenterStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spnCenterStateChanged
-        // TODO add your handling code here:
         membership.setCenter((Float) spnCenter.getValue());
     }//GEN-LAST:event_spnCenterStateChanged
 
     private void spnRightStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spnRightStateChanged
-        // TODO add your handling code here:
         membership.setRight((Float) spnRight.getValue());
     }//GEN-LAST:event_spnRightStateChanged
 
     private void spnLeftStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spnLeftStateChanged
-        // TODO add your handling code here:
         membership.setLeft((Float) spnLeft.getValue());
     }//GEN-LAST:event_spnLeftStateChanged
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -206,9 +199,9 @@ public class SigmoidPanel extends javax.swing.JPanel implements DocumentListener
         String newName = txtMembershipName.getText();
         this.membership.setName(newName);
 
-        if ( !membership.getName().equals(newName) ){
+        if (!membership.getName().equals(newName)) {
             txtMembershipName.setForeground(errorColor);
-        }else{
+        } else {
             txtMembershipName.setForeground(normalColor);
         }
     }
