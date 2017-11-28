@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.gui;
 
 import dae.project.Project;
@@ -19,7 +15,7 @@ import javax.swing.event.DocumentListener;
 
 /**
  *
- * @author samyn_000
+ * @author Koen Samyn
  */
 public class CreateLayerDialog extends javax.swing.JDialog {
 
@@ -35,6 +31,8 @@ public class CreateLayerDialog extends javax.swing.JDialog {
 
     /**
      * Creates new form CreateLayerDialog
+     * @param parent the parent for this dialog.
+     * @param modal
      */
     public CreateLayerDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
@@ -226,7 +224,7 @@ public class CreateLayerDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_closeDialog
 
     private void btnHelpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHelpActionPerformed
-        // TODO add your handling code here:
+        
     }//GEN-LAST:event_btnHelpActionPerformed
 
     private void doClose(int retStatus) {
