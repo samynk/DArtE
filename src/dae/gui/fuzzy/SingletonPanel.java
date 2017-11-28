@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.gui.fuzzy;
 
 import java.awt.Color;
@@ -47,14 +43,17 @@ public class SingletonPanel extends javax.swing.JPanel implements DocumentListen
         spnCenter.setValue(memberShip.getValue());
     }
     
+    @Override
      public void insertUpdate(DocumentEvent e) {
         updateMemberShipName();
     }
 
+    @Override
     public void removeUpdate(DocumentEvent e) {
         updateMemberShipName();
     }
 
+    @Override
     public void changedUpdate(DocumentEvent e) {
         updateMemberShipName();
     }
@@ -138,7 +137,6 @@ public class SingletonPanel extends javax.swing.JPanel implements DocumentListen
     }// </editor-fold>//GEN-END:initComponents
 
     private void spnCenterStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spnCenterStateChanged
-        // TODO add your handling code here:
         membership.setValue((Float)spnCenter.getValue());
     }//GEN-LAST:event_spnCenterStateChanged
 
