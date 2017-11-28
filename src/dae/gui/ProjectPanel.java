@@ -99,7 +99,6 @@ public class ProjectPanel extends javax.swing.JPanel implements TreeSelectionLis
     public void projectSelected(final ProjectEvent event) {
         if (event.getSource() != this) {
 
-
             if (event.getEventType() == ProjectEventType.CREATED || event.getEventType() == ProjectEventType.SELECTED) {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
@@ -238,7 +237,6 @@ public class ProjectPanel extends javax.swing.JPanel implements TreeSelectionLis
     }//GEN-LAST:event_mnuRemoveLevelActionPerformed
 
     private void mnuCreateKlatchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuCreateKlatchActionPerformed
-        // TODO add your handling code here:
         if (currentProject.hasFileLocation()) {
             createKlatchDialog.setLocationRelativeTo(this);
             createKlatchDialog.setCurrentProject(this.currentProject);
@@ -384,7 +382,6 @@ public class ProjectPanel extends javax.swing.JPanel implements TreeSelectionLis
     }
 
     private void deleteNode() {
-        // TODO add your handling code here:
         TreePath selection = projectTree.getSelectionPath();
         Prefab deleted = (Prefab) selection.getLastPathComponent();
         Level level = (Level) selection.getPathComponent(1);
