@@ -309,27 +309,23 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
     }// </editor-fold>//GEN-END:initComponents
 
     private void txtSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSearchActionPerformed
-        // TODO add your handling code here:
         FileNode node = searcher.findFilesInClassLoader(filePattern);
         this.assetTree.setModel(new AssetTreeModel(node));
     }//GEN-LAST:event_txtSearchActionPerformed
 
     private void assetTreeMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_assetTreeMousePressed
-        // TODO add your handling code here:
         if (evt.isPopupTrigger()) {
             showAssetTreePopup(evt);
         }
     }//GEN-LAST:event_assetTreeMousePressed
 
     private void assetTreeMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_assetTreeMouseReleased
-        // TODO add your handling code here:
         if (evt.isPopupTrigger()) {
             showAssetTreePopup(evt);
         }
     }//GEN-LAST:event_assetTreeMouseReleased
 
     private void mnuEditObjectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuEditObjectActionPerformed
-        // TODO add your handling code here:
         Object o = this.assetTree.getLastSelectedPathComponent();
         if (o != null && o instanceof FileNode) {
             FileNode fn = (FileNode) o;
@@ -339,7 +335,6 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
     }//GEN-LAST:event_mnuEditObjectActionPerformed
 
     private void cboMeshFilterItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cboMeshFilterItemStateChanged
-        // TODO add your handling code here:
         adaptFilter();
     }//GEN-LAST:event_cboMeshFilterItemStateChanged
 
@@ -359,7 +354,6 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
     }//GEN-LAST:event_cboRigFilterItemStateChanged
 
     private void mnuEditRigActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuEditRigActionPerformed
-        // TODO add your handling code here:
         Object o = this.assetTree.getLastSelectedPathComponent();
         if (o != null && o instanceof FileNode) {
             FileNode fn = (FileNode) o;
@@ -369,7 +363,6 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
     }//GEN-LAST:event_mnuEditRigActionPerformed
 
     private void mnuEditKlatchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuEditKlatchActionPerformed
-        // TODO add your handling code here:
         Object o = this.assetTree.getLastSelectedPathComponent();
         if (o != null && o instanceof FileNode) {
             FileNode fn = (FileNode) o;
@@ -468,10 +461,12 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
         }
     }
 
+    @Override
     public void pathModified(Path path) {
         Logger.getLogger("DArtE").log(Level.INFO, "Path modified: {0}", path.toString());
     }
 
+    @Override
     public void assetModified(Path path) {
         if (!filePattern.matcher(path.toString()).matches()) {
             return;
@@ -489,6 +484,7 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
         GlobalObjects.getInstance().postEvent(new AssetEvent(AssetEventType.MODIFIED, current));
     }
 
+    @Override
     public void pathCreated(Path subDir) {
         // class path searching can take a while, so rescan
         // from the correct file node.
@@ -527,6 +523,7 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
     private ArrayList tmpObjects = new ArrayList();
     private ArrayList<Integer> tmpIndices = new ArrayList<Integer>();
 
+    @Override
     public void pathDeleted(Path subDir) {
         File assetFolder = getAssetFolderForPath(subDir);
         Path assetPath = assetFolder.toPath();
@@ -577,6 +574,7 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
     private void dispatchTreeModelEvent(TreeModelEvent tme) {
     }
 
+    @Override
     public void assetCreated(Path subDir) {
         if (!filePattern.matcher(subDir.toString()).matches()) {
             return;
@@ -629,6 +627,7 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
         treeModel.fireNodeAdded(tme);
     }
 
+    @Override
     public void assetDeleted(Path subDir) {
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         File assetFolder = getAssetFolderForPath(subDir);
@@ -787,20 +786,16 @@ public class AssetPanel extends javax.swing.JPanel implements WatchServiceListen
             thread.start();
         }
         this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-        executor.execute(new Runnable() {
-            public void run() {
-                searcher.setAssetClassLoader(project.getAssetLoader());
-                thread.clearWatchService();
-                baseNode = searcher.findFilesInClassLoader(filePattern, thread);
-                baseNode.removeEmptyDirectories();
-                treeModel = new AssetTreeModel(baseNode);
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        assetTree.setModel(treeModel);
-                        setCursor(Cursor.getDefaultCursor());
-                    }
-                });
-            }
+        executor.execute(() -> {
+            searcher.setAssetClassLoader(project.getAssetLoader());
+            thread.clearWatchService();
+            baseNode = searcher.findFilesInClassLoader(filePattern, thread);
+            baseNode.removeEmptyDirectories();
+            treeModel = new AssetTreeModel(baseNode);
+            SwingUtilities.invokeLater(() -> {
+                assetTree.setModel(treeModel);
+                setCursor(Cursor.getDefaultCursor());
+            });
         });
     }
 
