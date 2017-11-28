@@ -232,8 +232,6 @@ public class FuzzyInputVariablePanel extends javax.swing.JPanel implements ItemL
     }// </editor-fold>//GEN-END:initComponents
 
     private void lstFuzzyVariablesValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_lstFuzzyVariablesValueChanged
-        // TODO add your handling code here:
-
         FuzzyVariable selected = (FuzzyVariable) lstFuzzyVariables.getSelectedValue();
         if (selected != null) {
             fuzzyVariableGUI1.setFuzzyVariable(selected);
@@ -241,7 +239,6 @@ public class FuzzyInputVariablePanel extends javax.swing.JPanel implements ItemL
     }//GEN-LAST:event_lstFuzzyVariablesValueChanged
     
     private void btnAddFuzzyVariableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddFuzzyVariableActionPerformed
-        // TODO add your handling code here:
         String name = "input";
         int index = 1;
         while (fuzzySystem.hasFuzzyInputVariable(name + index)) {
