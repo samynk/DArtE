@@ -46,7 +46,26 @@ public class TimeLine {
         if ( frame +1 > rotationFrames.size()){
             rotationFrames.ensureCapacity(frame+1);
         }
-        rotationFrames.add(frame,rotation);
+        rotationFrames.add(frame,copy);
     }
     
+    /**
+     * Returns the maximum frame number in this timeline.
+     * @return the maximum frame number.
+     */
+    public int getMaxFrameNumber(){
+        return rotationFrames.size()-1;
+    }
+
+    /**
+     * Checks if an animation key is set in this time line.
+     * @param i the animation key.
+     * @return true if the animation key is set, false otherwise.
+     */
+    public boolean containsKey(int i) {
+        if ( i < rotationFrames.size()){
+            return rotationFrames.get(i) != null;
+        }
+        return false;
+    }
 }
