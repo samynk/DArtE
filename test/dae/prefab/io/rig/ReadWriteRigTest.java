@@ -1,26 +1,12 @@
 
 package dae.prefab.io.rig;
 
-import com.jme3.asset.AssetManager;
 import dae.GlobalObjects;
 import dae.animation.rig.Rig;
-import dae.animation.rig.io.RigLoader;
-import dae.animation.rig.io.RigWriter;
 import dae.animation.skeleton.RevoluteJoint;
 import dae.components.ObjectComponent;
 import dae.components.PrefabComponent;
-import dae.io.SceneSaver;
 import dae.prefab.io.TextIOTestSuite;
-import dae.prefabs.types.ObjectTypeCategory;
-import dae.project.Level;
-import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
-import java.util.logging.Logger;
-import javax.xml.parsers.ParserConfigurationException;
 import org.junit.After;
 import org.junit.AfterClass;
 import static org.junit.Assert.assertEquals;
@@ -28,7 +14,6 @@ import static org.junit.Assert.assertNotNull;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.xml.sax.SAXException;
 
 /**
  *
@@ -54,11 +39,6 @@ public class ReadWriteRigTest {
     public void tearDown() {
     }
     
-    
-
-    // TODO add test methods here.
-    // The methods must be annotated with annotation @Test. For example:
-    //
     @Test
     public void readWriteRevoluteJoint() {
         Rig rig = (Rig) TextIOTestSuite.createObject("Animation", "Rig", Rig.class);
@@ -78,7 +58,6 @@ public class ReadWriteRigTest {
         rj.setCurrentAngle(7);
         
         rj.setRenderOptions(1.5f, 1.0f, false);
-        rj.setChainChildName("revolutejoint2");
         
         rig.attachBodyElement(rj);
         
@@ -99,6 +78,5 @@ public class ReadWriteRigTest {
         assertEquals(loaded.getRadius(),rj.getRadius(),0.0001f);
         assertEquals(loaded.getHeight(), rj.getHeight(),0.0001f);
         assertEquals(loaded.getCentered(),rj.getCentered());
-        assertEquals(loaded.getChainChildName(),rj.getChainChildName());
     }
 }
