@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.gui.fuzzy;
 
 import dae.gui.fuzzy.dialog.CreateLeftSigmoidDialog;
@@ -256,8 +252,6 @@ public class FuzzyInputVariablePanel extends javax.swing.JPanel implements ItemL
     }//GEN-LAST:event_btnAddFuzzyVariableActionPerformed
     
     private void btnAddMembershipActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddMembershipActionPerformed
-        // TODO add your handling code here:
-        // String memberShipName = JOptionPane.show(this, "Name for this membership function : ");
         if (cboMembershipType.getSelectedItem().equals("Left")) {
             leftSigmoidDialog.setLocationRelativeTo(this);
             leftSigmoidDialog.setVisible(true);
