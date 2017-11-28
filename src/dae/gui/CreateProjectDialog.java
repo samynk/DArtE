@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.gui;
 
 import dae.project.Project;
@@ -20,7 +16,7 @@ import javax.swing.event.DocumentListener;
 
 /**
  *
- * @author samyn_000
+ * @author Koen Samyn
  */
 public class CreateProjectDialog extends javax.swing.JDialog {
 
@@ -35,7 +31,7 @@ public class CreateProjectDialog extends javax.swing.JDialog {
     /**
      * The file chooser for this editor.
      */
-    private JFileChooser directoryChooser;
+    private final JFileChooser directoryChooser;
     /**
      * The location for the project.
      */
@@ -43,8 +39,8 @@ public class CreateProjectDialog extends javax.swing.JDialog {
     /**
      * The asset folders for the project.
      */
-    private ArrayList<File> assetLocations =
-            new ArrayList<File>();
+    private final ArrayList<File> assetLocations
+            = new ArrayList<File>();
     /**
      * The resulting project
      */
@@ -52,6 +48,9 @@ public class CreateProjectDialog extends javax.swing.JDialog {
 
     /**
      * Creates new form CreateProjectDialog
+     *
+     * @param parent the parent of the dialog.
+     * @param modal true if the dialog is modal, false otherwise.
      */
     public CreateProjectDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
@@ -71,28 +70,34 @@ public class CreateProjectDialog extends javax.swing.JDialog {
         directoryChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 
         txtName.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
             public void insertUpdate(DocumentEvent e) {
                 okButton.setEnabled(checkInput());
             }
 
+            @Override
             public void removeUpdate(DocumentEvent e) {
                 okButton.setEnabled(checkInput());
             }
 
+            @Override
             public void changedUpdate(DocumentEvent e) {
                 okButton.setEnabled(checkInput());
             }
         });
 
         txtLevelName.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
             public void insertUpdate(DocumentEvent e) {
                 okButton.setEnabled(checkInput());
             }
 
+            @Override
             public void removeUpdate(DocumentEvent e) {
                 okButton.setEnabled(checkInput());
             }
 
+            @Override
             public void changedUpdate(DocumentEvent e) {
                 okButton.setEnabled(checkInput());
             }
@@ -381,7 +386,6 @@ public class CreateProjectDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_btnAddFolderActionPerformed
 
     private void btnRemoveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveActionPerformed
-        // TODO add your handling code here:
         File selected = (File) lstAssetFolders.getSelectedValue();
         if (selected != null) {
             assetLocations.remove(selected);
@@ -392,7 +396,6 @@ public class CreateProjectDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_btnRemoveActionPerformed
 
     private void btnMoveUpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMoveUpActionPerformed
-        // TODO add your handling code here:
         File selected = (File) lstAssetFolders.getSelectedValue();
         if (selected != null) {
             int index = assetLocations.indexOf(selected);
@@ -406,7 +409,6 @@ public class CreateProjectDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_btnMoveUpActionPerformed
 
     private void btnMoveDownActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMoveDownActionPerformed
-        // TODO add your handling code here:
         File selected = (File) lstAssetFolders.getSelectedValue();
         if (selected != null) {
             int index = assetLocations.indexOf(selected);
@@ -420,7 +422,6 @@ public class CreateProjectDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_btnMoveDownActionPerformed
 
     private void btnChangeProjectLocationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChangeProjectLocationActionPerformed
-        // TODO add your handling code here:
         int option = directoryChooser.showOpenDialog(this);
         if (option == JFileChooser.APPROVE_OPTION) {
             this.projectLocation = directoryChooser.getSelectedFile();
@@ -430,11 +431,10 @@ public class CreateProjectDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_btnChangeProjectLocationActionPerformed
 
     private void txtLevelNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtLevelNameActionPerformed
-        // TODO add your handling code here:
+
     }//GEN-LAST:event_txtLevelNameActionPerformed
 
     private void cboCreateLevelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboCreateLevelActionPerformed
-        // TODO add your handling code here:
         txtLevelName.setEnabled(cboCreateLevel.isSelected());
     }//GEN-LAST:event_cboCreateLevelActionPerformed
 
