@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.gui.fuzzy;
 
 import java.awt.Color;
@@ -218,22 +214,18 @@ public class TrapezoidSigmoidPanel extends javax.swing.JPanel implements Documen
     }// </editor-fold>//GEN-END:initComponents
 
     private void spnCenterLeftStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spnCenterLeftStateChanged
-        // TODO add your handling code here:
         membership.setCenterLeft((Float) spnCenterLeft.getValue());
     }//GEN-LAST:event_spnCenterLeftStateChanged
 
     private void spnCenterRightStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spnCenterRightStateChanged
-        // TODO add your handling code here:
         membership.setCenterRight((Float) spnCenterRight.getValue());
     }//GEN-LAST:event_spnCenterRightStateChanged
 
     private void spnLeftStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spnLeftStateChanged
-        // TODO add your handling code here:
         membership.setLeft((Float) spnLeft.getValue());
     }//GEN-LAST:event_spnLeftStateChanged
 
     private void spnRightStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spnRightStateChanged
-        // TODO add your handling code here:
         membership.setRight((Float) spnRight.getValue());
     }//GEN-LAST:event_spnRightStateChanged
     // Variables declaration - do not modify//GEN-BEGIN:variables
