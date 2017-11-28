@@ -45,9 +45,6 @@ public class ReadWriteCopyRevoluteJointTwoAxisTest {
     public void tearDown() {
     }
 
-    // TODO add test methods here.
-    // The methods must be annotated with annotation @Test. For example:
-    //
     @Test
     public void readWriteRevoluteJoint() {
         RevoluteJointTwoAxis rj = (RevoluteJointTwoAxis) TextIOTestSuite.createObject("Animation", "RevoluteJointTwoAxis", RevoluteJointTwoAxis.class);
@@ -67,8 +64,7 @@ public class ReadWriteCopyRevoluteJointTwoAxisTest {
 
         assertEquals(loaded.getName(), rj.getName());
         assertEquals(loaded.getGroup(), rj.getGroup());
-        assertEquals(loaded.getRadius(), rj.getRadius(), 0.0001f);
-        assertEquals(loaded.getHeight(), rj.getHeight(), 0.0001f);
+        
         
         // there should be only one child.
         assertEquals(loaded.getChildren().size() , 1);

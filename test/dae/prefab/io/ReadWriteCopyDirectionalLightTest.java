@@ -26,10 +26,7 @@ public class ReadWriteCopyDirectionalLightTest {
             TextIOTestSuite.createMockGame();
         }
     }
-    // TODO add test methods here.
-    // The methods must be annotated with annotation @Test. For example:
-    //
-
+   
     @Test
     public void readWriteAmbientLight() {
         DirectionalLightPrefab al = (DirectionalLightPrefab) TextIOTestSuite.createObject("Light", "DirectionalLight", DirectionalLightPrefab.class);
