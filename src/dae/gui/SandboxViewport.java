@@ -364,6 +364,9 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
         inputManager.addMapping("DELETE_SELECTION", new KeyTrigger(KeyInput.KEY_DELETE));
         inputManager.addMapping("CHANGE_PIVOT", new KeyTrigger(KeyInput.KEY_C));
         inputManager.addMapping("COPY_LASTOBJECT", new KeyTrigger(KeyInput.KEY_F1));
+        inputManager.addMapping("CREATE_ANIMATION_KEY", new KeyTrigger(KeyInput.KEY_F11));
+        inputManager.addMapping("DELETE_ANIMATION_KEY", new KeyTrigger(KeyInput.KEY_F12));
+        
 
         inputManager.addMapping("DOBRUSH", new KeyTrigger(KeyInput.KEY_LSHIFT), new KeyTrigger(KeyInput.KEY_RSHIFT));
 
@@ -376,9 +379,22 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
         inputManager.addListener(analogListener, new String[]{"ACCEPT_INSERTION", "SELECT_OBJECT", "REJECT_INSERTION", "DELETE_SELECTION", "ROTATION_UP", "ROTATION_DOWN"});
         inputManager.addListener(actionListener, new String[]{"CHANGE_PIVOT", "COPY_LASTOBJECT"});
         inputManager.addListener(undoRedoListener, new String[]{"UNDO", "REDO"});
+        inputManager.addListener(animationListener,new String[]{"CREATE_ANIMATION_KEY","DELETE_ANIMATION_KEY"});
 
         inputManager.addRawInputListener(this);
     }
+    
+    private final ActionListener animationListener = new ActionListener(){
+        @Override
+        public void onAction(String name, boolean isPressed, float tpf) {
+            if (name.startsWith("CREATE")){
+                
+            }else if (name.startsWith("DELETE")){
+                
+            }
+        }
+    };
+            
     private final ActionListener undoRedoListener = new ActionListener() {
         @Override
         public void onAction(String name, boolean keyPressed, float tpf) {
@@ -418,7 +434,7 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
             }
         }
     };
-    private AnalogListener analogListener = new AnalogListener() {
+    private final AnalogListener analogListener = new AnalogListener() {
         @Override
         public void onAnalog(String name, float value, float tpf) {
             if (editorState == EditorState.IDLE) {
