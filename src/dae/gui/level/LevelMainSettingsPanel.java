@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.gui.level;
 
 import com.google.common.eventbus.Subscribe;
@@ -22,7 +18,7 @@ public class LevelMainSettingsPanel extends javax.swing.JPanel {
 
     private Level current;
     private boolean disregardEvent;
-    
+
     private JFileChooser chooser;
 
     /**
@@ -33,7 +29,7 @@ public class LevelMainSettingsPanel extends javax.swing.JPanel {
         GlobalObjects.getInstance().registerListener(this);
         chooser = new JFileChooser();
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        chooser.addChoosableFileFilter( new FileNameExtensionFilter( "j3o files","j3o"));
+        chooser.addChoosableFileFilter(new FileNameExtensionFilter("j3o files", "j3o"));
     }
 
     /**
@@ -205,7 +201,6 @@ public class LevelMainSettingsPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void cboTargetObjectsItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cboTargetObjectsItemStateChanged
-        // TODO add your handling code here:
         if (current != null) {
             if (!disregardEvent) {
                 current.showTargetObjects(evt.getStateChange() != ItemEvent.SELECTED);
@@ -214,42 +209,37 @@ public class LevelMainSettingsPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_cboTargetObjectsItemStateChanged
 
     private void btnExportAsJ3OActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportAsJ3OActionPerformed
-        // TODO add your handling code here:
         File j3o = current.getExportLocation("j3o");
-        if ( j3o != null){
+        if (j3o != null) {
             chooser.setCurrentDirectory(j3o.getParentFile());
         }
         int option = chooser.showOpenDialog(this);
-        if ( option == JFileChooser.APPROVE_OPTION){
+        if (option == JFileChooser.APPROVE_OPTION) {
             File selected = chooser.getSelectedFile();
-            if ( !selected.getPath().toLowerCase().endsWith(".j3o"))
-            {
-                selected = new File( selected.getParentFile(), selected.getName()+".j3o");
+            if (!selected.getPath().toLowerCase().endsWith(".j3o")) {
+                selected = new File(selected.getParentFile(), selected.getName() + ".j3o");
             }
-            current.setExportLocation("j3o",selected);
+            current.setExportLocation("j3o", selected);
             txtJ3OFileLocation.setText(selected.getAbsolutePath());
         }
     }//GEN-LAST:event_btnExportAsJ3OActionPerformed
 
     private void cboExportOnSaveItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cboExportOnSaveItemStateChanged
-        // TODO add your handling code here:
         current.setExportOnSave(cboExportOnSave.isSelected());
     }//GEN-LAST:event_cboExportOnSaveItemStateChanged
 
     private void btnExportAsOVActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportAsOVActionPerformed
-        // TODO add your handling code here:
-         File j3o = current.getExportLocation("ov");
-        if ( j3o != null){
+        File j3o = current.getExportLocation("ov");
+        if (j3o != null) {
             chooser.setCurrentDirectory(j3o.getParentFile());
         }
         int option = chooser.showOpenDialog(this);
-        if ( option == JFileChooser.APPROVE_OPTION){
+        if (option == JFileChooser.APPROVE_OPTION) {
             File selected = chooser.getSelectedFile();
-            if ( !selected.getPath().toLowerCase().endsWith(".ov"))
-            {
-                selected = new File( selected.getParentFile(), selected.getName()+".ov");
+            if (!selected.getPath().toLowerCase().endsWith(".ov")) {
+                selected = new File(selected.getParentFile(), selected.getName() + ".ov");
             }
-            current.setExportLocation("ov",selected);
+            current.setExportLocation("ov", selected);
             txtOVFileLocation.setText(selected.getAbsolutePath());
         }
     }//GEN-LAST:event_btnExportAsOVActionPerformed
@@ -264,11 +254,11 @@ public class LevelMainSettingsPanel extends javax.swing.JPanel {
             txtLevelName.setText(current.getName());
             cboExportOnSave.setSelected(current.isExportOnSave());
             File j3oExportFile = current.getExportLocation("j3o");
-            if ( j3oExportFile != null){
+            if (j3oExportFile != null) {
                 txtJ3OFileLocation.setText(j3oExportFile.getAbsolutePath());
             }
             File ovExportFile = current.getExportLocation("ov");
-            if ( ovExportFile != null){
+            if (ovExportFile != null) {
                 txtOVFileLocation.setText(ovExportFile.getAbsolutePath());
             }
         }
