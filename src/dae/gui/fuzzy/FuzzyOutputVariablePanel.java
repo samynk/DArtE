@@ -23,34 +23,36 @@ import mlproject.fuzzy.SingletonMemberShip;
  * @author Koen Samyn
  */
 public class FuzzyOutputVariablePanel extends javax.swing.JPanel implements ItemListener {
+
     private FuzzySystem fuzzySystem;
     private FuzzyOutputListModel fuzzyOutputListModel;
-    
+
     private CreateLeftSigmoidDialog leftSigmoidDialog;
     private CreateRightSigmoidDialog rightSigmoidDialog;
     private CreateSigmoidDialog sigmoidDialog;
     private CreateTrapezoidDialog trapezoidDialog;
     private CreateSingletonDialog singletonDialog;
+
     /**
      * Creates new form FuzzyInputVariablePanel
      */
     public FuzzyOutputVariablePanel() {
         initComponents();
-        
-        leftSigmoidDialog = new CreateLeftSigmoidDialog((Frame)this.getTopLevelAncestor(), true);
-        rightSigmoidDialog = new CreateRightSigmoidDialog((Frame)this.getTopLevelAncestor(), true);
-        sigmoidDialog = new CreateSigmoidDialog((Frame)this.getTopLevelAncestor(), true);
-        trapezoidDialog = new CreateTrapezoidDialog((Frame)this.getTopLevelAncestor(),true);
-        singletonDialog = new CreateSingletonDialog((Frame)this.getTopLevelAncestor(),true);
+
+        leftSigmoidDialog = new CreateLeftSigmoidDialog((Frame) this.getTopLevelAncestor(), true);
+        rightSigmoidDialog = new CreateRightSigmoidDialog((Frame) this.getTopLevelAncestor(), true);
+        sigmoidDialog = new CreateSigmoidDialog((Frame) this.getTopLevelAncestor(), true);
+        trapezoidDialog = new CreateTrapezoidDialog((Frame) this.getTopLevelAncestor(), true);
+        singletonDialog = new CreateSingletonDialog((Frame) this.getTopLevelAncestor(), true);
     }
-    
-    public void setFuzzySystem(FuzzySystem fuzzySystem){
+
+    public void setFuzzySystem(FuzzySystem fuzzySystem) {
         this.fuzzySystem = fuzzySystem;
         fuzzyOutputListModel = new FuzzyOutputListModel(fuzzySystem);
         lstFuzzyVariables.setModel(fuzzyOutputListModel);
         fuzzyVariableGUI1.addItemListener(this);
-        
-        if ( fuzzyOutputListModel.getSize()> 0){
+
+        if (fuzzyOutputListModel.getSize() > 0) {
             lstFuzzyVariables.setSelectedIndex(0);
             fuzzyVariableGUI1.setFuzzyVariable(fuzzySystem.getFuzzyOutputAt(0));
         }
@@ -228,68 +230,58 @@ public class FuzzyOutputVariablePanel extends javax.swing.JPanel implements Item
     }// </editor-fold>//GEN-END:initComponents
 
     private void lstFuzzyVariablesValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_lstFuzzyVariablesValueChanged
-        // TODO add your handling code here:
-        
-        FuzzyVariable selected = (FuzzyVariable)lstFuzzyVariables.getSelectedValue();
-        if ( selected != null){
+        FuzzyVariable selected = (FuzzyVariable) lstFuzzyVariables.getSelectedValue();
+        if (selected != null) {
             fuzzyVariableGUI1.setFuzzyVariable(selected);
         }
     }//GEN-LAST:event_lstFuzzyVariablesValueChanged
 
     private void btnAddFuzzyVariableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddFuzzyVariableActionPerformed
-        // TODO add your handling code here:
         String name = "output";
-        int index =1;
-        while ( fuzzySystem.hasFuzzyOutputVariable(name+index )){
+        int index = 1;
+        while (fuzzySystem.hasFuzzyOutputVariable(name + index)) {
             ++index;
         }
-        FuzzyVariable fv = new FuzzyVariable(name+index);
-        fv.addMemberShip(new SingletonMemberShip( "turnleftfast", -5));
-        fv.addMemberShip(new SingletonMemberShip( "turnleft", -2.5f));
-        fv.addMemberShip(new SingletonMemberShip( "stay", 0));
-        fv.addMemberShip(new SingletonMemberShip( "turnright", 2.5f));
-        fv.addMemberShip(new SingletonMemberShip( "turnrightfast", 5));
-        
+        FuzzyVariable fv = new FuzzyVariable(name + index);
+        fv.addMemberShip(new SingletonMemberShip("turnleftfast", -5));
+        fv.addMemberShip(new SingletonMemberShip("turnleft", -2.5f));
+        fv.addMemberShip(new SingletonMemberShip("stay", 0));
+        fv.addMemberShip(new SingletonMemberShip("turnright", 2.5f));
+        fv.addMemberShip(new SingletonMemberShip("turnrightfast", 5));
+
         int addedIndex = fuzzyOutputListModel.addFuzzyVariable(fv);
         lstFuzzyVariables.setSelectedIndex(addedIndex);
     }//GEN-LAST:event_btnAddFuzzyVariableActionPerformed
 
     private void btnAddMembershipActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddMembershipActionPerformed
-        // TODO add your handling code here:
-       // String memberShipName = JOptionPane.show(this, "Name for this membership function : ");
-        if (cboMembershipType.getSelectedItem().equals("Left")){
+        if (cboMembershipType.getSelectedItem().equals("Left")) {
             leftSigmoidDialog.setLocationRelativeTo(this);
             leftSigmoidDialog.setVisible(true);
-            if ( leftSigmoidDialog.getReturnStatus() == leftSigmoidDialog.RET_OK)
-            {
+            if (leftSigmoidDialog.getReturnStatus() == leftSigmoidDialog.RET_OK) {
                 fuzzyVariableGUI1.addMemberShip(leftSigmoidDialog.getResult());
             }
-        }else if (cboMembershipType.getSelectedItem().equals("Right")){
+        } else if (cboMembershipType.getSelectedItem().equals("Right")) {
             rightSigmoidDialog.setLocationRelativeTo(this);
             rightSigmoidDialog.setVisible(true);
-            if ( rightSigmoidDialog.getReturnStatus() == rightSigmoidDialog.RET_OK)
-            {
+            if (rightSigmoidDialog.getReturnStatus() == rightSigmoidDialog.RET_OK) {
                 fuzzyVariableGUI1.addMemberShip(rightSigmoidDialog.getResult());
             }
-        }else if (cboMembershipType.getSelectedItem().equals("Triangular")){
+        } else if (cboMembershipType.getSelectedItem().equals("Triangular")) {
             sigmoidDialog.setLocationRelativeTo(this);
             sigmoidDialog.setVisible(true);
-            if ( sigmoidDialog.getReturnStatus() == sigmoidDialog.RET_OK)
-            {
+            if (sigmoidDialog.getReturnStatus() == sigmoidDialog.RET_OK) {
                 fuzzyVariableGUI1.addMemberShip(sigmoidDialog.getResult());
             }
-        }else if (cboMembershipType.getSelectedItem().equals("Trapezoid")){
+        } else if (cboMembershipType.getSelectedItem().equals("Trapezoid")) {
             trapezoidDialog.setLocationRelativeTo(this);
             trapezoidDialog.setVisible(true);
-            if ( trapezoidDialog.getReturnStatus() == trapezoidDialog.RET_OK)
-            {
+            if (trapezoidDialog.getReturnStatus() == trapezoidDialog.RET_OK) {
                 fuzzyVariableGUI1.addMemberShip(trapezoidDialog.getResult());
             }
-        }else if (cboMembershipType.getSelectedItem().equals("Singleton")){
+        } else if (cboMembershipType.getSelectedItem().equals("Singleton")) {
             singletonDialog.setLocationRelativeTo(this);
             singletonDialog.setVisible(true);
-            if ( singletonDialog.getReturnStatus() == trapezoidDialog.RET_OK)
-            {
+            if (singletonDialog.getReturnStatus() == trapezoidDialog.RET_OK) {
                 fuzzyVariableGUI1.addMemberShip(singletonDialog.getResult());
             }
         }
@@ -302,7 +294,7 @@ public class FuzzyOutputVariablePanel extends javax.swing.JPanel implements Item
     private void btnDeleteVariableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteVariableActionPerformed
         int selectedIndex = lstFuzzyVariables.getSelectedIndex();
         fuzzyOutputListModel.removeFuzzyVariable(selectedIndex);
-        if ( selectedIndex == fuzzyOutputListModel.getSize() ){
+        if (selectedIndex == fuzzyOutputListModel.getSize()) {
             selectedIndex--;
         }
         lstFuzzyVariables.setSelectedIndex(selectedIndex);
@@ -326,6 +318,6 @@ public class FuzzyOutputVariablePanel extends javax.swing.JPanel implements Item
     // End of variables declaration//GEN-END:variables
 
     public void itemStateChanged(ItemEvent e) {
-       memberShipEditorPanel1.setMemberShip((MemberShip)e.getItem());
+        memberShipEditorPanel1.setMemberShip((MemberShip) e.getItem());
     }
 }
