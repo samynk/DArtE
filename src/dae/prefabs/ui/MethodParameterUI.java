@@ -50,7 +50,6 @@ public class MethodParameterUI extends javax.swing.JPanel implements ParameterUI
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnMethodActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMethodActionPerformed
-        // TODO add your handling code here:
         prefab.call(p);
     }//GEN-LAST:event_btnMethodActionPerformed
 

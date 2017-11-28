@@ -52,7 +52,6 @@ public class BooleanParameterUI extends javax.swing.JPanel implements ParameterU
     }// </editor-fold>//GEN-END:initComponents
 
     private void cbxBooleanParameterItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cbxBooleanParameterItemStateChanged
-        // TODO add your handling code here:
         if ( prefab != null && !internalEvent){
             prefab.setParameter(parameter, cbxBooleanParameter.isSelected(), true);
         }

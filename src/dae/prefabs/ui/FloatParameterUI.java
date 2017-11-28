@@ -64,7 +64,6 @@ public class FloatParameterUI extends javax.swing.JPanel implements ParameterUI 
     }// </editor-fold>//GEN-END:initComponents
 
     private void spnFloatValueStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spnFloatValueStateChanged
-        // TODO add your handling code here:
         if (disregardEvent) {
             return;
         }

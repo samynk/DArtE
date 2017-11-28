@@ -63,7 +63,6 @@ public class IntParameterUI extends javax.swing.JPanel implements ParameterUI {
     }// </editor-fold>//GEN-END:initComponents
 
     private void spnIntegerValueStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spnIntegerValueStateChanged
-        // TODO add your handling code here:
         if (disregardEvent) {
             return;
         }

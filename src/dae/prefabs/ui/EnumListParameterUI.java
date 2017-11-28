@@ -67,7 +67,6 @@ public class EnumListParameterUI extends javax.swing.JPanel implements Parameter
     }// </editor-fold>//GEN-END:initComponents
 
     private void cboChoiceItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cboChoiceItemStateChanged
-        // TODO add your handling code here:
         if ( evt.getStateChange() == ItemEvent.SELECTED)
         {
             Object value = evt.getItem();
@@ -88,6 +87,7 @@ public class EnumListParameterUI extends javax.swing.JPanel implements Parameter
         }
     }
     
+    @Override
     public Parameter getParameter(){
         return parameter;
     }

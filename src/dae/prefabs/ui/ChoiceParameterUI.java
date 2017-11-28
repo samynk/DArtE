@@ -70,7 +70,6 @@ public class ChoiceParameterUI extends javax.swing.JPanel implements ParameterUI
     }// </editor-fold>//GEN-END:initComponents
 
     private void cboChoiceItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cboChoiceItemStateChanged
-        // TODO add your handling code here:
         if (evt.getStateChange() == ItemEvent.SELECTED) {
             Object newValue = evt.getItem();
             parameter.invokeSet(prefab, newValue, true);

@@ -64,7 +64,6 @@ public class ConnectorParameterUI extends javax.swing.JPanel implements Paramete
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnEditRigConnectorsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditRigConnectorsActionPerformed
-        // TODO add your handling code here:
         if ( currentPrefab instanceof Rig){
             Rig rig = (Rig)currentPrefab;
             if (rigConnectorDialog == null){
@@ -79,6 +78,7 @@ public class ConnectorParameterUI extends javax.swing.JPanel implements Paramete
     private javax.swing.JLabel lblLabel;
     // End of variables declaration//GEN-END:variables
 
+    @Override
     public void setParameter(Parameter p) {
         this.p = p;
         lblLabel.setText(p.getLabel());

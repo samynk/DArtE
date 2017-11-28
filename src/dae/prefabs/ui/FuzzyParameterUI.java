@@ -62,7 +62,6 @@ public class FuzzyParameterUI extends javax.swing.JPanel implements ParameterUI 
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnEditFuzzySystemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditFuzzySystemActionPerformed
-        // TODO add your handling code here:
         Object value = ReflectionManager.getInstance().invokeGetMethod(currentPrefab,this.p); 
         if (value instanceof FuzzySystem) {
             FuzzySystem fs = (FuzzySystem) value;

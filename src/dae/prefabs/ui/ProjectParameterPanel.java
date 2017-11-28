@@ -18,42 +18,46 @@ import javax.swing.JFileChooser;
 
 /**
  * Shows the properties of the current project.
+ *
  * @author Koen Samyn
  */
 public class ProjectParameterPanel extends javax.swing.JPanel {
+
     private Project currentProject;
     private JFileChooser directoryChooser = new JFileChooser();
-    
+
     private ProjectAssetFolderListModel assetFolderListModel;
+
     /**
      * Creates new form ProjectParameterPanel
      */
     public ProjectParameterPanel() {
         initComponents();
         GlobalObjects.getInstance().registerListener(this);
-        
+
         lstLevels.setCellRenderer(new ProjectLevelListCellRenderer());
         lstAssetFolders.setCellRenderer(new ProjectAssetFolderListCellRenderer());
-        
+
         directoryChooser.setDialogTitle("Add asset folder");
         directoryChooser.setDialogType(JFileChooser.OPEN_DIALOG);
         directoryChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         directoryChooser.setAcceptAllFileFilterUsed(false);
     }
-    
+
     @Subscribe
-    public void projectChanged(ProjectEvent event){
+    public void projectChanged(ProjectEvent event) {
         currentProject = event.getProject();
-        if ( currentProject == null ){
+        if (currentProject == null) {
             lstLevels.setModel(null);
             return;
         }
         this.txtProjectName.setText(currentProject.getProjectName());
-        
+
         this.lstLevels.setModel(new ProjectLevelListModel(currentProject));
         assetFolderListModel = new ProjectAssetFolderListModel(currentProject);
         this.lstAssetFolders.setModel(assetFolderListModel);
     }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -199,27 +203,24 @@ public class ProjectParameterPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnAddAssetFolderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddAssetFolderActionPerformed
-        // TODO add your handling code here:
-        int option = directoryChooser.showDialog(this, "Add" );
-        if ( option == JFileChooser.APPROVE_OPTION){
+        int option = directoryChooser.showDialog(this, "Add");
+        if (option == JFileChooser.APPROVE_OPTION) {
             File directory = directoryChooser.getSelectedFile();
             this.currentProject.addAssetFolder(directory);
             int index = currentProject.getAssetFolderIndex(directory);
             assetFolderListModel.assetFolderAdded(index);
-            
-            GlobalObjects.getInstance().postEvent(new ProjectEvent(currentProject,ProjectEventType.ASSETFOLDERCHANGED,this));
+
+            GlobalObjects.getInstance().postEvent(new ProjectEvent(currentProject, ProjectEventType.ASSETFOLDERCHANGED, this));
         }
     }//GEN-LAST:event_btnAddAssetFolderActionPerformed
 
     private void btnRemoveAssetFolderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveAssetFolderActionPerformed
-        // TODO add your handling code here:
         File file = (File) lstAssetFolders.getSelectedValue();
         int indexOfFile = currentProject.getAssetFolderIndex(file);
-        if ( indexOfFile > -1 )
-        {
+        if (indexOfFile > -1) {
             currentProject.removeAssetFolder(file);
             assetFolderListModel.assetFolderRemoved(indexOfFile);
-            GlobalObjects.getInstance().postEvent(new ProjectEvent(currentProject,ProjectEventType.ASSETFOLDERCHANGED,this));
+            GlobalObjects.getInstance().postEvent(new ProjectEvent(currentProject, ProjectEventType.ASSETFOLDERCHANGED, this));
         }
     }//GEN-LAST:event_btnRemoveAssetFolderActionPerformed
 

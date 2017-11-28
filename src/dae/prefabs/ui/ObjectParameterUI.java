@@ -75,7 +75,6 @@ public class ObjectParameterUI extends javax.swing.JPanel implements ParameterUI
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnPickActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPickActionPerformed
-        // TODO add your handling code here:
         GizmoEvent ge = new GizmoEvent(this, GizmoType.PICK);
         ge.setPickProperty(parameter.getId());
         GlobalObjects.getInstance().postEvent(ge);
@@ -85,10 +84,12 @@ public class ObjectParameterUI extends javax.swing.JPanel implements ParameterUI
     private javax.swing.JTextField txtObjectName;
     // End of variables declaration//GEN-END:variables
 
+    @Override
     public void setParameter(Parameter p) {
         this.parameter = p;
     }
 
+    @Override
     public Parameter getParameter() {
         return parameter;
     }

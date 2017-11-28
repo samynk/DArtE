@@ -81,7 +81,6 @@ public class ColorParameterUI extends javax.swing.JPanel implements ParameterUI 
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnChangeColorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChangeColorActionPerformed
-        // TODO add your handling code here:
         Color newColor = JColorChooser.showDialog(
                 this,
                 "Choose Background Color",
