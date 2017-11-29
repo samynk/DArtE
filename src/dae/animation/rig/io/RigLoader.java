@@ -5,6 +5,8 @@ import com.jme3.asset.AssetLoader;
 import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.Quaternion;
+import com.jme3.scene.Spatial;
 import dae.GlobalObjects;
 import dae.animation.rig.AnimationController;
 import dae.animation.rig.AnimationListControl;
@@ -12,6 +14,9 @@ import dae.animation.rig.InputConnector;
 import dae.animation.rig.OutputConnector;
 import dae.animation.rig.PrefabPlaceHolderCallback;
 import dae.animation.rig.Rig;
+import dae.animation.rig.timing.Behaviour;
+import dae.animation.rig.timing.BehaviourControl;
+import dae.animation.rig.timing.TimeLine;
 import dae.io.SceneLoader;
 import dae.io.XMLUtils;
 import dae.prefabs.Prefab;
@@ -76,7 +81,7 @@ public class RigLoader implements AssetLoader {
             apMaterial.setColor("Color", ColorRGBA.Green);
             apMaterial.setTexture("ColorMap", assetInfo.getManager().loadTexture("Textures/refPattern.png"));
             result = readRig(is, assetInfo.getManager());
-            
+
         } catch (ParserConfigurationException | SAXException | IllegalAccessException | NumberFormatException | ClassNotFoundException | InstantiationException ex) {
             Logger.getLogger(RigLoader.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -96,21 +101,28 @@ public class RigLoader implements AssetLoader {
         NodeList nl = root.getChildNodes();
 
         SceneLoader.readNodeChildren(nl, assetManager, GlobalObjects.getInstance().getObjectsTypeCategory(), result);
-        
+
         for (int i = 0; i < nl.getLength(); ++i) {
             org.w3c.dom.Node n = nl.item(i);
-            switch(n.getNodeName())
-            {
-                case "fuzzysystems": readFuzzySystems(result, n);break;
-                case "animationtargets": readAnimationTargets(result, n);break;
-                case "controllerconnections":readControllerConnections(result,n);break;
+            switch (n.getNodeName()) {
+                case "fuzzysystems":
+                    readFuzzySystems(result, n);
+                    break;
+                case "animationtargets":
+                    readAnimationTargets(result, n);
+                    break;
+                case "controllerconnections":
+                    readControllerConnections(result, n);
+                    break;
+                case "behaviours":
+                    readBehaviours(result, n);
+                    break;
             }
         }
-        
+        result.addControl(new BehaviourControl());
         return result;
     }
 
-    
     private String getAttrContent(String key, NamedNodeMap map) {
         Node attr = map.getNamedItem(key);
         return attr != null ? attr.getTextContent() : "";
@@ -122,7 +134,7 @@ public class RigLoader implements AssetLoader {
             Node child = nl.item(i);
             if (child.getNodeName().equals("fuzzysystem")) {
                 String name = getAttrContent("name", child.getAttributes());
-                FuzzySystem system = new FuzzySystem(name,false);
+                FuzzySystem system = new FuzzySystem(name, false);
                 rig.setFuzzySystem(system);
                 readFuzzySystem(system, child);
             }
@@ -307,6 +319,54 @@ public class RigLoader implements AssetLoader {
                     rig.addControl(alc);
                 }
                 alc.addAnimationController(ac);
+            }
+        }
+    }
+
+    private void readBehaviours(Rig result, Node behaviours) {
+        NodeList nl = behaviours.getChildNodes();
+        for (int i = 0; i < nl.getLength(); ++i) {
+            Node b = nl.item(i);
+            if ("behaviour".equals(b.getNodeName())) {
+                NamedNodeMap bmap = b.getAttributes();
+                String name = XMLUtils.getAttribute("name", bmap);
+                int fps = XMLUtils.parseInt("fps", bmap);
+                Behaviour bhv = new Behaviour(name, fps);
+                result.addBehaviour(bhv);
+
+                readTimeLines(result, bhv, b);
+            }
+        }
+    }
+
+    private void readTimeLines(Rig result, Behaviour bhv, Node bhvNode) {
+        NodeList nl = bhvNode.getChildNodes();
+        for (int i = 0; i < nl.getLength(); ++i) {
+            Node tlNode = nl.item(i);
+            if ("timeline".equals(tlNode.getNodeName())) {
+                NamedNodeMap bmap = tlNode.getAttributes();
+                String target = XMLUtils.getAttribute("target", bmap);
+                Spatial sTarget = result.getChild(target);
+                TimeLine tl = new TimeLine(sTarget);
+                bhv.addTimeLine(tl);
+
+                readFrames(tl, tlNode);
+            }
+        }
+    }
+
+    private void readFrames(TimeLine tl, Node tlNode) {
+        NodeList nl = tlNode.getChildNodes();
+        for (int i = 0; i < nl.getLength(); ++i) {
+            Node fNode = nl.item(i);
+            if ("f".equals(fNode.getNodeName())) {
+                NamedNodeMap bmap = fNode.getAttributes();
+                int frameNr = XMLUtils.parseInt("n", bmap);
+                String sq = XMLUtils.getAttribute("r", bmap);
+                if (sq != null) {
+                    Quaternion q = XMLUtils.parseQuaternion(sq);
+                    tl.addRotation(frameNr, q);
+                }
             }
         }
     }
