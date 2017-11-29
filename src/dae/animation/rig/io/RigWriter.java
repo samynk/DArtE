@@ -1,8 +1,11 @@
 package dae.animation.rig.io;
 
+import com.jme3.math.ColorRGBA;
 import dae.animation.rig.AnimationController;
 import dae.animation.rig.AnimationListControl;
 import dae.animation.rig.Rig;
+import dae.animation.rig.timing.Behaviour;
+import dae.animation.rig.timing.TimeLine;
 import dae.io.SceneSaver;
 import dae.io.XMLUtils;
 import dae.io.writers.DefaultPrefabExporter;
@@ -31,7 +34,7 @@ import mlproject.fuzzy.TrapezoidMemberShip;
  * @author Koen Samyn
  */
 public class RigWriter {
-    
+
     private final static PrefabTextExporter prefabExporter = new DefaultPrefabExporter();
 
     /**
@@ -60,7 +63,7 @@ public class RigWriter {
             }
         }
     }
-    
+
     public static void writeRig(Writer bw, Rig rig) throws IOException {
         bw.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
         bw.write("<rig>\n");
@@ -102,13 +105,16 @@ public class RigWriter {
                 bw.write("\t\t\t");
                 bw.write(ac.getOutput().toXML());
                 bw.write("\t\t</controller>\n");
-                
+
             }
             bw.write("\t</controllerconnections>\n");
         }
+        bw.write("\t<behaviours>\n");
+        writeBehaviours(bw, rig);
+        bw.write("\t</behaviours>\n");
         bw.write("</rig>\n");
     }
-    
+
     private static void writeFuzzySystem(Writer bw, FuzzySystem fuzzySystem) throws IOException {
         bw.write("\t\t<fuzzysystem ");
         XMLUtils.writeAttribute(bw, "name", fuzzySystem.getName());
@@ -132,7 +138,7 @@ public class RigWriter {
             bw.write("\t\t\t\t</input>\n");
         }
         bw.write("\t\t\t</fuzzyinputs>\n");
-        
+
         bw.write("\t\t\t<fuzzyoutputs>\n");
         for (FuzzyVariable fuzzyVariable : fuzzySystem.getOutputs()) {
             bw.write("\t\t\t\t<output ");
@@ -172,7 +178,7 @@ public class RigWriter {
         bw.write("\t\t\t</fuzzyrules>\n");
         bw.write("\t\t</fuzzysystem>\n");
     }
-    
+
     private static void writeMemberShip(Writer bw, LeftSigmoidMemberShip lms) throws IOException {
         bw.write("\t\t\t\t\t<membership ");
         XMLUtils.writeAttribute(bw, "type", "left");
@@ -181,7 +187,7 @@ public class RigWriter {
         XMLUtils.writeAttribute(bw, "right", lms.getRight());
         bw.write("/>\n");
     }
-    
+
     private static void writeMemberShip(Writer bw, RightSigmoidMemberShip rms) throws IOException {
         bw.write("\t\t\t\t\t<membership ");
         XMLUtils.writeAttribute(bw, "type", "right");
@@ -190,7 +196,7 @@ public class RigWriter {
         XMLUtils.writeAttribute(bw, "left", rms.getLeft());
         bw.write("/>\n");
     }
-    
+
     private static void writeMemberShip(Writer bw, SigmoidMemberShip sms) throws IOException {
         bw.write("\t\t\t\t\t<membership ");
         XMLUtils.writeAttribute(bw, "type", "triangular");
@@ -200,7 +206,7 @@ public class RigWriter {
         XMLUtils.writeAttribute(bw, "right", sms.getRight());
         bw.write("/>\n");
     }
-    
+
     private static void writeMemberShip(Writer bw, TrapezoidMemberShip sms) throws IOException {
         bw.write("\t\t\t\t\t<membership ");
         XMLUtils.writeAttribute(bw, "type", "trapezoid");
@@ -211,12 +217,37 @@ public class RigWriter {
         XMLUtils.writeAttribute(bw, "right", sms.getRight());
         bw.write("/>\n");
     }
-    
+
     private static void writeMemberShip(Writer bw, SingletonMemberShip sms) throws IOException {
         bw.write("\t\t\t\t\t<membership ");
         XMLUtils.writeAttribute(bw, "type", "singleton");
         XMLUtils.writeAttribute(bw, "name", sms.getName());
         XMLUtils.writeAttribute(bw, "center", sms.getValue());
         bw.write("/>\n");
+    }
+
+    private static void writeBehaviours(Writer bw, Rig rig) throws IOException {
+        for (Behaviour b : rig.getBehaviours()) {
+            bw.write("\t\t<behaviour ");
+            XMLUtils.writeAttribute(bw, "name", b.getName());
+            XMLUtils.writeAttribute(bw, "fps", b.getFPS());
+            bw.write(">\n");
+
+            for (TimeLine tl : b.getTimeLines()) {
+                bw.write("\t\t\t<timeline ");
+                XMLUtils.writeAttribute(bw, "target", tl.getTarget().getName());
+                bw.write(">\n");
+                for (int f = 0; f <= tl.getMaxFrameNumber(); ++f) {
+                    if (tl.containsKey(f)) {
+                        bw.write("\t\t\t\t<f ");
+                        XMLUtils.writeAttribute(bw,"n",f);
+                        XMLUtils.writeAttribute(bw, "r", tl.getRotation(f));
+                        bw.write("/>\n");
+                    }
+                }
+                bw.write("\t\t\t</timeline>\n");
+            }
+            bw.write("\t\t</behaviour>\n");
+        }
     }
 }
