@@ -7,6 +7,7 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import dae.GlobalObjects;
 import dae.animation.rig.timing.Behaviour;
+import dae.animation.rig.timing.BehaviourControl;
 import dae.animation.skeleton.BodyElement;
 import dae.prefabs.Prefab;
 import dae.prefabs.shapes.DiamondShape;
@@ -31,7 +32,8 @@ public class Rig extends Prefab implements BodyElement {
     private final HashMap<String, Prefab> targets = new HashMap<>();
 
     private final ArrayList<Behaviour> behaviours = new ArrayList<>();
-    private final HashMap<String,Behaviour> behaviourMap = new HashMap<>();
+    private final HashMap<String, Behaviour> behaviourMap = new HashMap<>();
+    private Behaviour currentBehaviour = null;
 
     private AssetManager manager;
     private int defaultFPS = 15;
@@ -77,6 +79,14 @@ public class Rig extends Prefab implements BodyElement {
         if (listControl != null) {
             listControl.cloneForSpatial(rig);
         }
+        for (Behaviour b : behaviours) {
+            b.cloneForRig(rig);
+        }
+        BehaviourControl bhvControl = this.getControl(BehaviourControl.class);
+        if (bhvControl != null) {
+            bhvControl.cloneForSpatial(rig);
+        }
+
         rig.create(manager, null);
         return rig;
     }
@@ -186,32 +196,50 @@ public class Rig extends Prefab implements BodyElement {
     // 
     // void setProperty( String key, T value);
     // T getProperty( String key );
-    public List<Behaviour> getBehaviours(){
+    public List<Behaviour> getBehaviours() {
         return this.behaviours;
     }
 
     public boolean containsBehaviour(String name) {
         return behaviourMap.containsKey(name);
     }
-    
-    public void addBehaviour(Behaviour b){
+
+    public void addBehaviour(Behaviour b) {
         behaviours.add(b);
-        behaviourMap.put(b.getName(),b);
+        behaviourMap.put(b.getName(), b);
     }
-    
-    public void removeBehaviour(String name){
+
+    public void removeBehaviour(String name) {
         Behaviour b = behaviourMap.get(name);
-        if ( b != null ){
+        if (b != null) {
             behaviours.remove(b);
             behaviourMap.remove(name);
+            if (b == currentBehaviour) {
+                currentBehaviour = null;
+            }
+
         }
     }
-    
-    public int getDefaultFPS(){
+
+    public int getDefaultFPS() {
         return defaultFPS;
     }
-    
-    public void setDefaultFPS(int fps){
+
+    public void setDefaultFPS(int fps) {
         this.defaultFPS = fps;
+    }
+
+    public Behaviour getCurrentBehaviour() {
+        return currentBehaviour;
+    }
+
+    public void setCurrentBehaviour(Behaviour current) {
+        this.currentBehaviour = current;
+    }
+
+    public void selectFirstBehaviour() {
+        if (behaviours.size() > 0) {
+            this.currentBehaviour = behaviours.get(0);
+        }
     }
 }
