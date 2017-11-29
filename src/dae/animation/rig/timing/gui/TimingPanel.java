@@ -3,11 +3,16 @@
  */
 package dae.animation.rig.timing.gui;
 
+import com.google.common.eventbus.Subscribe;
+import dae.GlobalObjects;
+import dae.animation.rig.Rig;
 import dae.animation.rig.timing.Behaviour;
 import dae.prefabs.Prefab;
 import dae.prefabs.types.ObjectTypePanel;
+import dae.prefabs.ui.events.AnimationEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -21,6 +26,7 @@ public class TimingPanel extends javax.swing.JPanel implements ObjectTypePanel, 
     public TimingPanel() {
         initComponents();
         behaviourSelectorPanel2.addBehaviourListener(this);
+        GlobalObjects.getInstance().registerListener(this);
     }
 
     /**
@@ -76,6 +82,14 @@ public class TimingPanel extends javax.swing.JPanel implements ObjectTypePanel, 
     @Override
     public void setPrefab(Prefab prefab) {
         this.behaviourSelectorPanel2.setPrefab(prefab);
+        if ( prefab instanceof Rig ){
+            Rig r = (Rig)prefab;
+            Behaviour current = r.getCurrentBehaviour();
+            if ( current == null ){
+                r.selectFirstBehaviour();
+            }
+            this.framePanel1.setBehaviour(r.getCurrentBehaviour());
+        }
     }
 
     @Override
@@ -89,5 +103,12 @@ public class TimingPanel extends javax.swing.JPanel implements ObjectTypePanel, 
         {
             framePanel1.setBehaviour((Behaviour)e.getItem());
         }
+    }
+    
+    @Subscribe
+    public void animationChanged(AnimationEvent ae){
+        SwingUtilities.invokeLater(() -> {
+            framePanel1.repaint();
+        });
     }
 }
