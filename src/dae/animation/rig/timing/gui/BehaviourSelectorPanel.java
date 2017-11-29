@@ -20,6 +20,7 @@ import javax.swing.text.Document;
 public class BehaviourSelectorPanel extends javax.swing.JPanel {
 
     private Rig model;
+    private DefaultComboBoxModel<Behaviour> cboModel;
 
     /**
      * Creates new form BehaviourSelector
@@ -68,7 +69,6 @@ public class BehaviourSelectorPanel extends javax.swing.JPanel {
 
         jTextField1.setText("jTextField1");
 
-        cboBehaviours.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         cboBehaviours.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 cboBehavioursItemStateChanged(evt);
@@ -140,8 +140,9 @@ public class BehaviourSelectorPanel extends javax.swing.JPanel {
     private void btnAddBehaviourActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddBehaviourActionPerformed
         String name = txtBehaviourName.getText();
         Behaviour b = new Behaviour(name, model.getDefaultFPS());
+        txtBehaviourName.setText("");
         model.addBehaviour(b);
-        setPrefab(model);
+        cboModel.addElement(b);
         selectBehaviour(b);
     }//GEN-LAST:event_btnAddBehaviourActionPerformed
 
@@ -149,13 +150,14 @@ public class BehaviourSelectorPanel extends javax.swing.JPanel {
         if (evt.getStateChange() == ItemEvent.SELECTED) {
             Behaviour selected = (Behaviour) evt.getItem();
             selectBehaviour(selected);
+            model.setCurrentBehaviour(selected);
         }
     }//GEN-LAST:event_cboBehavioursItemStateChanged
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAddBehaviour;
-    private javax.swing.JComboBox<String> cboBehaviours;
+    private javax.swing.JComboBox<Behaviour> cboBehaviours;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JLabel lblFPS;
     private javax.swing.JLabel lblNewBehaviour;
@@ -181,14 +183,14 @@ public class BehaviourSelectorPanel extends javax.swing.JPanel {
         txtBehaviourName.setText("");
         if (prefab instanceof Rig) {
             model = (Rig) prefab;
-            cboBehaviours.setModel(new DefaultComboBoxModel(model.getBehaviours().toArray()));
+            cboModel = new DefaultComboBoxModel(model.getBehaviours().toArray());
+            cboBehaviours.setModel(cboModel);
         }
     }
 
     private void selectBehaviour(Behaviour b) {
         cboBehaviours.setSelectedItem(b);
         spnFPS.setValue(b.getFPS());
-
     }
 
     public void addBehaviourListener(ItemListener il) {
