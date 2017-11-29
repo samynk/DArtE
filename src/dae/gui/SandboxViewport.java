@@ -44,7 +44,10 @@ import com.jme3.scene.debug.WireBox;
 import com.jme3.shadow.AbstractShadowRenderer;
 import dae.DAECamAppState;
 import dae.GlobalObjects;
+import dae.animation.rig.Rig;
 import dae.animation.rig.io.RigLoader;
+import dae.animation.rig.timing.Behaviour;
+import dae.animation.rig.timing.TimeLine;
 import dae.components.ComponentType;
 import dae.components.MeshComponent;
 import dae.components.PrefabComponent;
@@ -79,6 +82,8 @@ import dae.prefabs.standard.MeshObject;
 import dae.prefabs.types.ObjectType;
 import dae.prefabs.types.ObjectTypeCategory;
 import dae.prefabs.ui.classpath.FileNode;
+import dae.prefabs.ui.events.AnimationEvent;
+import dae.prefabs.ui.events.AnimationEventType;
 import dae.prefabs.ui.events.AssetEvent;
 import dae.prefabs.ui.events.AssetEventType;
 import dae.prefabs.ui.events.ComponentEvent;
@@ -97,6 +102,7 @@ import dae.prefabs.ui.events.SelectionEvent;
 import dae.prefabs.ui.events.ShadowEvent;
 import dae.prefabs.ui.events.ViewportReshapeEvent;
 import dae.prefabs.ui.events.ZoomEvent;
+import dae.project.AssetLevel;
 import dae.project.Layer;
 import dae.project.Project;
 import dae.project.ProjectTreeNode;
@@ -164,19 +170,19 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
     /**
      * Code that has to be executed on the JMonkey thread.
      */
-    private final ArrayList<Runnable> viewportTasks = new ArrayList<Runnable>();
+    private final ArrayList<Runnable> viewportTasks = new ArrayList<>();
     /**
      * Selection from other thread (such as user interface).
      */
-    private final ArrayList<Node> selectionFromOutside = new ArrayList<Node>();
+    private final ArrayList<Node> selectionFromOutside = new ArrayList<>();
     /**
      * Copy and cut buffer
      */
-    private final ArrayList<Node> copyBuffer = new ArrayList<Node>();
+    private final ArrayList<Node> copyBuffer = new ArrayList<>();
     /**
      * shows the selected object.
      */
-    private WireBox wireBox = new WireBox();
+    private final WireBox wireBox = new WireBox();
     private Geometry wireBoxGeometry;
     private Material wireBoxMaterial;
     /**
@@ -366,7 +372,6 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
         inputManager.addMapping("COPY_LASTOBJECT", new KeyTrigger(KeyInput.KEY_F1));
         inputManager.addMapping("CREATE_ANIMATION_KEY", new KeyTrigger(KeyInput.KEY_F11));
         inputManager.addMapping("DELETE_ANIMATION_KEY", new KeyTrigger(KeyInput.KEY_F12));
-        
 
         inputManager.addMapping("DOBRUSH", new KeyTrigger(KeyInput.KEY_LSHIFT), new KeyTrigger(KeyInput.KEY_RSHIFT));
 
@@ -379,22 +384,39 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
         inputManager.addListener(analogListener, new String[]{"ACCEPT_INSERTION", "SELECT_OBJECT", "REJECT_INSERTION", "DELETE_SELECTION", "ROTATION_UP", "ROTATION_DOWN"});
         inputManager.addListener(actionListener, new String[]{"CHANGE_PIVOT", "COPY_LASTOBJECT"});
         inputManager.addListener(undoRedoListener, new String[]{"UNDO", "REDO"});
-        inputManager.addListener(animationListener,new String[]{"CREATE_ANIMATION_KEY","DELETE_ANIMATION_KEY"});
+        inputManager.addListener(animationListener, new String[]{"CREATE_ANIMATION_KEY", "DELETE_ANIMATION_KEY"});
 
         inputManager.addRawInputListener(this);
     }
-    
-    private final ActionListener animationListener = new ActionListener(){
+
+    private final ActionListener animationListener = new ActionListener() {
         @Override
         public void onAction(String name, boolean isPressed, float tpf) {
-            if (name.startsWith("CREATE")){
-                
-            }else if (name.startsWith("DELETE")){
-                
+            if (!isPressed) {
+                if (name.startsWith("CREATE")) {
+                    if (level instanceof AssetLevel) {
+                        // search the rig.
+                        List<Rig> rigs = level.descendantMatches(Rig.class);
+                        if (rigs.size() > 0) {
+                            Rig r = rigs.get(0);
+                            for (Node n : getSelection()) {
+                                Behaviour current = r.getCurrentBehaviour();
+                                if (current != null) {
+                                    TimeLine tl = current.getTimeLine(n);
+                                    tl.addRotation(current.getCurrentFrame(), n.getLocalRotation());
+                                }
+                            }
+                            GlobalObjects.getInstance().postEvent(new AnimationEvent(r, AnimationEventType.CREATE));
+                        }
+                    }
+                } else if (name.startsWith("DELETE")) {
+                    System.out.println("deleting the animation key");
+
+                }
             }
         }
     };
-            
+
     private final ActionListener undoRedoListener = new ActionListener() {
         @Override
         public void onAction(String name, boolean keyPressed, float tpf) {
