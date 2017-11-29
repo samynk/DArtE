@@ -3,27 +3,33 @@
  */
 package dae.animation.rig.timing.gui;
 
+import com.jme3.scene.Spatial;
 import dae.animation.rig.timing.Behaviour;
 import dae.animation.rig.timing.TimeLine;
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
+import java.awt.color.ColorSpace;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 /**
  *
  * @author Koen.Samyn
  */
-public class FramePanel extends javax.swing.JPanel {
+public class FramePanel extends javax.swing.JPanel implements MouseListener {
 
     private Behaviour model;
     private float scale;
     private int marginBottom = 10;
     private int marginTop = 20;
 
-    private Stroke thickStroke = new BasicStroke(2.0f);
-    private Stroke thinStroke = new BasicStroke(1.0f);
+    private final Stroke thickStroke = new BasicStroke(2.0f);
+    private final Stroke thinStroke = new BasicStroke(1.0f);
+    private Color selectionColor = new Color(245, 194, 20, 127);
 
     private final BasicStroke thinDashStroke
             = new BasicStroke(1.0f,
@@ -34,12 +40,24 @@ public class FramePanel extends javax.swing.JPanel {
      * The minimum frames to show.
      */
     private int minVisibleFrames = 20;
+    /**
+     * The amount of pixels used for the labels.
+     */
+    private int labelWidth = 0;
+    /**
+     * The current tool to use.
+     */
+    private TimingTool currentTool;
+    private final SelectTool selectTool;
 
     /**
      * Creates new form FramePanel
      */
     public FramePanel() {
         initComponents();
+        selectTool = new SelectTool(this);
+        currentTool = selectTool;
+        addMouseListener(this);
     }
 
     /**
@@ -68,6 +86,17 @@ public class FramePanel extends javax.swing.JPanel {
         repaint();
     }
 
+    public Behaviour getBehaviour() {
+        return model;
+    }
+
+    public int mouseXToFrame(int x) {
+        int maxFrameNumber = Math.max(this.minVisibleFrames, model.getMaxFrameNumber());
+        float cellWidth = getWidth() * 1.0f / maxFrameNumber;
+        int frame = (int) ((x - labelWidth) / cellWidth);
+        return frame;
+    }
+
     /**
      * Paints the timeline.
      *
@@ -87,11 +116,26 @@ public class FramePanel extends javax.swing.JPanel {
         float cellWidth = width * 1.0f / maxFrameNumber;
 
         int numTimeLines = model.getNumberOfTimeLines();
-        float cellHeight = height * 1.0f / numTimeLines;
+        float cellHeight = (height - marginTop - marginBottom) * 1.0f / numTimeLines;
+
+        labelWidth = 0;
+        int y = marginTop;
+        for (TimeLine tl : model.getTimeLines()) {
+            Spatial target = tl.getTarget();
+            String label = target.getName();
+            FontMetrics fm = g2d.getFontMetrics();
+            int currentWidth = fm.stringWidth(label);
+
+            labelWidth = currentWidth > labelWidth ? currentWidth : labelWidth;
+            
+            g.drawString(label, 2, y + fm.getAscent());
+            y+=cellHeight;
+        }
+        labelWidth +=4;
 
         for (int frame = 0; frame < maxFrameNumber; frame++) {
             int currentTimeLine = 0;
-            int x = (int) (frame * cellWidth);
+            int x = (int) (frame * cellWidth) + labelWidth;
             if (frame % 5 == 0) {
                 g2d.setStroke(thickStroke);
                 g2d.drawString(Integer.toString(frame), x, 10);
@@ -103,12 +147,12 @@ public class FramePanel extends javax.swing.JPanel {
             for (TimeLine tl : model.getTimeLines()) {
 
                 if (tl.containsKey(frame)) {
-                    int y = currentTimeLine * (int) cellHeight;
-                    g2d.setPaint(Color.ORANGE);
-                    g2d.fillRect(x, y, (int) cellWidth, (int) cellHeight);
+                    y = currentTimeLine * (int) cellHeight + marginTop;
+                    g2d.setPaint(Color.PINK);
+                    g2d.fillRect(x , y, (int) cellWidth - 1, (int) cellHeight);
 
                     g2d.setPaint(Color.BLACK);
-                    g2d.drawRect(x, y, (int) cellWidth, (int) cellHeight);
+                    g2d.drawRect(x , y, (int) cellWidth - 1, (int) cellHeight);
 
                 }
                 currentTimeLine++;
@@ -116,14 +160,39 @@ public class FramePanel extends javax.swing.JPanel {
         }
 
         // currentFrame
-        int x = (int) (model.getCurrentFrame() * cellWidth);
+        int x = (int) (model.getCurrentFrame() * cellWidth)+ labelWidth;
         g2d.setStroke(thickStroke);
 
-        g2d.setPaint(Color.ORANGE);
-        g2d.fillRect(x, 0, (int) cellWidth, (int) height);
+        g2d.setPaint(selectionColor);
+        g2d.fillRect(x + 1, marginTop, (int) cellWidth - 1, (int) (height - marginBottom - marginTop));
 
         g2d.setPaint(Color.BLACK);
-        g2d.drawRect(x, 0, (int) cellWidth, (int) height);
+        g2d.drawRect(x + 1, marginTop, (int) cellWidth - 1, (int) (height - marginBottom - marginTop));
+
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        currentTool.mouseClicked(e);
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+        currentTool.mousePressed(e);
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        currentTool.mouseReleased(e);
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
 
     }
 
