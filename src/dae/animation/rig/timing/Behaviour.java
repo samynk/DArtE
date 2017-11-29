@@ -3,7 +3,10 @@
  */
 package dae.animation.rig.timing;
 
+import com.jme3.scene.Spatial;
+import dae.animation.rig.Rig;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * A behaviour animates a set of targets that establish an animation in the
@@ -16,13 +19,27 @@ public class Behaviour {
     private final String name;
     private int fps;
     private final ArrayList<TimeLine> timeLines = new ArrayList<>();
+    private final HashMap<Spatial, TimeLine> timeLineMap = new HashMap<>();
 
     private int currentFrame = 0;
     private boolean isPlaying = false;
+    private float currentTime = 0;
 
     public Behaviour(String name, int fps) {
         this.name = name;
         this.fps = fps;
+    }
+    
+    public void cloneForRig(Rig rig) {
+        Behaviour copy = new Behaviour(name,fps);
+        for(TimeLine tl: this.timeLines){
+            String targetName = tl.getTarget().getName();
+            Spatial target = rig.getChild(targetName);
+            TimeLine copytl = new TimeLine(target);
+            copytl.addAllKeys(tl);
+            copy.addTimeLine(copytl);
+        }
+        rig.addBehaviour(copy);
     }
 
     /**
@@ -49,6 +66,31 @@ public class Behaviour {
     public void setCurrentFrame(int currentFrame){
         this.currentFrame = currentFrame;
     }
+    
+    /**
+     * Return the current animation time for this behaviour.
+     * @return the current animation time.
+     */
+    public float getCurrentTime(){
+        return currentTime;
+    }
+    
+    /**
+     * Adds an amount of time to the current time.
+     * @param time the amount to add.
+     */
+    public void addTime(float time){
+        currentTime += time;
+    }
+    
+    /**
+     * Returns the current frame as a float. This can be used to interpolate between frames.
+     * @return the current frame as a float.
+     */
+    public float getCurrentPlayFrame(){
+        float frame = (currentTime / fps) % getMaxFrameNumber() ;
+        return frame;
+    }
 
     /**
      * Add a timeLine object to the list of timelines.
@@ -57,6 +99,7 @@ public class Behaviour {
      */
     public void addTimeLine(TimeLine timeLine) {
         timeLines.add(timeLine);
+        timeLineMap.put(timeLine.getTarget(), timeLine);
     }
 
     /**
@@ -66,6 +109,15 @@ public class Behaviour {
      */
     public Iterable<TimeLine> getTimeLines() {
         return timeLines;
+    }
+    
+    public TimeLine getTimeLine(Spatial n) {
+        TimeLine tl = timeLineMap.get(n);
+        if ( tl == null ){
+            tl = new TimeLine(n);
+            addTimeLine(tl);
+        }
+        return tl;
     }
 
     /**
@@ -90,8 +142,16 @@ public class Behaviour {
      * Play the behaviour
      */
     public void play() {
-        currentFrame = 0;
+        currentTime = 0;
         isPlaying = true;
+    }
+    
+    /**
+     * Check if the behaviour is playing or not.
+     * @return 
+     */
+    public boolean isPlaying() {
+        return isPlaying;
     }
 
     /**
@@ -102,5 +162,7 @@ public class Behaviour {
     @Override
     public String toString() {
         return name;
-    }
+    } 
+
+    
 }
