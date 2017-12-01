@@ -54,10 +54,10 @@ public class TimeLine {
                 rotationFrames.add(null);
             }
         }
-        
+
         rotationFrames.set(frame, copy);
     }
-    
+
     public Quaternion getRotation(int f) {
         return rotationFrames.get(f);
     }
@@ -131,5 +131,10 @@ public class TimeLine {
         rotationFrames.addAll(tl.rotationFrames);
     }
 
+    public void removeRotation(int currentFrame) {
+        if (currentFrame < rotationFrames.size()) {
+            rotationFrames.set(currentFrame, null);
+        }
+    }
 
 }
