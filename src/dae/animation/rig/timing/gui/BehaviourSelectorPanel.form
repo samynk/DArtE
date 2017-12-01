@@ -23,10 +23,11 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" attributes="0">
+          <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="separator" max="32767" attributes="0"/>
+              <Group type="103" groupAlignment="1" attributes="0">
+                  <Component id="jSeparator1" max="32767" attributes="0"/>
+                  <Component id="separator" alignment="0" max="32767" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="lblNumberOfFrames" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
@@ -48,6 +49,11 @@
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
+          <Group type="102" alignment="0" attributes="0">
+              <EmptySpace min="-2" pref="117" max="-2" attributes="0"/>
+              <Component id="btnPlayPause" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
+          </Group>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
@@ -65,7 +71,11 @@
                   <Component id="spnFrameNumbers" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="lblNumberOfFrames" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="jSeparator1" min="-2" pref="10" max="-2" attributes="0"/>
               <EmptySpace max="32767" attributes="0"/>
+              <Component id="btnPlayPause" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Component id="separator" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
@@ -117,6 +127,21 @@
       </Events>
     </Component>
     <Component class="javax.swing.JSeparator" name="separator">
+    </Component>
+    <Component class="javax.swing.JToggleButton" name="btnPlayPause">
+      <Properties>
+        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+          <Image iconType="3" name="/dae/icons/miniplayer/control_play_blue.png"/>
+        </Property>
+        <Property name="selectedIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+          <Image iconType="3" name="/dae/icons/miniplayer/control_pause_blue.png"/>
+        </Property>
+      </Properties>
+      <Events>
+        <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="btnPlayPauseItemStateChanged"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JSeparator" name="jSeparator1">
     </Component>
   </SubComponents>
 </Form>

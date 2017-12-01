@@ -66,6 +66,8 @@ public class BehaviourSelectorPanel extends javax.swing.JPanel {
         txtBehaviourName = new dae.gui.components.AlphaNumericTextField();
         btnAddBehaviour = new javax.swing.JButton();
         separator = new javax.swing.JSeparator();
+        btnPlayPause = new javax.swing.JToggleButton();
+        jSeparator1 = new javax.swing.JSeparator();
 
         jTextField1.setText("jTextField1");
 
@@ -88,30 +90,43 @@ public class BehaviourSelectorPanel extends javax.swing.JPanel {
             }
         });
 
+        btnPlayPause.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dae/icons/miniplayer/control_play_blue.png"))); // NOI18N
+        btnPlayPause.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/dae/icons/miniplayer/control_pause_blue.png"))); // NOI18N
+        btnPlayPause.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                btnPlayPauseItemStateChanged(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(separator)
-                    .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jSeparator1)
+                    .addComponent(separator, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addComponent(lblNumberOfFrames)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(spnFrameNumbers))
-                    .addGroup(layout.createSequentialGroup()
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addComponent(lblFPS)
                         .addGap(43, 43, 43)
                         .addComponent(spnFPS))
-                    .addComponent(cboBehaviours, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
+                    .addComponent(cboBehaviours, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addComponent(lblNewBehaviour)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(txtBehaviourName, javax.swing.GroupLayout.DEFAULT_SIZE, 112, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnAddBehaviour)))
                 .addContainerGap())
+            .addGroup(layout.createSequentialGroup()
+                .addGap(117, 117, 117)
+                .addComponent(btnPlayPause)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -126,7 +141,11 @@ public class BehaviourSelectorPanel extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(spnFrameNumbers, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblNumberOfFrames))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btnPlayPause)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(separator, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -154,10 +173,23 @@ public class BehaviourSelectorPanel extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_cboBehavioursItemStateChanged
 
+    private void btnPlayPauseItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_btnPlayPauseItemStateChanged
+        Behaviour b = (Behaviour) cboBehaviours.getSelectedItem();
+        if (b != null) {
+            if (evt.getStateChange() == ItemEvent.SELECTED) {
+                b.play();
+            }else if(evt.getStateChange() == ItemEvent.DESELECTED){
+                b.pause();
+            }
+        }
+    }//GEN-LAST:event_btnPlayPauseItemStateChanged
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAddBehaviour;
+    private javax.swing.JToggleButton btnPlayPause;
     private javax.swing.JComboBox<Behaviour> cboBehaviours;
+    private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JLabel lblFPS;
     private javax.swing.JLabel lblNewBehaviour;
