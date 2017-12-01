@@ -411,7 +411,20 @@ public class SandboxViewport extends SimpleApplication implements RawInputListen
                     }
                 } else if (name.startsWith("DELETE")) {
                     System.out.println("deleting the animation key");
-
+                    if (level instanceof AssetLevel){
+                        List<Rig> rigs = level.descendantMatches(Rig.class);
+                        if (rigs.size() > 0) {
+                            Rig r = rigs.get(0);
+                            for (Node n : getSelection()) {
+                                Behaviour current = r.getCurrentBehaviour();
+                                if (current != null) {
+                                    TimeLine tl = current.getTimeLine(n);
+                                    tl.removeRotation(current.getCurrentFrame());
+                                }
+                            }
+                            GlobalObjects.getInstance().postEvent(new AnimationEvent(r, AnimationEventType.CREATE));
+                        }
+                    }
                 }
             }
         }
