@@ -12,7 +12,6 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
-import java.awt.color.ColorSpace;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
@@ -49,6 +48,11 @@ public class FramePanel extends javax.swing.JPanel implements MouseListener {
      */
     private TimingTool currentTool;
     private final SelectTool selectTool;
+    /**
+     * The currently selected timeline.
+     */
+    private TimeLine currentTimeLine;
+    private int currentTimeLineIndex = -1;
 
     /**
      * Creates new form FramePanel
@@ -97,6 +101,29 @@ public class FramePanel extends javax.swing.JPanel implements MouseListener {
         return frame;
     }
 
+    public int mouseYToTimeLine(int y) {
+        if (y - marginTop < 0) {
+            return -1;
+        } else {
+            return (int) ((y - marginTop) / getCellHeight());
+        }
+    }
+
+    void setCurrentTimeLine(int timeLineIndex) {
+        currentTimeLineIndex = timeLineIndex;
+        currentTimeLine = model.getTimeLine(currentTimeLineIndex);
+        if (currentTimeLine == null) {
+            currentTimeLineIndex = -1;
+        }
+    }
+
+    public float getCellHeight() {
+        int height = this.getHeight();
+        int numTimeLines = model.getNumberOfTimeLines();
+        float cellHeight = (height - marginTop - marginBottom) * 1.0f / numTimeLines;
+        return cellHeight;
+    }
+
     /**
      * Paints the timeline.
      *
@@ -115,8 +142,7 @@ public class FramePanel extends javax.swing.JPanel implements MouseListener {
         int maxFrameNumber = Math.max(this.minVisibleFrames, model.getMaxFrameNumber());
         float cellWidth = width * 1.0f / maxFrameNumber;
 
-        int numTimeLines = model.getNumberOfTimeLines();
-        float cellHeight = (height - marginTop - marginBottom) * 1.0f / numTimeLines;
+        float cellHeight = getCellHeight();
 
         labelWidth = 0;
         int y = marginTop;
@@ -127,14 +153,14 @@ public class FramePanel extends javax.swing.JPanel implements MouseListener {
             int currentWidth = fm.stringWidth(label);
 
             labelWidth = currentWidth > labelWidth ? currentWidth : labelWidth;
-            
+
             g.drawString(label, 2, y + fm.getAscent());
-            y+=cellHeight;
+            y += cellHeight;
         }
-        labelWidth +=4;
+        labelWidth += 4;
 
         for (int frame = 0; frame < maxFrameNumber; frame++) {
-            int currentTimeLine = 0;
+            int iCurrentTimeLine = 0;
             int x = (int) (frame * cellWidth) + labelWidth;
             if (frame % 5 == 0) {
                 g2d.setStroke(thickStroke);
@@ -147,28 +173,36 @@ public class FramePanel extends javax.swing.JPanel implements MouseListener {
             for (TimeLine tl : model.getTimeLines()) {
 
                 if (tl.containsKey(frame)) {
-                    y = currentTimeLine * (int) cellHeight + marginTop;
+                    y = iCurrentTimeLine * (int) cellHeight + marginTop;
                     g2d.setPaint(Color.PINK);
-                    g2d.fillRect(x , y, (int) cellWidth - 1, (int) cellHeight);
+                    g2d.fillRect(x, y, (int) cellWidth - 1, (int) cellHeight);
 
                     g2d.setPaint(Color.BLACK);
-                    g2d.drawRect(x , y, (int) cellWidth - 1, (int) cellHeight);
+                    g2d.drawRect(x, y, (int) cellWidth - 1, (int) cellHeight);
 
                 }
-                currentTimeLine++;
+                iCurrentTimeLine++;
             }
         }
 
         // currentFrame
-        int x = (int) (model.getCurrentFrame() * cellWidth)+ labelWidth;
+        int x = (int) (model.getCurrentFrame() * cellWidth) + labelWidth;
         g2d.setStroke(thickStroke);
 
-        g2d.setPaint(selectionColor);
-        g2d.fillRect(x + 1, marginTop, (int) cellWidth - 1, (int) (height - marginBottom - marginTop));
+        if (currentTimeLineIndex == -1) {
+            g2d.setPaint(selectionColor);
+            g2d.fillRect(x + 1, marginTop, (int) cellWidth - 1, (int) (height - marginBottom - marginTop));
 
-        g2d.setPaint(Color.BLACK);
-        g2d.drawRect(x + 1, marginTop, (int) cellWidth - 1, (int) (height - marginBottom - marginTop));
+            g2d.setPaint(Color.BLACK);
+            g2d.drawRect(x + 1, marginTop, (int) cellWidth - 1, (int) (height - marginBottom - marginTop));
+        } else {
+            int yBase = marginTop + (int) (currentTimeLineIndex * cellHeight);
+            g2d.setPaint(selectionColor);
+            g2d.fillRect(x + 1, yBase, (int) cellWidth - 1, (int) (cellHeight));
 
+            g2d.setPaint(Color.BLACK);
+            g2d.drawRect(x + 1, yBase, (int) cellWidth - 1, (int) (cellHeight));
+        }
     }
 
     @Override
