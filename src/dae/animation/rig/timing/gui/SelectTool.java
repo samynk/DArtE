@@ -22,6 +22,8 @@ public class SelectTool implements TimingTool{
         Behaviour current = parent.getBehaviour();
         if ( current != null ){
             current.setCurrentFrame(parent.mouseXToFrame(e.getX()));
+            int timeLineIndex = parent.mouseYToTimeLine(e.getY());
+            parent.setCurrentTimeLine(timeLineIndex);
             parent.repaint();
         }
     }
