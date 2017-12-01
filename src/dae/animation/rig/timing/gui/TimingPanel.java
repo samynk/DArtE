@@ -1,5 +1,15 @@
 /*
  * Digital Arts and Entertainment 
+
+* TODO : Keys verschuiven
+* TODO : interpolatie manipuleren --> linear 
+* TODO : filmpkes maken
+* TODO : automatic keymaker
+* TODO : multiple selections en verschuiven.
+* TODO : shift verschuiven : kopieren.
+* TODO : facials controls --> nog niet echt nodig voor robot.
+* TODO : blink + look to upper-right and come back.
+* TODO : timeline scaling --> 
  */
 package dae.animation.rig.timing.gui;
 
