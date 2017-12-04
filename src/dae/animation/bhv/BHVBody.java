@@ -16,8 +16,8 @@ public class BHVBody extends Node implements BodyElement {
     private int currentFrame = 0;
     private float currentFrameTime = 0;
     private float totalAnimTime = 0;
-    private ArrayList<RotationJoint> rotationJoints =
-            new ArrayList<RotationJoint>();
+    private final ArrayList<RotationJoint> rotationJoints =
+            new ArrayList<>();
 
     public BHVBody() {
     }
@@ -38,6 +38,7 @@ public class BHVBody extends Node implements BodyElement {
         rotationJoints.add(rj);
     }
 
+    @Override
     public void reset() {
     }
 
