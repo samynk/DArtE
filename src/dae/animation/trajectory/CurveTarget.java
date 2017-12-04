@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package dae.animation.trajectory;
 
 import com.jme3.math.Quaternion;
@@ -17,15 +12,15 @@ public class CurveTarget {
     /**
      * The name of the target
      */
-    private String name;
+    private final String name;
     /**
      * The translation of the target.
      */
-    private Vector3f translation;
+    private final Vector3f translation;
     /**
      * The rotation of the target.
      */
-    private Quaternion rotation;
+    private final Quaternion rotation;
     
     
     public CurveTarget(String name, Vector3f translation, Quaternion rotation)

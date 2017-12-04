@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.animation.trajectory;
 
 import com.jme3.asset.AssetInfo;
@@ -32,6 +28,7 @@ public class FootStepLoader implements AssetLoader {
     private Material leftFootMaterial;
     private Material rightFootMaterial;
 
+    @Override
     public Object load(AssetInfo assetInfo) throws IOException {
         try {
             FootSteps steps = new FootSteps();
@@ -99,9 +96,7 @@ public class FootStepLoader implements AssetLoader {
             }
 
             return steps;
-        } catch (ParserConfigurationException ex) {
-            Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
-        } catch (SAXException ex) {
+        } catch (ParserConfigurationException | SAXException ex) {
             Logger.getLogger("DArtE").log(Level.SEVERE, null, ex);
         }
         return null;

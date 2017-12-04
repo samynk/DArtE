@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.animation.trajectory;
 
 import java.util.ArrayList;
@@ -14,8 +10,8 @@ import java.util.ArrayList;
  */
 public class CurveChannel {
 
-    private String attachmentPointName;
-    private ArrayList<CurveTarget> curveTargets = new ArrayList<CurveTarget>();
+    private final String attachmentPointName;
+    private final ArrayList<CurveTarget> curveTargets = new ArrayList<>();
     private int currentTarget = 0;
 
     /**
@@ -68,6 +64,7 @@ public class CurveChannel {
 
     /**
      * Get the current target in the list.
+     * @return the current target.
      */
     public CurveTarget getCurrentTarget() {
         return curveTargets.get(currentTarget);

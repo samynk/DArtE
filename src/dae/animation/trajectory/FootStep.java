@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.animation.trajectory;
 
 import com.jme3.material.Material;
@@ -19,7 +15,7 @@ import com.jme3.scene.shape.Box;
  */
 public class FootStep extends Node {
 
-    private Vector3f location;
+    private final Vector3f location;
     private Vector3f direction;
     private static Vector3f normalDirAxis = new Vector3f(1, 0, 0);
     private String type;

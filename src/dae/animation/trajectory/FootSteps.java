@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dae.animation.trajectory;
 
 import com.jme3.material.Material;
@@ -16,7 +12,7 @@ import java.util.ArrayList;
 public class FootSteps extends Node {
 
     private Vector3f startLoc;
-    private ArrayList<FootStep> footSteps = new ArrayList<FootStep>();
+    private final ArrayList<FootStep> footSteps = new ArrayList<>();
     private int currentIndex = 0;
 
     public FootSteps() {

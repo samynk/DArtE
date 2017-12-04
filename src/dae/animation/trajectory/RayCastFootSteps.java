@@ -20,13 +20,13 @@ import dae.animation.rig.Rig;
 public class RayCastFootSteps {
     // the body to do the raycasting for.
 
-    private Rig body;
+    private final Rig body;
     // the first foot to start with.
-    private String type = "right";
+    private final String type = "right";
     // the node to do the ray casting from
-    private Node rootNode;
+    private final Node rootNode;
     private FootStep current;
-    private CollisionResults results = new CollisionResults();
+    private final CollisionResults results = new CollisionResults();
     public Material leftFootMaterial;
     public Material rightFootMaterial;
 
@@ -66,8 +66,8 @@ public class RayCastFootSteps {
         sagVector.normalizeLocal();
 
         // start ray casting from current support foot
-        Vector3f currentSupport = null;
-        Material material = null;
+        Vector3f currentSupport ;
+        Material material ;
         if ("right".equals(type)) {
             currentSupport = body.getChild("leftFootJointX").getWorldTranslation();
             material = rightFootMaterial;

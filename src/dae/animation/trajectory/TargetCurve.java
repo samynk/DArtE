@@ -84,6 +84,7 @@ public class TargetCurve extends Prefab implements TransformListener{
     /**
      * Gets the correct curve channel.
      * @param name the name of the channel.
+     * @return the CurveChannel object.
      */
     public CurveChannel getCurveChannel(String name){
         return channelMap.get(name);
@@ -96,7 +97,7 @@ public class TargetCurve extends Prefab implements TransformListener{
      *
      * @param channel the channel object to add.
      */
-    public void addCurveChannel(CurveChannel channel) {
+    public final void addCurveChannel(CurveChannel channel) {
         channels.add(channel);
         channelMap.put(channel.getAttachmentPointName(),channel);
     }
